@@ -34,5 +34,17 @@ namespace GoogleDriveHttprequest.Oauth
         {
             if (flag) this.Close();
         }
+
+        private void InitializeComponent()
+        {
+            this.SuspendLayout();
+            // 
+            // OauthFormGoogleDrive
+            // 
+            this.ClientSize = new System.Drawing.Size(338, 283);
+            this.Name = "OauthFormGoogleDrive";
+            this.ResumeLayout(false);
+
+        }
     }
 }

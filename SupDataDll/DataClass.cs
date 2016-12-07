@@ -119,6 +119,11 @@ namespace SupDataDll
 
     public class UD_data_WPF : ITreeModel
     {
+        public event EventHandler<TreeModelEventArgs> NodesChanged;
+        public event EventHandler<TreeModelEventArgs> NodesInserted;
+        public event EventHandler<TreeModelEventArgs> NodesRemoved;
+        public event EventHandler<TreePathEventArgs> StructureChanged;
+
         List<UD_group_work> ud_groups = new List<UD_group_work>();
 
         public UD_data_WPF(UD_group_work group)
@@ -159,6 +164,16 @@ namespace SupDataDll
         public bool HasChildren(object parent)
         {
             return parent is UD_group_work;
+        }
+
+        public IEnumerable GetChildren(TreePath treePath)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsLeaf(TreePath treePath)
+        {
+            throw new NotImplementedException();
         }
     }
 

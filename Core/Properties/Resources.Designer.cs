@@ -64,18 +64,17 @@ namespace Core.Properties {
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
         ///&lt;Configuration&gt;
         ///  &lt;LANG&gt;
+        ///    &lt;KEY NAME=&quot;BT_save&quot; VALUE=&quot;Save&quot; /&gt;
+        ///    &lt;KEY NAME=&quot;BT_close&quot; VALUE=&quot;Close&quot; /&gt;
+        ///    &lt;KEY NAME=&quot;BT_cancel&quot; VALUE=&quot;Cancel&quot; /&gt;
+        ///    &lt;KEY NAME=&quot;BT_create&quot; VALUE=&quot;Create&quot; /&gt;
+        ///    &lt;KEY NAME=&quot;BT_yes&quot; VALUE=&quot;Yes&quot; /&gt;
+        ///    &lt;!-- Login form --&gt;
         ///    &lt;KEY NAME=&quot;Form_Text&quot; VALUE=&quot;Login&quot; /&gt;
         ///    &lt;KEY NAME=&quot;LB_User&quot; VALUE=&quot;User:&quot; /&gt;
         ///    &lt;KEY NAME=&quot;LB_pass&quot; VALUE=&quot;Pass:&quot; /&gt;
         ///    &lt;KEY NAME=&quot;BT_Login&quot; VALUE=&quot;Login&quot; /&gt;
-        ///    &lt;KEY NAME=&quot;BT_cancel&quot; VALUE=&quot;Cancel&quot; /&gt;
-        ///    &lt;KEY NAME=&quot;CB_autologin&quot; VALUE=&quot;Auto Login&quot; /&gt;
-        ///    &lt;KEY NAME=&quot;&quot; VALUE=&quot;&quot; /&gt;
-        ///    &lt;KEY NAME=&quot;&quot; VALUE=&quot;&quot; /&gt;
-        ///    &lt;KEY NAME=&quot;&quot; VALUE=&quot;&quot; /&gt;
-        ///    &lt;KEY NAME=&quot;&quot; VALUE=&quot;&quot; /&gt;
-        ///    &lt;KEY NAME=&quot;&quot; VALUE=&quot;&quot; /&gt;
-        ///    &lt;KEY NAME=&quot;&quot; VALUE=&quot;&quot;  [rest of string was truncated]&quot;;.
+        ///    &lt;KEY NAME=&quot;CB_autologin&quot; VALUE= [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string eng {
             get {
@@ -107,14 +106,13 @@ namespace Core.Properties {
         ///    &lt;KEY NAME=&quot;Admin_user&quot; VALUE=&quot;admin&quot; /&gt;
         ///    &lt;KEY NAME=&quot;Admin_password&quot; VALUE =&quot;21232F297A57A5A743894A0E4A801FC3&quot; /&gt;
         ///    &lt;KEY NAME=&quot;AutoLogin&quot; VALUE=&quot;0&quot;/&gt;
-        ///    &lt;KEY NAME=&quot;UI_dll_file&quot; VALUE=&quot;main.UI.dll&quot;/&gt;
+        ///    &lt;KEY NAME=&quot;UI_dll_file&quot; VALUE=&quot;Form.UI.dll&quot;/&gt;
         ///    &lt;KEY NAME=&quot;lang&quot; VALUE=&quot;eng.xml&quot;/&gt;
         ///    &lt;KEY NAME=&quot;DATE_TIME_FORMAT&quot; VALUE=&quot;HH:mm dd/MM/yyyy&quot; /&gt;
-        ///    
-        ///    
-        ///    &lt;KEY NAME=&quot;mimeType_audio&quot; VALUE=&quot;&quot;/&gt;
-        ///    &lt;KEY NAME=&quot;mimeType_document&quot; VALUE=&quot;docx&quot;/&gt;
-        ///    &lt;KEY NAME=&quot;mimeTy [rest of string was truncated]&quot;;.
+        ///
+        ///    &lt;KEY NAME=&quot;AutoStartTransfer&quot; VALUE=&quot;1&quot;/&gt;
+        ///    &lt;KEY NAME=&quot;ShutdownWhenDone&quot; VALUE=&quot;0&quot;/&gt;
+        ///    &lt;KEY NAME=&quot;MaxGroupsDownloa [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string SettingDefault {
             get {
