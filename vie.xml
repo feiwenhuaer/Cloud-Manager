@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Configuration>
+  <LANG>
+    <KEY NAME="BT_save" VALUE="Lưu" />
+    <KEY NAME="BT_close" VALUE="Đóng" />
+    <KEY NAME="BT_cancel" VALUE="Hủy" />
+    <KEY NAME="BT_create" VALUE="Tạo" />
+    <KEY NAME="BT_yes" VALUE="Đòng ý" />
+    <!-- Login form -->
+    <KEY NAME="Form_Text" VALUE="Đăng nhập" />
+    <KEY NAME="LB_User" VALUE="User:" />
+    <KEY NAME="LB_pass" VALUE="Pass:" />
+    <KEY NAME="BT_Login" VALUE="Đăng nhập" />
+    <KEY NAME="CB_autologin" VALUE="Tự động đăng nhập" />
+    <!-- Mainform -->
+    <!-- Mainform > ToolStrip -->
+    <KEY NAME="ToolStrip_files" VALUE="Tệp" />
+    <KEY NAME="ToolStrip_cloud" VALUE="Đám mây" />
+    <KEY NAME="ToolStrip_settings" VALUE="Cài đặt" />
+    <KEY NAME="ToolStrip_settings_setting" VALUE="Cài đặt..." />
+    <KEY NAME="ToolStrip_files_exit" VALUE="Thoát" />
+    <KEY NAME="ToolStrip_cloud_add" VALUE="Thêm" />
+    <KEY NAME="ToolStrip_cloud_remove" VALUE="Gỡ bỏ" />
+    <!-- Mainform > UC_Lv_ud > Tabpage -->
+    <KEY NAME="TP_processing" VALUE="Tiến trình" />
+    <KEY NAME="TP_done" VALUE="Hoàn thành" />
+    <!-- Mainform > UC_Lv_ud > ToolsStripMenuItem -->
+    <KEY NAME="TSMI_ChangeStatus" VALUE="Thay đổi trạng thái" />
+    <KEY NAME="TSMI_numberOfParallelDownloads" VALUE="Số lượng tải đồng thời" />
+    <KEY NAME="TSMI_remove" VALUE="Gỡ bỏ" />
+    <KEY NAME="TSMI_start" VALUE="Bắt đầu" />
+    <KEY NAME="TSMI_stop" VALUE="Dừng lại" />
+    <KEY NAME="TSMI_wating" VALUE="Chờ" />
+    <KEY NAME="TSMI_error" VALUE="Lỗi" />
+    <KEY NAME="TSMI_forcestart" VALUE="Bắt đầu" />
+    <KEY NAME="TSMI_forcewaiting" VALUE="Bắt đầu chờ" />
+    <!-- Mainform > UC_Lv_ud > Header Listview -->
+    <KEY NAME="TLV_UD_Columns_0" VALUE="#" />
+    <KEY NAME="TLV_UD_Columns_1" VALUE="Từ" />
+    <KEY NAME="TLV_UD_Columns_2" VALUE="Đến" />
+    <KEY NAME="TLV_UD_Columns_3" VALUE="Trạng thái" />
+    <KEY NAME="TLV_UD_Columns_4" VALUE="Tiến trình" />
+    <KEY NAME="TLV_UD_Columns_5" VALUE="Tốc độ" />
+    <KEY NAME="TLV_UD_Columns_6" VALUE="Thời gian ước tính" />
+    <KEY NAME="TLV_UD_Columns_7" VALUE="Lỗi" />
+    <!-- Mainform > UC_LVitem-->
+    <KEY NAME="TB_path" VALUE="Đường dẫn:" />
+    <!-- Mainform > UC_LVitem > tabpage-->
+    <KEY NAME="newtab" VALUE="Thẻ mới" />
+    <KEY NAME="addtab" VALUE="Thêm thẻ mới" />
+    <KEY NAME="removetab" VALUE="Đóng thẻ này" />
+    <!-- Mainform > UC_LVitem > listview > column-->
+    <KEY NAME="LVitem_Columns_0" VALUE="Tên" />
+    <KEY NAME="LVitem_Columns_1" VALUE="Kiểu" />
+    <KEY NAME="LVitem_Columns_2" VALUE="Kích thước" />
+    <KEY NAME="LVitem_Columns_3" VALUE="Ngày chỉnh sửa" />
+    <KEY NAME="LVitem_Columns_4" VALUE="mimeType" />
+    <KEY NAME="LVitem_Columns_5" VALUE="ID" />
+    <!-- Mainform > UC_LVitem > listview > menu & Mainform > treeview menu-->
+    <KEY NAME="TSMI_refresh" VALUE="Làm mới" />
+    <KEY NAME="TSMI_open" VALUE="Mở" />
+    <KEY NAME="TSMI_cut" VALUE="Cắt" />
+    <KEY NAME="TSMI_copy" VALUE="Chép" />
+    <KEY NAME="TSMI_paste" VALUE="Dán" />
+    <KEY NAME="TSMI_rename" VALUE="Đổi tên" />
+    <KEY NAME="TSMI_delete" VALUE="Xóa" />
+    <KEY NAME="TSMI_createfolder" VALUE="Tạo thư mục mới" />
+    <KEY NAME="TSMI_copyid" VALUE="Chép ID vào clipboard" />
+    <KEY NAME="TSMI_downloadsellected" VALUE="Download các phần tử đã chọn" />
+    <KEY NAME="TSMI_uploadfolder" VALUE="Upload thư mục vào đây" />
+    <KEY NAME="TSMI_uploadfile" VALUE="Upload file vào đây" />
+    <!-- ClosingForm -->
+    <KEY NAME="CloseThread" VALUE="Đang đóng các threads" />
+    <KEY NAME="SaveData" VALUE="Lưu dữ liệu download" />
+    <!-- ChangeNumberItemDownload Form -->
+    <KEY NAME="ChangeNumberItemDownload" VALUE="Số lượng phần tử chạy cùng lúc" />
+    <!-- CreateFolderForm Form -->
+    <KEY NAME="CreateFolderForm_name" VALUE="Tên:" />
+    <!-- DeleteConfirmForm Form -->
+    <KEY NAME="DeleteConfirmForm_waning" VALUE="Bạn có muốn xóa không?" />
+    <KEY NAME="CB_pernament" VALUE="Xóa vĩnh viễn" />
+    <KEY NAME="DeleteConfirmForm_text" VALUE="Xác nhận xóa" />
+    <!-- DeleteForm -->
+    <KEY NAME="DeleteForm_text" VALUE="Đang xóa..." />
+    <KEY NAME="DeleteForm_CB_autoclose" VALUE="Thự động đóng bảng này" />
+    <KEY NAME="DeleteForm_updatetext_Deleting" VALUE="Đang xóa: " />
+    <KEY NAME="DeleteForm_updatetext_Deleted" VALUE=" ...Đã xóa." />
+    <KEY NAME="DeleteForm_updatetext_Error" VALUE=" ...Lỗi." />
+  </LANG>
+</Configuration>

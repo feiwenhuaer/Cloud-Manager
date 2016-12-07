@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Configuration>
+  <LANG>
+    <KEY NAME="BT_save" VALUE="Save" />
+    <KEY NAME="BT_close" VALUE="Close" />
+    <KEY NAME="BT_cancel" VALUE="Cancel" />
+    <KEY NAME="BT_create" VALUE="Create" />
+    <KEY NAME="BT_yes" VALUE="Yes" />
+    <!-- Login form -->
+    <KEY NAME="Form_Text" VALUE="Login" />
+    <KEY NAME="LB_User" VALUE="User:" />
+    <KEY NAME="LB_pass" VALUE="Pass:" />
+    <KEY NAME="BT_Login" VALUE="Login" />
+    <KEY NAME="CB_autologin" VALUE="Auto Login" />
+    <!-- Mainform -->
+    <!-- Mainform > ToolStrip -->
+    <KEY NAME="ToolStrip_files" VALUE="Files" />
+    <KEY NAME="ToolStrip_cloud" VALUE="Cloud" />
+    <KEY NAME="ToolStrip_settings" VALUE="Settings" />
+    <KEY NAME="ToolStrip_settings_setting" VALUE="Settings..." />
+    <KEY NAME="ToolStrip_files_exit" VALUE="Exit" />
+    <KEY NAME="ToolStrip_cloud_add" VALUE="Add" />
+    <KEY NAME="ToolStrip_cloud_remove" VALUE="Remove" />
+    <!-- Mainform > UC_Lv_ud > Tabpage -->
+    <KEY NAME="TP_processing" VALUE="Processing" />
+    <KEY NAME="TP_done" VALUE="Done" />
+    <!-- Mainform > UC_Lv_ud > ToolsStripMenuItem -->
+    <KEY NAME="TSMI_ChangeStatus" VALUE="Change Status" />
+    <KEY NAME="TSMI_numberOfParallelDownloads" VALUE="Number of parallel downloads" />
+    <KEY NAME="TSMI_remove" VALUE="Remove" />
+    <KEY NAME="TSMI_start" VALUE="Start" />
+    <KEY NAME="TSMI_stop" VALUE="Stop" />
+    <KEY NAME="TSMI_wating" VALUE="Wating" />
+    <KEY NAME="TSMI_error" VALUE="Error" />
+    <KEY NAME="TSMI_forcestart" VALUE="Force Start" />
+    <KEY NAME="TSMI_forcewaiting" VALUE="Force Waiting" />
+    <!-- Mainform > UC_Lv_ud > Header Listview -->
+    <KEY NAME="TLV_UD_Columns_0" VALUE="#" />
+    <KEY NAME="TLV_UD_Columns_1" VALUE="From" />
+    <KEY NAME="TLV_UD_Columns_2" VALUE="To" />
+    <KEY NAME="TLV_UD_Columns_3" VALUE="Status" />
+    <KEY NAME="TLV_UD_Columns_4" VALUE="Progress" />
+    <KEY NAME="TLV_UD_Columns_5" VALUE="Speed" />
+    <KEY NAME="TLV_UD_Columns_6" VALUE="Estimated" />
+    <KEY NAME="TLV_UD_Columns_7" VALUE="Error" />
+    <!-- Mainform > UC_LVitem-->
+    <KEY NAME="TB_path" VALUE="Path:" />
+    <!-- Mainform > UC_LVitem > tabpage-->
+    <KEY NAME="newtab" VALUE="New Tab" />
+    <KEY NAME="addtab" VALUE="Add New Tab" />
+    <KEY NAME="removetab" VALUE="Close This Tab" />
+    <!-- Mainform > UC_LVitem > listview > column-->
+    <KEY NAME="LVitem_Columns_0" VALUE="Name" />
+    <KEY NAME="LVitem_Columns_1" VALUE="Type" />
+    <KEY NAME="LVitem_Columns_2" VALUE="Size" />
+    <KEY NAME="LVitem_Columns_3" VALUE="Date modified" />
+    <KEY NAME="LVitem_Columns_4" VALUE="mimeType" />
+    <KEY NAME="LVitem_Columns_5" VALUE="ID" />
+    <!-- Mainform > UC_LVitem > listview > menu & Mainform > treeview menu-->
+    <KEY NAME="TSMI_refresh" VALUE="Refresh" />
+    <KEY NAME="TSMI_open" VALUE="Open" />
+    <KEY NAME="TSMI_cut" VALUE="Cut" />
+    <KEY NAME="TSMI_copy" VALUE="Copy" />
+    <KEY NAME="TSMI_paste" VALUE="Paste" />
+    <KEY NAME="TSMI_rename" VALUE="Rename" />
+    <KEY NAME="TSMI_delete" VALUE="Delete" />
+    <KEY NAME="TSMI_createfolder" VALUE="Create Folder" />
+    <KEY NAME="TSMI_copyid" VALUE="Copy ID To Clipboard" />
+    <KEY NAME="TSMI_downloadsellected" VALUE="Download Sellected Items" />
+    <KEY NAME="TSMI_uploadfolder" VALUE="Upload Folder To Here" />
+    <KEY NAME="TSMI_uploadfile" VALUE="Upload File To Here" />
+    <!-- ClosingForm -->
+    <KEY NAME="CloseThread" VALUE="Stopping all threads" />
+    <KEY NAME="SaveData" VALUE="Saving Data" />
+    <!-- ChangeNumberItemDownload Form -->
+    <KEY NAME="ChangeNumberItemDownload" VALUE="Number items work same time" />
+    <!-- CreateFolderForm Form -->
+    <KEY NAME="CreateFolderForm_name" VALUE="Name:" />
+    <!-- DeleteConfirmForm Form -->
+    <KEY NAME="DeleteConfirmForm_waning" VALUE="Are you sure you want to delete it?" />
+    <KEY NAME="CB_pernament" VALUE="Permanent Delete" />
+    <KEY NAME="DeleteConfirmForm_text" VALUE="Confirm Delete" />
+    <!-- DeleteForm -->
+    <KEY NAME="DeleteForm_text" VALUE="Deleting..." />
+    <KEY NAME="DeleteForm_CB_autoclose" VALUE="Auto Close" />
+    <KEY NAME="DeleteForm_updatetext_Deleting" VALUE="Deleting: " />
+    <KEY NAME="DeleteForm_updatetext_Deleted" VALUE=" ...deleted." />
+    <KEY NAME="DeleteForm_updatetext_Error" VALUE=" ...error." />
+  </LANG>
+</Configuration>

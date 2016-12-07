@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Configuration>
+  <SETTINGS>
+    <KEY NAME="Admin_user" VALUE="admin" />
+    <KEY NAME="Admin_password" VALUE ="21232F297A57A5A743894A0E4A801FC3" />
+    <KEY NAME="AutoLogin" VALUE="0"/>
+    <KEY NAME="UI_dll_file" VALUE="Form.UI.dll"/>
+    <KEY NAME="lang" VALUE="eng.xml"/>
+    <KEY NAME="DATE_TIME_FORMAT" VALUE="HH:mm dd/MM/yyyy" />
+
+    <KEY NAME="AutoStartTransfer" VALUE="1"/>
+    <KEY NAME="ShutdownWhenDone" VALUE="0"/>
+    <KEY NAME="MaxGroupsDownload" VALUE="2" />
+    <KEY NAME="MaxItemsInGroupDownload" VALUE="2" />
+    <KEY NAME="BufferSize" VALUE="32" />
+    <KEY NAME="GD_ChunksSize" VALUE="5" />
+    <KEY NAME="Dropbox_ChunksSize" VALUE="25" />
+    
+    
+    <KEY NAME="mimeType_audio" VALUE=""/>
+    <KEY NAME="mimeType_document" VALUE="docx"/>
+    <KEY NAME="mimeType_drawing" VALUE=""/>
+    <KEY NAME="mimeType_form" VALUE=""/>
+    <KEY NAME="mimeType_fusiontable" VALUE=""/>
+    <KEY NAME="mimeType_map" VALUE=""/>
+    <KEY NAME="mimeType_photo" VALUE=""/>
+    <KEY NAME="mimeType_presentation" VALUE=""/>
+    <KEY NAME="mimeType_script" VALUE=""/>
+    <KEY NAME="mimeType_sites" VALUE=""/>
+    <KEY NAME="mimeType_spreadsheet" VALUE="xlsx"/>
+    <KEY NAME="mimeType_unknown" VALUE=""/>
+    <KEY NAME="mimeType_video" VALUE=""/>
+    
+  </SETTINGS>
+  <UserAccount>
+  </UserAccount>
+</Configuration>
