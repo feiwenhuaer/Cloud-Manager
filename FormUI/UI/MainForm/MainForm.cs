@@ -8,6 +8,7 @@ using Etier.IconHelper;
 using SupDataDll;
 using System.Threading;
 using SupDataDll.UiInheritance;
+using FormUI.UI.SettingForm;
 
 namespace FormUI.UI.MainForm
 {

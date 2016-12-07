@@ -5,13 +5,12 @@ using System.Net;
 using System.IO;
 using Newtonsoft.Json;
 using CustomHttpRequest;
+using DropboxHttprequest;
 
 namespace DropboxHttpRequest
 {
     public class DropboxRequestAPIv2
     {
-        const string appkey = "sdxv9bvu37pjd5r";
-        const string appsecret = "xsfy8way52uuf1j";
         private string access_token;
         public string AccessToken { get { return access_token;} set { access_token = value; } }
         private string uid;
@@ -52,8 +51,8 @@ namespace DropboxHttpRequest
         {
             BuildURL build = new BuildURL("https://api.dropboxapi.com/1/oauth2/token");
             build.AddParameter("code", key_authorize);
-            build.AddParameter("client_id", appkey);
-            build.AddParameter("client_secret", appsecret);
+            build.AddParameter("client_id", Appkey.ApiKey);
+            build.AddParameter("client_secret", Appkey.ApiSecret);
             build.AddParameter("grant_type", "authorization_code");
             if(port != -1) build.AddParameter("redirect_uri", string.Format("http%3A%2F%2Flocalhost%3A{0}",port.ToString()));
             HttpRequest_ rq = new HttpRequest_(build.Url,TypeRequest.POST.ToString());

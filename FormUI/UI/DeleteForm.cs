@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using SupDataDll.UiInheritance;
 
 namespace FormUI.UI
 {
@@ -14,8 +15,8 @@ namespace FormUI.UI
     {
         #region interface
         bool autoclose = true;
-
-        public event CancelDelegate EventCancelDelegate;
+        public event CancelDelegate EventCancel;
+        public event ClosingDelegate EventClosing;
 
         public bool AutoClose
         {
@@ -83,7 +84,7 @@ namespace FormUI.UI
         #region Event Form
         private void BT_cancel_Click(object sender, EventArgs e)
         {
-            EventCancelDelegate();
+            EventCancel();
         }
 
         private void CB_autoclose_CheckedChanged(object sender, EventArgs e)

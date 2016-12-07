@@ -4,6 +4,7 @@ using System.Windows.Forms;
 //using BrightIdeasSoftware;
 using SupDataDll;
 using System.ComponentModel;
+using BrightIdeasSoftware;
 
 namespace FormUI.UI.MainForm
 {

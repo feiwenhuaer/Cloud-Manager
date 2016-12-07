@@ -4,7 +4,6 @@ using System.IO;
 using System.Text;
 using Core.EncodeDecode;
 using SupDataDll;
-using System.Windows.Forms;
 
 namespace Core
 {

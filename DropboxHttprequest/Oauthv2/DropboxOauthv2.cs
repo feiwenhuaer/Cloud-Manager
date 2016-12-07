@@ -1,16 +1,15 @@
-﻿using System;
+﻿using DropboxHttpRequest;
+using System;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Windows.Forms;
 
-namespace DropboxHttpRequest
+namespace DropboxHttprequest.Oauthv2
 {
     public class DropboxOauthv2
     {
-        private string APPKey = "sdxv9bvu37pjd5r";
-        private string APPSecret = "xsfy8way52uuf1j";
         internal const string LoopbackCallback = "http://localhost:{0}";
         internal const int MaxPortRange = 22439;
         internal const int MinPortRange = 22430;
@@ -36,20 +35,18 @@ namespace DropboxHttpRequest
 
         HttpListener listener;
         int port = -1;
-        public void GetCode(Form owner = null)
+        public void GetCode(OauthUI oauthui,object owner = null)
         {
             port = GetFirstAvailableRandomPort(MinPortRange, MaxPortRange);
             listener = new HttpListener();
             redirectURI = string.Format(LoopbackCallback, port);
             listener.Prefixes.Add(redirectURI +"/");
             string urloauth = string.Format("https://www.dropbox.com/1/oauth2/authorize?client_id={0}&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A{1}"
-                , APPKey, port.ToString());
+                , Appkey.ApiKey, port.ToString());
             try
             {
                 listener.Start();
-                Oauthv2FormDropbox f = new Oauthv2FormDropbox(urloauth,redirectURI);
-                if (owner == null) f.Show();
-                else f.Show(owner);
+                oauthui.Show(owner);
                 listener.BeginGetContext(new AsyncCallback(RecieveCode), null);
             }catch
             {

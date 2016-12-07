@@ -30,8 +30,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -76,6 +80,20 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\SettingDefault.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DropboxHttprequest\DropboxHttprequest.csproj">
+      <Project>{368a4fe1-8348-498f-997d-19ccd34a8a1c}</Project>
+      <Name>DropboxHttprequest</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GoogleDriveHttprequest\GoogleDriveHttprequest.csproj">
+      <Project>{0aefa63d-8c09-4d16-97c6-a4645b9e03d7}</Project>
+      <Name>GoogleDriveHttprequest</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SupDataDll\SupDataDll.csproj">
+      <Project>{700eed73-135e-422d-a06e-738d3ad057a1}</Project>
+      <Name>SupDataDll</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

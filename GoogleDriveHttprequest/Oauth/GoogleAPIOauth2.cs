@@ -64,7 +64,7 @@ namespace GoogleDriveHttprequest.Oauth
             this.refresh_token = refresh_token;
         }
         
-        public void GetCode(Form owner = null)
+        public void GetCode(OauthUI UI, object owner = null)
         {
             state = randomDataBase64url(32);
             code_verifier = randomDataBase64url(32);
@@ -73,17 +73,14 @@ namespace GoogleDriveHttprequest.Oauth
 
             redirectURI = string.Format("http://{0}:{1}/", IPAddress.Loopback, GetRandomUnusedPort());
             string authorizationRequest = string.Format("{0}?response_type=code&scope={1}&redirect_uri={2}&client_id={3}&state={4}&code_challenge={5}&code_challenge_method={6}",
-                authorizationEndpoint,scopepara,System.Uri.EscapeDataString(redirectURI), APPkey.ClientID,state,code_challenge,code_challenge_method);
+                authorizationEndpoint,scopepara,Uri.EscapeDataString(redirectURI), APPkey.ClientID,state,code_challenge,code_challenge_method);
 
             listener = new HttpListener();
             listener.Prefixes.Add(redirectURI);
             try
             {
                 listener.Start();
-                OauthFormGoogleDrive f = new OauthFormGoogleDrive(authorizationRequest, redirectURI);
-                if (owner == null) f.Show();
-                else f.Show(owner);
-                f.Activate();
+                UI.Show(owner);
                 listener.BeginGetContext(new AsyncCallback(RecieveCode), null);
             }
             catch(Exception ex)

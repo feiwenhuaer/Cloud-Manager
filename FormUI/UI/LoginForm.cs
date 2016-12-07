@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
+using SupDataDll.UiInheritance;
+using SupDataDll;
 
 namespace FormUI.UI
 {
@@ -40,6 +36,19 @@ namespace FormUI.UI
             set
             {
                 ShowInTaskbar = value;
+            }
+        }
+
+        WindowState UILogin.WindowState_
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
             }
         }
 

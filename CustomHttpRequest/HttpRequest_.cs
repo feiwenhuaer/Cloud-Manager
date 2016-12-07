@@ -12,9 +12,9 @@ using System.Web;
 
 namespace CustomHttpRequest
 {
-    public class CustomHttpRequest
+    public class HttpRequest_
     {
-        public CustomHttpRequest(string url, string RequestMethod)
+        public HttpRequest_(string url, string RequestMethod)
         {
             if (string.IsNullOrEmpty(url)) throw new NullReferenceException("url can't be null or empty");
             this.url = url;

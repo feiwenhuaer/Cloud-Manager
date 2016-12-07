@@ -30,6 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Windows.Forms" />
@@ -41,16 +44,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AllEnum.cs" />
+    <Compile Include="Appkey.cs" />
     <Compile Include="BuildJson.cs" />
     <Compile Include="BuildURL.cs" />
     <Compile Include="DropboxRequestAPIv2.cs" />
     <Compile Include="DropboxSharingMember.cs" />
     <Compile Include="ErrorCode.cs" />
     <Compile Include="Oauthv2\DropboxOauthv2.cs" />
-    <Compile Include="Oauthv2\Oauthv2FormDropbox_.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="Oauthv2\OauthUI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CustomHttpRequest\CustomHttpRequest.csproj">
+      <Project>{1d279a6b-ce8d-4184-b9ab-bc24c6f69045}</Project>
+      <Name>CustomHttpRequest</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -5,10 +5,9 @@ using GoogleDriveHttprequest.Oauth;
 using GoogleDriveHttprequest;
 using Newtonsoft.Json;
 using System;
-using System.Windows.Forms;
 using Core.StaticClass;
 using System.Threading;
-using System.Collections.Generic;
+using DropboxHttprequest.Oauthv2;
 
 namespace Core.cloud
 {
@@ -128,13 +127,13 @@ namespace Core.cloud
                 case CloudName.Dropbox:
                     DropboxOauthv2 oauth_dropbox = new DropboxOauthv2();
                     oauth_dropbox.TokenCallBack += Oauth_dropbox_TokenCallBack;
-                    oauth_dropbox.GetCode((Form)AppSetting.UIMain);
+                    oauth_dropbox.GetCode(null,AppSetting.UIMain);
                     break;
                 case CloudName.GoogleDrive:
                     string[] scope = new string[] { Scope.Drive, Scope.DriveFile, Scope.DriveMetadata };
                     GoogleAPIOauth2 oauth_gd = new GoogleAPIOauth2(scope);
                     oauth_gd.TokenCallBack += Oauth_gd_TokenCallBack;
-                    oauth_gd.GetCode((Form)AppSetting.UIMain);
+                    oauth_gd.GetCode(null,AppSetting.UIMain);
                     break;
                 default: return;
             }
@@ -190,8 +189,8 @@ namespace Core.cloud
             Type type_deleteform = LoadDllUI.GetTypeInterface(typeof(SupDataDll.UiInheritance.UIDelete));
             SupDataDll.UiInheritance.UIDelete deleteform = (SupDataDll.UiInheritance.UIDelete)Activator.CreateInstance(type_deleteform);
             CancelDelete cd = new CancelDelete();
-            deleteform.EventCancelDelegate += cd.Deleteform_EventCancelDelegate;
-            ((Form)deleteform).FormClosing += cd.Deleteform_EventCloseForm;
+            deleteform.EventCancel += cd.Deleteform_EventCancelDelegate;
+            deleteform.EventClosing += cd.Deleteform_EventCloseForm;
             Thread thr = new Thread(deleteform.ShowDialog_);
             thr.Start();
             Thread.Sleep(500);
@@ -262,7 +261,7 @@ namespace Core.cloud
             cancel = !cancel;
         }
 
-        public void Deleteform_EventCloseForm(object sender,EventArgs e)
+        public void Deleteform_EventCloseForm()
         {
             closedform = !closedform;
         }

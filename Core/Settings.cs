@@ -5,7 +5,6 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading;
-using System.Windows.Forms;
 using System.Xml;
 
 namespace Core
@@ -35,7 +34,7 @@ namespace Core
             }
             catch (Exception Ex)
             {
-                MessageBox.Show("read setting error");
+                //MessageBox.Show("read setting error");
             }
         }
 
@@ -53,7 +52,7 @@ namespace Core
                 }
                 catch (Exception Ex)
                 {
-                    MessageBox.Show("Can't write setting\r\n" + Ex.Message);
+                    //MessageBox.Show("Can't write setting\r\n" + Ex.Message);
                 }
             }
         }
