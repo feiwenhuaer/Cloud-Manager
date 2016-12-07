@@ -5,7 +5,7 @@ using System.Text;
 using System.Windows.Controls;
 using System.Windows.Data;
 
-namespace WPFUI.Class
+namespace WpfUI.Class
 {
     public class TreeViewLineConverter : IValueConverter
     {

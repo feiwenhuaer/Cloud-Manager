@@ -40,6 +40,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -71,6 +72,16 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Setting_UI.cs" />
+    <Compile Include="UI\Main\Lv_item\LV_data.cs" />
+    <Compile Include="UI\Main\Lv_item\UC_Lv_item.xaml.cs">
+      <DependentUpon>UC_Lv_item.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Main\Lv_ud\UCLV_ud.xaml.cs">
+      <DependentUpon>UCLV_ud.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Main\Lv_ud\UC_TLV.xaml.cs">
+      <DependentUpon>UC_TLV.xaml</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -87,10 +98,7 @@
       <Name>SupDataDll</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="UI\Main\Lv_item\" />
-    <Folder Include="UI\Main\Lv_ud\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="Resources\back-icon.png" />
   </ItemGroup>
@@ -114,6 +122,20 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\search 64x64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="UI\Main\Lv_item\UC_Lv_item.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Main\Lv_ud\UCLV_ud.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Main\Lv_ud\UC_TLV.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

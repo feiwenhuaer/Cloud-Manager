@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Media;
 
-namespace WPFUI.Class
+namespace WpfUI.Class
 {
     public class TreeviewDataItem
     {

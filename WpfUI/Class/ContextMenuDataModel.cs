@@ -6,7 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
-namespace WPFUI.Class
+namespace WpfUI.Class
 {
     public class ContextMenuDataModel: INotifyPropertyChanged
     {

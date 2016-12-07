@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Media.Imaging;
 
-namespace WPFUI
+namespace WpfUI
 {
     public class Setting_UI
     {
