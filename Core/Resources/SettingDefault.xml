@@ -4,7 +4,7 @@
     <KEY NAME="Admin_user" VALUE="admin" />
     <KEY NAME="Admin_password" VALUE ="21232F297A57A5A743894A0E4A801FC3" />
     <KEY NAME="AutoLogin" VALUE="0"/>
-    <KEY NAME="UI_dll_file" VALUE="Form.UI.dll"/>
+    <KEY NAME="UI_dll_file" VALUE="FormUI.dll"/>
     <KEY NAME="lang" VALUE="eng.xml"/>
     <KEY NAME="DATE_TIME_FORMAT" VALUE="HH:mm dd/MM/yyyy" />
 

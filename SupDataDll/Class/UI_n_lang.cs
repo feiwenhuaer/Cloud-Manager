@@ -11,7 +11,7 @@ namespace SupDataDll
         public static List<string> GetListUiFile()
         {
             List<string> list = new List<string>();
-            foreach (string file in Directory.GetFiles(Directory.GetCurrentDirectory(), "*.UI.dll"))
+            foreach (string file in Directory.GetFiles(Directory.GetCurrentDirectory(), "*UI.dll"))
             {
                 FileInfo info = new FileInfo(file);
                 list.Add(info.Name);

@@ -43,12 +43,12 @@ namespace FormUI.UI
         {
             get
             {
-                throw new NotImplementedException();
+                return (WindowState)(int)this.WindowState;
             }
 
             set
             {
-                throw new NotImplementedException();
+                this.WindowState = (FormWindowState)(int)value;
             }
         }
 
