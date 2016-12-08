@@ -5,8 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfUI.UI"
         mc:Ignorable="d"
-        Title="Closing" Height="300" Width="300">
+        Title="Closing" Height="36.769" Width="352.646" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterScreen" WindowStyle="None">
     <Grid>
-        
+        <Label x:Name="label" Content="" Margin="0,1,0,0" VerticalAlignment="Top" Height="36" FontSize="17" HorizontalContentAlignment="Center"/>
+
     </Grid>
 </Window>
