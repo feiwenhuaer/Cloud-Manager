@@ -149,6 +149,12 @@
     <EmbeddedResource Include="UI\CreateFolderForm.resx">
       <DependentUpon>CreateFolderForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\LoginForm.resx">
+      <DependentUpon>LoginForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\MainForm\MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\MainForm\UC_LVitem.resx">
       <DependentUpon>UC_LVitem.cs</DependentUpon>
     </EmbeddedResource>

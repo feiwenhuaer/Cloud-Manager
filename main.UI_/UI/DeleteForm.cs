@@ -1,0 +1,95 @@
+﻿using System;
+using System.Windows.Forms;
+using SupDataDll.UiInheritance;
+using SupDataDll;
+
+namespace Form.UI
+{
+    public partial class DeleteForm : System.Windows.Forms.Form,SupDataDll.UiInheritance.UIDelete
+    {
+        #region interface
+        bool autoclose = true;
+
+        public event CancelDelegate EventCancelDelegate;
+
+        public bool AutoClose
+        {
+            get
+            {
+                return autoclose;
+            }
+        }
+
+        public void ShowDialog_()
+        {
+            if (InvokeRequired)
+            {
+                this.Invoke(new Action(() => this.ShowDialog()));
+            }
+            else this.ShowDialog();
+        }
+
+        public void SetTextButtonCancel(string text)
+        {
+            if (InvokeRequired) this.Invoke(new Action(() => BT_cancel.Text = text));
+            else BT_cancel.Text = text;
+        }
+
+        public void Close_()
+        {
+            if (InvokeRequired) this.Invoke(new Action(() => this.Close()));
+            else this.Close();
+        }
+
+        public void UpdateText(string text)
+        {
+            if (InvokeRequired)
+            {
+                this.Invoke(new Action(() => TB.Text += text));
+            }
+            else
+            {
+                TB.Text += text;
+            }
+            
+        }
+        public void SetAutoClose(bool c)
+        {
+            if (InvokeRequired)
+            {
+                this.Invoke(new Action(() => { CB_autoclose.Checked = c; autoclose = c; }));
+            }
+            else
+            {
+                CB_autoclose.Checked = c;
+                autoclose = c;
+            }
+        }
+        #endregion
+
+        public DeleteForm()
+        {
+            InitializeComponent();
+            CB_autoclose.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.DeleteForm_CB_autoclose);
+            BT_cancel.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.BT_cancel);
+            this.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.DeleteForm_text);
+        }
+
+        #region Event Form
+        private void BT_cancel_Click(object sender, EventArgs e)
+        {
+            EventCancelDelegate();
+        }
+
+        private void CB_autoclose_CheckedChanged(object sender, EventArgs e)
+        {
+            autoclose = CB_autoclose.Checked;
+        }
+
+        private void DeleteForm_FormClosed(object sender, System.Windows.Forms.FormClosedEventArgs e)
+        {
+            autoclose = true;
+        }
+        #endregion
+    }
+}
