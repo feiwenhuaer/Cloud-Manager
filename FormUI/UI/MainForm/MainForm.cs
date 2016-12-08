@@ -537,7 +537,7 @@ namespace FormUI.UI.MainForm
             //ui
             uiToolStripMenuItem.DropDownItems.Clear();
             string dll_now = Setting_UI.reflection_eventtocore._GetSetting(SettingsKey.UI_dll_file);
-            foreach (string file in UI_n_lang.GetListUiFile())
+            foreach (string file in GetList_UI_n_lang.GetListUiFile())
             {
                 ToolStripMenuItem item = new ToolStripMenuItem(file);
                 item.Size = new System.Drawing.Size(152, 22);
@@ -548,7 +548,7 @@ namespace FormUI.UI.MainForm
             //lang
             languageToolStripMenuItem.DropDownItems.Clear();
             string lang_now = Setting_UI.reflection_eventtocore._GetSetting(SettingsKey.lang);
-            foreach (string file in UI_n_lang.GetListLangFile())
+            foreach (string file in GetList_UI_n_lang.GetListLangFile())
             {
                 ToolStripMenuItem item = new ToolStripMenuItem(file);
                 item.Size = new System.Drawing.Size(152, 22);

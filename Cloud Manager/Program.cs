@@ -39,8 +39,9 @@ namespace Cloud_Manager
                         GC.Collect();
                         //reload dll ui
                         LoadDllUI.Load();//reload dll
-                        Reflection_UI.Load_UIMain();//load main and LV_ud
-                        AppSetting.ud_items.ReloadGroupToListView();//reload all group to listview
+                        Reflection_UI.Load_Setting_UI();//Add handle to event
+                        Reflection_UI.Load_UIMain();//create instance main and LV_ud
+                        AppSetting.ud_items.ReloadGroupToListView();//reload all group transfer to treelistview
                         AppSetting.settings.SaveSettings();
                         goto showMainForm;
                     }

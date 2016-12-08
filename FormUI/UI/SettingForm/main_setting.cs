@@ -47,10 +47,10 @@ namespace FormUI.UI.SettingForm
             CB_autologin.Checked = Setting_UI.reflection_eventtocore._GetSetting(SettingsKey.AutoLogin) == "1" ? true : false;
             CB_shutdown.Checked = Setting_UI.reflection_eventtocore._GetSetting(SettingsKey.ShutdownWhenDone) == "1" ? true : false;
 
-            CBB_lang.Items.AddRange(UI_n_lang.GetListLangFile().ToArray());
+            CBB_lang.Items.AddRange(GetList_UI_n_lang.GetListLangFile().ToArray());
             langfilename = Setting_UI.reflection_eventtocore._GetSetting(SettingsKey.lang);
             CBB_lang.SelectedText = langfilename;
-            CBB_ui.Items.AddRange(UI_n_lang.GetListUiFile().ToArray());
+            CBB_ui.Items.AddRange(GetList_UI_n_lang.GetListUiFile().ToArray());
             uifilename = Setting_UI.reflection_eventtocore._GetSetting(SettingsKey.UI_dll_file);
             CBB_ui.SelectedText = uifilename;
 

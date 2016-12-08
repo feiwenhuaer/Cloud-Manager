@@ -18,9 +18,9 @@ namespace Core.StaticClass
 
             //add event handler
             #region AddEventHandler reflection_eventtocore
-            Type Type_setting = LoadDllUI.GetTypeClassName("Setting_UI");
-            Type Type_reflection_eventtocore = Type_setting.GetField("reflection_eventtocore").FieldType;
-            object instance_reflection_eventtocore = Type_setting.GetField("reflection_eventtocore").GetValue(null);
+            Type Type_setting = LoadDllUI.GetTypeInterface(typeof(SupDataDll.UiInheritance.UI));
+            Type Type_reflection_eventtocore = Type_setting.BaseType.GetField("reflection_eventtocore").FieldType;
+            object instance_reflection_eventtocore = Type_setting.BaseType.GetField("reflection_eventtocore").GetValue(null);
             List<object[]> listloadevent = new List<object[]>() {
             new object[] { Type_reflection_eventtocore, "EventAddItem",AppSetting.ud_items,"AddItems", instance_reflection_eventtocore }
             ,new object[] { Type_reflection_eventtocore, "EventGetListAccountCloud", AppSetting.settings, "GetListAccountCloud", instance_reflection_eventtocore }

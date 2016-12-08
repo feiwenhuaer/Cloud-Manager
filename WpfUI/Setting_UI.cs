@@ -9,13 +9,8 @@ using System.Windows.Media.Imaging;
 
 namespace WpfUI
 {
-    public class Setting_UI
+    public class Setting_UI : SupDataDll.UiInheritance.UI
     {
-        //Reflection
-        public static Reflection_EventToCore reflection_eventtocore = new Reflection_EventToCore();
-
-        public static ManagerThread ManagerThreads = new ManagerThread();
-
         public static System.Windows.Controls.Image GetImage(Bitmap bmp,double Width=16,double Height=16)
         {
             System.Windows.Controls.Image image = new System.Windows.Controls.Image();

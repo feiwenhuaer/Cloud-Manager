@@ -6,7 +6,7 @@ using System.Text;
 
 namespace SupDataDll
 {
-    public static class UI_n_lang
+    public static class GetList_UI_n_lang
     {
         public static List<string> GetListUiFile()
         {

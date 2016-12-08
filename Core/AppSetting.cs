@@ -10,15 +10,16 @@ namespace Core
     {
         public static void Load()
         {
-            settings = new Settings();
+            //load core
+            settings = new Settings();//load settings
             settings.ReadSettings();
-            login = new Login();
-            ManageCloud = new CloudManager();
-            LoadDllUI.Load();
-            Get_mimeType.Load();
+            login = new Login();//login
+            ManageCloud = new CloudManager();//explorer
+            Get_mimeType.Load();//mimeType (google drive upload)
             ud_items = new UploadDownloadItems();//transfer file
-            lang = new Languages(settings.GetSettingsAsString(SettingsKey.lang));
-            Reflection_UI.Load_Setting_UI();// add event language & setting
+            lang = new Languages(settings.GetSettingsAsString(SettingsKey.lang));//load language
+            LoadDllUI.Load();//load dll UI
+            Reflection_UI.Load_Setting_UI();//Add handle to event
         }
         //can't static class (because event)
         public static Settings settings;//setting
