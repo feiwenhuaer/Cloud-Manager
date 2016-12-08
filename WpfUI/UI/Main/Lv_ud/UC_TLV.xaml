@@ -1,12 +1,22 @@
-﻿<UserControl x:Class="WpfUI.UI.Main.Lv_ud.UC_TLV"
+﻿<UserControl
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WpfUI.UI.Main.Lv_ud"
-             mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
-            
-    </Grid>
+             xmlns:a="clr-namespace:WpfUI.Class"
+             xmlns:Tree="clr-namespace:Aga.Controls.Tree;assembly=Aga.Controls" x:Class="WpfUI.UI.Main.Lv_ud.UC_TLV"
+             mc:Ignorable="d" Height="265.738" Width="661.838">
+    <UserControl.Resources>
+        <a:TreeViewLineConverter x:Key="RegImageConverter"/>
+    </UserControl.Resources>
+    
+    <Tree:TreeList x:Name="treeList">
+        <Tree:TreeList.View>
+            <GridView>
+                <GridViewColumn/>
+            </GridView>
+        </Tree:TreeList.View>
+    </Tree:TreeList>
+
 </UserControl>

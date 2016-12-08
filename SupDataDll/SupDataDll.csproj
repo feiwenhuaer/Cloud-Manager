@@ -61,7 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Aga.Controls\Aga.Controls.csproj">
-      <Project>{e73bb233-d88b-44a7-a98f-d71ee158381d}</Project>
+      <Project>{d17cd489-1b14-47eb-8c22-c189d078aec9}</Project>
       <Name>Aga.Controls</Name>
     </ProjectReference>
   </ItemGroup>

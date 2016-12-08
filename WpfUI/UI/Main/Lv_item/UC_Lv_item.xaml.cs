@@ -1,6 +1,8 @@
-﻿using SupDataDll;
+﻿using Etier.IconHelper;
+using SupDataDll;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -12,16 +14,18 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WPF.UI;
 using WpfUI;
+using WpfUI.Class;
 
 namespace WpfUI.UI.Main.Lv_item
 {
     /// <summary>
     /// Interaction logic for UC_Lv_item.xaml
     /// </summary>
-    public partial class Lv_item : UserControl
+    public partial class UC_Lv_item : UserControl
     {
-        public Lv_item()
+        public UC_Lv_item()
         {
             InitializeComponent();
             this.Height = double.NaN;
@@ -40,7 +44,7 @@ namespace WpfUI.UI.Main.Lv_item
         void UILanguage()
         {
             label.Content = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TB_path);
-            col_path.Width = new GridLength(label.Width + 1);
+            col_path.Width = new GridLength(label.Width + 2);
             LoadContextMenuListview();
         }
 

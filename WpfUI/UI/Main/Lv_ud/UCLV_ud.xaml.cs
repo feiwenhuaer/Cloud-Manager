@@ -33,16 +33,16 @@ namespace WpfUI.UI.Main.Lv_ud
         public int AddNewGroup(UD_group_work Group)
         {
             Group.col[2] = Group.status.ToString();
-            if (Group.change == ChangeTLV.Processing)
-            {
-                if (LV_process.data == null) LV_process.data = new UD_data_WPF(Group);
-                else LV_process.data.Add(Group);
-            }
-            else
-            {
-                if (LV_done.data == null) LV_done.data = new UD_data_WPF(Group);
-                else LV_done.data.Add(Group);
-            }
+            //if (Group.change == ChangeTLV.Processing)
+            //{
+            //    if (LV_process.data == null) LV_process.data = new UD_data_WPF(Group);
+            //    else LV_process.data.Add(Group);
+            //}
+            //else
+            //{
+            //    if (LV_done.data == null) LV_done.data = new UD_data_WPF(Group);
+            //    else LV_done.data.Add(Group);
+            //}
             return 0;
         }
 
@@ -53,34 +53,34 @@ namespace WpfUI.UI.Main.Lv_ud
 
         public void RefreshAll()
         {
-            if (!Dispatcher.CheckAccess())
-            {
-                Dispatcher.Invoke(new Action(() =>
-                {
-                    LV_process.treeList.Model = LV_process.data;
-                    LV_done.treeList.Model = LV_done.data;
-                    //LV_process.Refresh();
-                    //LV_done.Refresh();
-                }));
-            }
-            else
-            {
-                LV_process.treeList.Model = LV_process.data;
-                LV_done.treeList.Model = LV_done.data;
-                //LV_process.Refresh();
-                //LV_done.Refresh();
-            }
+            //if (!Dispatcher.CheckAccess())
+            //{
+            //    Dispatcher.Invoke(new Action(() =>
+            //    {
+            //        LV_process.treeList.Model = LV_process.data;
+            //        LV_done.treeList.Model = LV_done.data;
+            //        //LV_process.Refresh();
+            //        //LV_done.Refresh();
+            //    }));
+            //}
+            //else
+            //{
+            //    LV_process.treeList.Model = LV_process.data;
+            //    LV_done.treeList.Model = LV_done.data;
+            //    //LV_process.Refresh();
+            //    //LV_done.Refresh();
+            //}
         }
 
         public void RemoveGroup(UD_group_work Group)
         {
-            if (Group.change == ChangeTLV.Processing) LV_process.data.Remove(Group);
-            else LV_done.data.Remove(Group);
+            //if (Group.change == ChangeTLV.Processing) LV_process.data.Remove(Group);
+            //else LV_done.data.Remove(Group);
         }
 
         #endregion
 
-        public UIUC_Lv_ud()
+        public UCLV_ud()
         {
             InitializeComponent();
         }

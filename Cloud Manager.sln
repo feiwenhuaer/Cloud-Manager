@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aga.Controls", "Aga.Controls\Aga.Controls.csproj", "{E73BB233-D88B-44A7-A98F-D71EE158381D}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cloud Manager", "Cloud Manager\Cloud Manager.csproj", "{EEB042C5-861E-4FD2-9F90-FF6425C31619}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{1FF27BDB-F1ED-4EB2-9F6F-1D28DC32E0F9}"
@@ -21,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormUI", "FormUI\FormUI.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfUI", "WpfUI\WpfUI.csproj", "{8462DC0C-B74E-48AF-9C53-094CC4773586}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aga.Controls", "Aga.Controls\Aga.Controls.csproj", "{D17CD489-1B14-47EB-8C22-C189D078AEC9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,14 +29,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E73BB233-D88B-44A7-A98F-D71EE158381D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E73BB233-D88B-44A7-A98F-D71EE158381D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E73BB233-D88B-44A7-A98F-D71EE158381D}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{E73BB233-D88B-44A7-A98F-D71EE158381D}.Debug|x86.Build.0 = Debug|Any CPU
-		{E73BB233-D88B-44A7-A98F-D71EE158381D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E73BB233-D88B-44A7-A98F-D71EE158381D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E73BB233-D88B-44A7-A98F-D71EE158381D}.Release|x86.ActiveCfg = Release|Any CPU
-		{E73BB233-D88B-44A7-A98F-D71EE158381D}.Release|x86.Build.0 = Release|Any CPU
 		{EEB042C5-861E-4FD2-9F90-FF6425C31619}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EEB042C5-861E-4FD2-9F90-FF6425C31619}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EEB042C5-861E-4FD2-9F90-FF6425C31619}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -101,6 +93,14 @@ Global
 		{8462DC0C-B74E-48AF-9C53-094CC4773586}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8462DC0C-B74E-48AF-9C53-094CC4773586}.Release|x86.ActiveCfg = Release|Any CPU
 		{8462DC0C-B74E-48AF-9C53-094CC4773586}.Release|x86.Build.0 = Release|Any CPU
+		{D17CD489-1B14-47EB-8C22-C189D078AEC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D17CD489-1B14-47EB-8C22-C189D078AEC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D17CD489-1B14-47EB-8C22-C189D078AEC9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D17CD489-1B14-47EB-8C22-C189D078AEC9}.Debug|x86.Build.0 = Debug|Any CPU
+		{D17CD489-1B14-47EB-8C22-C189D078AEC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D17CD489-1B14-47EB-8C22-C189D078AEC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D17CD489-1B14-47EB-8C22-C189D078AEC9}.Release|x86.ActiveCfg = Release|Any CPU
+		{D17CD489-1B14-47EB-8C22-C189D078AEC9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

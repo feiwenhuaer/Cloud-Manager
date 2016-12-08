@@ -4,8 +4,61 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WpfUI.UI.Main.Lv_item"
-             mc:Ignorable="d" Height="191.365" Width="544.011">
-    <Grid>
-            
+             mc:Ignorable="d" Height="208.365" Width="930.011">
+    <UserControl.Resources>
+        <Style TargetType="ListViewItem">
+            <Setter Property="Height" Value="20"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid Background="WhiteSmoke">
+        <Grid Height="24" VerticalAlignment="Top" Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Name="col_path" Width="44"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Label Name="label" Content="Path:" HorizontalAlignment="Left" Width="auto" Margin="0" Padding="2,4,2,0"/>
+            <Image Name="image_back" Grid.Column="1" HorizontalAlignment="Left" Width="32" Margin="3,0,0,0"/>
+            <TextBox Name="textBox" Grid.Column="1" Margin="40,0,66,0" TextWrapping="Wrap" Text="" Padding="2,4,2,0"/>
+            <Image Name="image_next" Grid.Column="1" Margin="0,0,31,0" HorizontalAlignment="Right" Width="30"/>
+            <Image Name="image_search" Grid.Column="1" HorizontalAlignment="Right" Width="26"/>
+        </Grid>
+        <ListView x:Name="LV_items" Margin="0,24,0,0">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Name" Width="250">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <Image Source="{Binding ImgSource}"/>
+                                    <TextBlock Text="{Binding Name}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Type" Width="70" DisplayMemberBinding="{Binding Type}"/>
+                    <GridViewColumn Header="Size" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock>
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="{Binding Size}"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Size}" Value="-1">
+                                                    <Setter Property="Text" Value=""/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Date Modified" Width="100" DisplayMemberBinding="{Binding d_mod}"/>
+                    <GridViewColumn Header="mimeType" Width="100" DisplayMemberBinding="{Binding mimeType}"/>
+                    <GridViewColumn Header="id" Width="80" DisplayMemberBinding="{Binding id}"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
     </Grid>
 </UserControl>

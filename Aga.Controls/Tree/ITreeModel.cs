@@ -1,5 +1,6 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Collections;
 
@@ -7,12 +8,14 @@ namespace Aga.Controls.Tree
 {
 	public interface ITreeModel
 	{
-		IEnumerable GetChildren(TreePath treePath);
-		bool IsLeaf(TreePath treePath);
+		/// <summary>
+		/// Get list of children of the specified parent
+		/// </summary>
+		IEnumerable GetChildren(object parent);
 
-		event EventHandler<TreeModelEventArgs> NodesChanged; 
-		event EventHandler<TreeModelEventArgs> NodesInserted;
-		event EventHandler<TreeModelEventArgs> NodesRemoved; 
-		event EventHandler<TreePathEventArgs> StructureChanged;
+		/// <summary>
+		/// returns wheather specified parent has any children or not.
+		/// </summary>
+		bool HasChildren(object parent);
 	}
 }
