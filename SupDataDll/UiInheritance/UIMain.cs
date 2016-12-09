@@ -3,7 +3,7 @@
     public interface UIMain
     {
         bool AreReloadUI { get; }
-        void load_uC_Lv_ud(UIUC_Lv_ud control);
+        void load_uC_Lv_ud(UIUC_TLV_ud control);
         void ShowDialog_();
         void AddNewCloudToTV(string email, CloudName type);
 

@@ -82,8 +82,8 @@
     <Compile Include="UI\Main\Lv_item\UC_Lv_item.xaml.cs">
       <DependentUpon>UC_Lv_item.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Main\Lv_ud\UCLV_ud.xaml.cs">
-      <DependentUpon>UCLV_ud.xaml</DependentUpon>
+    <Compile Include="UI\Main\Lv_ud\UC_TLV_ud.xaml.cs">
+      <DependentUpon>UC_TLV_ud.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Main\Lv_ud\UC_TLV.xaml.cs">
       <DependentUpon>UC_TLV.xaml</DependentUpon>
@@ -152,7 +152,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\Main\Lv_ud\UCLV_ud.xaml">
+    <Page Include="UI\Main\Lv_ud\UC_TLV_ud.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

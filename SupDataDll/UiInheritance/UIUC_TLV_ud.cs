@@ -2,7 +2,7 @@
 
 namespace SupDataDll.UiInheritance
 {
-    public interface UIUC_Lv_ud
+    public interface UIUC_TLV_ud
     {
         object UIMain { set; }
         int AddNewGroup(UD_group_work Group);

@@ -8,7 +8,7 @@ using BrightIdeasSoftware;
 
 namespace FormUI.UI.MainForm
 {
-    public partial class UC_Lv_ud : UserControl, SupDataDll.UiInheritance.UIUC_Lv_ud
+    public partial class UC_Lv_ud : UserControl, SupDataDll.UiInheritance.UIUC_TLV_ud
     {
 
         #region Reflection

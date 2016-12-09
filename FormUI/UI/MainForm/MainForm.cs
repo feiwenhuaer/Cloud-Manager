@@ -17,7 +17,7 @@ namespace FormUI.UI.MainForm
         bool ReloadUI = false;
         #region interface
         UserControl LV_Ud_control;
-        public void load_uC_Lv_ud(UIUC_Lv_ud control)
+        public void load_uC_Lv_ud(UIUC_TLV_ud control)
         {
             LV_Ud_control = (UserControl)control;
             LV_Ud_control.Dock = DockStyle.Fill;
@@ -192,7 +192,7 @@ namespace FormUI.UI.MainForm
             addNewTabToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.addtab);
             closeThisTabToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.removetab);
 
-            ((SupDataDll.UiInheritance.UIUC_Lv_ud)LV_Ud_control).LoadLanguage();
+            ((SupDataDll.UiInheritance.UIUC_TLV_ud)LV_Ud_control).LoadLanguage();
 
             for(int i = 0; i < tabControl1.Controls.Count;i++)
             {

@@ -7,7 +7,7 @@
              xmlns:local="clr-namespace:WpfUI.UI.Main.Lv_ud"
              xmlns:a="clr-namespace:WpfUI.Class"
              xmlns:Tree="clr-namespace:Aga.Controls.Tree;assembly=Aga.Controls" 
-             mc:Ignorable="d" Height="265.738" Width="661.838">
+             mc:Ignorable="d" Height="186.132" Width="1191.1">
     <UserControl.Resources>
         <a:TreeViewLineConverter x:Key="RegImageConverter"/>
 
@@ -40,13 +40,27 @@
             </Setter>
         </Style>
     </UserControl.Resources>
-    
+
     <Tree:TreeList x:Name="treeList">
         <Tree:TreeList.View>
             <GridView>
-                <GridViewColumn/>
+                <GridViewColumn Header="From" Width="250">
+                    <GridViewColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Tree:RowExpander/>
+                                <TextBlock Text="{Binding col[0]}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+                <GridViewColumn Header="To" Width="250" DisplayMemberBinding="{Binding col[1]}"/>
+                <GridViewColumn Header="Status" Width="60" DisplayMemberBinding="{Binding col[2]}"/>
+                <GridViewColumn Header="Progress" Width="150" DisplayMemberBinding="{Binding col[3]}"/>
+                <GridViewColumn Header="Speed" Width="100" DisplayMemberBinding="{Binding col[4]}"/>
+                <GridViewColumn Header="Estimated" Width="100" DisplayMemberBinding="{Binding col[5]}"/>
+                <GridViewColumn Header="Error" Width="250" DisplayMemberBinding="{Binding col[6]}"/>
             </GridView>
         </Tree:TreeList.View>
     </Tree:TreeList>
-
 </UserControl>
