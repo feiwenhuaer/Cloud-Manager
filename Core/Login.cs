@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using Core.EncodeDecode;
 using SupDataDll;
+using Core.StaticClass;
 
 namespace Core
 {
@@ -71,21 +72,11 @@ namespace Core
 
         public LoginData ReadDataLogin()
         {
-            FileInfo info = new FileInfo("login.dat");
-            if (info.Exists)
+            if (ReadWriteData.Exists(ReadWriteData.File_Login))
             {
-                byte[] buffer = new byte[info.Length - 1];
-                byte[] crypt = new byte[1];
-                FileStream fs = new FileStream("login.dat", FileMode.Open, FileAccess.Read);
-                fs.Read(crypt, 0, 1);
-                fs.Read(buffer, 0, buffer.Length);
-                fs.Close();
-                buffer = AppSetting.Crypt(buffer, crypt[0]);
-                MemoryStream mstream = new MemoryStream(buffer);
-                StreamReader sreader = new StreamReader(mstream);
-                LoginData data = JsonConvert.DeserializeObject<LoginData>(sreader.ReadToEnd());
-                mstream.Close();
-                sreader.Close();
+                TextReader reader = ReadWriteData.Read(ReadWriteData.File_Login);
+                LoginData data = JsonConvert.DeserializeObject<LoginData>(reader.ReadToEnd());
+                reader.Close();
                 return data;
             }
             return null;
@@ -93,21 +84,8 @@ namespace Core
 
         public bool WriteDataLogin(LoginData Data)
         {
-            FileInfo info = new FileInfo("login.dat");
-            if (info.Exists)
-            {
-                info.Delete();
-            }
-
             byte[] data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(Data));
-            FileStream fs = new FileStream("login.dat", FileMode.CreateNew, FileAccess.Write);
-            Random rd = new Random();
-            int val = rd.Next(1, 2 ^ 8 - 1);
-            data = AppSetting.Crypt(data, val);
-            fs.WriteByte((byte)val);
-            fs.Write(data, 0, data.Length);
-            fs.Flush();
-            fs.Close();
+            ReadWriteData.Write(ReadWriteData.File_Login, data);
             return true;
         }
     }

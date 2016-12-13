@@ -10,6 +10,7 @@ namespace Core
     {
         public static void Load()
         {
+            ReadWriteData.CreateFolderSaveData();// create folder %appdata%\\CloudManager
             //load core
             settings = new Settings();//load settings
             settings.ReadSettings();

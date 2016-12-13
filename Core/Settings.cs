@@ -19,11 +19,11 @@ namespace Core
             xmlSettings = new XmlDocument();
             try
             {
-                if (File.Exists(AppSetting.RootDirectory + "\\" + "Settings.dat"))
+                if (ReadWriteData.Exists(ReadWriteData.File_Settings))
                 {
                     lock (SyncSetting)
                     {
-                        xmlSettings.Load(ReadWriteData.Read("Settings.dat"));
+                        xmlSettings.Load(ReadWriteData.Read(ReadWriteData.File_Settings));
                     }
                 }
                 else
@@ -48,7 +48,7 @@ namespace Core
                     MemoryStream Stream = new MemoryStream();
                     TextWriter TxtWriter = new StreamWriter(Stream, Encoding.UTF8);
                     xmlSettings.Save(TxtWriter);
-                    ReadWriteData.Write("Settings.dat", Stream.GetBuffer());
+                    ReadWriteData.Write(ReadWriteData.File_Settings, Stream.GetBuffer());
                 }
                 catch (Exception Ex)
                 {

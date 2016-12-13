@@ -212,12 +212,12 @@ namespace Core
 
         #region Save/Read Data When Close/Open program
         bool readdata = false;
-        private const string FileName = "DataUploadDownload.dat";
+
         public void ReadData()
         {
-            if (File.Exists(AppSetting.RootDirectory + "\\" + FileName))
+            if (ReadWriteData.Exists(ReadWriteData.File_DataUploadDownload))
             {
-                Json_Data_UDGroup json_groups = JsonConvert.DeserializeObject<Json_Data_UDGroup>(ReadWriteData.Read(FileName).ReadToEnd());
+                Json_Data_UDGroup json_groups = JsonConvert.DeserializeObject<Json_Data_UDGroup>(ReadWriteData.Read(ReadWriteData.File_DataUploadDownload).ReadToEnd());
                 foreach (Group_Json_Data_UDItem json_group in json_groups.groups)
                 {
                     GroupTransferItemsProcess group = new GroupTransferItemsProcess(json_group);
@@ -244,7 +244,7 @@ namespace Core
             string json = JsonConvert.SerializeObject(json_groups);
             if (temp_jsonSaveData == json) return;
             else temp_jsonSaveData = json;
-            ReadWriteData.Write(FileName, Encoding.UTF8.GetBytes(json));
+            ReadWriteData.Write(ReadWriteData.File_DataUploadDownload, Encoding.UTF8.GetBytes(json));
         }
         #endregion
     }
