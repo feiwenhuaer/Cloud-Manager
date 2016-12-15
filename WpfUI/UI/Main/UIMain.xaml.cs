@@ -296,12 +296,12 @@ namespace WpfUI.UI.Main
             bool iscloud = AnalyzePath.IsCloud(list.path_raw);
             if (load.addToTV && load.TV_data != null && load.TV_node != null)//add folder to tree view
             {
-                ((TreeViewDataModel)load.TV_data).Children.Clear();
+                ((TreeViewDataModel)load.TV_data).Childrens.Clear();
                 foreach (FileFolder ff in list.Items)
                 {
                     if (ff.Size != -1) continue;
                     TreeViewDataModel child = new TreeViewDataModel((TreeViewDataModel)load.TV_data) { DisplayData = new TreeviewDataItem(ff.Name, CloudName.Folder) };
-                    ((TreeViewDataModel)load.TV_data).Children.Add(child);
+                    ((TreeViewDataModel)load.TV_data).Childrens.Add(child);
                 }
                 if (load.explandTV) ((TreeViewItem)load.TV_node).ExpandSubtree();
             }

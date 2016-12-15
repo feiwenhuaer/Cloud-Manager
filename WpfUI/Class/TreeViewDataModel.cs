@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
 namespace WpfUI.Class
 {
-    public class TreeViewDataModel : System.ComponentModel.INotifyPropertyChanged
+    public class TreeViewDataModel : INotifyPropertyChanged, IEnumerable
     {
         public TreeViewDataModel(TreeViewDataModel Parent)
         {
@@ -14,24 +16,29 @@ namespace WpfUI.Class
         }
         public TreeviewDataItem DisplayData { get; set; }
         public TreeViewDataModel Parent { get; set; }
-        private ObservableCollection<TreeViewDataModel> _children;
-        public ObservableCollection<TreeViewDataModel> Children
+        private ObservableCollection<TreeViewDataModel> _childrens;
+        public ObservableCollection<TreeViewDataModel> Childrens
         {
-            get { return _children ?? (_children = new ObservableCollection<TreeViewDataModel>()); }
+            get { return _childrens ?? ( _childrens = new ObservableCollection<TreeViewDataModel>()); }
             set
             {
-                _children = value;
-                NotifyPropertyChange("Children");
+                _childrens = value;
+                NotifyPropertyChange("Childrens");
             }
         }
         private void NotifyPropertyChange(string name)
         {
             if (PropertyChanged != null)
-                PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(name));
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
+        }
+
+        public IEnumerator GetEnumerator()
+        {
+            return Childrens.GetEnumerator();
         }
 
         #region INotifyPropertyChanged Members
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
         #endregion
     }
 }
