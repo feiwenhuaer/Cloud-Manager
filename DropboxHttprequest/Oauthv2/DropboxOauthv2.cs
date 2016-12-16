@@ -6,7 +6,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Windows.Forms;
 
-namespace DropboxHttprequest.Oauthv2
+namespace DropboxHttpRequest.Oauthv2
 {
     public class DropboxOauthv2
     {

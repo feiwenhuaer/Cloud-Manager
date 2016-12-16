@@ -21,12 +21,13 @@ namespace WpfUI.UI.Main.Lv_ud
     public partial class UC_TLV_ud : UserControl, SupDataDll.UiInheritance.UIUC_TLV_ud
     {
         List<UD_group_work> ud = new List<UD_group_work>();
+        object uimain;
         #region interface
         public object UIMain
         {
             set
             {
-                throw new NotImplementedException();
+                uimain = value;
             }
         }
 
@@ -48,7 +49,8 @@ namespace WpfUI.UI.Main.Lv_ud
 
         public void LoadLanguage()
         {
-            throw new NotImplementedException();
+            TI_process.Header = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TP_processing);
+            TI_complete.Header = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TP_done);
         }
 
         public void RefreshAll()

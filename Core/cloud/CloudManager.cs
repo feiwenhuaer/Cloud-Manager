@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 using System;
 using Core.StaticClass;
 using System.Threading;
-using DropboxHttprequest.Oauthv2;
+using DropboxHttpRequest.Oauthv2;
 
 namespace Core.cloud
 {

@@ -34,12 +34,12 @@
                     </Setter>
                 </Style>
             </TabControl.Resources>
-            <TabItem Header="TabItem">
+            <TabItem Name="TI_process" Header="Processing">
                 <Grid Background="#FFE5E5E5">
                     <local:UC_TLV  x:Name="TLV_process" Height="Auto" Width="Auto"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="TabItem">
+            <TabItem Name="TI_complete" Header="Complete">
                 <Grid Background="#FFE5E5E5">
                     <local:UC_TLV  x:Name="TLV_done" Height="Auto" Width="Auto"/>
                 </Grid>

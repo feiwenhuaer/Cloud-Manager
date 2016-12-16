@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Media;
 
-namespace WPF.UI
+namespace WpfUI
 {
     public class LV_data
     {
