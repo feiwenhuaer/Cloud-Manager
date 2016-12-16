@@ -99,7 +99,6 @@ namespace WpfUI.UI.Main
 
         #region TV
         public ObservableCollection<TreeViewDataModel> TreeObservableCollection { get; set; }
-
         private void TV_LoadDisk()
         {
             foreach (var drive in DriveInfo.GetDrives())
@@ -109,16 +108,6 @@ namespace WpfUI.UI.Main
         {
             foreach (CloudEmail_Type cloud in Setting_UI.reflection_eventtocore._GetListAccountCloud().account)
                 TreeObservableCollection.Add(new TreeViewDataModel(null) { DisplayData = new TreeviewDataItem(cloud.Email, cloud.Type) });
-        }
-
-        TreeViewItem Get_TreeViewItem(StackPanel stackpanel)
-        {
-            DependencyObject parent = VisualTreeHelper.GetParent(stackpanel);
-            while (!(parent is TreeViewItem))
-            {
-                parent = VisualTreeHelper.GetParent(parent);
-            }
-            return parent as TreeViewItem;
         }
         TreeViewDataModel Get_TVDataMoldel(TreeViewItem item)
         {
@@ -145,8 +134,16 @@ namespace WpfUI.UI.Main
                 }
             } while (true);
         }
-
-        private void stackpannel_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        TreeViewItem Get_TreeViewItem(StackPanel stackpanel)
+        {
+            DependencyObject parent = VisualTreeHelper.GetParent(stackpanel);
+            while (!(parent is TreeViewItem))
+            {
+                parent = VisualTreeHelper.GetParent(parent);
+            }
+            return parent as TreeViewItem;
+        }
+        private void StackPanel_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             TreeViewItem item = Get_TreeViewItem(sender as StackPanel);
             TreeViewDataModel tv_datamodel = Get_TVDataMoldel(item);
@@ -203,7 +200,7 @@ namespace WpfUI.UI.Main
         }
         private void TV_MenuItem_Click(object sender, RoutedEventArgs e)
         {
-
+            MessageBox.Show(sender.GetType().Name);
         }
         #endregion
         #endregion
@@ -316,7 +313,6 @@ namespace WpfUI.UI.Main
             //(tabControl.Items[tabControl.SelectedIndex] as TabItem_).ToolTip = load.path;
             ((tabControl.Items[tabControl.SelectedIndex] as TabItem_).Content as UC_Lv_item).textBox.Text = load.path.TrimEnd(new char[] { '\\', '/' });
         }
-
     }
     public class TabItem_ : TabItem
     {

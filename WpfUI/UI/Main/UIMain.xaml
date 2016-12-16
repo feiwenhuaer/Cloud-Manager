@@ -9,16 +9,7 @@
         Title="UIMain" Height="590.778" Width="1181.411" Closing="Window_Closing">
 
     <Window.Resources>
-        
-        <HierarchicalDataTemplate x:Key="ItemTemplate" DataType="local:UIMain" ItemsSource="{Binding Childrens}">
-            <StackPanel Orientation="Horizontal" MouseLeftButtonUp="stackpannel_MouseLeftButtonUp" MouseRightButtonDown="StackPanel_MouseRightButtonDown" Height="20" Margin="0" MinWidth="50">
-                <Image Source="{Binding DisplayData.ImgSource}" Height="16" Width="16" Margin="0"/>
-                <TextBlock Text="{Binding DisplayData.Name}" Height="20" Margin="0,3,0,0" Padding="0" FontSize="12"/>
-            </StackPanel>
-        </HierarchicalDataTemplate>
-        
         <c:TreeViewLineConverter x:Key="LineConverter"/>
-
         <!-- Toggle Button -->
         <Style x:Key="ExpandCollapseToggleStyle" TargetType="ToggleButton">
             <Setter Property="Focusable" Value="False"/>
@@ -26,6 +17,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="ToggleButton">
                         <Grid Width="15" Height="13" SnapsToDevicePixels="True">
+                            <!-- Rectangle 9x9 pixels -->
                             <Rectangle Width="9" Height="9" Stroke="#919191" SnapsToDevicePixels="true">
                                 <Rectangle.Fill>
                                     <LinearGradientBrush EndPoint="0.5,2" StartPoint="0.5,0">
@@ -35,7 +27,9 @@
                                     </LinearGradientBrush>
                                 </Rectangle.Fill>
                             </Rectangle>
+                            <!-- Vertical line inside rectangle -->
                             <Rectangle x:Name="ExpandPath" Width="1" Height="5" Stroke="Black" SnapsToDevicePixels="true"/>
+                            <!-- Horizontal line inside rectangle -->
                             <Rectangle Width="5" Height="1" Stroke="Black" SnapsToDevicePixels="true"/>
                         </Grid>
                         <ControlTemplate.Triggers>
@@ -68,11 +62,9 @@
 
                             <!-- Connecting Lines -->
                             <Rectangle x:Name="HorLn" Margin="9,1,0,0" Height="1" Stroke="#DCDCDC" SnapsToDevicePixels="True"/>
-                            <Rectangle x:Name="VerLn" Grid.RowSpan="1" Width="1" Stroke="#DCDCDC" Margin="0,0,1,0" SnapsToDevicePixels="true" Fill="White"/>
-                            <ToggleButton Margin="-1,0,0,0" x:Name="Expander" Style="{StaticResource ExpandCollapseToggleStyle}" 
-                                          IsChecked="{Binding Path=IsExpanded, RelativeSource={RelativeSource TemplatedParent}}" ClickMode="Press"/>
-                            
-                            <Border Name="Bd" Grid.Column="1" Grid.ColumnSpan="3" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="True">
+                            <Rectangle x:Name="VerLn" Width="1" Stroke="#DCDCDC" Margin="0,0,1,0" Grid.RowSpan="2" SnapsToDevicePixels="true" Fill="White"/>
+                            <ToggleButton Margin="-1,0,0,0" x:Name="Expander" Style="{StaticResource ExpandCollapseToggleStyle}" IsChecked="{Binding Path=IsExpanded, RelativeSource={RelativeSource TemplatedParent}}" ClickMode="Press"/>
+                            <Border Name="Bd" Grid.Column="1" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="True">
                                 <ContentPresenter x:Name="PART_Header" ContentSource="Header" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" MinWidth="20"/>
                             </Border>
                             <ItemsPresenter x:Name="ItemsHost" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"/>
@@ -86,14 +78,9 @@
                             <Trigger Property="IsExpanded" Value="false">
                                 <Setter TargetName="ItemsHost" Property="Visibility" Value="Collapsed"/>
                             </Trigger>
-                            <Trigger Property="IsExpanded" Value="true">
-                                <Setter TargetName="ItemsHost" Property="Visibility" Value="Visible"/>
-                            </Trigger>
-                            <!-- Hide button expand if !HasItems -->
                             <Trigger Property="HasItems" Value="false">
                                 <Setter TargetName="Expander" Property="Visibility" Value="Hidden"/>
                             </Trigger>
-                            <!-- if no header set MinWidth-->
                             <MultiTrigger>
                                 <MultiTrigger.Conditions>
                                     <Condition Property="HasHeader" Value="false"/>
@@ -101,7 +88,6 @@
                                 </MultiTrigger.Conditions>
                                 <Setter TargetName="PART_Header" Property="MinWidth" Value="75"/>
                             </MultiTrigger>
-                            <!-- if no header set MinHeight-->
                             <MultiTrigger>
                                 <MultiTrigger.Conditions>
                                     <Condition Property="HasHeader" Value="false"/>
@@ -109,7 +95,6 @@
                                 </MultiTrigger.Conditions>
                                 <Setter TargetName="PART_Header" Property="MinHeight" Value="19"/>
                             </MultiTrigger>
-                            <!-- trigger changes color -->
                             <Trigger Property="IsSelected" Value="true">
                                 <Setter TargetName="Bd" Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
                                 <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
@@ -130,7 +115,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -143,9 +127,15 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Menu x:Name="menu" Grid.ColumnSpan="2"/>
-        <TreeView x:Name="treeView" Grid.Row="1" Margin="2,2,2,2" ItemsSource="{Binding TreeObservableCollection}" 
-                  ContextMenuOpening="treeView_ContextMenuOpening" BorderThickness="0" ItemTemplate="{StaticResource ItemTemplate}">
-            
+        <TreeView x:Name="treeView" Grid.Row="1" Margin="2,2,2,2" ItemsSource="{Binding TreeObservableCollection}" ContextMenuOpening="treeView_ContextMenuOpening" BorderThickness="0">
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate ItemsSource="{Binding Childrens}">
+                    <StackPanel Orientation="Horizontal" Height="20" Margin="0" MinWidth="50" MouseLeftButtonUp="StackPanel_MouseLeftButtonUp" MouseRightButtonDown="StackPanel_MouseRightButtonDown">
+                        <Image Source="{Binding DisplayData.ImgSource}" Height="16" Width="16" Margin="0"/>
+                        <TextBlock Text="{Binding DisplayData.Name}" Height="20" Margin="0,3,0,0" Padding="0" FontSize="12"/>
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
             <TreeView.ContextMenu>
                 <ContextMenu>
                     <ContextMenu.Resources>
