@@ -179,7 +179,7 @@ namespace SupDataDll
         /// <summary>
         /// Close App
         /// </summary>
-        public void ExitApp()
+        public void _ExitApp()
         {
             if (!Exitting)
             {

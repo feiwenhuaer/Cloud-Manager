@@ -27,7 +27,6 @@ namespace Core.cloud
                     switch (rp.TypePath)
                     {
                         case TypePath.Cloud:
-                            return GoogleDrive.GetListFileFolder(rp.GetPath(), rp.Email, id);
                         case TypePath.CloudID:
                             return GoogleDrive.GetListFileFolder(rp.GetPath(), rp.Email, id);
                         case TypePath.UrlFolder:
@@ -182,10 +181,10 @@ namespace Core.cloud
             }
             catch(Exception ex) { return false; }
         }
-
-        public void Delete(object item_)
+        
+        public void Delete(object items_)
         {
-            DeleteItems items = (DeleteItems)item_;
+            DeleteItems items = items_ as DeleteItems;
             Type type_deleteform = LoadDllUI.GetTypeInterface(typeof(SupDataDll.UiInheritance.UIDelete));
             SupDataDll.UiInheritance.UIDelete deleteform = (SupDataDll.UiInheritance.UIDelete)Activator.CreateInstance(type_deleteform);
             CancelDelete cd = new CancelDelete();

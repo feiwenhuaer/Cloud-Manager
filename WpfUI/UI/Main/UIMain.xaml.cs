@@ -40,7 +40,7 @@ namespace WpfUI.UI.Main
 
         public void AddNewCloudToTV(string email, CloudName type)
         {
-
+            TreeObservableCollection.Add(new TreeViewDataModel(null) { DisplayData = new TreeviewDataItem(email, type) });
         }
 
         public void FileSaveDialog(string InitialDirectory, string FileName, string Filter, AnalyzePath rp, string filename, long filesize)
@@ -89,7 +89,7 @@ namespace WpfUI.UI.Main
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            Setting_UI.reflection_eventtocore.ExitApp();
+            Setting_UI.reflection_eventtocore._ExitApp();
         }
 
         void LoadLanguage()
@@ -152,7 +152,6 @@ namespace WpfUI.UI.Main
             ((UC_Lv_item)((TabItem_)tabControl.Items[tabControl.SelectedIndex]).Content).HistoryPathID.Add(new OldPathLV(null, path));
             ((UC_Lv_item)((TabItem_)tabControl.Items[tabControl.SelectedIndex]).Content).Next(e.ClickCount >= 2 ? true : false, true, tv_datamodel, item);
         }
-
         private void StackPanel_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             Get_TreeViewItem(sender as StackPanel).Focus();
@@ -200,7 +199,65 @@ namespace WpfUI.UI.Main
         }
         private void TV_MenuItem_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show(sender.GetType().Name);
+            MenuItem menuitem = sender as MenuItem;
+            if (menuitem == null) return;
+            ContextMenuDataModel data_menu = menuitem.DataContext as ContextMenuDataModel;
+            if (data_menu == null) return;
+            switch(data_menu.Key)
+            {
+                case LanguageKey.TSMI_cut: CutCopy(true); break;
+                case LanguageKey.TSMI_copy: CutCopy(false); break;
+                case LanguageKey.TSMI_paste: Paste(); break;
+                case LanguageKey.TSMI_delete: Delete(); break;
+                case LanguageKey.TSMI_downloadsellected: break;
+                case LanguageKey.TSMI_uploadfile: break;
+                case LanguageKey.TSMI_uploadfolder: break;
+                default: return;
+            }
+        }
+
+        private void CutCopy(bool AreCut)
+        {
+            ClipBoard_.Clear();
+            ClipBoard_.AreCut = AreCut;
+            TreeViewDataModel model = treeView.SelectedItem as TreeViewDataModel;
+            UpDownloadItem item = new UpDownloadItem(model.DisplayData.Name, "", "", Type_FileFolder.Folder);
+            string path = GetRoot_TV(model);
+            AnalyzePath ap = new AnalyzePath(path);
+            ClipBoard_.directory = ap.Parent;
+            ClipBoard_.Add(item);
+            ClipBoard_.Clipboard = true;
+        }
+
+        private void Paste()
+        {
+            if (!ClipBoard_.Clipboard) return;
+            TreeViewDataModel model = treeView.SelectedItem as TreeViewDataModel;
+            string savefolder = GetRoot_TV(model);
+            Setting_UI.reflection_eventtocore._AddItem(ClipBoard_.Items, ClipBoard_.directory, savefolder, ClipBoard_.AreCut);
+        }
+
+        private void Delete()
+        {
+            TreeViewDataModel model = treeView.SelectedItem as TreeViewDataModel;
+            switch(model.DisplayData.Type)
+            {
+                case CloudName.LocalDisk: return;
+                case CloudName.Folder:
+                    Thread thr = new Thread(Setting_UI.reflection_eventtocore._DeletePath);
+                    Setting_UI.ManagerThreads.delete.Add(thr);
+                    thr.Start(new DeleteItems(GetRoot_TV(model)) { PernamentDelete = false });
+                    break;
+                default:
+                    if (Setting_UI.reflection_eventtocore._DeleteAccountCloud(model.DisplayData.Name, model.DisplayData.Type))
+                    {
+                        TreeObservableCollection.Remove(model);
+                    }
+                    else MessageBox.Show(this, "Error", "Remove cloud " + model.DisplayData.Type.ToString() + ":" + model.DisplayData.Name + " failed.", MessageBoxButton.OK, MessageBoxImage.Error);
+                    break;
+            }
+
+           
         }
         #endregion
         #endregion

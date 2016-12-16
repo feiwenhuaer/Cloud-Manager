@@ -175,6 +175,19 @@ namespace SupDataDll
     
     public class DeleteItems
     {
+        public DeleteItems()
+        {
+
+        }
+        public DeleteItems(string item)
+        {
+            items.Add(item);
+        }
+
+        public DeleteItems(List<string> items)
+        {
+            this.items.AddRange(items);
+        }
         public List<string> items = new List<string>();
         public bool PernamentDelete;
     }

@@ -103,7 +103,7 @@ namespace FormUI.UI.MainForm
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             Setting_UI.ManagerThreads.CloseAll();
-            if(!ReloadUI) Setting_UI.reflection_eventtocore.ExitApp();
+            if(!ReloadUI) Setting_UI.reflection_eventtocore._ExitApp();
         }
         #endregion
 
