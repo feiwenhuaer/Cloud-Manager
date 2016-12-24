@@ -75,8 +75,11 @@
     <Compile Include="UI\Closing.xaml.cs">
       <DependentUpon>Closing.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Delete.xaml.cs">
-      <DependentUpon>Delete.xaml</DependentUpon>
+    <Compile Include="UI\UICreateFolder.xaml.cs">
+      <DependentUpon>UICreateFolder.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\UIDelete.xaml.cs">
+      <DependentUpon>UIDelete.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Main\Lv_item\LV_data.cs" />
     <Compile Include="UI\Main\Lv_item\UC_Lv_item.xaml.cs">
@@ -90,6 +93,9 @@
     </Compile>
     <Compile Include="UI\Main\UIMain.xaml.cs">
       <DependentUpon>UIMain.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\RenameItem.xaml.cs">
+      <DependentUpon>RenameItem.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\UILogin.xaml.cs">
       <DependentUpon>UILogin.xaml</DependentUpon>
@@ -144,7 +150,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\Delete.xaml">
+    <Page Include="UI\UICreateFolder.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\UIDelete.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -161,6 +171,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Main\UIMain.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\RenameItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

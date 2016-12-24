@@ -130,7 +130,7 @@
         <TreeView x:Name="treeView" Grid.Row="1" Margin="2,2,2,2" ItemsSource="{Binding TreeObservableCollection}" ContextMenuOpening="treeView_ContextMenuOpening" BorderThickness="0">
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Childrens}">
-                    <StackPanel Orientation="Horizontal" Height="20" Margin="0" MinWidth="50" MouseLeftButtonUp="StackPanel_MouseLeftButtonUp" MouseRightButtonDown="StackPanel_MouseRightButtonDown">
+                    <StackPanel Orientation="Horizontal" Height="20" Margin="0" Width="auto" MouseLeftButtonUp="StackPanel_MouseLeftButtonUp" MouseRightButtonDown="StackPanel_MouseRightButtonDown">
                         <Image Source="{Binding DisplayData.ImgSource}" Height="16" Width="16" Margin="0"/>
                         <TextBlock Text="{Binding DisplayData.Name}" Height="20" Margin="0,3,0,0" Padding="0" FontSize="12"/>
                     </StackPanel>

@@ -17,17 +17,11 @@ namespace WpfUI.UI
     /// <summary>
     /// Interaction logic for Delete.xaml
     /// </summary>
-    public partial class Delete : Window, UIDelete
+    public partial class UIDelete : Window, SupDataDll.UiInheritance.UIDelete
     {
-        public Delete()
+        public UIDelete()
         {
             InitializeComponent();
-            this.Closing += Delete_Closing;
-        }
-
-        private void Delete_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            EventClosing();
         }
 
         bool autoclose = false;
@@ -112,6 +106,7 @@ namespace WpfUI.UI
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             autoclose = true;
+            EventClosing();
         }
         #endregion
     }

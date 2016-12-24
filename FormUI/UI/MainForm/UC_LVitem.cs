@@ -419,9 +419,8 @@ namespace FormUI.UI.MainForm
         {
             CreateFolderForm f = new CreateFolderForm();
             AnalyzePath ap = new AnalyzePath(TB_Path.Text);
-            f.Path = TB_Path.Text;
+            f.Path = HistoryPathID[HistoryPathID_index].Path;
             f.Id = HistoryPathID[HistoryPathID_index].ID;
-            f.Email = ap.Email;
             f.Show(MainForm);
         }
         #endregion

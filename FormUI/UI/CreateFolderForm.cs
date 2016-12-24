@@ -44,7 +44,6 @@ namespace FormUI.UI
 
         public string Path;
         public string Id;
-        public string Email;
         public CreateFolderForm()
         {
             InitializeComponent();
@@ -94,7 +93,7 @@ namespace FormUI.UI
         {
             AnalyzePath ap = new AnalyzePath(Path);
             string temp = ap.AddRawChildPath(textBox1.Text);
-            Setting_UI.reflection_eventtocore._CreateFolder(temp, Id, Email, textBox1.Text);
+            Setting_UI.reflection_eventtocore._CreateFolder(temp, Id, ap.Email, textBox1.Text);
             Invoke(new Action(() => this.Close()));
         }
 

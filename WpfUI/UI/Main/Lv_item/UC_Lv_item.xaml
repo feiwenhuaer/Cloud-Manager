@@ -8,6 +8,8 @@
     <UserControl.Resources>
         <Style TargetType="ListViewItem">
             <Setter Property="Height" Value="20"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
         </Style>
     </UserControl.Resources>
     <Grid Background="WhiteSmoke">
@@ -17,12 +19,12 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <Label Name="label" Content="Path:" HorizontalAlignment="Left" Width="35" Margin="0" Padding="2,4,2,0"/>
-            <Image Name="image_back" Grid.Column="1" HorizontalAlignment="Left" Width="32" Margin="3,0,0,0"/>
+            <Image Name="image_back" Grid.Column="1" HorizontalAlignment="Left" Width="32" Margin="3,0,0,0" MouseUp="image_back_MouseUp"/>
             <TextBox Name="textBox" Grid.Column="1" Margin="40,0,66,0" TextWrapping="Wrap" Text="" Padding="2,4,2,0"/>
-            <Image Name="image_next" Grid.Column="1" Margin="0,0,31,0" HorizontalAlignment="Right" Width="30"/>
-            <Image Name="image_search" Grid.Column="1" HorizontalAlignment="Right" Width="26"/>
+            <Image Name="image_next" Grid.Column="1" Margin="0,0,31,0" HorizontalAlignment="Right" Width="30" MouseUp="image_next_MouseUp"/>
+            <Image Name="image_search" Grid.Column="1" HorizontalAlignment="Right" Width="26" MouseUp="image_search_MouseUp"/>
         </Grid>
-        <ListView x:Name="LV_items" Margin="0,24,0,0">
+        <ListView x:Name="LV_items" Margin="0,24,0,0" ContextMenuOpening="LVitems_ContextMenu_ContextMenuOpening" MouseDoubleClick="LV_items_MouseDoubleClick" SelectionMode="Extended">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Name" Width="250">

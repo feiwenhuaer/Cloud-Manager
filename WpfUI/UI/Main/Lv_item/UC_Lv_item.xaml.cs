@@ -3,12 +3,15 @@ using SupDataDll;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -22,7 +25,7 @@ namespace WpfUI.UI.Main.Lv_item
     /// <summary>
     /// Interaction logic for UC_Lv_item.xaml
     /// </summary>
-    public partial class UC_Lv_item : UserControl
+    public partial class UC_Lv_item : System.Windows.Controls.UserControl
     {
         public UC_Lv_item()
         {
@@ -172,9 +175,9 @@ namespace WpfUI.UI.Main.Lv_item
         }
         #endregion
 
-        private void Lvitem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void LV_items_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            LV_data data = (sender as ListViewItem).DataContext as LV_data;
+            LV_data data = LV_items.SelectedItem as LV_data;
             if (data.Type == Type_FileFolder.Folder)
             {
                 Clear();
@@ -230,29 +233,29 @@ namespace WpfUI.UI.Main.Lv_item
         }
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
-            MenuItem menuitem = sender as MenuItem;
+            System.Windows.Controls.MenuItem menuitem = sender as System.Windows.Controls.MenuItem;
             if (menuitem != null && menuitem.Header != null && menuitem.DataContext is ContextMenuDataModel)
             {
                 ContextMenuDataModel menu_data_blind = menuitem.DataContext as ContextMenuDataModel;
                 switch (menu_data_blind.Key)
                 {
-                    case LanguageKey.TSMI_refresh: HistoryPathID_index--; Next(); break;
-                    case LanguageKey.TSMI_open: Open(); break;
-                    case LanguageKey.TSMI_cut: Add_Clipboard(true); break;
-                    case LanguageKey.TSMI_copy: Add_Clipboard(false); break;
-                    case LanguageKey.TSMI_paste: Paste(); break;
-                    case LanguageKey.TSMI_rename: break;
-                    case LanguageKey.TSMI_delete: break;
-                    case LanguageKey.TSMI_createfolder: break;
-                    case LanguageKey.TSMI_copyid: break;
-                    case LanguageKey.TSMI_downloadsellected: break;
-                    case LanguageKey.TSMI_uploadfolder: break;
-                    case LanguageKey.TSMI_uploadfile: break;
-                    default: return;
+                    case LanguageKey.TSMI_refresh: HistoryPathID_index--; Next(); return;
+                    case LanguageKey.TSMI_open: Open(); return;
+                    case LanguageKey.TSMI_cut: CutCopy(true); return;
+                    case LanguageKey.TSMI_copy: CutCopy(false); return;
+                    case LanguageKey.TSMI_paste: Paste(); return;
+                    case LanguageKey.TSMI_rename: Rename(); return;
+                    case LanguageKey.TSMI_delete: Delete(); return;
+                    case LanguageKey.TSMI_createfolder: CreateFolder(); return;
+                    case LanguageKey.TSMI_copyid: System.Windows.Clipboard.SetText((LV_items.SelectedItem as LV_data).id); return;
+                    case LanguageKey.TSMI_downloadsellected: DownloadSelected(); return;
+                    case LanguageKey.TSMI_uploadfolder: uploadfolder(); return;
+                    case LanguageKey.TSMI_uploadfile: uploadfile(); return;
+                    default: throw new Exception("Not found MenuItem: " + menu_data_blind.Key.ToString());
                 }
             }
         }
-        void Add_Clipboard(bool cut)
+        void CutCopy(bool cut)
         {
             ClipBoard_.Clear();
             ClipBoard_.AreCut = cut;
@@ -275,6 +278,77 @@ namespace WpfUI.UI.Main.Lv_item
             }
             Setting_UI.reflection_eventtocore._AddItem(ClipBoard_.Items, ClipBoard_.directory, savefolder, ClipBoard_.AreCut);
         }
+        void Rename()
+        {
+            LV_data data = LV_items.SelectedItem as LV_data;
+            RenameItem rename = new RenameItem(textBox.Text + (AnalyzePath.IsCloud(textBox.Text) ? "/" : "\\") + data.Name,data.id,data.Name);
+            rename.Show();
+        }
+        void Delete()
+        {
+            DeleteItems items = new DeleteItems();
+            string s = AnalyzePath.IsCloud(textBox.Text) ? "/" : "\\";
+            foreach(LV_data data in LV_items.SelectedItems as List<LV_data>)
+            {
+                items.items.Add(textBox.Text + s + data.Name);
+            }
+            items.PernamentDelete = false;
+            Thread thr = new Thread(Setting_UI.reflection_eventtocore._DeletePath);
+            Setting_UI.ManagerThreads.delete.Add(thr);
+            thr.Start(items);
+        }
+        void CreateFolder()
+        {
+            UICreateFolder ui_cf = new UICreateFolder();
+            AnalyzePath ap = new AnalyzePath(HistoryPathID[HistoryPathID_index].Path);
+            ui_cf.Path = HistoryPathID[HistoryPathID_index].Path;
+            if (LV_items.SelectedIndex == 1 && (LV_items.SelectedItem as LV_data).Type == Type_FileFolder.Folder) ui_cf.Path = ap.AddRawChildPath((LV_items.SelectedItem as LV_data).Name);
+            ui_cf.Id = HistoryPathID[HistoryPathID_index].ID;
+            ui_cf.ShowDialog();
+        }
+        void DownloadSelected()
+        {
+            if (LV_items.SelectedIndex < 1) return;
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
+            fbd.RootFolder = Environment.SpecialFolder.MyComputer;
+            fbd.ShowNewFolderButton = true;
+            DialogResult result = fbd.ShowDialog();
+            if (result != DialogResult.OK | result != DialogResult.Yes) return;
+            List<UpDownloadItem> listitems = new List<UpDownloadItem>();
+            foreach(LV_data item in LV_items.SelectedItems as List<LV_data>)
+            {
+                listitems.Add(new UpDownloadItem(item.Name, item.id, item.mimeType, item.Type, item.Size));
+            }
+            Setting_UI.reflection_eventtocore._AddItem(listitems, HistoryPathID[HistoryPathID_index].Path, fbd.SelectedPath, false);
+        }
+        void uploadfolder()
+        {
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
+            fbd.RootFolder = Environment.SpecialFolder.MyComputer;
+            fbd.ShowNewFolderButton = true;
+            DialogResult result = fbd.ShowDialog();
+            if (result != DialogResult.OK | result != DialogResult.Yes) return;
+            AnalyzePath ap = new AnalyzePath(fbd.SelectedPath);
+            Setting_UI.reflection_eventtocore._AddItem(new List<UpDownloadItem>() { new UpDownloadItem(ap.NameLastItem,null,null, Type_FileFolder.Folder) }, ap.Parent, fbd.SelectedPath, false);
+        }
+        void uploadfile()
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Multiselect = true;
+            ofd.Filter = "All files (*.*)|*.*";
+            ofd.InitialDirectory = "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}";
+            DialogResult result = ofd.ShowDialog();
+            if (result != DialogResult.OK | result != DialogResult.Yes) return;
+            List<UpDownloadItem> items = new List<UpDownloadItem>();
+            string root = System.IO.Path.GetDirectoryName(ofd.FileNames[0]);
+            foreach (string s in ofd.SafeFileNames)
+            {
+                FileInfo info = new FileInfo(root + "\\" + s);
+                items.Add(new UpDownloadItem(s, "", "", Type_FileFolder.File, info.Length));
+            }
+            Setting_UI.reflection_eventtocore._AddItem(items, root, HistoryPathID[HistoryPathID_index].Path, false);
+        }
+
         #endregion
     }
 }

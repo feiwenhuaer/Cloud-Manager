@@ -7,13 +7,15 @@ using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Web;
 
 namespace CustomHttpRequest
 {
     public class HttpRequest_
     {
+        public bool debug = false;
+        Uri uri;
+
         public HttpRequest_(string url, string RequestMethod)
         {
             if (string.IsNullOrEmpty(url)) throw new NullReferenceException("url can't be null or empty");
@@ -23,22 +25,23 @@ namespace CustomHttpRequest
         }
 
         private string url;
-        public bool debug = false;
         /// <summary>
         /// Get/Set url
         /// </summary>
         public string URL { get { return url; } set { url = value; } }
-        Uri uri;
+
         /// <summary>
         /// Get/Set RequestMethod
         /// </summary>
         public string RequestMethod { get { return requestmethod; } set { requestmethod = value; } }
         string requestmethod;
+
         /// <summary>
         /// Get Data Respone
         /// </summary>
         public string TextDataResponse { get { return textdataresponse; } }
-        string textdataresponse = "";
+        string textdataresponse;
+
 
         #region Connection & SSL
         /// <summary>
@@ -46,6 +49,7 @@ namespace CustomHttpRequest
         /// </summary>
         public int ReceiveTimeout { get { return receive_timeout; } set { receive_timeout = value; } }
         int receive_timeout = 10000;
+
         /// <summary>
         /// Get/Set SendTimeout of tcpclient (default 10000ms)
         /// </summary>
@@ -55,7 +59,7 @@ namespace CustomHttpRequest
         public TcpClient tcp = new TcpClient();
         SslStream sslStream;
         bool ssl = false;
-        private void ConnectToHost()
+        void ConnectToHost()
         {
             if (tcp.Connected) return;
             try
@@ -66,11 +70,7 @@ namespace CustomHttpRequest
                 tcp.Client.NoDelay = true;
                 uri = new Uri(this.url);
                 ssl = url.ToLower().IndexOf("https://") == 0;
-                try
-                {
-                    tcp.Connect(uri.Host, ssl ? 443 : 80);
-                }
-                catch (ThreadAbortException ex) { throw ex; }
+                tcp.Connect(uri.Host, ssl ? 443 : 80);
                 debugwrite("TcpClient Connected", "uri.Host: " + uri.Host + ", RemoteEndPoint: " + tcp.Client.RemoteEndPoint.ToString());
                 if (ssl)
                 {
@@ -87,7 +87,7 @@ namespace CustomHttpRequest
                 }
             }catch(Exception ex) { throw ex; }
         }
-        private bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
             if (sslPolicyErrors == SslPolicyErrors.None) return true;
             Console.WriteLine("Certificate error: {0}", sslPolicyErrors);
@@ -112,6 +112,7 @@ namespace CustomHttpRequest
         }
         #endregion
 
+        
         #region Count byte send/receive
         long byte_receive = 0;
         long byte_send = 0;
@@ -123,10 +124,13 @@ namespace CustomHttpRequest
         public long TotalByteReceive { get { return byte_receive; } }
         #endregion
 
+
+
         #region HeaderSend
         bool WasSendHeader = false;
         public string HeaderSend { get { return header_send; } set { header_send = value; } }
         string header_send = "";
+
         public void AddHeader(string HeadName, string Data)
         {
             header_send += HeadName + ": " + Data + "\r\n";
@@ -142,6 +146,7 @@ namespace CustomHttpRequest
                 header_send += h + "\r\n";
             }
         }
+
         /// <summary>
         /// Make new request
         /// </summary>
@@ -153,28 +158,19 @@ namespace CustomHttpRequest
             uri = new Uri(url);
             header_send = RequestMethod.ToUpper() + " " + uri.PathAndQuery + " HTTP/1.1\r\n";
         }
-        private long GetContentLengthHeaderSend()
-        {
-            if (WasSendHeader) return -1;
-            string[] lh = Regex.Split(header_send, "\r\n");
-            foreach (string s in lh)
-            {
-                if (s.ToLower().IndexOf("content-length") >= 0)
-                {
-                    return long.Parse(Regex.Split(s, ": ")[1]);
-                }
-            }
-            return -1;
-        }
         #endregion
+
+
 
         #region HeaderReceive
         bool WasReceiveHeader = false;
+
         /// <summary>
         /// Get HeaderReceive
         /// </summary>
         public string HeaderReceive { get { return header_receive; } }
         string header_receive = "";
+
         /// <summary>
         /// Get status code.
         /// </summary>
@@ -184,6 +180,7 @@ namespace CustomHttpRequest
             if(WasReceiveHeader) return int.Parse(Regex.Split(GetHeaderResponse()[0], " ")[1]);
             return -1;
         }
+
         /// <summary>
         /// Get size data will receive.
         /// </summary>
@@ -195,6 +192,11 @@ namespace CustomHttpRequest
             string length = ls.Count == 0 ? null : ls[0];
             return length == null ? (long)-1 : long.Parse(length);
         }
+
+        /// <summary>
+        /// Get Array String Header Response
+        /// </summary>
+        /// <returns></returns>
         public string[] GetHeaderResponse()
         {
             if (!string.IsNullOrEmpty(header_receive) & WasReceiveHeader)
@@ -203,11 +205,11 @@ namespace CustomHttpRequest
             }
             throw new Exception("Header is null");
         }
+        
         public List<string> GetHeaderDataResponse(string HeaderName)
         {
-            var header = GetHeaderResponse();
             List<string> data = new List<string>();
-            foreach (string h in header)
+            foreach (string h in GetHeaderResponse())
             {
                 if (h.ToLower().IndexOf(HeaderName.ToLower() + ": ") >= 0)
                 {
@@ -250,6 +252,9 @@ namespace CustomHttpRequest
         #endregion
 
         #region Receive
+        byte[] buffer = new byte[1];
+        byte[] buffer_header = new byte[8 * 1024];
+
         /// <summary>
         /// Send header -> Receive header response
         /// </summary>
@@ -268,8 +273,6 @@ namespace CustomHttpRequest
             if (!WasReceiveHeader)
             {
                 int byteread = 0;
-                byte[] buffer = new byte[1];
-                byte[] buffer_header = new byte[8 * 1024];
                 try
                 {
                     do //Receive header
@@ -283,7 +286,7 @@ namespace CustomHttpRequest
                             buffer_header[(int)byte_receive - 2] == 13 && buffer_header[(int)byte_receive - 1] == 10) { break; }
                     } while (true);
                 }
-                catch (ThreadAbortException ex) { throw ex; }
+                catch (Exception ex) { throw ex; }
                 header_receive = Encoding.UTF8.GetString(buffer_header, 0, (int)byte_header_receive).TrimStart(' ');
                 debugwrite("header response.", header_receive);
                 WasReceiveHeader = true;
@@ -298,6 +301,39 @@ namespace CustomHttpRequest
                 throw new HttpException(statuscode, "Error code "+ statuscode.ToString()+"\r\n"+textdataresponse);
             }
         }
+        
+        public void ReadHeaderResponse_and_GetStreamResponse(AsyncCallback callback, bool SendDataHeader = true, bool CheckStatusCode = false)
+        {
+            Stream st = GetStream();
+            byte_receive = 0;
+            byte_send = 0;
+            byte_header_receive = 0;
+            byte_header_send = 0;
+            if (SendDataHeader) SendHeader(st);
+            if (!WasReceiveHeader) st.BeginRead(buffer, 0, buffer.Length, BeginRead, callback);
+        }
+
+        void BeginRead(IAsyncResult asyncResult)
+        {
+            Stream st = GetStream();
+            int byteread = st.EndRead(asyncResult);
+            buffer_header[byte_receive] = buffer[0];
+            byte_receive += byteread;
+            //check
+            if(byte_receive > 4)
+            {
+                if (buffer_header[(int)byte_receive - 4] == 13 && buffer_header[(int)byte_receive - 3] == 10 &&
+                            buffer_header[(int)byte_receive - 2] == 13 && buffer_header[(int)byte_receive - 1] == 10)
+                {
+                    ReceiveHeaderIAsyncResult a = new ReceiveHeaderIAsyncResult(st);
+                    ((AsyncCallback)asyncResult.AsyncState).Invoke(a);
+                    return;
+                }
+            }
+            st.BeginRead(buffer, 0, buffer.Length, BeginRead, null);
+        }
+
+
         /// <summary>
         /// Send header -> Receive header -> Read text data response.
         /// </summary>
@@ -329,6 +365,7 @@ namespace CustomHttpRequest
             if (!CheckStatusCode) return textdataresponse;
             throw new HttpException(response_code, "Error code " + response_code.ToString() +"\r\n"+ textdataresponse);
         }
+
         /// <summary>
         /// Read text data response.
         /// </summary>
@@ -338,6 +375,7 @@ namespace CustomHttpRequest
             if (!WasReceiveHeader) throw new NullReferenceException("header_receive: " + header_receive);
             return ReadDataResponseText(CheckMethodTransfer());
         }
+
         private string ReadDataResponseText(MethodTransfer mt)
         {
             try
@@ -401,7 +439,7 @@ namespace CustomHttpRequest
                     return textdataresponse;
                 }
                 else return "";
-            }catch(ThreadAbortException ex) { throw ex; }
+            }catch(Exception ex) { throw ex; }
         }//read data text receive
         #endregion
         
@@ -463,15 +501,5 @@ namespace CustomHttpRequest
                 Console.WriteLine(">> " + title + "\r\n" + data);
             }
         }
-    }
-    public class ParseHeader
-    {
-        public string ReceiveName;
-        public string SendName;
-    }
-
-    internal enum MethodTransfer
-    {
-        ContentLength,Chunk,None
     }
 }

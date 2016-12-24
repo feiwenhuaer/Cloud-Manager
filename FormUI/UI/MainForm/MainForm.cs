@@ -227,8 +227,6 @@ namespace FormUI.UI.MainForm
             list_UCLVitem[tabControl1.SelectedIndex].HistoryPathID.Add(pathnext);
             list_UCLVitem[tabControl1.SelectedIndex].Next(explandTV,true,e.Node);
         }
-
-
         private void CMS_TVitem_Opening(object sender, CancelEventArgs e)
         {
             if (ClipBoard_.Clipboard) pasteToolStripMenuItem.Enabled = true;
@@ -255,12 +253,10 @@ namespace FormUI.UI.MainForm
             }
             
         }
-
         private void cutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             CutCopy(true);
         }
-
         private void copyToolStripMenuItem_Click(object sender, EventArgs e)
         {
             CutCopy(false);
@@ -283,7 +279,6 @@ namespace FormUI.UI.MainForm
             ClipBoard_.Add(item);
             ClipBoard_.Clipboard = true;
         }
-        
         private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             TreeNode parent_node = GetRootParent(TV_item.SelectedNode);
@@ -294,7 +289,6 @@ namespace FormUI.UI.MainForm
             Setting_UI.reflection_eventtocore._AddItem(ClipBoard_.Items, ClipBoard_.directory, path, ClipBoard_.AreCut);
             if (ClipBoard_.AreCut) ClipBoard_.Clipboard = false;
         }
-        
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             DeleteConfirmForm d = new DeleteConfirmForm();
@@ -377,7 +371,6 @@ namespace FormUI.UI.MainForm
                     ((CloudName)GetRootParent(TV_item.SelectedNode).ImageIndex).ToString() + ":" + TV_item.SelectedNode.FullPath.Replace('\\', '/'),false);
             }
         }
-
         private TreeNode GetRootParent(TreeNode node)
         {
             TreeNode parent = node;
@@ -605,34 +598,5 @@ namespace FormUI.UI.MainForm
             }
         }
         #endregion
-
-        #region TLV Up Down 
-        private void LV_updown_MouseClick(object sender, MouseEventArgs e)
-        {
-            //Point mousePos = LV_updown.PointToClient(Control.MousePosition);
-            //ListViewHitTestInfo hitTest = LV_updown.HitTest(mousePos);
-            //int columnIndex = hitTest.Item.SubItems.IndexOf(hitTest.SubItem);
-            //int rowIndex = hitTest.Item.Index;
-            //if (e.Button == MouseButtons.Right & columnIndex > 0 )
-            //{
-            //    CMS_LVUpDown.Show(Control.MousePosition);
-            //}
-            //if (e.Button == MouseButtons.Left & columnIndex == 0)
-            //{
-
-            //}
-        }
-
-        private void LV_updown_ItemMouseHover(object sender, ListViewItemMouseHoverEventArgs e)
-        {
-            //Point mousePos = LV_updown.PointToClient(Control.MousePosition);
-            //mousePos.X += 10;
-            //ListViewHitTestInfo hitTest = LV_updown.HitTest(mousePos);
-            //int columnIndex = hitTest.Item.SubItems.IndexOf(hitTest.SubItem);
-            //int rowIndex = hitTest.Item.Index;
-            //toolTip1.Show(LV_updown.Items[rowIndex].SubItems[columnIndex].Text, LV_updown, mousePos, 2000);
-        }
-        #endregion
-
     }
 }

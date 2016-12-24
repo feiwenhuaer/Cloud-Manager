@@ -256,9 +256,9 @@ namespace WpfUI.UI.Main
                     else MessageBox.Show(this, "Error", "Remove cloud " + model.DisplayData.Type.ToString() + ":" + model.DisplayData.Name + " failed.", MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
             }
-
-           
         }
+
+
         #endregion
         #endregion
 
