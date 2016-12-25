@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 
 namespace SupDataDll
@@ -99,22 +100,38 @@ namespace SupDataDll
         public List<UD_item_work> items = new List<UD_item_work>();
     }
 
-
     public class UD_item_work
     {
+        //Show UI
         public List<string> col { get; set; }
+        public string SizeString = "";
+
         public long Timestamp = 0;
         public UD_item_work_info From = new UD_item_work_info();
         public UD_item_work_info To = new UD_item_work_info();
         public StatusUpDown status = StatusUpDown.Waiting;
         public StatusUpDown CheckChangeStatus = StatusUpDown.Waiting;
-        public string UploadID = "";
+        public string UploadID = "";//for remuse
         public string ErrorMsg = "";
+        public int byteread = 0;
         public long Transfer = 0;
-        public long OldTransfer = 0;
+        public long OldTransfer = 0;//for cal speed
+        public int ChunkUpload = -1;// = -1 is download, >0 is chunk size upload
         public long TransferRequest = 0;
         public Thread item_work;
-        public string SizeString = "";
+        public byte[] buffer;
+    }
+
+    
+    public class UD_item_work_info
+    {
+        public Stream stream;
+        public string filename;
+        public string path;
+        public string Fileid;
+        public CloudName TypeCloud;
+        public string email;
+        public long Size = -1;
     }
 
     public class UD_data_WPF : ITreeModel
@@ -162,17 +179,8 @@ namespace SupDataDll
         }
     }
 
-    public class UD_item_work_info
-    {
-        public string filename;
-        public string path;
-        public string Fileid;
-        public CloudName TypeCloud;
-        public string email;
-        public long Size = -1;
-    }
     #endregion
-    
+
     public class DeleteItems
     {
         public DeleteItems()
@@ -189,6 +197,6 @@ namespace SupDataDll
             this.items.AddRange(items);
         }
         public List<string> items = new List<string>();
-        public bool PernamentDelete;
+        public bool PernamentDelete = false;
     }
 }

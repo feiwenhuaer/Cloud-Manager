@@ -258,6 +258,7 @@ namespace Core
         public AnalyzePath savefolder;
         public bool AreCut = false;
         public List<Thread> threads = new List<Thread>();
+        
         internal GroupTransferItemsProcess(Group_Json_Data_UDItem group_json)
         {
             addGroup_toTLV = true;
@@ -535,13 +536,11 @@ namespace Core
             try{
                 AnalyzePath rp_from;
                 AnalyzePath rp_to = new AnalyzePath(group.items[x].To.path);
-                Stream StreamTo;
-                Stream StreamFrom;
 
                 if (!fromfolder.PathIsUrl)
                 {
                     rp_from = new AnalyzePath(group.items[x].From.path);
-                    StreamFrom = AppSetting.ManageCloud.GetFileStream(group.items[x].From.path,
+                    group.items[x].From.stream = AppSetting.ManageCloud.GetFileStream(group.items[x].From.path,
                         group.items[x].From.Fileid,
                         rp_to.PathIsCloud,
                         group.items[x].TransferRequest,
@@ -549,7 +548,7 @@ namespace Core
                 }
                 else
                 {
-                    StreamFrom = AppSetting.ManageCloud.GetFileStream("",
+                    group.items[x].From.stream = AppSetting.ManageCloud.GetFileStream("",
                         group.items[x].From.Fileid,
                         rp_to.PathIsCloud,
                         group.items[x].TransferRequest,
@@ -559,7 +558,7 @@ namespace Core
                 }
                 int buffer_length = 32;//default
                 int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.BufferSize), out buffer_length);
-                byte[] buffer = new byte[buffer_length * 1024];
+                group.items[x].buffer = new byte[buffer_length * 1024];
                 int byteread = 0;
                 string token = "";
                 if (rp_to.PathIsCloud) token = AppSetting.settings.GetToken(rp_to.Email, rp_to.TypeCloud);
@@ -571,18 +570,19 @@ namespace Core
                 {
                     case CloudName.LocalDisk:
                         #region LocalDisk
-                        StreamTo = AppSetting.ManageCloud.GetFileStream(group.items[x].To.path, null,false,group.items[x].Transfer);
+                        group.items[x].To.stream = AppSetting.ManageCloud.GetFileStream(group.items[x].To.path, null,false,group.items[x].Transfer);
+                        //test 
                         do
                         {
-                            byteread = StreamFrom.Read(buffer, 0, buffer.Length);
-                            StreamTo.Write(buffer, 0, byteread);
-                            StreamTo.Flush();
+                            byteread = group.items[x].From.stream.Read(group.items[x].buffer, 0, group.items[x].buffer.Length);
+                            group.items[x].To.stream.Write(group.items[x].buffer, 0, byteread);
+                            group.items[x].To.stream.Flush();
                             group.items[x].Transfer += byteread;
                             group.items[x].TransferRequest = group.items[x].Transfer;
                         } while (IsStillDownloading(x) && byteread != 0 && group.items[x].Transfer < group.items[x].From.Size);
 
-                        if (!fromfolder.PathIsCloud) StreamFrom.Close();
-                        if (!savefolder.PathIsCloud) StreamTo.Close();
+                        if (!fromfolder.PathIsCloud) group.items[x].From.stream.Close();
+                        if (!savefolder.PathIsCloud) group.items[x].To.stream.Close();
 
                         if (group.status == StatusUpDown.Remove) { group.status = StatusUpDown.Removing; return; }
                         if (group.items[x].status == StatusUpDown.Remove) { group.items[x].status = StatusUpDown.Removing; return; }
@@ -605,12 +605,12 @@ namespace Core
                         int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.Dropbox_ChunksSize), out chunksizedb);
                         int size_db = chunksizedb * 1024*1024;
                         DropboxRequestAPIv2 client = new DropboxRequestAPIv2(token);
-                        byteread = StreamFrom.Read(buffer, 0, buffer.Length);
+                        byteread = group.items[x].From.stream.Read(group.items[x].buffer, 0, group.items[x].buffer.Length);
                         db_createupload:
                         int loop = 0;
                         if (string.IsNullOrEmpty(group.items[x].UploadID))
                         {
-                            dynamic json = JsonConvert.DeserializeObject(client.upload_session_start(buffer, byteread));
+                            dynamic json = JsonConvert.DeserializeObject(client.upload_session_start(group.items[x].buffer, byteread));
                             group.items[x].UploadID = json.session_id;
                             group.items[x].Transfer += byteread;
                             loop = (int)((group.items[x].From.Size - byteread) / (long)size_db);
@@ -626,7 +626,7 @@ namespace Core
                         {
                             try
                             {
-                                StreamTo = client.upload_session_append(group.items[x].UploadID,
+                                group.items[x].To.stream = client.upload_session_append(group.items[x].UploadID,
                                     group.items[x].From.Size - group.items[x].Transfer > size_db ? size_db : group.items[x].From.Size - group.items[x].Transfer,
                                     group.items[x].Transfer);
                             }catch(HttpException http_ex) {
@@ -636,9 +636,9 @@ namespace Core
                             int temp_send = 0;
                             do
                             {
-                                byteread = StreamFrom.Read(buffer, 0, (size_db - temp_send) > buffer.Length ? buffer.Length : (size_db - temp_send));
-                                StreamTo.Write(buffer, 0, byteread);
-                                StreamTo.Flush();
+                                byteread = group.items[x].From.stream.Read(group.items[x].buffer, 0, (size_db - temp_send) > group.items[x].buffer.Length ? group.items[x].buffer.Length : (size_db - temp_send));
+                                group.items[x].To.stream.Write(group.items[x].buffer, 0, byteread);
+                                group.items[x].To.stream.Flush();
                                 group.items[x].Transfer += byteread;
                                 temp_send += byteread;
                             } while (IsStillDownloading(x) & temp_send != size_db & group.items[x].Transfer != group.items[x].From.Size);
@@ -647,11 +647,11 @@ namespace Core
                             if (group.status == StatusUpDown.Remove) { group.status = StatusUpDown.Removing; return; }
                             if (group.items[x].status == StatusUpDown.Remove) { group.items[x].status = StatusUpDown.Removing; return; }
                             if (group.status == StatusUpDown.Stop) group.items[x].status = StatusUpDown.Stop;
-                            if (group.items[x].status != StatusUpDown.Stop) { if (!fromfolder.PathIsCloud) StreamFrom.Close(); return; }
+                            if (group.items[x].status != StatusUpDown.Stop) { if (!fromfolder.PathIsCloud) group.items[x].From.stream.Close(); return; }
 
                             group.items[x].TransferRequest = group.items[x].Transfer;
                         }
-                        if (!fromfolder.PathIsCloud) StreamFrom.Close();
+                        if (!fromfolder.PathIsCloud) group.items[x].From.stream.Close();
                         //create folder if not found
                         if(Dropbox.AutoCreateFolder(rp_to.GetPath(), rp_to.Email) != rp_to.GetPath())
                         {
@@ -700,7 +700,7 @@ namespace Core
                         #region Processing
                         for (int i = 0; i < gd_loop; i++)
                         {
-                            StreamTo = gdclient.Files_insert_resumable( group.items[x].UploadID, 
+                            group.items[x].To.stream = gdclient.Files_insert_resumable( group.items[x].UploadID, 
                                                                         group.items[x].TransferRequest, 
                                                                         (i != gd_loop-1) ? group.items[x].TransferRequest + size_gd - 1 : group.items[x].From.Size - 1,
                                                                         group.items[x].From.Size);
@@ -708,15 +708,15 @@ namespace Core
                             int sizechunk = (i != gd_loop - 1) ? size_gd : (int)(group.items[x].From.Size - group.items[x].TransferRequest);
                             do
                             {
-                                byteread = StreamFrom.Read(buffer, 0, sizechunk - temp_send > buffer.Length ? buffer.Length : sizechunk - temp_send);
-                                StreamTo.Write(buffer, 0, byteread);
-                                StreamTo.Flush();
+                                byteread = group.items[x].From.stream.Read(group.items[x].buffer, 0, sizechunk - temp_send > group.items[x].buffer.Length ? group.items[x].buffer.Length : sizechunk - temp_send);
+                                group.items[x].To.stream.Write(group.items[x].buffer, 0, byteread);
+                                group.items[x].To.stream.Flush();
                                 group.items[x].Transfer += byteread;
                                 temp_send += byteread;
                             } while (IsStillDownloading(x) && byteread != 0 && temp_send != sizechunk);
 
                             gdclient.GetResponse_Files_insert_resumable();//get header response
-                            StreamTo.Close();
+                            group.items[x].To.stream.Close();
 
                             if (group.items[x].status == StatusUpDown.Running) group.items[x].TransferRequest = group.items[x].Transfer;
                             if (group.status == StatusUpDown.Remove) { group.status = StatusUpDown.Removing; return; }
@@ -724,7 +724,7 @@ namespace Core
                             if (group.status == StatusUpDown.Stop) group.items[x].status = StatusUpDown.Stop;
                             if (group.items[x].status == StatusUpDown.Stop) return;
                         }
-                        StreamFrom.Close();
+                        group.items[x].From.stream.Close();
                         //if (!rp_from.IsCloud) StreamFrom.Close();
                         if (this.group.items[x].Transfer != this.group.items[x].From.Size) group.items[x].status = StatusUpDown.Error; 
                         else group.items[x].status = StatusUpDown.Done;
@@ -755,28 +755,87 @@ namespace Core
         public UD_group_work Group = new UD_group_work();
     }
     #endregion
+    
 
-    static class CurrentMillis
+    public class TransferByte
     {
-        private static readonly DateTime Jan1St1970 = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-        /// <summary>Get extra long current timestamp</summary>
-        public static long Millis { get { return (long)((DateTime.UtcNow - Jan1St1970).TotalMilliseconds); } }
-
-        public static string GetTimeBySecond(int second)
+        UD_item_work item;
+        object clientTo;
+        public TransferByte(UD_item_work item,object clientTo)
         {
-            int sec = second % 60;
-            int minute = (second - sec) / 60;
-            int min = minute % 60;
-            int hour = (minute - min) / 60;
-            int hr = hour % 24;
-            int days = (hour - hr) / 24;
-            string text = "";
-            if (days != 0)
-            {
-                text += days.ToString() + " days ";
-            }
-            text += hr.ToString() + ":" + min.ToString() + ":" + sec.ToString();
-            return text;
+            this.item = item;
+            this.clientTo = clientTo;
+            //Make Stream To
+            if (item.ChunkUpload > 0) MakeNextChunkStreamTo(true);
+            else this.item.To.stream = AppSetting.ManageCloud.GetFileStream(item.To.path, null, false, item.Transfer);
+            //begin transfer
+            item.status = StatusUpDown.Running;
+            item.From.stream.BeginRead(item.buffer, 0, item.buffer.Length, new AsyncCallback(GetFrom), 0);
         }
+
+        public void GetFrom(IAsyncResult result)
+        {
+            item.byteread = item.From.stream.EndRead(result);
+            if (item.ChunkUpload < 0) item.To.stream.Seek(item.Transfer, SeekOrigin.Begin);//if download to disk then seek.
+            item.To.stream.Write(item.buffer, 0, item.byteread);
+            item.Transfer += item.byteread;
+            if (item.Transfer == item.From.Size | item.status != StatusUpDown.Running)//transfer done/force stop.
+            {
+                item.TransferRequest = item.Transfer;
+                item.From.stream.Close();
+                if (item.ChunkUpload > 0)//if upload
+                {
+                    switch(item.To.TypeCloud)
+                    {
+                        case CloudName.Dropbox: ((DropboxRequestAPIv2)clientTo).GetResponse_upload_session_append(); return;
+                        case CloudName.GoogleDrive: ((DriveAPIHttprequestv2)clientTo).GetResponse_Files_insert_resumable(); return;
+                        default: throw new Exception("Not support");
+                    }
+                }else item.To.stream.Close();//close file in disk
+                return;
+            }
+
+            if (item.ChunkUpload > 0)//if upload
+            {
+                int totalchunkupload = (int)result.AsyncState;
+                totalchunkupload += item.byteread;
+                if (totalchunkupload == item.ChunkUpload)
+                {
+                    MakeNextChunkStreamTo();
+                }
+                int nexbyteread = item.ChunkUpload - totalchunkupload >= item.buffer.Length ? item.buffer.Length : item.ChunkUpload - totalchunkupload;
+                item.From.stream.BeginRead(item.buffer, 0, nexbyteread, new AsyncCallback(GetFrom), totalchunkupload);
+            }
+            else
+            {
+                item.TransferRequest = item.Transfer;
+                item.From.stream.BeginRead(item.buffer, 0, item.buffer.Length, new AsyncCallback(GetFrom), 0);
+            }
+        }
+
+        void MakeNextChunkStreamTo(bool CreateNew = false)
+        {
+            if (item.ChunkUpload <= 0) throw new Exception("Not upload type");
+            long pos_end = item.Transfer + item.ChunkUpload - 1;
+            if (pos_end >= item.From.Size) pos_end = item.From.Size - 1;
+
+            switch (item.To.TypeCloud)
+            {
+                case CloudName.Dropbox:
+                    if (!CreateNew) ((DropboxRequestAPIv2)clientTo).GetResponse_upload_session_append();//get data return from server
+                    item.To.stream = ((DropboxRequestAPIv2)clientTo).upload_session_append(item.From.Fileid, pos_end - item.Transfer + 1, item.Transfer);
+                    break;
+
+                case CloudName.GoogleDrive:
+                    if (!CreateNew) ((DriveAPIHttprequestv2)clientTo).GetResponse_Files_insert_resumable();//get data return from server
+                    item.To.stream = ((DriveAPIHttprequestv2)clientTo).Files_insert_resumable(item.From.Fileid, item.Transfer, pos_end, item.From.Size);
+                    break;
+
+
+                default:throw new Exception("Not support.");
+            }
+            item.TransferRequest = item.Transfer;//
+        }
+
     }
 }

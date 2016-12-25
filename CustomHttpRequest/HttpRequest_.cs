@@ -325,6 +325,9 @@ namespace CustomHttpRequest
                 if (buffer_header[(int)byte_receive - 4] == 13 && buffer_header[(int)byte_receive - 3] == 10 &&
                             buffer_header[(int)byte_receive - 2] == 13 && buffer_header[(int)byte_receive - 1] == 10)
                 {
+                    header_receive = Encoding.UTF8.GetString(buffer_header, 0, (int)byte_receive-4).TrimStart(' ');
+                    WasReceiveHeader = true;
+
                     ReceiveHeaderIAsyncResult a = new ReceiveHeaderIAsyncResult(st);
                     ((AsyncCallback)asyncResult.AsyncState).Invoke(a);
                     return;
