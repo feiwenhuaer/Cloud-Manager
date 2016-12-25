@@ -24,7 +24,7 @@
             <Image Name="image_next" Grid.Column="1" Margin="0,0,31,0" HorizontalAlignment="Right" Width="30" MouseUp="image_next_MouseUp"/>
             <Image Name="image_search" Grid.Column="1" HorizontalAlignment="Right" Width="26" MouseUp="image_search_MouseUp"/>
         </Grid>
-        <ListView x:Name="LV_items" Margin="0,24,0,0" ContextMenuOpening="LVitems_ContextMenu_ContextMenuOpening" MouseDoubleClick="LV_items_MouseDoubleClick" SelectionMode="Extended">
+        <ListView x:Name="LV_items" Margin="0,24,0,0" ContextMenuOpening="LVitems_ContextMenu_ContextMenuOpening" MouseDoubleClick="LV_items_MouseDoubleClick" SelectionMode="Extended" MouseDown="LV_items_MouseDown">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Name" Width="250">
@@ -56,7 +56,7 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Date Modified" Width="100" DisplayMemberBinding="{Binding d_mod}"/>
+                    <GridViewColumn Header="Date Modified" Width="120" DisplayMemberBinding="{Binding d_mod}"/>
                     <GridViewColumn Header="mimeType" Width="100" DisplayMemberBinding="{Binding mimeType}"/>
                     <GridViewColumn Header="id" Width="80" DisplayMemberBinding="{Binding id}"/>
                 </GridView>

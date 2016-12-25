@@ -781,17 +781,18 @@ namespace Core
             item.Transfer += item.byteread;
             if (item.Transfer == item.From.Size | item.status != StatusUpDown.Running)//transfer done/force stop.
             {
-                item.TransferRequest = item.Transfer;
+                if (item.status == StatusUpDown.Running) item.TransferRequest = item.Transfer;
                 item.From.stream.Close();
                 if (item.ChunkUpload > 0)//if upload
                 {
                     switch(item.To.TypeCloud)
                     {
-                        case CloudName.Dropbox: ((DropboxRequestAPIv2)clientTo).GetResponse_upload_session_append(); return;
-                        case CloudName.GoogleDrive: ((DriveAPIHttprequestv2)clientTo).GetResponse_Files_insert_resumable(); return;
+                        case CloudName.Dropbox: ((DropboxRequestAPIv2)clientTo).GetResponse_upload_session_append(); break;
+                        case CloudName.GoogleDrive: ((DriveAPIHttprequestv2)clientTo).GetResponse_Files_insert_resumable(); break;
                         default: throw new Exception("Not support");
                     }
                 }else item.To.stream.Close();//close file in disk
+                item.status = StatusUpDown.Done;
                 return;
             }
 

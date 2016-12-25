@@ -175,18 +175,6 @@ namespace WpfUI.UI.Main.Lv_item
         }
         #endregion
 
-        private void LV_items_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            LV_data data = LV_items.SelectedItem as LV_data;
-            if (data.Type == Type_FileFolder.Folder)
-            {
-                Clear();
-                OldPathLV op_lv = new OldPathLV(data.id, textBox.Text + (AnalyzePath.IsCloud(textBox.Text) ? "/" : "\\") + data.Name);
-                HistoryPathID.Add(op_lv);
-                Next();
-            }
-        }
-
         #region ContextMenu Listview
         ObservableCollection<ContextMenuDataModel> menuitemsource;
         public void LoadContextMenuListview()
@@ -281,14 +269,14 @@ namespace WpfUI.UI.Main.Lv_item
         void Rename()
         {
             LV_data data = LV_items.SelectedItem as LV_data;
-            RenameItem rename = new RenameItem(textBox.Text + (AnalyzePath.IsCloud(textBox.Text) ? "/" : "\\") + data.Name,data.id,data.Name);
+            RenameItem rename = new RenameItem(textBox.Text + (AnalyzePath.IsCloud(textBox.Text) ? "/" : "\\") + data.Name, data.id, data.Name);
             rename.Show();
         }
         void Delete()
         {
             DeleteItems items = new DeleteItems();
             string s = AnalyzePath.IsCloud(textBox.Text) ? "/" : "\\";
-            foreach(LV_data data in LV_items.SelectedItems as List<LV_data>)
+            foreach (LV_data data in LV_items.SelectedItems as List<LV_data>)
             {
                 items.items.Add(textBox.Text + s + data.Name);
             }
@@ -315,7 +303,7 @@ namespace WpfUI.UI.Main.Lv_item
             DialogResult result = fbd.ShowDialog();
             if (result != DialogResult.OK | result != DialogResult.Yes) return;
             List<UpDownloadItem> listitems = new List<UpDownloadItem>();
-            foreach(LV_data item in LV_items.SelectedItems as List<LV_data>)
+            foreach (LV_data item in LV_items.SelectedItems as List<LV_data>)
             {
                 listitems.Add(new UpDownloadItem(item.Name, item.id, item.mimeType, item.Type, item.Size));
             }
@@ -329,7 +317,7 @@ namespace WpfUI.UI.Main.Lv_item
             DialogResult result = fbd.ShowDialog();
             if (result != DialogResult.OK | result != DialogResult.Yes) return;
             AnalyzePath ap = new AnalyzePath(fbd.SelectedPath);
-            Setting_UI.reflection_eventtocore._AddItem(new List<UpDownloadItem>() { new UpDownloadItem(ap.NameLastItem,null,null, Type_FileFolder.Folder) }, ap.Parent, fbd.SelectedPath, false);
+            Setting_UI.reflection_eventtocore._AddItem(new List<UpDownloadItem>() { new UpDownloadItem(ap.NameLastItem, null, null, Type_FileFolder.Folder) }, ap.Parent, fbd.SelectedPath, false);
         }
         void uploadfile()
         {
@@ -349,6 +337,26 @@ namespace WpfUI.UI.Main.Lv_item
             Setting_UI.reflection_eventtocore._AddItem(items, root, HistoryPathID[HistoryPathID_index].Path, false);
         }
 
+        #endregion
+
+        #region ListView Event
+        private void LV_items_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            LV_data data = LV_items.SelectedItem as LV_data;
+            if (data == null) return;
+            if (data.Type == Type_FileFolder.Folder)
+            {
+                Clear();
+                OldPathLV op_lv = new OldPathLV(data.id, textBox.Text + (AnalyzePath.IsCloud(textBox.Text) ? "/" : "\\") + data.Name);
+                HistoryPathID.Add(op_lv);
+                Next();
+            }
+        }
+
+        private void LV_items_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            LV_items.SelectedItems.Clear();
+        }
         #endregion
     }
 }
