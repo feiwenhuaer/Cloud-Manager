@@ -40,9 +40,9 @@ namespace WpfUI.UI.Main
 
         public void AddNewCloudToTV(string email, CloudName type)
         {
-            if (Dispatcher.CheckAccess())
+            //if (Dispatcher.CheckAccess())
                 Dispatcher.Invoke(new Action(() => TreeObservableCollection.Add(new TreeViewDataModel(null) { DisplayData = new TreeviewDataItem(email, type) })));
-            else TreeObservableCollection.Add(new TreeViewDataModel(null) { DisplayData = new TreeviewDataItem(email, type) });            
+            //else TreeObservableCollection.Add(new TreeViewDataModel(null) { DisplayData = new TreeviewDataItem(email, type) });            
         }
 
         public void FileSaveDialog(string InitialDirectory, string FileName, string Filter, AnalyzePath rp, string filename, long filesize)
@@ -370,6 +370,7 @@ namespace WpfUI.UI.Main
 
         #region UI menu
         ObservableCollection<ContextMenuDataModel> CloudsAdd;
+        ObservableCollection<ContextMenuDataModel> CloudsRemove;
         private void MenuItem_Cloud_Load()
         {
             CloudsAdd = new ObservableCollection<ContextMenuDataModel>();
@@ -377,32 +378,39 @@ namespace WpfUI.UI.Main
             CloudsAdd.Add(new ContextMenuDataModel(CloudName.GoogleDrive));
             Cloud_add.ItemsSource = CloudsAdd;
         }
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        private void MenuItem_SubmenuOpened(object sender, RoutedEventArgs e)
         {
-            Cloud_remove.Items.Clear();
+            CloudsRemove = new ObservableCollection<ContextMenuDataModel>();
             foreach (CloudEmail_Type cloud in Setting_UI.reflection_eventtocore._GetListAccountCloud().account)
             {
-                MenuItem item = new MenuItem();
-                item.Header = cloud.Email;
-                item.Icon = Setting_UI.GetImage(TreeviewDataItem.list_bm[(int)cloud.Type]);//.Source;
-                item.Click += Remove_Click;
-                Cloud_remove.Items.Add(item);
+                CloudsRemove.Add(new ContextMenuDataModel(cloud.Email, cloud.Type));
             }
+            Cloud_remove.ItemsSource = CloudsRemove;
         }
-        private void Remove_Click(object sender, RoutedEventArgs e)
-        {
-            
-        }
-
         private void Cloud_add_click(object sender, RoutedEventArgs e)
         {
             MenuItem item = sender as MenuItem;
             ContextMenuDataModel data = item.DataContext as ContextMenuDataModel;
             Setting_UI.reflection_eventtocore._ShowFormOauth(data.Type);
         }
+        private void Cloud_remove_click(object sender, RoutedEventArgs e)
+        {
+            MenuItem item = sender as MenuItem;
+            ContextMenuDataModel data = item.DataContext as ContextMenuDataModel;
+            if (data.Type == CloudName.Folder | data.Type == CloudName.LocalDisk) throw new Exception("Can remove cloud only.");
+            if(Setting_UI.reflection_eventtocore._DeleteAccountCloud(data.Text, data.Type))
+            {
+                foreach(TreeViewDataModel tv_data in TreeObservableCollection)
+                {
+                    if(tv_data.DisplayData.Name == data.Text && tv_data.DisplayData.Type == data.Type)
+                    {
+                        TreeObservableCollection.Remove(tv_data);
+                        return;
+                    }
+                }
+            }
+        }
         #endregion
-
-
     }
     public class TabItem_ : TabItem
     {

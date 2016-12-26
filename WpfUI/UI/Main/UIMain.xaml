@@ -127,7 +127,7 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Menu x:Name="menu" Grid.ColumnSpan="2">
-            <MenuItem Header="Cloud" Click="MenuItem_Click">
+            <MenuItem Header="Cloud" SubmenuOpened="MenuItem_SubmenuOpened">
                 <MenuItem x:Name="Cloud_add" Header="Add" ItemsSource="{Binding CloudsAdd}">
                     <MenuItem.ItemContainerStyle>
                         <Style TargetType="{x:Type MenuItem}">
@@ -137,9 +137,19 @@
                         </Style>
                     </MenuItem.ItemContainerStyle>
                 </MenuItem>
-                <MenuItem x:Name="Cloud_remove" Header="Remove"/>
+                <MenuItem x:Name="Cloud_remove" Header="Remove" ItemsSource="{Binding CloudsRemove}">
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="{x:Type MenuItem}">
+                            <Setter Property="Header" Value="{Binding Text}"/>
+                            <Setter Property="Icon" Value="{Binding Img}"/>
+                            <EventSetter Event="Click" Handler="Cloud_remove_click"/>
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                </MenuItem>
             </MenuItem>
-            <MenuItem Header="Settings"/>
+            <MenuItem Header="Settings">
+                <MenuItem Header="Settings..."/>
+            </MenuItem>
         </Menu>
         <TreeView x:Name="treeView" Grid.Row="1" Margin="2,2,3,2" ItemsSource="{Binding TreeObservableCollection}" ContextMenuOpening="treeView_ContextMenuOpening" 
                   BorderThickness="0">
