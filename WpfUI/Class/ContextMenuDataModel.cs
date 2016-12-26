@@ -11,20 +11,22 @@ namespace WpfUI.Class
 {
     public class ContextMenuDataModel: INotifyPropertyChanged
     {
+        public ContextMenuDataModel(string Text)
+        {
+            this.Text = Text;
+        }
         public ContextMenuDataModel(LanguageKey Key)
         {
             Text = Setting_UI.reflection_eventtocore._GetTextLanguage(Key);
             this.Key = Key;
             IsEnabled = true;
         }
-
         public ContextMenuDataModel(string Name,CloudName Img_type)
         {
             this.Text = Name;
             this.Img = Setting_UI.GetImage(TreeviewDataItem.list_bm[(int)Img_type]);
             this.Type = Img_type;
         }
-
         public ContextMenuDataModel(CloudName Name_n_Img_type)
         {
             this.Text = Name_n_Img_type.ToString();
@@ -41,13 +43,11 @@ namespace WpfUI.Class
                 NotifyPropertyChange("Child");
             }
         }
-        public string Text { get; set; }
-        public LanguageKey Key { get; set; }
-        public Image Img { get; set; }
-        public CloudName Type { get; set; }
 
         private bool _IsEnabled = true;
-        public bool IsEnabled { get { return _IsEnabled; }
+        public bool IsEnabled
+        {
+            get { return _IsEnabled; }
             set
             {
                 _IsEnabled = value;
@@ -55,12 +55,18 @@ namespace WpfUI.Class
             }
         }
 
+
+        public string Text { get; set; }
+        public LanguageKey Key { get; set; }
+        public Image Img { get; set; }
+        public CloudName Type { get; set; }
+
+        
         private void NotifyPropertyChange(string name)
         {
             if (PropertyChanged != null)
                 PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(name));
         }
-
         public event PropertyChangedEventHandler PropertyChanged;
     }
 }

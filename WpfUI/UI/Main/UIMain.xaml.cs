@@ -378,7 +378,7 @@ namespace WpfUI.UI.Main
             CloudsAdd.Add(new ContextMenuDataModel(CloudName.GoogleDrive));
             Cloud_add.ItemsSource = CloudsAdd;
         }
-        private void MenuItem_SubmenuOpened(object sender, RoutedEventArgs e)
+        private void MenuCloud_SubmenuOpened(object sender, RoutedEventArgs e)
         {
             CloudsRemove = new ObservableCollection<ContextMenuDataModel>();
             foreach (CloudEmail_Type cloud in Setting_UI.reflection_eventtocore._GetListAccountCloud().account)
@@ -410,6 +410,44 @@ namespace WpfUI.UI.Main
                 }
             }
         }
+
+        ObservableCollection<ContextMenuDataModel> uis;
+        ObservableCollection<ContextMenuDataModel> langs;
+        private void MenuSetting_SubmenuOpened(object sender, RoutedEventArgs e)
+        {
+            uis = new ObservableCollection<ContextMenuDataModel>();
+            langs = new ObservableCollection<ContextMenuDataModel>();
+            string ui_default = Setting_UI.reflection_eventtocore._GetSetting(SettingsKey.UI_dll_file);
+            string lang_default = Setting_UI.reflection_eventtocore._GetSetting(SettingsKey.lang);
+
+            foreach (string s in GetList_UI_n_lang.GetListUiFile()) uis.Add(new ContextMenuDataModel(s) { IsEnabled = s == ui_default ? false : true });
+            foreach (string s in GetList_UI_n_lang.GetListLangFile())
+            {
+                langs.Add(new ContextMenuDataModel(s) { IsEnabled = s == lang_default ? false : true });
+            }
+
+            MenuChangeUI.ItemsSource = uis;
+            MenuChangeLang.ItemsSource = langs;
+        }
+
+        private void ChangeUI_click(object sender, RoutedEventArgs e)
+        {
+            MenuItem item = sender as MenuItem;
+            ContextMenuDataModel data = item.DataContext as ContextMenuDataModel;
+            Setting_UI.reflection_eventtocore._SetSetting(SettingsKey.UI_dll_file, data.Text);
+            Setting_UI.reflection_eventtocore._SaveSetting();
+            this.reloadui = true;
+            this.Close();
+        }
+        private void ChangeLang_click(object sender, RoutedEventArgs e)
+        {
+            MenuItem item = sender as MenuItem;
+            ContextMenuDataModel data = item.DataContext as ContextMenuDataModel;
+            Setting_UI.reflection_eventtocore._SetSetting(SettingsKey.lang, data.Text);
+            Setting_UI.reflection_eventtocore._SaveSetting();
+            LoadLanguage();
+        }
+
         #endregion
     }
     public class TabItem_ : TabItem

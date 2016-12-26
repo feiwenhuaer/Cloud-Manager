@@ -24,9 +24,11 @@ namespace Core.StaticClass
             List<object[]> listloadevent = new List<object[]>() {
             new object[] { Type_reflection_eventtocore, "EventAddItem",AppSetting.ud_items,"AddItems", instance_reflection_eventtocore }
             ,new object[] { Type_reflection_eventtocore, "EventGetListAccountCloud", AppSetting.settings, "GetListAccountCloud", instance_reflection_eventtocore }
+
             ,new object[] { Type_reflection_eventtocore, "EventSetSetting", AppSetting.settings, "SetSettingAsString", instance_reflection_eventtocore }
             ,new object[] { Type_reflection_eventtocore, "EventSaveSetting", AppSetting.settings,"SaveSettings", instance_reflection_eventtocore }
             ,new object[] { Type_reflection_eventtocore, "EventGetSetting", AppSetting.settings, "GetSettingsAsString", instance_reflection_eventtocore }
+
             ,new object[] { Type_reflection_eventtocore, "EventGetTextLanguage", AppSetting.lang, "GetText", instance_reflection_eventtocore }
             ,new object[] { Type_reflection_eventtocore, "EventRenameItem", AppSetting.ManageCloud, "RenameItem", instance_reflection_eventtocore }
             ,new object[] { Type_reflection_eventtocore, "EventDeleteAccountCloud", AppSetting.settings, "RemoveCloud", instance_reflection_eventtocore }

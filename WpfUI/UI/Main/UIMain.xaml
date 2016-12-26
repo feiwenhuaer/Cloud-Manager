@@ -127,7 +127,7 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Menu x:Name="menu" Grid.ColumnSpan="2">
-            <MenuItem Header="Cloud" SubmenuOpened="MenuItem_SubmenuOpened">
+            <MenuItem x:Name="MenuCloud" Header="Cloud" SubmenuOpened="MenuCloud_SubmenuOpened">
                 <MenuItem x:Name="Cloud_add" Header="Add" ItemsSource="{Binding CloudsAdd}">
                     <MenuItem.ItemContainerStyle>
                         <Style TargetType="{x:Type MenuItem}">
@@ -147,8 +147,26 @@
                     </MenuItem.ItemContainerStyle>
                 </MenuItem>
             </MenuItem>
-            <MenuItem Header="Settings">
+            <MenuItem x:Name="MenuSetting" Header="Settings" SubmenuOpened="MenuSetting_SubmenuOpened">
                 <MenuItem Header="Settings..."/>
+                <MenuItem x:Name="MenuChangeUI" Header="Change UI">
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="{x:Type MenuItem}">
+                            <Setter Property="Header" Value="{Binding Text}"/>
+                            <Setter Property="IsEnabled" Value="{Binding IsEnabled}"/>
+                            <EventSetter Event="Click" Handler="ChangeUI_click"/>
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                </MenuItem>
+                <MenuItem x:Name="MenuChangeLang" Header="Change Language">
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="{x:Type MenuItem}">
+                            <Setter Property="Header" Value="{Binding Text}"/>
+                            <Setter Property="IsEnabled" Value="{Binding IsEnabled}"/>
+                            <EventSetter Event="Click" Handler="ChangeLang_click"/>
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                </MenuItem>
             </MenuItem>
         </Menu>
         <TreeView x:Name="treeView" Grid.Row="1" Margin="2,2,3,2" ItemsSource="{Binding TreeObservableCollection}" ContextMenuOpening="treeView_ContextMenuOpening" 
