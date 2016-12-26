@@ -51,13 +51,16 @@
     <Compile Include="DropboxSharingMember.cs" />
     <Compile Include="ErrorCode.cs" />
     <Compile Include="Oauthv2\DropboxOauthv2.cs" />
-    <Compile Include="Oauthv2\OauthUI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CustomHttpRequest\CustomHttpRequest.csproj">
       <Project>{1d279a6b-ce8d-4184-b9ab-bc24c6f69045}</Project>
       <Name>CustomHttpRequest</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SupDataDll\SupDataDll.csproj">
+      <Project>{700EED73-135E-422D-A06E-738D3AD057A1}</Project>
+      <Name>SupDataDll</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

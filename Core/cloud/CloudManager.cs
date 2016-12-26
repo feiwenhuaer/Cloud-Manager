@@ -8,6 +8,8 @@ using System;
 using Core.StaticClass;
 using System.Threading;
 using DropboxHttpRequest.Oauthv2;
+using SupDataDll.UiInheritance;
+using SupDataDll.UiInheritance.Oauth;
 
 namespace Core.cloud
 {
@@ -121,20 +123,30 @@ namespace Core.cloud
         #region Oauth
         public void Oauth(CloudName type)
         {
+            Type type_oauthUI;
+            OauthUI instanceUI;
             switch (type)
             {
                 case CloudName.Dropbox:
                     DropboxOauthv2 oauth_dropbox = new DropboxOauthv2();
                     oauth_dropbox.TokenCallBack += Oauth_dropbox_TokenCallBack;
-                    oauth_dropbox.GetCode(null,AppSetting.UIMain);
+
+                    type_oauthUI = LoadDllUI.GetTypeInterface(typeof(interfaceDB));
+                    instanceUI = (OauthUI)Activator.CreateInstance(type_oauthUI);
+
+                    oauth_dropbox.GetCode(instanceUI, AppSetting.UIMain);
                     break;
                 case CloudName.GoogleDrive:
                     string[] scope = new string[] { Scope.Drive, Scope.DriveFile, Scope.DriveMetadata };
                     GoogleAPIOauth2 oauth_gd = new GoogleAPIOauth2(scope);
                     oauth_gd.TokenCallBack += Oauth_gd_TokenCallBack;
-                    oauth_gd.GetCode(null,AppSetting.UIMain);
+
+                    type_oauthUI = LoadDllUI.GetTypeInterface(typeof(interfaceGD));
+                    instanceUI = (OauthUI)Activator.CreateInstance(type_oauthUI);
+
+                    oauth_gd.GetCode(instanceUI, AppSetting.UIMain);
                     break;
-                default: return;
+                default: throw new Exception("Not support");
             }
         }
         private void Oauth_dropbox_TokenCallBack(string token)

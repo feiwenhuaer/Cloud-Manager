@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json;
 using System.Windows.Forms;
+using SupDataDll.UiInheritance.Oauth;
 
 namespace GoogleDriveHttprequest.Oauth
 {
@@ -64,7 +65,7 @@ namespace GoogleDriveHttprequest.Oauth
             this.refresh_token = refresh_token;
         }
         
-        public void GetCode(OauthUI UI, object owner = null)
+        public void GetCode(OauthUI ui, object owner)
         {
             state = randomDataBase64url(32);
             code_verifier = randomDataBase64url(32);
@@ -80,7 +81,9 @@ namespace GoogleDriveHttprequest.Oauth
             try
             {
                 listener.Start();
-                UI.Show(owner);
+                ui.Url = authorizationRequest;
+                ui.CheckUrl = redirectURI;
+                ui.ShowUI(owner);
                 listener.BeginGetContext(new AsyncCallback(RecieveCode), null);
             }
             catch(Exception ex)

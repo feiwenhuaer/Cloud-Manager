@@ -66,6 +66,7 @@ namespace WpfUI.UI.Main.Lv_item
                 dt.Size = item.Size;
                 if (item.Size > 0)
                 {
+                    dt.SizeString = UnitConventer.ConvertSize(item.Size, 2, UnitConventer.unit_size);
                     dt.Type = Type_FileFolder.File;
                     string[] splitPath = item.Name.Split(new Char[] { '.' });
                     string extension = (string)splitPath.GetValue(splitPath.GetUpperBound(0));
@@ -73,6 +74,7 @@ namespace WpfUI.UI.Main.Lv_item
                 }
                 else
                 {
+                    dt.SizeString = "-1";
                     dt.Type = Type_FileFolder.Folder;
                     dt.ImgSource = Setting_UI.GetImage(IconReader.GetFolderIcon(IconReader.IconSize.Small, IconReader.FolderType.Closed)).Source;
                 }
@@ -344,12 +346,20 @@ namespace WpfUI.UI.Main.Lv_item
         {
             LV_data data = LV_items.SelectedItem as LV_data;
             if (data == null) return;
+            bool iscloud = AnalyzePath.IsCloud(HistoryPathID[HistoryPathID_index].Path);
             if (data.Type == Type_FileFolder.Folder)
             {
                 Clear();
-                OldPathLV op_lv = new OldPathLV(data.id, textBox.Text + (AnalyzePath.IsCloud(textBox.Text) ? "/" : "\\") + data.Name);
+                OldPathLV op_lv = new OldPathLV(data.id, HistoryPathID[HistoryPathID_index].Path + (iscloud ? "/" : "\\") + data.Name);
                 HistoryPathID.Add(op_lv);
                 Next();
+            }
+            else
+            {
+                if(!iscloud)
+                {
+                    System.Diagnostics.Process.Start(HistoryPathID[HistoryPathID_index].Path + "\\" + data.Name);
+                }
             }
         }
 

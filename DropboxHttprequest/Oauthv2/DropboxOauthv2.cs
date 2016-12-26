@@ -1,10 +1,10 @@
 ﻿using DropboxHttpRequest;
+using SupDataDll.UiInheritance.Oauth;
 using System;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
-using System.Windows.Forms;
 
 namespace DropboxHttpRequest.Oauthv2
 {
@@ -35,7 +35,7 @@ namespace DropboxHttpRequest.Oauthv2
 
         HttpListener listener;
         int port = -1;
-        public void GetCode(OauthUI oauthui,object owner = null)
+        public void GetCode(OauthUI oauthui,object owner)
         {
             port = GetFirstAvailableRandomPort(MinPortRange, MaxPortRange);
             listener = new HttpListener();
@@ -46,7 +46,7 @@ namespace DropboxHttpRequest.Oauthv2
             try
             {
                 listener.Start();
-                oauthui.Show(owner);
+                oauthui.ShowUI(owner);
                 listener.BeginGetContext(new AsyncCallback(RecieveCode), null);
             }catch
             {

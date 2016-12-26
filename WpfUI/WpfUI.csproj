@@ -75,6 +75,11 @@
     <Compile Include="UI\Closing.xaml.cs">
       <DependentUpon>Closing.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\Oauth\OauthDB.cs" />
+    <Compile Include="UI\Oauth\OauthGD.cs" />
+    <Compile Include="UI\Oauth\UiOauth.xaml.cs">
+      <DependentUpon>UiOauth.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\UICreateFolder.xaml.cs">
       <DependentUpon>UICreateFolder.xaml</DependentUpon>
     </Compile>
@@ -115,6 +120,10 @@
       <Project>{d17cd489-1b14-47eb-8c22-c189d078aec9}</Project>
       <Name>Aga.Controls</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GoogleDriveHttprequest\GoogleDriveHttprequest.csproj">
+      <Project>{0AEFA63D-8C09-4D16-97C6-A4645B9E03D7}</Project>
+      <Name>GoogleDriveHttprequest</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SupDataDll\SupDataDll.csproj">
       <Project>{700eed73-135e-422d-a06e-738d3ad057a1}</Project>
       <Name>SupDataDll</Name>
@@ -147,6 +156,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="UI\Closing.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Oauth\UiOauth.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

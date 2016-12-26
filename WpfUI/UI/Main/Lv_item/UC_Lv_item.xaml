@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:a="clr-namespace:WpfUI.Class"
              xmlns:local="clr-namespace:WpfUI.UI.Main.Lv_item"
              mc:Ignorable="d" Height="208.365" Width="930.011">
     <UserControl.Resources>
@@ -44,9 +45,9 @@
                                 <TextBlock>
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
-                                            <Setter Property="Text" Value="{Binding Size}"/>
+                                            <Setter Property="Text" Value="{Binding SizeString}"/>
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Size}" Value="-1">
+                                                <DataTrigger Binding="{Binding SizeString}" Value="-1">
                                                     <Setter Property="Text" Value=""/>
                                                 </DataTrigger>
                                             </Style.Triggers>

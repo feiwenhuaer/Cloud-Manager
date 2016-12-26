@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Windows.Controls;
 
 namespace WpfUI.Class
 {
@@ -15,6 +16,20 @@ namespace WpfUI.Class
             Text = Setting_UI.reflection_eventtocore._GetTextLanguage(Key);
             this.Key = Key;
             IsEnabled = true;
+        }
+
+        public ContextMenuDataModel(string Name,CloudName Img_type)
+        {
+            this.Text = Name;
+            this.Img = Setting_UI.GetImage(TreeviewDataItem.list_bm[(int)Img_type]);
+            this.Type = Img_type;
+        }
+
+        public ContextMenuDataModel(CloudName Name_n_Img_type)
+        {
+            this.Text = Name_n_Img_type.ToString();
+            this.Img = Setting_UI.GetImage(TreeviewDataItem.list_bm[(int)Name_n_Img_type]);
+            this.Type = Name_n_Img_type;
         }
 
         private ObservableCollection<ContextMenuDataModel> _Child;
@@ -28,6 +43,8 @@ namespace WpfUI.Class
         }
         public string Text { get; set; }
         public LanguageKey Key { get; set; }
+        public Image Img { get; set; }
+        public CloudName Type { get; set; }
 
         private bool _IsEnabled = true;
         public bool IsEnabled { get { return _IsEnabled; }

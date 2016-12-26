@@ -10,7 +10,7 @@ namespace WpfUI.Class
 {
     public class TreeviewDataItem
     {
-        static List<Bitmap> list_bm = new List<Bitmap>()
+        public static List<Bitmap> list_bm = new List<Bitmap>()
         {
                 WpfUI.Properties.Resources.hard_drive_disk_icon_256x256,
                 WpfUI.Properties.Resources.folder_closed64x64,

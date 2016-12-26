@@ -13,6 +13,7 @@ namespace Core.cloud
             foreach (string item in Directory.GetDirectories(path))
             {
                 DirectoryInfo info = new DirectoryInfo(item);
+                if (CheckAttribute(info.Attributes, FileAttributes.System) | CheckAttribute(info.Attributes, FileAttributes.Offline)) continue;
                 FileFolder f = new FileFolder();
                 f.Name = info.Name;
                 f.Size = -1;
@@ -22,6 +23,7 @@ namespace Core.cloud
             foreach (string item in Directory.GetFiles(path))
             {
                 FileInfo info = new FileInfo(item);
+                if (CheckAttribute(info.Attributes, FileAttributes.System) | CheckAttribute(info.Attributes, FileAttributes.Offline)) continue;
                 FileFolder f = new FileFolder();
                 f.Name = info.Name;
                 f.Size = info.Length;
@@ -31,6 +33,12 @@ namespace Core.cloud
             data.path_raw = path;
             return data;
         }
+
+        static bool CheckAttribute(FileAttributes Item,FileAttributes compare)
+        {
+            return (Item & compare) == compare;
+        }
+
 
         public static Stream GetFileSteam(string path,bool GetfileForUpload,long Startpos)
         {

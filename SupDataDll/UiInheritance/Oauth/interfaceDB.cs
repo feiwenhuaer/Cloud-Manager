@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DropboxHttpRequest.Oauthv2
+namespace SupDataDll.UiInheritance.Oauth
 {
-    public interface OauthUI
+    public interface interfaceDB
     {
-        void Show(object owner = null);
     }
 }

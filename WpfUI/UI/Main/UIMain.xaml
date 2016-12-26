@@ -118,7 +118,7 @@
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="25"/>
+            <RowDefinition Height="20"/>
             <RowDefinition/>
             <RowDefinition MinHeight="150" Height="200" MaxHeight="300"/>
         </Grid.RowDefinitions>
@@ -126,8 +126,23 @@
             <ColumnDefinition MinWidth="150" Width="250" MaxWidth="350"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Menu x:Name="menu" Grid.ColumnSpan="2"/>
-        <TreeView x:Name="treeView" Grid.Row="1" Margin="2,2,2,2" ItemsSource="{Binding TreeObservableCollection}" ContextMenuOpening="treeView_ContextMenuOpening" BorderThickness="0">
+        <Menu x:Name="menu" Grid.ColumnSpan="2">
+            <MenuItem Header="Cloud" Click="MenuItem_Click">
+                <MenuItem x:Name="Cloud_add" Header="Add" ItemsSource="{Binding CloudsAdd}">
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="{x:Type MenuItem}">
+                            <Setter Property="Header" Value="{Binding Text}"/>
+                            <Setter Property="Icon" Value="{Binding Img}"/>
+                            <EventSetter Event="Click" Handler="Cloud_add_click"/>
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                </MenuItem>
+                <MenuItem x:Name="Cloud_remove" Header="Remove"/>
+            </MenuItem>
+            <MenuItem Header="Settings"/>
+        </Menu>
+        <TreeView x:Name="treeView" Grid.Row="1" Margin="2,2,3,2" ItemsSource="{Binding TreeObservableCollection}" ContextMenuOpening="treeView_ContextMenuOpening" 
+                  BorderThickness="0">
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Childrens}">
                     <StackPanel Orientation="Horizontal" Height="20" Margin="0" Width="auto" MouseLeftButtonUp="StackPanel_MouseLeftButtonUp" MouseRightButtonDown="StackPanel_MouseRightButtonDown">
@@ -158,9 +173,9 @@
                 </ContextMenu>
             </TreeView.ContextMenu>
         </TreeView>
-        <GridSplitter x:Name="gridSplitter" Grid.Column="1" HorizontalAlignment="Left" Grid.Row="1" Width="4"/>
-        <GridSplitter x:Name="gridSplitter2" HorizontalAlignment="Stretch" Height="4" Grid.Row="2" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
-        <TabControl x:Name="tabControl" Grid.Column="1" Margin="1,1,1,1" Grid.Row="1"/>
+        <GridSplitter x:Name="gridSplitter" Grid.Column="1" HorizontalAlignment="Left" Grid.Row="1" Width="3" Background="DarkGray"/>
+        <GridSplitter x:Name="gridSplitter2" HorizontalAlignment="Stretch" Height="3" Grid.Row="2" VerticalAlignment="Top" Grid.ColumnSpan="2" Background="DarkGray"/>
+        <TabControl x:Name="tabControl" Grid.Column="1" Margin="3,0,0,0" Grid.Row="1"/>
         <Grid Grid.ColumnSpan="2" Grid.Row="2" Margin="0,2,0,0" Name="Grid_Lv_ud"/>
     </Grid>
 </Window>

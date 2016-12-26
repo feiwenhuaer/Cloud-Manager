@@ -40,7 +40,7 @@ namespace WpfUI.UI.Main
 
         public void AddNewCloudToTV(string email, CloudName type)
         {
-            TreeObservableCollection.Add(new TreeViewDataModel(null) { DisplayData = new TreeviewDataItem(email, type) });
+            Dispatcher.Invoke(new Action(() => TreeObservableCollection.Add(new TreeViewDataModel(null) { DisplayData = new TreeviewDataItem(email, type) })));
         }
 
         public void FileSaveDialog(string InitialDirectory, string FileName, string Filter, AnalyzePath rp, string filename, long filesize)
@@ -84,14 +84,13 @@ namespace WpfUI.UI.Main
             TV_LoadDisk();
             TV_LoadCloud();
             Newtab();
+            MenuItem_Cloud_Load();
             LoadLanguage();
         }
-
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             Setting_UI.reflection_eventtocore._ExitApp();
         }
-
         void LoadLanguage()
         {
             LoadMenu_TV();
@@ -257,12 +256,9 @@ namespace WpfUI.UI.Main
                     break;
             }
         }
-
-
+        
         #endregion
         #endregion
-
-
 
         #region TabControl
         void Newtab()
@@ -344,7 +340,6 @@ namespace WpfUI.UI.Main
                 Dispatcher.Invoke(new Action(() => SetData_TV_LV(o, list)));
             }
         }
-
         void SetData_TV_LV(ExplorerListItem load, ListItemFileFolder list)
         {
             bool iscloud = AnalyzePath.IsCloud(list.path_raw);
@@ -370,6 +365,42 @@ namespace WpfUI.UI.Main
             //(tabControl.Items[tabControl.SelectedIndex] as TabItem_).ToolTip = load.path;
             ((tabControl.Items[tabControl.SelectedIndex] as TabItem_).Content as UC_Lv_item).textBox.Text = load.path.TrimEnd(new char[] { '\\', '/' });
         }
+
+        #region UI menu
+        ObservableCollection<ContextMenuDataModel> CloudsAdd;
+        private void MenuItem_Cloud_Load()
+        {
+            CloudsAdd = new ObservableCollection<ContextMenuDataModel>();
+            CloudsAdd.Add(new ContextMenuDataModel(CloudName.Dropbox));
+            CloudsAdd.Add(new ContextMenuDataModel(CloudName.GoogleDrive));
+            Cloud_add.ItemsSource = CloudsAdd;
+        }
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Cloud_remove.Items.Clear();
+            foreach (CloudEmail_Type cloud in Setting_UI.reflection_eventtocore._GetListAccountCloud().account)
+            {
+                MenuItem item = new MenuItem();
+                item.Header = cloud.Email;
+                item.Icon = Setting_UI.GetImage(TreeviewDataItem.list_bm[(int)cloud.Type]);//.Source;
+                item.Click += Remove_Click;
+                Cloud_remove.Items.Add(item);
+            }
+        }
+        private void Remove_Click(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        private void Cloud_add_click(object sender, RoutedEventArgs e)
+        {
+            MenuItem item = sender as MenuItem;
+            ContextMenuDataModel data = item.DataContext as ContextMenuDataModel;
+            Setting_UI.reflection_eventtocore._ShowFormOauth(data.Type);
+        }
+        #endregion
+
+
     }
     public class TabItem_ : TabItem
     {

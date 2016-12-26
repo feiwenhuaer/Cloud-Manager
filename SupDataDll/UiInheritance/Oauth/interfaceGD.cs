@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace GoogleDriveHttprequest.Oauth
+namespace SupDataDll.UiInheritance.Oauth
 {
-    public interface OauthUI
+    public interface interfaceGD
     {
-        void Show(object owner);
     }
 }
