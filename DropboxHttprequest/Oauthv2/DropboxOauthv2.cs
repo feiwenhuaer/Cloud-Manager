@@ -35,7 +35,7 @@ namespace DropboxHttpRequest.Oauthv2
 
         HttpListener listener;
         int port = -1;
-        public void GetCode(OauthUI oauthui,object owner)
+        public void GetCode(OauthUI ui,object owner)
         {
             port = GetFirstAvailableRandomPort(MinPortRange, MaxPortRange);
             listener = new HttpListener();
@@ -46,7 +46,9 @@ namespace DropboxHttpRequest.Oauthv2
             try
             {
                 listener.Start();
-                oauthui.ShowUI(owner);
+                ui.Url = urloauth;
+                ui.CheckUrl = redirectURI;
+                ui.ShowUI(owner);
                 listener.BeginGetContext(new AsyncCallback(RecieveCode), null);
             }catch
             {

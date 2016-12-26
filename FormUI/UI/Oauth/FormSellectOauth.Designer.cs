@@ -1,6 +1,6 @@
-﻿namespace FormUI.UI
+﻿namespace FormUI.UI.Oauth
 {
-    partial class FormOauth
+    partial class FormSellectOauth
     {
         /// <summary>
         /// Required designer variable.

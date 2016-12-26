@@ -40,7 +40,9 @@ namespace WpfUI.UI.Main
 
         public void AddNewCloudToTV(string email, CloudName type)
         {
-            Dispatcher.Invoke(new Action(() => TreeObservableCollection.Add(new TreeViewDataModel(null) { DisplayData = new TreeviewDataItem(email, type) })));
+            if (Dispatcher.CheckAccess())
+                Dispatcher.Invoke(new Action(() => TreeObservableCollection.Add(new TreeViewDataModel(null) { DisplayData = new TreeviewDataItem(email, type) })));
+            else TreeObservableCollection.Add(new TreeViewDataModel(null) { DisplayData = new TreeviewDataItem(email, type) });            
         }
 
         public void FileSaveDialog(string InitialDirectory, string FileName, string Filter, AnalyzePath rp, string filename, long filesize)

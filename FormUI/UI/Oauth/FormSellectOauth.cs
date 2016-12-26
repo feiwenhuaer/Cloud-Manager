@@ -7,11 +7,11 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace FormUI.UI
+namespace FormUI.UI.Oauth
 {
-    public partial class FormOauth : System.Windows.Forms.Form
+    public partial class FormSellectOauth : System.Windows.Forms.Form
     {
-        public FormOauth()
+        public FormSellectOauth()
         {
             InitializeComponent();
         }

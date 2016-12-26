@@ -9,6 +9,7 @@ using SupDataDll;
 using System.Threading;
 using SupDataDll.UiInheritance;
 using FormUI.UI.SettingForm;
+using FormUI.UI.Oauth;
 
 namespace FormUI.UI.MainForm
 {
@@ -568,7 +569,7 @@ namespace FormUI.UI.MainForm
         //add cloud
         private void addToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            FormOauth oauth = new FormOauth();
+            FormSellectOauth oauth = new FormSellectOauth();
             //oauth.Show(this);
             oauth.ShowDialog(this);
         }
