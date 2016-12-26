@@ -56,13 +56,14 @@ namespace WpfUI.UI.Main.Lv_item
         {
             lv_data.Clear();
             string timeformat = Setting_UI.reflection_eventtocore._GetSetting(SettingsKey.DATE_TIME_FORMAT);
+            DateTime time_default = new DateTime();
             foreach (FileFolder item in data)
             {
                 LV_data dt = new LV_data();
                 dt.Name = item.Name;
                 dt.mimeType = item.mimeType;
                 dt.id = item.id;
-                dt.d_mod = item.Time_mod.ToString(timeformat);
+                if(item.Time_mod != time_default) dt.d_mod = item.Time_mod.ToString(timeformat);
                 dt.Size = item.Size;
                 if (item.Size > 0)
                 {
