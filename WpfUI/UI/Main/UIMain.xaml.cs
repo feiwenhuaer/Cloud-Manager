@@ -149,9 +149,9 @@ namespace WpfUI.UI.Main
             TreeViewItem item = Get_TreeViewItem(sender as StackPanel);
             TreeViewDataModel tv_datamodel = Get_TVDataMoldel(item);
             string path = GetRoot_TV(tv_datamodel);
-            ((UC_Lv_item)((TabItem_)tabControl.Items[tabControl.SelectedIndex]).Content).Clear();
-            ((UC_Lv_item)((TabItem_)tabControl.Items[tabControl.SelectedIndex]).Content).HistoryPathID.Add(new OldPathLV(null, path));
-            ((UC_Lv_item)((TabItem_)tabControl.Items[tabControl.SelectedIndex]).Content).Next(e.ClickCount >= 2 ? true : false, true, tv_datamodel, item);
+            ((UC_Lv_item)((TabItem)tabControl.Items[tabControl.SelectedIndex]).Content).Clear();
+            ((UC_Lv_item)((TabItem)tabControl.Items[tabControl.SelectedIndex]).Content).HistoryPathID.Add(new OldPathLV(null, path));
+            ((UC_Lv_item)((TabItem)tabControl.Items[tabControl.SelectedIndex]).Content).Next(e.ClickCount >= 2 ? true : false, true, tv_datamodel, item);
         }
         private void StackPanel_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -265,12 +265,23 @@ namespace WpfUI.UI.Main
         #region TabControl
         void Newtab()
         {
-            TabItem_ item = new TabItem_();
+            TabItem item = new TabItem();
             item.Header = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.newtab);
             UC_Lv_item lvitem = new UC_Lv_item();
             lvitem.EventListViewFolderDoubleClickCallBack += Lvitem_EventListViewFolderDoubleClickCallBack;
             item.Content = lvitem;
             tabControl.Items.Add(item);
+        }
+        private void ContextMenu_newtab_Click(object sender, RoutedEventArgs e)
+        {
+            Newtab();
+            if (ContextMenu_closetab.IsEnabled == false) ContextMenu_closetab.IsEnabled = true;
+        }
+        private void ContextMenu_closetab_Click(object sender, RoutedEventArgs e)
+        {
+            tabControl.Items.Remove(tabControl.Items[tabControl.SelectedIndex]);
+            GC.Collect();
+            if (tabControl.Items.Count == 1) ContextMenu_closetab.IsEnabled = false;
         }
         #endregion
 
@@ -278,9 +289,10 @@ namespace WpfUI.UI.Main
         private void Lvitem_EventListViewFolderDoubleClickCallBack(ExplorerListItem load)
         {
             load.indexLV_tab = tabControl.SelectedIndex;
-            try { if (((TabItem_)tabControl.Items[tabControl.SelectedIndex]).thr.IsAlive) ((TabItem_)tabControl.Items[tabControl.SelectedIndex]).thr.Abort(); } catch { }
-            ((TabItem_)tabControl.Items[tabControl.SelectedIndex]).thr = new Thread(GetData_TV_LV);
-            ((TabItem_)tabControl.Items[tabControl.SelectedIndex]).thr.Start(load);
+            Thread thr = ((UC_Lv_item)((TabItem)tabControl.Items[tabControl.SelectedIndex]).Content).thr;
+            try { if (thr.IsAlive) thr.Abort(); } catch { }
+            thr = new Thread(GetData_TV_LV);
+            thr.Start(load);
         }
         #endregion
 
@@ -320,17 +332,17 @@ namespace WpfUI.UI.Main
             finally
             {
                 string textboxpath = "";
-                Dispatcher.Invoke(new Action(() => textboxpath = ((UC_Lv_item)((TabItem_)tabControl.Items[tabControl.SelectedIndex]).Content).textBox.Text));
+                Dispatcher.Invoke(new Action(() => textboxpath = ((UC_Lv_item)((TabItem)tabControl.Items[tabControl.SelectedIndex]).Content).textBox.Text));
                 if (list == null | (exception & textboxpath == o.path.TrimEnd(new char[] { '/', '\\' })))
                 {
                     Dispatcher.Invoke(new Action(() =>
                     {
-                        if (((tabControl.Items[tabControl.SelectedIndex] as TabItem_).Content as UC_Lv_item).HistoryPathID_index <= 0) ((tabControl.Items[tabControl.SelectedIndex] as TabItem_).Content as UC_Lv_item).textBox.Text = "";
+                        if (((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).HistoryPathID_index <= 0) ((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).textBox.Text = "";
                         else
                         {
-                            ((tabControl.Items[tabControl.SelectedIndex] as TabItem_).Content as UC_Lv_item).HistoryPathID.RemoveAt(((tabControl.Items[tabControl.SelectedIndex] as TabItem_).Content as UC_Lv_item).HistoryPathID_index);
-                            ((tabControl.Items[tabControl.SelectedIndex] as TabItem_).Content as UC_Lv_item).HistoryPathID_index--;
-                            ((tabControl.Items[tabControl.SelectedIndex] as TabItem_).Content as UC_Lv_item).textBox.Text = ((tabControl.Items[tabControl.SelectedIndex] as TabItem_).Content as UC_Lv_item).HistoryPathID[((tabControl.Items[tabControl.SelectedIndex] as TabItem_).Content as UC_Lv_item).HistoryPathID_index].Path;
+                            ((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).HistoryPathID.RemoveAt(((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).HistoryPathID_index);
+                            ((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).HistoryPathID_index--;
+                            ((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).textBox.Text = ((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).HistoryPathID[((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).HistoryPathID_index].Path;
                         }
                     }
                     ));
@@ -356,17 +368,18 @@ namespace WpfUI.UI.Main
                 }
                 if (load.explandTV) ((TreeViewItem)load.TV_node).ExpandSubtree();
             }
-            ((tabControl.Items[tabControl.SelectedIndex] as TabItem_).Content as UC_Lv_item).ShowDataToLV(list.Items);
+            ((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).ShowDataToLV(list.Items);
 
             string tabname = "";
             if (!string.IsNullOrEmpty(list.NameFolder)) tabname = list.NameFolder;
             else if (load.path.IndexOf('/') >= 0) { string[] splitPath = load.path.Split('/'); tabname = (string)splitPath.GetValue(splitPath.GetUpperBound(0)); }
             else if (load.path.IndexOf('\\') >= 0) { string[] splitPath = load.path.Split('\\'); tabname = (string)splitPath.GetValue(splitPath.GetUpperBound(0)); }
             else { tabname = load.path; }
-            (tabControl.Items[tabControl.SelectedIndex] as TabItem_).Header = tabname;
+            (tabControl.Items[tabControl.SelectedIndex] as TabItem).Header = tabname;
             //(tabControl.Items[tabControl.SelectedIndex] as TabItem_).ToolTip = load.path;
-            ((tabControl.Items[tabControl.SelectedIndex] as TabItem_).Content as UC_Lv_item).textBox.Text = load.path.TrimEnd(new char[] { '\\', '/' });
+            ((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).textBox.Text = load.path.TrimEnd(new char[] { '\\', '/' });
         }
+
 
         #region UI menu
         ObservableCollection<ContextMenuDataModel> CloudsAdd;
@@ -429,7 +442,6 @@ namespace WpfUI.UI.Main
             MenuChangeUI.ItemsSource = uis;
             MenuChangeLang.ItemsSource = langs;
         }
-
         private void ChangeUI_click(object sender, RoutedEventArgs e)
         {
             MenuItem item = sender as MenuItem;
@@ -447,11 +459,8 @@ namespace WpfUI.UI.Main
             Setting_UI.reflection_eventtocore._SaveSetting();
             LoadLanguage();
         }
-
         #endregion
-    }
-    public class TabItem_ : TabItem
-    {
-        public Thread thr;
+
+        
     }
 }

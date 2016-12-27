@@ -27,6 +27,7 @@ namespace WpfUI.UI.Main.Lv_item
     /// </summary>
     public partial class UC_Lv_item : System.Windows.Controls.UserControl
     {
+        public Thread thr;
         public UC_Lv_item()
         {
             InitializeComponent();

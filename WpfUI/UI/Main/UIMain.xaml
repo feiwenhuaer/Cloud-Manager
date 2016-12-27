@@ -203,7 +203,14 @@
         </TreeView>
         <GridSplitter x:Name="gridSplitter" Grid.Column="1" HorizontalAlignment="Left" Grid.Row="1" Width="3" Background="DarkGray"/>
         <GridSplitter x:Name="gridSplitter2" HorizontalAlignment="Stretch" Height="3" Grid.Row="2" VerticalAlignment="Top" Grid.ColumnSpan="2" Background="DarkGray"/>
-        <TabControl x:Name="tabControl" Grid.Column="1" Margin="3,0,0,0" Grid.Row="1"/>
+        <TabControl x:Name="tabControl" Grid.Column="1" Margin="3,0,0,0" Grid.Row="1">
+            <TabControl.ContextMenu>
+                <ContextMenu>
+                    <MenuItem x:Name="ContextMenu_newtab" Header="Newtab" Click="ContextMenu_newtab_Click"/>
+                    <MenuItem x:Name="ContextMenu_closetab" Header="Close this tab" Click="ContextMenu_closetab_Click" IsEnabled="False"/>
+                </ContextMenu>
+            </TabControl.ContextMenu>
+        </TabControl>
         <Grid Grid.ColumnSpan="2" Grid.Row="2" Margin="0,2,0,0" Name="Grid_Lv_ud"/>
     </Grid>
 </Window>

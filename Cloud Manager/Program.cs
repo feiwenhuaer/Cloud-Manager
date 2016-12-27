@@ -19,7 +19,9 @@ namespace Cloud_Manager
             {
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
+
                 DeleteFile_dev();// dev mode
+
                 AppSetting.Load(); // load setting
 
                 LoadDllUI.Load();//load dll UI
@@ -66,6 +68,7 @@ namespace Cloud_Manager
 
         private static void DeleteFile_dev()
         {
+            Console.WriteLine("Debug mode");
             FileInfo info = new FileInfo(Directory.GetCurrentDirectory() + "\\lang\\" + "eng.xml");
             if (info.Exists) info.Delete();
             //info = new FileInfo("Settings.dat");
