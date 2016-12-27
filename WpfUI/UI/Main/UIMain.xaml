@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:WpfUI.UI.Main"
         xmlns:c="clr-namespace:WpfUI.Class"
         mc:Ignorable="d"
-        Title="UIMain" Height="590.778" Width="1181.411" Closing="Window_Closing">
+        Title="UIMain" Height="590.778" Width="1181.411" Closing="Window_Closing" WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
         <c:TreeViewLineConverter x:Key="LineConverter"/>

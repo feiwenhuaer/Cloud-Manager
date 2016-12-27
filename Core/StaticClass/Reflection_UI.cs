@@ -10,12 +10,6 @@ namespace Core.StaticClass
         public static object instance_ListAccountCloud;
         public static void Load_Setting_UI()
         {
-            //set instance
-            #region Create instance UI 
-            Type Login = LoadDllUI.GetTypeInterface(typeof(UILogin));
-            AppSetting.UILogin = (UILogin)Activator.CreateInstance(Login);
-            #endregion
-
             //add event handler
             #region AddEventHandler reflection_eventtocore
             Type Type_setting = LoadDllUI.GetTypeInterface(typeof(SupDataDll.UiInheritance.UI));
@@ -49,6 +43,12 @@ namespace Core.StaticClass
             #endregion
         }
 
+        public static void CreateInstanceLogin()
+        {
+            Type Login = LoadDllUI.GetTypeInterface(typeof(UILogin));
+            AppSetting.UILogin = (UILogin)Activator.CreateInstance(Login);
+        }
+
         public static void Load_UIMain()
         {
             Type Main = LoadDllUI.GetTypeInterface(typeof(UIMain));
@@ -58,6 +58,7 @@ namespace Core.StaticClass
             AppSetting.uc_lv_ud_instance = (UIUC_TLV_ud)Activator.CreateInstance(uc_lv_ud);
 
             AppSetting.UIMain.load_uC_Lv_ud(AppSetting.uc_lv_ud_instance);
+            AppSetting.ud_items.LoadGroupToListView();
         }
     }
 }

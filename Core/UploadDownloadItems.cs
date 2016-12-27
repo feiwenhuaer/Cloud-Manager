@@ -37,13 +37,13 @@ namespace Core
             bool flag_shutdown = false;
             timestamp = CurrentMillis.Millis;
             bool lockkillthr = false;
+            ReadData();
             //int count_group_done = 0;
             while (Loop)
             {
                 GC.Collect();
                 Thread.Sleep(100);
                 if (status == StatusUpDownApp.Pause) continue;
-                if (!readdata) { ReadData(); readdata = !readdata; }
                 for (int i = 0; i < threads.Count; i++)
                 {
                     if (!threads[i].IsAlive)
@@ -147,15 +147,14 @@ namespace Core
             groups[(int)obj].AddItems();
         }
         
-        public void ReloadGroupToListView()
+        public void LoadGroupToListView()
         {
             foreach(GroupTransferItemsProcess gr in groups)
             {
                 AppSetting.uc_lv_ud_instance.AddNewGroup(gr.group);
             }
         }
-
-
+        
         void KillThreads(List<Thread> thrs)
         {
             for (int i = 0; i < thrs.Count; i++)
@@ -168,37 +167,7 @@ namespace Core
         {
             thr.Abort();
         }
-
-
-        public void SetStatusItem(bool IsGroup,object obj,int EnumValue)
-        {
-            if (IsGroup)
-            {
-                foreach (GroupTransferItemsProcess group in groups)
-                {
-                    if (group.group == (UD_group_work)obj)
-                    {
-                        group.group.status = (StatusUpDown)EnumValue;
-                        return;
-                    }
-                }
-            }
-            else
-            {
-                foreach (GroupTransferItemsProcess group in groups)
-                {
-                    for(int i =0; i< group.group.items.Count;i++)
-                    {
-                        if(group.group.items[i] == (UD_item_work)obj)
-                        {
-                            group.group.items[i].status = (StatusUpDown)EnumValue;
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-
+        
         #region Closing Form
         public void Exit()
         {
@@ -211,8 +180,6 @@ namespace Core
         #endregion
 
         #region Save/Read Data When Close/Open program
-        bool readdata = false;
-
         public void ReadData()
         {
             if (ReadWriteData.Exists(ReadWriteData.File_DataUploadDownload))
@@ -275,7 +242,6 @@ namespace Core
             }
             this.group.change = ChangeTLV.Done;
             RefreshGroup(-1);
-            AppSetting.uc_lv_ud_instance.AddNewGroup(group);
         }
         public GroupTransferItemsProcess(List<UpDownloadItem> items, string fromfolder_raw, string savefolder_raw,bool AreCut = false)
         {

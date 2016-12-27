@@ -21,6 +21,11 @@ namespace Cloud_Manager
                 Application.SetCompatibleTextRenderingDefault(false);
                 DeleteFile_dev();// dev mode
                 AppSetting.Load(); // load setting
+
+                LoadDllUI.Load();//load dll UI
+                Reflection_UI.CreateInstanceLogin();//Create Login UI
+                Reflection_UI.Load_Setting_UI();//Load Setting_UI and event
+
                 AppSetting.login.Load(arg);// load login form
                 AppSetting.UILogin.ShowDialog_();
                 if (!string.IsNullOrEmpty(AppSetting.Pass))
@@ -36,13 +41,12 @@ namespace Cloud_Manager
                         //clean memory
                         AppSetting.UIMain = null;
                         AppSetting.uc_lv_ud_instance = null;
-                        GC.Collect();
                         //reload dll ui
                         LoadDllUI.Load();//reload dll
-                        Reflection_UI.Load_Setting_UI();//Add handle to event
+                        Reflection_UI.Load_Setting_UI();//Load Setting_UI and event
                         Reflection_UI.Load_UIMain();//create instance main and LV_ud
-                        AppSetting.ud_items.ReloadGroupToListView();//reload all group transfer to treelistview
                         AppSetting.settings.SaveSettings();
+                        GC.Collect();
                         goto showMainForm;
                     }
                     // close all thread

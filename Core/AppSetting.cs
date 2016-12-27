@@ -19,8 +19,6 @@ namespace Core
             Get_mimeType.Load();//mimeType (google drive upload)
             ud_items = new UploadDownloadItems();//transfer file
             lang = new Languages(settings.GetSettingsAsString(SettingsKey.lang));//load language
-            LoadDllUI.Load();//load dll UI
-            Reflection_UI.Load_Setting_UI();//Add handle to event
         }
         //can't static class (because event)
         public static Settings settings;//setting
