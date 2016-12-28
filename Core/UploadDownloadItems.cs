@@ -738,7 +738,7 @@ namespace Core
             this.item = item;
             this.clientTo = clientTo;
             //Make Stream To
-            if (item.ChunkUpload > 0) MakeNextChunkStreamTo(true);
+            if (item.ChunkUploadSize > 0) MakeNextChunkUploadInStreamTo(true);
             else this.item.To.stream = AppSetting.ManageCloud.GetFileStream(item.To.path, null, false, item.Transfer);
             //begin transfer
             item.status = StatusUpDown.Running;
@@ -747,15 +747,19 @@ namespace Core
 
         public void GetFrom(IAsyncResult result)
         {
+            #region Get byte[]
             item.byteread = item.From.stream.EndRead(result);
-            if (item.ChunkUpload < 0) item.To.stream.Seek(item.Transfer, SeekOrigin.Begin);//if download to disk then seek.
+            if (item.ChunkUploadSize < 0) item.To.stream.Seek(item.Transfer, SeekOrigin.Begin);//if download to disk then seek.
             item.To.stream.Write(item.buffer, 0, item.byteread);
             item.Transfer += item.byteread;
+            #endregion
+
+            #region transfer done/force stop.
             if (item.Transfer == item.From.Size | item.status != StatusUpDown.Running)//transfer done/force stop.
             {
                 if (item.status == StatusUpDown.Running) item.TransferRequest = item.Transfer;
                 item.From.stream.Close();
-                if (item.ChunkUpload > 0)//if upload
+                if (item.ChunkUploadSize > 0)//if upload
                 {
                     switch(item.To.TypeCloud)
                     {
@@ -767,16 +771,15 @@ namespace Core
                 item.status = StatusUpDown.Done;
                 return;
             }
+            #endregion
 
-            if (item.ChunkUpload > 0)//if upload
+            #region initial next byte[]
+            if (item.ChunkUploadSize > 0)//if upload
             {
                 int totalchunkupload = (int)result.AsyncState;
                 totalchunkupload += item.byteread;
-                if (totalchunkupload == item.ChunkUpload)
-                {
-                    MakeNextChunkStreamTo();
-                }
-                int nexbyteread = item.ChunkUpload - totalchunkupload >= item.buffer.Length ? item.buffer.Length : item.ChunkUpload - totalchunkupload;
+                if (totalchunkupload == item.ChunkUploadSize) totalchunkupload = MakeNextChunkUploadInStreamTo();//make new stream chunk and set totalchunkupload=0
+                int nexbyteread = item.ChunkUploadSize - totalchunkupload >= item.buffer.Length ? item.buffer.Length : item.ChunkUploadSize - totalchunkupload;
                 item.From.stream.BeginRead(item.buffer, 0, nexbyteread, new AsyncCallback(GetFrom), totalchunkupload);
             }
             else
@@ -784,12 +787,13 @@ namespace Core
                 item.TransferRequest = item.Transfer;
                 item.From.stream.BeginRead(item.buffer, 0, item.buffer.Length, new AsyncCallback(GetFrom), 0);
             }
+            #endregion
         }
 
-        void MakeNextChunkStreamTo(bool CreateNew = false)
+        int MakeNextChunkUploadInStreamTo(bool CreateNew = false)
         {
-            if (item.ChunkUpload <= 0) throw new Exception("Not upload type");
-            long pos_end = item.Transfer + item.ChunkUpload - 1;
+            if (item.ChunkUploadSize <= 0) throw new Exception("Not upload type");
+            long pos_end = item.Transfer + item.ChunkUploadSize - 1;
             if (pos_end >= item.From.Size) pos_end = item.From.Size - 1;
 
             switch (item.To.TypeCloud)
@@ -808,6 +812,7 @@ namespace Core
                 default:throw new Exception("Not support.");
             }
             item.TransferRequest = item.Transfer;//
+            return 0;
         }
 
     }

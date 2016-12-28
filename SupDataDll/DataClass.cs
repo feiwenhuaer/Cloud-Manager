@@ -111,15 +111,16 @@ namespace SupDataDll
         public UD_item_work_info To = new UD_item_work_info();
         public StatusUpDown status = StatusUpDown.Waiting;
         public StatusUpDown CheckChangeStatus = StatusUpDown.Waiting;
-        public string UploadID = "";//for remuse
+        public string UploadID = "";//for remuse upload
         public string ErrorMsg = "";
-        public int byteread = 0;
-        public long Transfer = 0;
-        public long OldTransfer = 0;//for cal speed
-        public int ChunkUpload = -1;// = -1 is download, >0 is chunk size upload
-        public long TransferRequest = 0;
+        public long Transfer = 0;//byte[] was transfer
+        public long OldTransfer = 0;//for caculate speed
+        public int ChunkUploadSize = -1;// = -1 is download, >0 is chunk size upload
+        public long TransferRequest = 0;//Save pos chunk upload success
         public Thread item_work;
-        public byte[] buffer;
+        
+        public int byteread = 0;
+        public byte[] buffer;//buffer
     }
 
     
