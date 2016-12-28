@@ -3,6 +3,7 @@ using Core.cloud;
 using Core.StaticClass;
 using SupDataDll;
 using SupDataDll.UiInheritance;
+using Core.Transfer;
 
 namespace Core
 {
@@ -17,13 +18,13 @@ namespace Core
             login = new Login();//login
             ManageCloud = new CloudManager();//explorer
             Get_mimeType.Load();//mimeType (google drive upload)
-            ud_items = new UploadDownloadItems();//transfer file
+            ud_items = new GroupsTransferManager();//transfer file
             lang = new Languages(settings.GetSettingsAsString(SettingsKey.lang));//load language
         }
         //can't static class (because event)
         public static Settings settings;//setting
         public static Login login;//login
-        public static UploadDownloadItems ud_items;//upload download
+        public static GroupsTransferManager ud_items;//upload download
         public static CloudManager ManageCloud;
         public static Languages lang;
         //instance

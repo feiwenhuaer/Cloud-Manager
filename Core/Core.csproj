@@ -65,7 +65,10 @@
     <Compile Include="StaticClass\ReadWriteData.cs" />
     <Compile Include="StaticClass\Reflection_UI.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="UploadDownloadItems.cs" />
+    <Compile Include="Transfer\GroupsTransferManager.cs" />
+    <Compile Include="Transfer\ItemsTransferManager.cs" />
+    <Compile Include="Transfer\JsonDataSaveGroup.cs" />
+    <Compile Include="Transfer\TransferBytes.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -96,6 +99,7 @@
       <Name>SupDataDll</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
