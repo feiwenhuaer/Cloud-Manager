@@ -41,6 +41,8 @@ namespace Core.Transfer
             {
                 if (item.status == StatusUpDown.Running) item.status = StatusUpDown.Stop;
                 item.col[3] = item.status.ToString();
+                item.From.ap = new AnalyzePath(item.From.path);
+                item.To.ap = new AnalyzePath(item.To.path);
             }
             this.group.change = ChangeTLV.Done;
             RefreshGroupDataToShow(-1);
@@ -111,22 +113,18 @@ namespace Core.Transfer
         {
             TransferItem ud_item = new TransferItem();
             //From
-            ud_item.From.path = Path_Parent + (fromfolder.PathIsCloud ? "/" : "\\") + FileName;// id/filename or GD:a@gmail.com/filename
+            ud_item.From.path = Path_Parent + (fromfolder.PathIsCloud ? "/" : "\\") + FileName;
+            ud_item.From.ap = new AnalyzePath(ud_item.From.path);
             ud_item.From.Fileid = FileId;
-            ud_item.From.email = fromfolder.PathIsUrl ? AppSetting.settings.GetDefaultCloud(fromfolder.TypeCloud) : fromfolder.Email;// if url -> get defaul email
-            ud_item.From.TypeCloud = fromfolder.TypeCloud;
             ud_item.From.Size = size;
-            ud_item.From.filename = FileName;
             //group & UI
             group.TotalFileLength += size;
             ud_item.SizeString = UnitConventer.ConvertSize(size, 2, UnitConventer.unit_size);
             ud_item.status = StatusUpDown.Waiting;
             //To
-            ud_item.To.filename = FileName;
-            ud_item.To.path = AnalyzePath.GetPathTo(fromfolder.PathIsUrl ? ud_item.From.path : (new AnalyzePath(ud_item.From.path)).GetPath(), fromfolder, savefolder);//
-            ud_item.To.email = savefolder.Email;
-            ud_item.To.TypeCloud = savefolder.TypeCloud;
-            ud_item.col = new List<string> { ud_item.From.path, ud_item.To.path, ud_item.status.ToString(), "", "", "", "" };
+            ud_item.To.path = AnalyzePath.GetPathTo(fromfolder.PathIsUrl ? ud_item.From.ap.Path_Raw : (new AnalyzePath(ud_item.From.ap.Path_Raw)).GetPath(), fromfolder, savefolder);
+            ud_item.To.ap = new AnalyzePath(ud_item.To.path);
+            ud_item.col = new List<string> { ud_item.From.ap.Path_Raw, ud_item.To.ap.Path_Raw, ud_item.status.ToString(), "", "", "", "" };
             return ud_item;
         }
         #endregion
@@ -299,13 +297,11 @@ namespace Core.Transfer
             int x = (int)obj;
             try
             {
-                group.items[x].To.ap = new AnalyzePath(group.items[x].To.path);
-
                 #region CreateStreamFrom
                 if (!fromfolder.PathIsUrl)
                 {
                     //group.items[x].From.ap = new AnalyzePath(group.items[x].From.path);
-                    group.items[x].From.stream = AppSetting.ManageCloud.GetFileStream(group.items[x].From.path,
+                    group.items[x].From.stream = AppSetting.ManageCloud.GetFileStream(group.items[x].From.ap.Path_Raw,
                         group.items[x].From.Fileid,
                         group.items[x].To.ap.PathIsCloud,
                         group.items[x].TransferRequest,
@@ -331,7 +327,7 @@ namespace Core.Transfer
                 string token = "";
                 if (group.items[x].To.ap.PathIsCloud) token = AppSetting.settings.GetToken(group.items[x].To.ap.Email, group.items[x].To.ap.TypeCloud);
                 //this.group.items[x].UploadID = "";//remuse
-                group.items[x].Transfer = group.items[x].TransferRequest;//remuse
+                group.items[x].Transfer = group.items[x].OldTransfer = group.items[x].TransferRequest;//remuse
                 group.items[x].ErrorMsg = "";//clear error
                 group.items[x].Timestamp = CurrentMillis.Millis;
                 switch (group.items[x].To.ap.TypeCloud)
@@ -374,13 +370,12 @@ namespace Core.Transfer
                         int chunksizeGD = 5;//default
                         int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.GD_ChunksSize), out chunksizeGD);
                         group.items[x].ChunkUploadSize = chunksizeGD * 1024 * 1024;
-
                         
                         if (string.IsNullOrEmpty(group.items[x].UploadID))//create upload id
                         {
                             string parentid = GoogleDrive.GetIdOfPath(group.items[x].To.ap.Parent, group.items[x].To.ap.Email);
                             string mimeType = Get_mimeType.Get_mimeType_From_FileExtension(group.items[x].To.ap.GetExtensionFile());
-                            string jsondata = "{\"title\": \"" + group.items[x].From.filename + "\", \"mimeType\": \"" + mimeType + "\", \"parents\": [{\"id\": \"" + parentid + "\"}]}";
+                            string jsondata = "{\"title\": \"" + group.items[x].From.ap.NameLastItem + "\", \"mimeType\": \"" + mimeType + "\", \"parents\": [{\"id\": \"" + parentid + "\"}]}";
                             group.items[x].UploadID = gdclient.Files_insert_resumable_getUploadID(jsondata, mimeType, group.items[x].From.Size);
                         }
                         ItemsTransfer.Add(new TransferBytes(group.items[x], gdclient));

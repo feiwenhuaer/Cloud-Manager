@@ -21,7 +21,7 @@ namespace Core.Transfer
             this.clientTo = clientTo;
             //Make Stream To
             if (item.ChunkUploadSize > 0) MakeNextChunkUploadInStreamTo(true);
-            else this.item.To.stream = AppSetting.ManageCloud.GetFileStream(item.To.path, null, false, item.Transfer);//download to disk
+            else this.item.To.stream = AppSetting.ManageCloud.GetFileStream(item.To.ap.Path_Raw, null, false, item.Transfer);//download to disk
             //begin transfer
             item.status = StatusUpDown.Running;
             item.From.stream.BeginRead(item.buffer, 0, item.buffer.Length, new AsyncCallback(GetFrom), 0);
@@ -46,7 +46,7 @@ namespace Core.Transfer
                     try { item.To.stream.Close(); } catch { }
                     if (item.status == StatusUpDown.Running)
                     {
-                        if (item.To.TypeCloud == CloudName.Dropbox)
+                        if (item.To.ap.TypeCloud == CloudName.Dropbox)
                         {
                             if (SaveUploadDropbox()) item.status = StatusUpDown.Done;
                             else item.status = StatusUpDown.Error;
@@ -82,7 +82,7 @@ namespace Core.Transfer
             long pos_end = item.Transfer + item.ChunkUploadSize - 1;
             if (pos_end >= item.From.Size) pos_end = item.From.Size - 1;
 
-            switch (item.To.TypeCloud)
+            switch (item.To.ap.TypeCloud)
             {
                 case CloudName.Dropbox:
                     if (!CreateNew) ((DropboxRequestAPIv2)clientTo).GetResponse_upload_session_append();//get data return from server

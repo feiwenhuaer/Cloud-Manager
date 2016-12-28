@@ -1,4 +1,5 @@
 ﻿using Aga.Controls.Tree;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -105,7 +106,7 @@ namespace SupDataDll
         //Show UI
         public List<string> col { get; set; }
         public string SizeString = "";
-
+        [JsonIgnore]
         public long Timestamp = 0;
         public UD_item_work_info From = new UD_item_work_info();
         public UD_item_work_info To = new UD_item_work_info();
@@ -113,26 +114,28 @@ namespace SupDataDll
         public StatusUpDown CheckChangeStatus = StatusUpDown.Waiting;
         public string UploadID = "";//for remuse upload
         public string ErrorMsg = "";
+        [JsonIgnore]
         public long Transfer = 0;//byte[] was transfer
         public long OldTransfer = 0;//for caculate speed
         public int ChunkUploadSize = -1;// = -1 is download, >0 is chunk size upload
         public long TransferRequest = 0;//Save pos chunk upload success
+        [JsonIgnore]
         public Thread item_work;
-        
+        [JsonIgnore]
         public int byteread = 0;
+        [JsonIgnore]
         public byte[] buffer;//buffer
     }
 
     
     public class UD_item_work_info
     {
+        [JsonIgnore]
         public AnalyzePath ap;
+        [JsonIgnore]
         public Stream stream;
-        public string filename;
-        public string path;
         public string Fileid;
-        public CloudName TypeCloud;
-        public string email;
+        public string path;
         public long Size = -1;
     }
 
