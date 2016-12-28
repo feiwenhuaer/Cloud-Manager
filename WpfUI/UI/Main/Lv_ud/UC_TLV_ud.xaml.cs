@@ -30,7 +30,7 @@ namespace WpfUI.UI.Main.Lv_ud
             }
         }
 
-        public int AddNewGroup(UD_group_work Group)
+        public int AddNewGroup(TransferGroup Group)
         {
             Group.col[2] = Group.status.ToString();
             if (Group.change == ChangeTLV.Processing)
@@ -69,7 +69,7 @@ namespace WpfUI.UI.Main.Lv_ud
             }
         }
 
-        public void RemoveGroup(UD_group_work Group)
+        public void RemoveGroup(TransferGroup Group)
         {
             if (Group.change == ChangeTLV.Processing) TLV_process.data.Remove(Group);
             else TLV_done.data.Remove(Group);

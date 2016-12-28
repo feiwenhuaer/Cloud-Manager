@@ -21,11 +21,11 @@ namespace SupDataDll
         /// <param name="fromfolder">From</param>
         /// <param name="savefolder">To</param>
         /// <param name="AreCut">Cut or Copy (Cut will delete items in From folder)</param>
-        public void _AddItem(List<UpDownloadItem> items, string fromfolder, string savefolder, bool AreCut)
+        public void _AddItem(List<NewTransferItem> items, string fromfolder, string savefolder, bool AreCut)
         {
             EventAddItem(items, fromfolder, savefolder, AreCut);
         }
-        public delegate void AddItem(List<UpDownloadItem> items, string fromfolder, string savefolder, bool AreCut);
+        public delegate void AddItem(List<NewTransferItem> items, string fromfolder, string savefolder, bool AreCut);
         public event AddItem EventAddItem;
         /// <summary>
         /// SetSetting

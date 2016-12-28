@@ -17,9 +17,9 @@ namespace Core.Transfer
 {
     public class ItemsTransferManager
     {
-        public UD_group_work group = new UD_group_work();
+        public TransferGroup group = new TransferGroup();
         bool addGroup_toTLV = false;
-        List<UpDownloadItem> items;
+        List<NewTransferItem> items;
         public AnalyzePath fromfolder;
         public AnalyzePath savefolder;
         public bool AreCut = false;
@@ -35,7 +35,7 @@ namespace Core.Transfer
             this.savefolder = new AnalyzePath(group_json.savefolder_raw);
 
             this.group.status = (group_json.Group.status == StatusUpDown.Done | group_json.Group.status == StatusUpDown.Error) ? group_json.Group.status : StatusUpDown.Stop;
-            foreach (UD_item_work item in this.group.items)
+            foreach (TransferItem item in this.group.items)
             {
                 if (item.status == StatusUpDown.Running) item.status = StatusUpDown.Stop;
                 item.col[3] = item.status.ToString();
@@ -43,9 +43,9 @@ namespace Core.Transfer
             this.group.change = ChangeTLV.Done;
             RefreshGroupDataToShow(-1);
         }
-        public ItemsTransferManager(List<UpDownloadItem> items, string fromfolder_raw, string savefolder_raw, bool AreCut = false)
+        public ItemsTransferManager(List<NewTransferItem> items, string fromfolder_raw, string savefolder_raw, bool AreCut = false)
         {
-            if (items.Count == 0) throw new Exception("List<UpDownloadItem> items count = 0");
+            if (items.Count == 0) throw new Exception("List<NewTransferItem> items count = 0");
             if (string.IsNullOrEmpty(fromfolder_raw)) throw new ArgumentNullException(fromfolder_raw);
             if (string.IsNullOrEmpty(savefolder_raw)) throw new ArgumentNullException(savefolder_raw);
             this.items = items;
@@ -59,13 +59,13 @@ namespace Core.Transfer
         public void LoadListItems()
         {
             this.group.col = new List<string> { fromfolder.Path_Raw, savefolder.Path_Raw, this.group.status.ToString(), "0/0", "", "", "" };
-            foreach (UpDownloadItem item in items)
+            AppSetting.uc_lv_ud_instance.AddNewGroup(group);
+            foreach (NewTransferItem item in items)
             {
                 if (item.type == Type_FileFolder.File)
                     group.items.Add(LoadFile(fromfolder.PathIsUrl ? fromfolder.ID : fromfolder.Path_Raw, item.name, item.size, item.id));
                 else
                 {
-                    //if(string.IsNullOrEmpty(item.name) & items.Count == 1){ListAllItemInFolder(rp_from.Path_Raw, "");break;}
                     group.items.AddRange(
                         ListAllItemInFolder(
                             fromfolder.PathIsUrl ? fromfolder.ID + "/" + item.name : fromfolder.Path_Raw + (fromfolder.PathIsCloud ? "/" : "\\") + item.name,
@@ -75,10 +75,10 @@ namespace Core.Transfer
             }
             group.status = StatusUpDown.Waiting;
         }
-        List<UD_item_work> ListAllItemInFolder(string path_rawItem, string id = "")
+        List<TransferItem> ListAllItemInFolder(string path_rawItem, string id = "")
         {
             ListItemFileFolder list;
-            List<UD_item_work> ud_items = new List<UD_item_work>();
+            List<TransferItem> ud_items = new List<TransferItem>();
             try
             {
                 if (fromfolder.PathIsUrl) list = AppSetting.ManageCloud.GetItemsList("", id);
@@ -104,9 +104,9 @@ namespace Core.Transfer
             return ud_items;
         }
         //Path_Parent : id/folder/folder or GD:a@gmail.com/folder/folder
-        UD_item_work LoadFile(string Path_Parent, string FileName, long size, string FileId)//Path_raw path parent folder of file
+        TransferItem LoadFile(string Path_Parent, string FileName, long size, string FileId)//Path_raw path parent folder of file
         {
-            UD_item_work ud_item = new UD_item_work();
+            TransferItem ud_item = new TransferItem();
             //From
             ud_item.From.path = Path_Parent + (fromfolder.PathIsCloud ? "/" : "\\") + FileName;// id/filename or GD:a@gmail.com/filename
             ud_item.From.Fileid = FileId;
@@ -124,21 +124,9 @@ namespace Core.Transfer
             ud_item.To.email = savefolder.Email;
             ud_item.To.TypeCloud = savefolder.TypeCloud;
             ud_item.col = new List<string> { ud_item.From.path, ud_item.To.path, ud_item.status.ToString(), "", "", "", "" };
-            Group_UD_item_EventAddDataToListview();
             return ud_item;
         }
         #endregion
-
-        void Group_UD_item_EventAddDataToListview()
-        {
-            if (AppSetting.ud_items.status == StatusUpDownApp.StopForClosingApp | AppSetting.ud_items.status == StatusUpDownApp.SavingData) return;
-            if (!addGroup_toTLV)//& index == -1)
-            {
-                AppSetting.uc_lv_ud_instance.AddNewGroup(group);
-                addGroup_toTLV = true;
-                return;
-            }
-        }
 
         public void ManagerItemsAndRefreshData()
         {
@@ -265,7 +253,7 @@ namespace Core.Transfer
                     {
                         DeleteItems list = new DeleteItems();
                         list.PernamentDelete = false;
-                        foreach (UpDownloadItem item in items)
+                        foreach (NewTransferItem item in items)
                         {
                             list.items.Add(fromfolder.Path_Raw + (fromfolder.PathIsCloud ? "/" : "\\") + item.name);
                         }

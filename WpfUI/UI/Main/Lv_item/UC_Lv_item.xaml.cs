@@ -254,7 +254,7 @@ namespace WpfUI.UI.Main.Lv_item
             ClipBoard_.directory = textBox.Text;
             foreach (LV_data item in LV_items.SelectedItems)
             {
-                UpDownloadItem ud_item = new UpDownloadItem(item.Name, item.id, item.mimeType, item.Type, item.Size);
+                NewTransferItem ud_item = new NewTransferItem(item.Name, item.id, item.mimeType, item.Type, item.Size);
                 ClipBoard_.Add(ud_item);
             }
             ClipBoard_.Clipboard = true;
@@ -306,10 +306,10 @@ namespace WpfUI.UI.Main.Lv_item
             fbd.ShowNewFolderButton = true;
             DialogResult result = fbd.ShowDialog();
             if (result != DialogResult.OK | result != DialogResult.Yes) return;
-            List<UpDownloadItem> listitems = new List<UpDownloadItem>();
+            List<NewTransferItem> listitems = new List<NewTransferItem>();
             foreach (LV_data item in LV_items.SelectedItems as List<LV_data>)
             {
-                listitems.Add(new UpDownloadItem(item.Name, item.id, item.mimeType, item.Type, item.Size));
+                listitems.Add(new NewTransferItem(item.Name, item.id, item.mimeType, item.Type, item.Size));
             }
             Setting_UI.reflection_eventtocore._AddItem(listitems, HistoryPathID[HistoryPathID_index].Path, fbd.SelectedPath, false);
         }
@@ -321,7 +321,7 @@ namespace WpfUI.UI.Main.Lv_item
             DialogResult result = fbd.ShowDialog();
             if (result != DialogResult.OK | result != DialogResult.Yes) return;
             AnalyzePath ap = new AnalyzePath(fbd.SelectedPath);
-            Setting_UI.reflection_eventtocore._AddItem(new List<UpDownloadItem>() { new UpDownloadItem(ap.NameLastItem, null, null, Type_FileFolder.Folder) }, ap.Parent, fbd.SelectedPath, false);
+            Setting_UI.reflection_eventtocore._AddItem(new List<NewTransferItem>() { new NewTransferItem(ap.NameLastItem, null, null, Type_FileFolder.Folder) }, ap.Parent, fbd.SelectedPath, false);
         }
         void uploadfile()
         {
@@ -331,12 +331,12 @@ namespace WpfUI.UI.Main.Lv_item
             ofd.InitialDirectory = "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}";
             DialogResult result = ofd.ShowDialog();
             if (result != DialogResult.OK | result != DialogResult.Yes) return;
-            List<UpDownloadItem> items = new List<UpDownloadItem>();
+            List<NewTransferItem> items = new List<NewTransferItem>();
             string root = System.IO.Path.GetDirectoryName(ofd.FileNames[0]);
             foreach (string s in ofd.SafeFileNames)
             {
                 FileInfo info = new FileInfo(root + "\\" + s);
-                items.Add(new UpDownloadItem(s, "", "", Type_FileFolder.File, info.Length));
+                items.Add(new NewTransferItem(s, "", "", Type_FileFolder.File, info.Length));
             }
             Setting_UI.reflection_eventtocore._AddItem(items, root, HistoryPathID[HistoryPathID_index].Path, false);
         }

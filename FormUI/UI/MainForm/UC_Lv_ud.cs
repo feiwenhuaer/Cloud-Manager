@@ -15,7 +15,7 @@ namespace FormUI.UI.MainForm
         System.Windows.Forms.Form mainform;
         public object UIMain { set { mainform = (System.Windows.Forms.Form)value; } }
 
-        public int AddNewGroup(UD_group_work group_work)
+        public int AddNewGroup(TransferGroup group_work)
         {
             group_work.col[2] = group_work.status.ToString();
             Groups.Add(group_work);
@@ -24,7 +24,7 @@ namespace FormUI.UI.MainForm
             return Groups.IndexOf(group_work);
         }
 
-        public void RemoveGroup(UD_group_work Group)
+        public void RemoveGroup(TransferGroup Group)
         {
             TLV_ud.RemoveObject(Groups[Groups.IndexOf(Group)]);
             TLV_done.RemoveObject(Groups[Groups.IndexOf(Group)]);
@@ -46,7 +46,7 @@ namespace FormUI.UI.MainForm
 
         void DoRefresh()
         {
-            foreach (UD_group_work item in Groups)
+            foreach (TransferGroup item in Groups)
             {
                 if (item.change == ChangeTLV.Done)
                 {
@@ -116,7 +116,7 @@ namespace FormUI.UI.MainForm
         #endregion
 
 
-        List<UD_group_work> Groups = new List<UD_group_work>();
+        List<TransferGroup> Groups = new List<TransferGroup>();
         private List<OLVColumn> LoadHeader_TLV(List<HeaderTLV> list)
         {
             List<OLVColumn> ListHeader_TLV = new List<OLVColumn>();
@@ -142,10 +142,10 @@ namespace FormUI.UI.MainForm
 
             cc.Add(TLV);// add to ControlCollection
             //
-            TLV.CanExpandGetter = delegate (object x) { return (x is UD_group_work); };//group
+            TLV.CanExpandGetter = delegate (object x) { return (x is TransferGroup); };//group
             TLV.ChildrenGetter = delegate (object x)//child
             {
-                UD_group_work list_ud_item = x as UD_group_work;
+                TransferGroup list_ud_item = x as TransferGroup;
                 return list_ud_item.items;
             };
 
@@ -154,9 +154,9 @@ namespace FormUI.UI.MainForm
             //col 0
             array_header[0].AspectGetter = delegate (object x)
             {
-                if (x is UD_group_work)//group
+                if (x is TransferGroup)//group
                 {
-                    return ((UD_group_work)x).Name;
+                    return ((TransferGroup)x).Name;
                 }
                 else//child
                 {
@@ -169,21 +169,21 @@ namespace FormUI.UI.MainForm
                 int i = val - 1;
                 array_header[val].AspectGetter = delegate (object x)
                 {
-                    if (x is UD_item_work)//item in group
+                    if (x is TransferItem)//item in group
                     {
-                        return ((UD_item_work)x).col[i];
+                        return ((TransferItem)x).col[i];
                     }
-                    if (x is UD_group_work)//group
+                    if (x is TransferGroup)//group
                     {
-                        return ((UD_group_work)x).col[i];
+                        return ((TransferGroup)x).col[i];
                     }
                     return "";
                 };
             }
         }
 
-        List<UD_group_work> parents;
-        List<UD_item_work> childs;
+        List<TransferGroup> parents;
+        List<TransferItem> childs;
 
         private List<HeaderTLV> Create_Headeritem_TLV_ud()
         {
@@ -224,13 +224,13 @@ namespace FormUI.UI.MainForm
 
         private void TLV_SelectedIndexChanged(object sender, EventArgs e)
         {
-            parents = new List<UD_group_work>();
-            childs = new List<UD_item_work>();
+            parents = new List<TransferGroup>();
+            childs = new List<TransferItem>();
             olv = sender as TreeListView;
             for (int i = 0; i < olv.SelectedObjects.Count; i++)
             {
-                if (olv.SelectedObjects[i].GetType() == typeof(UD_item_work)) childs.Add(olv.SelectedObjects[i] as UD_item_work);
-                else parents.Add(olv.SelectedObjects[i] as UD_group_work);
+                if (olv.SelectedObjects[i].GetType() == typeof(TransferItem)) childs.Add(olv.SelectedObjects[i] as TransferItem);
+                else parents.Add(olv.SelectedObjects[i] as TransferGroup);
             }
         }
         private void contextMenuStrip1_Opening(object sender, CancelEventArgs e)
@@ -298,7 +298,7 @@ namespace FormUI.UI.MainForm
                                                         child.status == StatusUpDown.Error))
                     {
                         child.status = val;
-                        UD_group_work pr = olv.GetParent(child) as UD_group_work;
+                        TransferGroup pr = olv.GetParent(child) as TransferGroup;
                         if (pr != null && (pr.status != StatusUpDown.Running | pr.status != StatusUpDown.Loading | pr.status != StatusUpDown.Removing)) pr.status = val;
                     }
                     //set Stop child

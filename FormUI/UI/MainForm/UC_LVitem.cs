@@ -303,7 +303,7 @@ namespace FormUI.UI.MainForm
             foreach (ListViewItem item in LV_item.SelectedItems)
             {
                 Type_FileFolder type = (Type_FileFolder)Enum.Parse(typeof(Type_FileFolder), item.SubItems[index_collumn_Type].Text);
-                ClipBoard_.Add(new UpDownloadItem(item.SubItems[index_collumn_name].Text,
+                ClipBoard_.Add(new NewTransferItem(item.SubItems[index_collumn_name].Text,
                                                   item.SubItems[index_collumn_Id].Text,
                                                   item.SubItems[index_cullumn_mimeType].Text,
                                                   type,
@@ -335,11 +335,11 @@ namespace FormUI.UI.MainForm
             DialogResult result = fbd.ShowDialog(MainForm);
             if (result == DialogResult.OK | result == DialogResult.Yes)
             {
-                List<UpDownloadItem> list_item_from = new List<UpDownloadItem>();
+                List<NewTransferItem> list_item_from = new List<NewTransferItem>();
                 foreach (ListViewItem item in LV_item.SelectedItems)
                 {
                     Type_FileFolder type = (Type_FileFolder)Enum.Parse(typeof(Type_FileFolder), item.SubItems[index_collumn_Type].Text);
-                    UpDownloadItem dl_item = new UpDownloadItem(item.SubItems[index_collumn_name].Text,
+                    NewTransferItem dl_item = new NewTransferItem(item.SubItems[index_collumn_name].Text,
                                                                 item.SubItems[index_collumn_Id].Text,
                                                                 item.SubItems[index_cullumn_mimeType].Text,
                                                                 type,
@@ -358,7 +358,7 @@ namespace FormUI.UI.MainForm
             DialogResult result = fbd.ShowDialog(MainForm);
             if (result == DialogResult.OK | result == DialogResult.Yes)
             {
-                List<UpDownloadItem> list_item_from = new List<UpDownloadItem>();
+                List<NewTransferItem> list_item_from = new List<NewTransferItem>();
                 string[] pathfrom_arr = fbd.SelectedPath.TrimEnd('\\').Split('\\');
                 string parent_directory_from = "";
                 for (int i = 0; i < pathfrom_arr.Length - 1; i++)
@@ -367,7 +367,7 @@ namespace FormUI.UI.MainForm
                 }
                 if (string.IsNullOrEmpty(parent_directory_from)) parent_directory_from = pathfrom_arr[0];
 
-                UpDownloadItem dl_item = new UpDownloadItem(string.IsNullOrEmpty(parent_directory_from) ? "" : pathfrom_arr[pathfrom_arr.Length - 1],
+                NewTransferItem dl_item = new NewTransferItem(string.IsNullOrEmpty(parent_directory_from) ? "" : pathfrom_arr[pathfrom_arr.Length - 1],
                                                             "",
                                                             "",
                                                             Type_FileFolder.Folder

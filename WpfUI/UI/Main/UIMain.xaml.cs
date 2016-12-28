@@ -56,9 +56,9 @@ namespace WpfUI.UI.Main
             {
                 if (sfd.ShowDialog().Value)
                 {
-                    UpDownloadItem uditem = new UpDownloadItem(filename, rp.ID, "", Type_FileFolder.File, filesize);
+                    NewTransferItem uditem = new NewTransferItem(filename, rp.ID, "", Type_FileFolder.File, filesize);
                     AnalyzePath ap = new AnalyzePath(sfd.FileName);
-                    Setting_UI.reflection_eventtocore._AddItem(new List<UpDownloadItem>() { uditem }, rp.Path_Raw, ap.Parent, false);
+                    Setting_UI.reflection_eventtocore._AddItem(new List<NewTransferItem>() { uditem }, rp.Path_Raw, ap.Parent, false);
                 }
             }));
         }
@@ -222,7 +222,7 @@ namespace WpfUI.UI.Main
             ClipBoard_.Clear();
             ClipBoard_.AreCut = AreCut;
             TreeViewDataModel model = treeView.SelectedItem as TreeViewDataModel;
-            UpDownloadItem item = new UpDownloadItem(model.DisplayData.Name, "", "", Type_FileFolder.Folder);
+            NewTransferItem item = new NewTransferItem(model.DisplayData.Name, "", "", Type_FileFolder.Folder);
             string path = GetRoot_TV(model);
             AnalyzePath ap = new AnalyzePath(path);
             ClipBoard_.directory = ap.Parent;

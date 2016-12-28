@@ -129,7 +129,7 @@ namespace Core.Transfer
             }
         }
 
-        public void AddItems(List<UpDownloadItem> items, string fromfolder_raw, string savefolder_raw, bool AreCut)
+        public void AddItems(List<NewTransferItem> items, string fromfolder_raw, string savefolder_raw, bool AreCut)
         {
             ItemsTransferManager gr = new ItemsTransferManager(items, fromfolder_raw, savefolder_raw, AreCut);
             groups.Add(gr);
@@ -150,6 +150,7 @@ namespace Core.Transfer
             }
         }
 
+        #region Kill thread
         void KillThreads(List<Thread> thrs)
         {
             for (int i = 0; i < thrs.Count; i++)
@@ -162,6 +163,7 @@ namespace Core.Transfer
         {
             thr.Abort();
         }
+        #endregion
 
         #region Closing Form
         public void Exit()
@@ -210,5 +212,4 @@ namespace Core.Transfer
         }
         #endregion
     }
-
 }

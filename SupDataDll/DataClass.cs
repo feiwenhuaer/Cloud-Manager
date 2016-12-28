@@ -64,9 +64,9 @@ namespace SupDataDll
     #endregion
 
     #region Transfer
-    public class UpDownloadItem
+    public class NewTransferItem
     {
-        public UpDownloadItem(string name,string id,string mimeType, Type_FileFolder type,long size = -1)
+        public NewTransferItem(string name,string id,string mimeType, Type_FileFolder type,long size = -1)
         {
             this.name = name;
             this.id = id;
@@ -81,12 +81,12 @@ namespace SupDataDll
         public Type_FileFolder type;
     }
     
-    public class UD_group_work
+    public class TransferGroup
     {
         // MaxItemDownload
         public int MaxItemsDownload = 2;
         //TreeListView
-        public string Name = "";
+        public string Name = "";//TreeListView Form
         public List<string> col { get; set; }
         //Speed & timeleft
         public long TotalFileLength = 0;
@@ -97,10 +97,10 @@ namespace SupDataDll
         public StatusUpDown CheckChangeStatus = StatusUpDown.Loading;
         public ChangeTLV change = ChangeTLV.Processing;
         //Items
-        public List<UD_item_work> items = new List<UD_item_work>();
+        public List<TransferItem> items = new List<TransferItem>();
     }
 
-    public class UD_item_work
+    public class TransferItem
     {
         //Show UI
         public List<string> col { get; set; }
@@ -137,19 +137,19 @@ namespace SupDataDll
 
     public class UD_data_WPF : ITreeModel
     {
-        List<UD_group_work> ud_groups = new List<UD_group_work>();
+        List<TransferGroup> ud_groups = new List<TransferGroup>();
 
-        public UD_data_WPF(UD_group_work group)
+        public UD_data_WPF(TransferGroup group)
         {
             ud_groups.Add(group);
         }
 
 
-        public void Add(UD_group_work ud_group)
+        public void Add(TransferGroup ud_group)
         {
             ud_groups.Add(ud_group);
         }
-        public void Remove(UD_group_work ud_group)
+        public void Remove(TransferGroup ud_group)
         {
             if (ud_groups.IndexOf(ud_group) > -1)
                 ud_groups.Remove(ud_group);
@@ -158,17 +158,17 @@ namespace SupDataDll
 
         public IEnumerable GetChildren(object parent)
         {
-            var pr = parent as UD_group_work;
+            var pr = parent as TransferGroup;
             if (parent == null)
             {
-                foreach (UD_group_work group in ud_groups)
+                foreach (TransferGroup group in ud_groups)
                 {
                     yield return group;
                 }
             }
             else if (pr != null)
             {
-                foreach (UD_item_work item in pr.items)
+                foreach (TransferItem item in pr.items)
                 {
                     yield return item;
                 }
@@ -177,7 +177,7 @@ namespace SupDataDll
 
         public bool HasChildren(object parent)
         {
-            return parent is UD_group_work;
+            return parent is TransferGroup;
         }
     }
 

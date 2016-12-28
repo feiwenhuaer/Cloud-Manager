@@ -10,25 +10,25 @@ namespace SupDataDll
         public static bool Clipboard = false;
         public static bool AreCut = false;
         public static string directory;
-        public static List<UpDownloadItem> Items = new List<UpDownloadItem>();
+        public static List<NewTransferItem> Items = new List<NewTransferItem>();
         public static void Clear()
         {
-            Items = new List<UpDownloadItem>();
+            Items = new List<NewTransferItem>();
             Clipboard = false;
             directory = string.Empty;
         }
 
-        public static void Add(UpDownloadItem item)
+        public static void Add(NewTransferItem item)
         {
             Items.Add(item);
         }
 
-        public static void Add(UpDownloadItem[] item)
+        public static void Add(NewTransferItem[] item)
         {
             Items.AddRange(item);
         }
 
-        public static void Add(List<UpDownloadItem> item)
+        public static void Add(List<NewTransferItem> item)
         {
             Items.AddRange(item);
         }

@@ -11,9 +11,9 @@ namespace Core.Transfer
 {
     public class TransferBytes
     {
-        UD_item_work item;
+        TransferItem item;
         object clientTo;
-        public TransferBytes(UD_item_work item, object clientTo)
+        public TransferBytes(TransferItem item, object clientTo)
         {
             this.item = item;
             this.clientTo = clientTo;
