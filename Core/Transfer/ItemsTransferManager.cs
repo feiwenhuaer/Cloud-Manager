@@ -17,14 +17,18 @@ namespace Core.Transfer
 {
     public class ItemsTransferManager
     {
+        public bool AreCut = false;//delete from after transfer
+        public List<Thread> ThreadsItemLoadWork = new List<Thread>();
         public TransferGroup group = new TransferGroup();
+        List<TransferBytes> ItemsTransfer = new List<TransferBytes>();
+
+        //loading
         List<NewTransferItem> items;
         public AnalyzePath fromfolder;
         public AnalyzePath savefolder;
-        public bool AreCut = false;
-        public List<Thread> threads = new List<Thread>();
-
+        
         #region Declare
+        //load from save data
         internal ItemsTransferManager(JsonDataSaveGroup group_json)
         {
             this.group = group_json.Group;
@@ -41,6 +45,7 @@ namespace Core.Transfer
             this.group.change = ChangeTLV.Done;
             RefreshGroupDataToShow(-1);
         }
+        //load from user
         public ItemsTransferManager(List<NewTransferItem> items, string fromfolder_raw, string savefolder_raw, bool AreCut = false)
         {
             if (items.Count == 0) throw new Exception("List<NewTransferItem> items count = 0");
@@ -129,11 +134,11 @@ namespace Core.Transfer
         public void ManagerItemsAndRefreshData()
         {
             //clean thread
-            for (int i = 0; i < threads.Count; i++)
+            for (int i = 0; i < ThreadsItemLoadWork.Count; i++)
             {
-                if (!threads[i].IsAlive)
+                if (!ThreadsItemLoadWork[i].IsAlive)
                 {
-                    threads.RemoveAt(i);
+                    ThreadsItemLoadWork.RemoveAt(i);
                     i--;
                 }
             }
@@ -189,7 +194,7 @@ namespace Core.Transfer
                         Thread thr = new Thread(WorkThread);
                         this.group.items[i].status = StatusUpDown.Running;
                         thr.Start(i);
-                        threads.Add(thr);
+                        ThreadsItemLoadWork.Add(thr);
                         count_item_running++;
                     }
                     if (group.items[i].status == StatusUpDown.Waiting && count_item_running < group.MaxItemsDownload)//start item waiting
@@ -198,7 +203,7 @@ namespace Core.Transfer
                         group.items[i].status = StatusUpDown.Running;
                         group.items[i].Timestamp = Stopwatch.GetTimestamp();
                         thr.Start(i);
-                        threads.Add(thr);
+                        ThreadsItemLoadWork.Add(thr);
                         count_item_running++;
                     }
                     #region caculate speed & time left item
@@ -294,15 +299,15 @@ namespace Core.Transfer
             int x = (int)obj;
             try
             {
-                AnalyzePath rp_from;
-                AnalyzePath rp_to = new AnalyzePath(group.items[x].To.path);
+                group.items[x].To.ap = new AnalyzePath(group.items[x].To.path);
 
+                #region CreateStreamFrom
                 if (!fromfolder.PathIsUrl)
                 {
-                    rp_from = new AnalyzePath(group.items[x].From.path);
+                    //group.items[x].From.ap = new AnalyzePath(group.items[x].From.path);
                     group.items[x].From.stream = AppSetting.ManageCloud.GetFileStream(group.items[x].From.path,
                         group.items[x].From.Fileid,
-                        rp_to.PathIsCloud,
+                        group.items[x].To.ap.PathIsCloud,
                         group.items[x].TransferRequest,
                         group.items[x].From.Size - 1);
                 }
@@ -310,191 +315,75 @@ namespace Core.Transfer
                 {
                     group.items[x].From.stream = AppSetting.ManageCloud.GetFileStream("",
                         group.items[x].From.Fileid,
-                        rp_to.PathIsCloud,
+                        group.items[x].To.ap.PathIsCloud,
                         group.items[x].TransferRequest,
                         group.items[x].From.Size - 1,
                         fromfolder.TypeCloud,
                         AppSetting.settings.GetDefaultCloud(fromfolder.TypeCloud));
                 }
+                #endregion
 
                 int buffer_length = 32;//default
                 int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.BufferSize), out buffer_length);//get buffer_length from setting
                 group.items[x].buffer = new byte[buffer_length * 1024];//create buffer
 
-                int byteread = 0;
+                group.items[x].byteread = 0;
                 string token = "";
-                if (rp_to.PathIsCloud) token = AppSetting.settings.GetToken(rp_to.Email, rp_to.TypeCloud);
+                if (group.items[x].To.ap.PathIsCloud) token = AppSetting.settings.GetToken(group.items[x].To.ap.Email, group.items[x].To.ap.TypeCloud);
                 //this.group.items[x].UploadID = "";//remuse
                 group.items[x].Transfer = group.items[x].TransferRequest;//remuse
                 group.items[x].ErrorMsg = "";//clear error
                 group.items[x].Timestamp = CurrentMillis.Millis;
-                switch (rp_to.TypeCloud)
+                switch (group.items[x].To.ap.TypeCloud)
                 {
                     case CloudName.LocalDisk:
                         #region LocalDisk
-                        group.items[x].To.stream = AppSetting.ManageCloud.GetFileStream(group.items[x].To.path, null, false, group.items[x].Transfer);
-                        //test 
-                        do
-                        {
-                            byteread = group.items[x].From.stream.Read(group.items[x].buffer, 0, group.items[x].buffer.Length);
-                            group.items[x].To.stream.Write(group.items[x].buffer, 0, byteread);
-                            group.items[x].To.stream.Flush();
-                            group.items[x].Transfer += byteread;
-                            group.items[x].TransferRequest = group.items[x].Transfer;
-                        } while (IsStillDownloading(x) && byteread != 0 && group.items[x].Transfer < group.items[x].From.Size);
-
-                        if (!fromfolder.PathIsCloud) group.items[x].From.stream.Close();
-                        if (!savefolder.PathIsCloud) group.items[x].To.stream.Close();
-
-                        if (group.status == StatusUpDown.Remove) { group.status = StatusUpDown.Removing; return; }
-                        if (group.items[x].status == StatusUpDown.Remove) { group.items[x].status = StatusUpDown.Removing; return; }
-
-
-                        if (group.status == StatusUpDown.Stop) group.items[x].status = StatusUpDown.Stop;
-                        if (group.items[x].status == StatusUpDown.Stop)
-                        {//if (info.Exists) info.Delete();
-                            return;
-                        }
-
-                        //check size
-                        FileInfo info = new FileInfo(group.items[x].To.path);
-                        if (info.Length != group.items[x].From.Size) group.items[x].status = StatusUpDown.Error;
-                        else group.items[x].status = StatusUpDown.Done;
+                        ItemsTransfer.Add(new TransferBytes(group.items[x], null));
                         return;
                     #endregion
 
                     case CloudName.Dropbox:
                         #region Dropbox
+
                         int chunksizedb = 25;//default
                         int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.Dropbox_ChunksSize), out chunksizedb);
-                        int size_db = chunksizedb * 1024 * 1024;
+                        group.items[x].ChunkUploadSize = chunksizedb * 1024 * 1024;
+
                         DropboxRequestAPIv2 client = new DropboxRequestAPIv2(token);
-                        byteread = group.items[x].From.stream.Read(group.items[x].buffer, 0, group.items[x].buffer.Length);
-                        db_createupload:
-                        int loop = 0;
-                        if (string.IsNullOrEmpty(group.items[x].UploadID))
+
+                        if (string.IsNullOrEmpty(group.items[x].UploadID))//create upload id
                         {
-                            dynamic json = JsonConvert.DeserializeObject(client.upload_session_start(group.items[x].buffer, byteread));
+                            group.items[x].byteread = group.items[x].From.stream.Read(group.items[x].buffer, 0, group.items[x].buffer.Length);
+                            dynamic json = JsonConvert.DeserializeObject(client.upload_session_start(group.items[x].buffer, group.items[x].byteread));
                             group.items[x].UploadID = json.session_id;
-                            group.items[x].Transfer += byteread;
-                            loop = (int)((group.items[x].From.Size - byteread) / (long)size_db);
-                            if (((group.items[x].From.Size - byteread) % (long)size_db) != 0) loop++;
+                            group.items[x].Transfer += group.items[x].byteread;
                         }
-                        else
-                        {
-                            loop = (int)((group.items[x].From.Size - group.items[x].TransferRequest) / (long)size_db);
-                            if (((group.items[x].From.Size - group.items[x].TransferRequest) % (long)size_db) != 0) loop++;
-                        }
-
-                        for (int i = 0; i < loop; i++)
-                        {
-                            try
-                            {
-                                group.items[x].To.stream = client.upload_session_append(group.items[x].UploadID,
-                                    group.items[x].From.Size - group.items[x].Transfer > size_db ? size_db : group.items[x].From.Size - group.items[x].Transfer,
-                                    group.items[x].Transfer);
-                            }
-                            catch (HttpException http_ex)
-                            {
-                                if (http_ex.ErrorCode == 404) { group.items[x].UploadID = ""; goto db_createupload; }
-                                throw http_ex;
-                            }
-                            int temp_send = 0;
-                            do
-                            {
-                                byteread = group.items[x].From.stream.Read(group.items[x].buffer, 0, (size_db - temp_send) > group.items[x].buffer.Length ? group.items[x].buffer.Length : (size_db - temp_send));
-                                group.items[x].To.stream.Write(group.items[x].buffer, 0, byteread);
-                                group.items[x].To.stream.Flush();
-                                group.items[x].Transfer += byteread;
-                                temp_send += byteread;
-                            } while (IsStillDownloading(x) & temp_send != size_db & group.items[x].Transfer != group.items[x].From.Size);
-                            client.GetResponse_upload_session_append();
-
-                            if (group.status == StatusUpDown.Remove) { group.status = StatusUpDown.Removing; return; }
-                            if (group.items[x].status == StatusUpDown.Remove) { group.items[x].status = StatusUpDown.Removing; return; }
-                            if (group.status == StatusUpDown.Stop) group.items[x].status = StatusUpDown.Stop;
-                            if (group.items[x].status != StatusUpDown.Stop) { if (!fromfolder.PathIsCloud) group.items[x].From.stream.Close(); return; }
-
-                            group.items[x].TransferRequest = group.items[x].Transfer;
-                        }
-                        if (!fromfolder.PathIsCloud) group.items[x].From.stream.Close();
-                        //create folder if not found
-                        if (Dropbox.AutoCreateFolder(rp_to.GetPath(), rp_to.Email) != rp_to.GetPath())
-                        {
-                            group.items[x].ErrorMsg = "Failed to create folder: " + rp_to.GetPath();
-                            group.items[x].status = StatusUpDown.Error;
-                            return;
-                        }
-                        dynamic json_ = JsonConvert.DeserializeObject(client.upload_session_finish(null, group.items[x].UploadID, group.items[x].Transfer, rp_to.GetPath(), DropboxUploadMode.add));
-                        long size = json_.size;
-                        if (size == group.items[x].From.Size) group.items[x].status = StatusUpDown.Done;
-                        else group.items[x].status = StatusUpDown.Error;
+                        ItemsTransfer.Add(new TransferBytes(group.items[x], client));
                         return;
                     #endregion
 
                     case CloudName.GoogleDrive:
                         #region GoogleDrive
                         DriveAPIHttprequestv2 gdclient = new DriveAPIHttprequestv2(JsonConvert.DeserializeObject<TokenGoogleDrive>(token));
-                        gdclient.Email = rp_to.Email;
+                        gdclient.Email = group.items[x].To.ap.Email;
                         gdclient.TokenRenewEvent += GoogleDrive.Gdclient_TokenRenewEvent;
-                        gdclient.Debug = true;
 
-                        if (GoogleDrive.CreateFolder(rp_to.TypeCloud.ToString() + ":" + rp_to.Email + rp_to.Parent) != rp_to.Parent)
-                            throw new Exception("Can't create folder: " + rp_to.TypeCloud.ToString() + ":" + rp_to.Email + rp_to.Parent);
-
-                        string parentid = GoogleDrive.GetIdOfPath(rp_to.Parent, rp_to.Email);
+                        if (GoogleDrive.CreateFolder(group.items[x].To.ap.TypeCloud.ToString() + ":" + group.items[x].To.ap.Email + group.items[x].To.ap.Parent) != group.items[x].To.ap.Parent)
+                            throw new Exception("Can't create folder: " + group.items[x].To.ap.TypeCloud.ToString() + ":" + group.items[x].To.ap.Email + group.items[x].To.ap.Parent);
+                        
                         int chunksizeGD = 5;//default
                         int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.GD_ChunksSize), out chunksizeGD);
-                        int size_gd = chunksizeGD * 1024 * 1024;
-                        string mimeType = Get_mimeType.Get_mimeType_From_FileExtension(fromfolder.GetExtensionFile());
-                        string jsondata = "{\"title\": \"" + group.items[x].From.filename + "\", \"mimeType\": \"" + mimeType + "\", \"parents\": [{\"id\": \"" + parentid + "\"}]}";
-                        #region gd_loop
-                        int gd_loop = 0;
-                        if (string.IsNullOrEmpty(group.items[x].UploadID))
+                        group.items[x].ChunkUploadSize = chunksizeGD * 1024 * 1024;
+
+                        
+                        if (string.IsNullOrEmpty(group.items[x].UploadID))//create upload id
                         {
+                            string parentid = GoogleDrive.GetIdOfPath(group.items[x].To.ap.Parent, group.items[x].To.ap.Email);
+                            string mimeType = Get_mimeType.Get_mimeType_From_FileExtension(group.items[x].To.ap.GetExtensionFile());
+                            string jsondata = "{\"title\": \"" + group.items[x].From.filename + "\", \"mimeType\": \"" + mimeType + "\", \"parents\": [{\"id\": \"" + parentid + "\"}]}";
                             group.items[x].UploadID = gdclient.Files_insert_resumable_getUploadID(jsondata, mimeType, group.items[x].From.Size);
-                            gd_loop = (int)((group.items[x].From.Size) / (long)size_gd);
-                            if (((group.items[x].From.Size) % (long)size_gd) != 0) gd_loop++;
                         }
-                        else
-                        {
-                            gd_loop = (int)((group.items[x].From.Size - group.items[x].TransferRequest) / (long)size_gd);
-                            if (((group.items[x].From.Size - group.items[x].TransferRequest) % (long)size_gd) != 0) gd_loop++;
-                        }
-                        #endregion
-
-                        #region Processing
-                        for (int i = 0; i < gd_loop; i++)
-                        {
-                            group.items[x].To.stream = gdclient.Files_insert_resumable(group.items[x].UploadID,
-                                                                        group.items[x].TransferRequest,
-                                                                        (i != gd_loop - 1) ? group.items[x].TransferRequest + size_gd - 1 : group.items[x].From.Size - 1,
-                                                                        group.items[x].From.Size);
-                            int temp_send = 0;
-                            int sizechunk = (i != gd_loop - 1) ? size_gd : (int)(group.items[x].From.Size - group.items[x].TransferRequest);
-                            do
-                            {
-                                byteread = group.items[x].From.stream.Read(group.items[x].buffer, 0, sizechunk - temp_send > group.items[x].buffer.Length ? group.items[x].buffer.Length : sizechunk - temp_send);
-                                group.items[x].To.stream.Write(group.items[x].buffer, 0, byteread);
-                                group.items[x].To.stream.Flush();
-                                group.items[x].Transfer += byteread;
-                                temp_send += byteread;
-                            } while (IsStillDownloading(x) && byteread != 0 && temp_send != sizechunk);
-
-                            gdclient.GetResponse_Files_insert_resumable();//get header response
-                            group.items[x].To.stream.Close();
-
-                            if (group.items[x].status == StatusUpDown.Running) group.items[x].TransferRequest = group.items[x].Transfer;
-                            if (group.status == StatusUpDown.Remove) { group.status = StatusUpDown.Removing; return; }
-                            if (group.items[x].status == StatusUpDown.Remove) { group.items[x].status = StatusUpDown.Removing; return; }
-                            if (group.status == StatusUpDown.Stop) group.items[x].status = StatusUpDown.Stop;
-                            if (group.items[x].status == StatusUpDown.Stop) return;
-                        }
-                        group.items[x].From.stream.Close();
-                        //if (!rp_from.IsCloud) StreamFrom.Close();
-                        if (this.group.items[x].Transfer != this.group.items[x].From.Size) group.items[x].status = StatusUpDown.Error;
-                        else group.items[x].status = StatusUpDown.Done;
-                        #endregion
+                        ItemsTransfer.Add(new TransferBytes(group.items[x], gdclient));
                         return;
                         #endregion
                 }

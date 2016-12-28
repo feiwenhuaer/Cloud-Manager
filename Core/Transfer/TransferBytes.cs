@@ -1,5 +1,7 @@
-﻿using DropboxHttpRequest;
+﻿using Core.cloud;
+using DropboxHttpRequest;
 using GoogleDriveHttprequest;
+using Newtonsoft.Json;
 using SupDataDll;
 using System;
 using System.Collections.Generic;
@@ -19,7 +21,7 @@ namespace Core.Transfer
             this.clientTo = clientTo;
             //Make Stream To
             if (item.ChunkUploadSize > 0) MakeNextChunkUploadInStreamTo(true);
-            else this.item.To.stream = AppSetting.ManageCloud.GetFileStream(item.To.path, null, false, item.Transfer);
+            else this.item.To.stream = AppSetting.ManageCloud.GetFileStream(item.To.path, null, false, item.Transfer);//download to disk
             //begin transfer
             item.status = StatusUpDown.Running;
             item.From.stream.BeginRead(item.buffer, 0, item.buffer.Length, new AsyncCallback(GetFrom), 0);
@@ -42,7 +44,14 @@ namespace Core.Transfer
                     item.TransferRequest = item.Transfer;
                     try { item.From.stream.Close(); } catch { }
                     try { item.To.stream.Close(); } catch { }
-                    if (item.status == StatusUpDown.Running) item.status = StatusUpDown.Done;
+                    if (item.status == StatusUpDown.Running)
+                    {
+                        if (item.To.TypeCloud == CloudName.Dropbox)
+                        {
+                            if (SaveUploadDropbox()) item.status = StatusUpDown.Done;
+                            else item.status = StatusUpDown.Error;
+                        }
+                    }
                     else item.status = StatusUpDown.Stop;
                     return;
                 }
@@ -77,12 +86,12 @@ namespace Core.Transfer
             {
                 case CloudName.Dropbox:
                     if (!CreateNew) ((DropboxRequestAPIv2)clientTo).GetResponse_upload_session_append();//get data return from server
-                    item.To.stream = ((DropboxRequestAPIv2)clientTo).upload_session_append(item.From.Fileid, pos_end - item.Transfer + 1, item.Transfer);
+                    item.To.stream = ((DropboxRequestAPIv2)clientTo).upload_session_append(item.UploadID, pos_end - item.Transfer + 1, item.Transfer);
                     break;
 
                 case CloudName.GoogleDrive:
                     if (!CreateNew) ((DriveAPIHttprequestv2)clientTo).GetResponse_Files_insert_resumable();//get data return from server
-                    item.To.stream = ((DriveAPIHttprequestv2)clientTo).Files_insert_resumable(item.From.Fileid, item.Transfer, pos_end, item.From.Size);
+                    item.To.stream = ((DriveAPIHttprequestv2)clientTo).Files_insert_resumable(item.UploadID, item.Transfer, pos_end, item.From.Size);
                     break;
 
 
@@ -90,6 +99,24 @@ namespace Core.Transfer
             }
             item.TransferRequest = item.Transfer;//
             return 0;
+        }
+
+        bool SaveUploadDropbox()
+        {
+            //create folder if not found
+            if (Dropbox.AutoCreateFolder(item.To.ap.GetPath(), item.To.ap.Email) != item.To.ap.GetPath())
+            {
+                item.ErrorMsg = "Failed to create folder: " + item.To.ap.GetPath();
+                return false;
+            }
+            dynamic json_ = JsonConvert.DeserializeObject(((DropboxRequestAPIv2)clientTo).upload_session_finish(null, item.UploadID, item.Transfer, item.To.ap.GetPath(), DropboxUploadMode.add));
+            long size = json_.size;
+            if (size == item.From.Size) return true;
+            else
+            {
+                item.ErrorMsg = "File size was upload not match.";
+                return false;
+            }
         }
     }
 }

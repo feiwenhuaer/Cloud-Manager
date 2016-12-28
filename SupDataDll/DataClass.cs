@@ -126,6 +126,7 @@ namespace SupDataDll
     
     public class UD_item_work_info
     {
+        public AnalyzePath ap;
         public Stream stream;
         public string filename;
         public string path;

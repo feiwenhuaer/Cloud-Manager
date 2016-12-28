@@ -15,7 +15,7 @@ namespace Core.Transfer
         public Thread MainThread;
         public StatusUpDownApp status = StatusUpDownApp.Pause; //UploadDownloadItems
         public List<ItemsTransferManager> groups = new List<ItemsTransferManager>();
-        public List<Thread> threads = new List<Thread>();
+        public List<Thread> LoadGroupThreads = new List<Thread>();
         public bool AuToStartGroupMode = true;
         public bool Loop = true;
         long timestamp;
@@ -38,11 +38,11 @@ namespace Core.Transfer
                 GC.Collect();
                 Thread.Sleep(100);
                 if (status == StatusUpDownApp.Pause) continue;
-                for (int i = 0; i < threads.Count; i++)
+                for (int i = 0; i < LoadGroupThreads.Count; i++)
                 {
-                    if (!threads[i].IsAlive)
+                    if (!LoadGroupThreads[i].IsAlive)
                     {
-                        threads.RemoveAt(i);
+                        LoadGroupThreads.RemoveAt(i);
                         i--;
                     }
                 }
@@ -68,7 +68,7 @@ namespace Core.Transfer
                                 count_group_running++;
                             }
 
-                            if (groups[i].group.status == StatusUpDown.Removing & groups[i].threads.Count == 0)
+                            if (groups[i].group.status == StatusUpDown.Removing & groups[i].ThreadsItemLoadWork.Count == 0)
                             {
                                 AppSetting.uc_lv_ud_instance.RemoveGroup(this.groups[i].group);
                                 this.groups.RemoveAt(i);
@@ -106,11 +106,11 @@ namespace Core.Transfer
                         {
                             if (group.group.status == StatusUpDown.Running | group.group.status == StatusUpDown.Started |
                                 group.group.status == StatusUpDown.Waiting) group.group.status = StatusUpDown.Stop;
-                            if (lockkillthr) KillThreads(group.threads);
+                            if (lockkillthr) KillThreads(group.ThreadsItemLoadWork);
                             group.ManagerItemsAndRefreshData();//clean thread
-                            thrcount += group.threads.Count;
+                            thrcount += group.ThreadsItemLoadWork.Count;
                         }
-                        thrcount += this.threads.Count;
+                        thrcount += this.LoadGroupThreads.Count;
                         //if (lockkillthr) KillThreads(threads);
                         if (thrcount == 0) this.status = StatusUpDownApp.SavingData;
                         else if (CurrentMillis.Millis - timestamp > 5000 & !lockkillthr) lockkillthr = true;
@@ -129,19 +129,17 @@ namespace Core.Transfer
             }
         }
 
+        //from Reflection_UI
         public void AddItems(List<NewTransferItem> items, string fromfolder_raw, string savefolder_raw, bool AreCut)
         {
             ItemsTransferManager gr = new ItemsTransferManager(items, fromfolder_raw, savefolder_raw, AreCut);
             groups.Add(gr);
-            Thread thr = new Thread(Loaditem);
-            thr.Start(groups.IndexOf(gr));
-            threads.Add(thr);
-        }
-        public void Loaditem(object obj)
-        {
-            groups[(int)obj].LoadListItems();
+            Thread thr = new Thread(groups[groups.IndexOf(gr)].LoadListItems);
+            thr.Start();
+            LoadGroupThreads.Add(thr);
         }
 
+        //add data to TLV when create new ui
         public void LoadGroupToListView()
         {
             foreach (ItemsTransferManager gr in groups)
