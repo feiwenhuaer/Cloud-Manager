@@ -41,7 +41,7 @@
         </Style>
     </UserControl.Resources>
 
-    <Tree:TreeList x:Name="treeList" ItemsSource="{Binding}">
+    <Tree:TreeList x:Name="treeList" MouseDown="treeList_MouseDown">
         <Tree:TreeList.View>
             <GridView>
                 <GridViewColumn Header="From" Width="250">

@@ -19,5 +19,10 @@ namespace WpfUI.UI.Main.Lv_ud
         {
             treeList.UpdateLayout();
         }
+
+        private void treeList_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            treeList.SelectedItems.Clear();
+        }
     }
 }

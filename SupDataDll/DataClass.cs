@@ -143,16 +143,17 @@ namespace SupDataDll
             ud_groups.Add(group);
         }
 
+
         public void Add(UD_group_work ud_group)
         {
             ud_groups.Add(ud_group);
         }
-
         public void Remove(UD_group_work ud_group)
         {
             if (ud_groups.IndexOf(ud_group) > -1)
                 ud_groups.Remove(ud_group);
         }
+
 
         public IEnumerable GetChildren(object parent)
         {

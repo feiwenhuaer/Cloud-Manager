@@ -69,16 +69,16 @@ namespace Cloud_Manager
         private static void DeleteFile_dev()
         {
             Console.WriteLine("Debug mode");
-            FileInfo info = new FileInfo(Directory.GetCurrentDirectory() + "\\lang\\" + "eng.xml");
-            if (info.Exists) info.Delete();
+            //FileInfo info = new FileInfo(Directory.GetCurrentDirectory() + "\\lang\\" + "eng.xml");
+            //if (info.Exists) info.Delete();
             //info = new FileInfo("Settings.dat");
             //if (info.Exists) info.Delete();
             //info = new FileInfo(Directory.GetCurrentDirectory() + "\\" + "DataUploadDownload.dat");
             //if (info.Exists) info.Delete();
 
-            //DirectoryInfo dinfo = new DirectoryInfo(@"E:\temp");
-            //if (dinfo.Exists) { dinfo.Delete(true); }
-            //dinfo.Create();
+            DirectoryInfo dinfo = new DirectoryInfo(@"E:\temp");
+            if (dinfo.Exists) { dinfo.Delete(true); }
+            dinfo.Create();
         }
     }
 }

@@ -20,7 +20,6 @@ namespace WpfUI.UI.Main.Lv_ud
     /// </summary>
     public partial class UC_TLV_ud : UserControl, SupDataDll.UiInheritance.UIUC_TLV_ud
     {
-        List<UD_group_work> ud = new List<UD_group_work>();
         object uimain;
         #region interface
         public object UIMain
@@ -61,16 +60,12 @@ namespace WpfUI.UI.Main.Lv_ud
                 {
                     TLV_process.treeList.Model = TLV_process.data;
                     TLV_done.treeList.Model = TLV_done.data;
-                    //LV_process.Refresh();
-                    //LV_done.Refresh();
                 }));
             }
             else
             {
                 TLV_process.treeList.Model = TLV_process.data;
                 TLV_done.treeList.Model = TLV_done.data;
-                //LV_process.Refresh();
-                //LV_done.Refresh();
             }
         }
 

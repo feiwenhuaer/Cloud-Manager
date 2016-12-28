@@ -128,7 +128,7 @@
         </Grid.ColumnDefinitions>
         <Menu x:Name="menu" Grid.ColumnSpan="2">
             <MenuItem x:Name="MenuCloud" Header="Cloud" SubmenuOpened="MenuCloud_SubmenuOpened">
-                <MenuItem x:Name="Cloud_add" Header="Add" ItemsSource="{Binding CloudsAdd}">
+                <MenuItem x:Name="Cloud_add" Header="Add" ItemsSource="{Binding}">
                     <MenuItem.ItemContainerStyle>
                         <Style TargetType="{x:Type MenuItem}">
                             <Setter Property="Header" Value="{Binding Text}"/>
@@ -137,7 +137,7 @@
                         </Style>
                     </MenuItem.ItemContainerStyle>
                 </MenuItem>
-                <MenuItem x:Name="Cloud_remove" Header="Remove" ItemsSource="{Binding CloudsRemove}">
+                <MenuItem x:Name="Cloud_remove" Header="Remove" ItemsSource="{Binding}">
                     <MenuItem.ItemContainerStyle>
                         <Style TargetType="{x:Type MenuItem}">
                             <Setter Property="Header" Value="{Binding Text}"/>

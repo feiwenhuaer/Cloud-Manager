@@ -38,7 +38,6 @@ namespace Core
             timestamp = CurrentMillis.Millis;
             bool lockkillthr = false;
             ReadData();
-            //int count_group_done = 0;
             while (Loop)
             {
                 GC.Collect();
@@ -82,24 +81,25 @@ namespace Core
                                 continue;
                             }
 
-                            groups[i].CheckStartDownloadItem();
-
-                            if (!flag_shutdown && count_group_running > 0 && AppSetting.settings.GetSettingsAsString(SettingsKey.ShutdownWhenDone) == "1") flag_shutdown = true;
-                            if (flag_shutdown && AppSetting.settings.GetSettingsAsString(SettingsKey.ShutdownWhenDone) == "0") flag_shutdown = false;
-                            count = count_group_running + count;
-                            if (flag_shutdown && AppSetting.settings.GetSettingsAsString(SettingsKey.ShutdownWhenDone) == "1" && count == 0)
-                            {
-                                SaveData();
-                                Console.WriteLine("shutdown");
-                                //Process.Start("shutdown.exe", "-s -t 30");
-                                return;
-                            }
+                            groups[i].ManagerItemsAndRefreshData();
                         }
+
+                        if (!flag_shutdown && count_group_running > 0 && AppSetting.settings.GetSettingsAsString(SettingsKey.ShutdownWhenDone) == "1") flag_shutdown = true;
+                        if (flag_shutdown && AppSetting.settings.GetSettingsAsString(SettingsKey.ShutdownWhenDone) == "0") flag_shutdown = false;
+                        if (flag_shutdown && AppSetting.settings.GetSettingsAsString(SettingsKey.ShutdownWhenDone) == "1" && (count_group_running + count) == 0)
+                        {
+                            SaveData();
+                            Console.WriteLine("shutdown");
+                            //Process.Start("shutdown.exe", "-s -t 30");
+                            return;
+                        }
+
                         if (CurrentMillis.Millis - timestamp > 500)
                         {
                             timestamp = CurrentMillis.Millis;
                             AppSetting.uc_lv_ud_instance.RefreshAll();
                         }
+
                         SaveData();
                         #endregion
                         break;
@@ -112,7 +112,7 @@ namespace Core
                             if (group.group.status == StatusUpDown.Running | group.group.status == StatusUpDown.Started |
                                 group.group.status == StatusUpDown.Waiting ) group.group.status = StatusUpDown.Stop;
                             if (lockkillthr) KillThreads(group.threads);
-                            group.CheckStartDownloadItem();//clean thread
+                            group.ManagerItemsAndRefreshData();//clean thread
                             thrcount += group.threads.Count;
                         }
                         thrcount += this.threads.Count;
@@ -144,7 +144,7 @@ namespace Core
         }
         public void Loaditem(object obj)
         {
-            groups[(int)obj].AddItems();
+            groups[(int)obj].LoadListItems();
         }
         
         public void LoadGroupToListView()
@@ -225,7 +225,8 @@ namespace Core
         public AnalyzePath savefolder;
         public bool AreCut = false;
         public List<Thread> threads = new List<Thread>();
-        
+
+        #region Declare
         internal GroupTransferItemsProcess(Group_Json_Data_UDItem group_json)
         {
             addGroup_toTLV = true;
@@ -241,7 +242,7 @@ namespace Core
                 item.col[3] = item.status.ToString();
             }
             this.group.change = ChangeTLV.Done;
-            RefreshGroup(-1);
+            RefreshGroupDataToShow(-1);
         }
         public GroupTransferItemsProcess(List<UpDownloadItem> items, string fromfolder_raw, string savefolder_raw,bool AreCut = false)
         {
@@ -253,7 +254,10 @@ namespace Core
             this.savefolder = new AnalyzePath(savefolder_raw);
             this.AreCut = AreCut;
         }
-        public void AddItems()
+        #endregion
+
+        #region Load List File
+        public void LoadListItems()
         {
             this.group.col = new List<string> { fromfolder.Path_Raw, savefolder.Path_Raw, this.group.status.ToString(), "0/0", "", "", "" };
             foreach (UpDownloadItem item in items)
@@ -272,7 +276,7 @@ namespace Core
             }
             group.status = StatusUpDown.Waiting;
         }
-        private List<UD_item_work> ListAllItemInFolder(string path_rawItem,string id = "")
+        List<UD_item_work> ListAllItemInFolder(string path_rawItem,string id = "")
         {
             ListItemFileFolder list;
             List<UD_item_work> ud_items = new List<UD_item_work>();
@@ -299,9 +303,8 @@ namespace Core
             }
             return ud_items;
         }
-
         //Path_Parent : id/folder/folder or GD:a@gmail.com/folder/folder
-        private UD_item_work LoadFile(string Path_Parent,string FileName,long size,string FileId)//Path_raw path parent folder of file
+        UD_item_work LoadFile(string Path_Parent,string FileName,long size,string FileId)//Path_raw path parent folder of file
         {
             UD_item_work ud_item = new UD_item_work();
             //From
@@ -324,7 +327,9 @@ namespace Core
             Group_UD_item_EventAddDataToListview();
             return ud_item;
         }
-        private void Group_UD_item_EventAddDataToListview()
+        #endregion
+
+        void Group_UD_item_EventAddDataToListview()
         {
             if (AppSetting.ud_items.status == StatusUpDownApp.StopForClosingApp | AppSetting.ud_items.status == StatusUpDownApp.SavingData) return;
             if (!addGroup_toTLV)//& index == -1)
@@ -334,7 +339,8 @@ namespace Core
                 return;
             }
         }
-        public void CheckStartDownloadItem()
+
+        public void ManagerItemsAndRefreshData()
         {
             //clean thread
             for (int i = 0; i < threads.Count; i++)
@@ -479,10 +485,10 @@ namespace Core
                 this.group.change = ChangeTLV.DoneToProcessing;
             #endregion
 
-            RefreshGroup(count_item_done);
+            RefreshGroupDataToShow(count_item_done);
         }
 
-        private void RefreshGroup(int count_item_done)
+        void RefreshGroupDataToShow(int count_item_done)
         {
             if (count_item_done != -1 & group.col[3].IndexOf("100% (") < 0 & group.items.Count != 0)
                 group.col[3] = Math.Round((double)count_item_done * 100 / group.items.Count, 2).ToString() + "% (" + count_item_done.ToString() + "/" + group.items.Count.ToString() + ")";
@@ -496,7 +502,7 @@ namespace Core
             }
         }
         
-        private void WorkThread(object obj)
+        void WorkThread(object obj)
         {
             int x = (int)obj;
             try{
