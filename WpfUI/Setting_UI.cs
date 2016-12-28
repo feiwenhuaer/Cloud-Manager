@@ -9,7 +9,7 @@ using System.Windows.Media.Imaging;
 
 namespace WpfUI
 {
-    public class Setting_UI : SupDataDll.UiInheritance.UI
+    public class Setting_UI : SupDataDll.UiInheritance.SettingUI
     {
         public static System.Windows.Controls.Image GetImage(Bitmap bmp,double Width=16,double Height=16)
         {

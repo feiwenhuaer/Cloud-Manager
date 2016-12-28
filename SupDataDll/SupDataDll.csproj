@@ -56,7 +56,7 @@
     <Compile Include="UiInheritance\Oauth\interfaceDB.cs" />
     <Compile Include="UiInheritance\Oauth\interfaceGD.cs" />
     <Compile Include="UiInheritance\Oauth\OauthUI.cs" />
-    <Compile Include="UiInheritance\UI.cs" />
+    <Compile Include="UiInheritance\SettingUI.cs" />
     <Compile Include="UiInheritance\UIClosing.cs" />
     <Compile Include="UiInheritance\UIDelete.cs" />
     <Compile Include="UiInheritance\UILogin.cs" />
