@@ -191,7 +191,7 @@ namespace Core.cloud
                         throw new UnknowCloudNameException("Error Unknow Cloud Type: " + rp.TypeCloud.ToString());
                 }
             }
-            catch(Exception ex) { return false; }
+            catch{ return false; }
         }
         
         public void Delete(object items_)

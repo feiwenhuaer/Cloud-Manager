@@ -17,24 +17,17 @@ namespace Core
         public void ReadSettings()
         {
             xmlSettings = new XmlDocument();
-            try
+            if (ReadWriteData.Exists(ReadWriteData.File_Settings))
             {
-                if (ReadWriteData.Exists(ReadWriteData.File_Settings))
+                lock (SyncSetting)
                 {
-                    lock (SyncSetting)
-                    {
-                        xmlSettings.Load(ReadWriteData.Read(ReadWriteData.File_Settings));
-                    }
-                }
-                else
-                {
-                    xmlSettings.LoadXml(global::Core.Properties.Resources.SettingDefault);
-                    SaveSettings();
+                    xmlSettings.Load(ReadWriteData.Read(ReadWriteData.File_Settings));
                 }
             }
-            catch (Exception Ex)
+            else
             {
-                //MessageBox.Show("read setting error");
+                xmlSettings.LoadXml(global::Core.Properties.Resources.SettingDefault);
+                SaveSettings();
             }
         }
 
@@ -42,18 +35,10 @@ namespace Core
         {
             lock (SyncSetting)
             {
-                try
-                {
-
-                    MemoryStream Stream = new MemoryStream();
-                    TextWriter TxtWriter = new StreamWriter(Stream, Encoding.UTF8);
-                    xmlSettings.Save(TxtWriter);
-                    ReadWriteData.Write(ReadWriteData.File_Settings, Stream.GetBuffer());
-                }
-                catch (Exception Ex)
-                {
-                    //MessageBox.Show("Can't write setting\r\n" + Ex.Message);
-                }
+                MemoryStream Stream = new MemoryStream();
+                TextWriter TxtWriter = new StreamWriter(Stream, Encoding.UTF8);
+                xmlSettings.Save(TxtWriter);
+                ReadWriteData.Write(ReadWriteData.File_Settings, Stream.GetBuffer());
             }
         }
 

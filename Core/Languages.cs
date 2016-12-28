@@ -25,16 +25,12 @@ namespace Core
         }
         void Load()
         {
-            try
+            xmlLanguages.LoadXml(global::Core.Properties.Resources.eng);
+            if (!File.Exists(AppSetting.RootDirectory + "\\lang\\eng.xml")) SaveFile(true);
+            if (File.Exists(filepath))
             {
-                xmlLanguages.LoadXml(global::Core.Properties.Resources.eng);
-                if (!File.Exists(AppSetting.RootDirectory + "\\lang\\eng.xml")) SaveFile(true);
-                if (File.Exists(filepath))
-                {
-                    xmlLanguages.Load(filepath);
-                }
+                xmlLanguages.Load(filepath);
             }
-            catch (Exception Ex) { }
             langlist = xmlLanguages.DocumentElement.SelectSingleNode("LANG").ChildNodes;
         }
         string Reload()

@@ -18,7 +18,6 @@ namespace Core.Transfer
     public class ItemsTransferManager
     {
         public TransferGroup group = new TransferGroup();
-        bool addGroup_toTLV = false;
         List<NewTransferItem> items;
         public AnalyzePath fromfolder;
         public AnalyzePath savefolder;
@@ -28,7 +27,6 @@ namespace Core.Transfer
         #region Declare
         internal ItemsTransferManager(JsonDataSaveGroup group_json)
         {
-            addGroup_toTLV = true;
             this.group = group_json.Group;
             this.fromfolder = new AnalyzePath(group_json.fromfolder_raw);
             this.AreCut = group_json.AreCut;

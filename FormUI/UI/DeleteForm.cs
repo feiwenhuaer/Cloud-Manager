@@ -95,6 +95,7 @@ namespace FormUI.UI
         private void DeleteForm_FormClosed(object sender, System.Windows.Forms.FormClosedEventArgs e)
         {
             autoclose = true;
+            EventClosing();
         }
         #endregion
     }
