@@ -6,6 +6,8 @@ using System.IO;
 using System.Threading;
 using System.Windows.Forms;
 using SupDataDll.UiInheritance;
+using Core.cloud;
+using Core.Transfer;
 
 namespace Cloud_Manager
 {
@@ -22,7 +24,17 @@ namespace Cloud_Manager
 
                 DeleteFile_dev();// dev mode
 
-                AppSetting.Load(); // load setting
+                //load instance class
+                ReadWriteData.CreateFolderSaveData();// create folder %appdata%\\CloudManager
+                Get_mimeType.Load();//mimeType (google drive upload)
+                AppSetting.ManageCloud = new CloudManager();//explorer
+                AppSetting.TransferManager = new GroupsTransferManager();//transfer file
+                AppSetting.login = new Login();//load login
+
+                //load core
+                AppSetting.settings = new Settings();//load settings
+                AppSetting.settings.ReadSettings();
+                AppSetting.lang = new Languages(AppSetting.settings.GetSettingsAsString(SettingsKey.lang));//load language
 
                 LoadDllUI.Load();//load dll UI
                 Reflection_UI.CreateInstanceLogin();//Create Login UI
@@ -32,14 +44,14 @@ namespace Cloud_Manager
                 AppSetting.UILogin.ShowDialog_();
                 if (!string.IsNullOrEmpty(AppSetting.Pass))
                 {
-                    AppSetting.ud_items.Start();
+                    AppSetting.TransferManager.Start();
                     Reflection_UI.Load_UIMain();
                     showMainForm:
-                    AppSetting.ud_items.status = StatusUpDownApp.Start;
+                    AppSetting.TransferManager.status = StatusUpDownApp.Start;
                     AppSetting.UIMain.ShowDialog_();
                     if (AppSetting.UIMain.AreReloadUI)//if reload ui
                     {
-                        AppSetting.ud_items.status = StatusUpDownApp.Pause;
+                        AppSetting.TransferManager.status = StatusUpDownApp.Pause;
                         //clean memory
                         AppSetting.UIMain = null;
                         AppSetting.uc_lv_ud_instance = null;
@@ -53,9 +65,9 @@ namespace Cloud_Manager
                     }
                     // close all thread
                     AppSetting.UIclose = (UIClosing)Activator.CreateInstance(LoadDllUI.GetTypeInterface(typeof(UIClosing)));
-                    AppSetting.ud_items.Eventupdateclosingform += AppSetting.UIclose.updatedata;
-                    AppSetting.ud_items.Eventcloseapp += AppSetting.UIclose.Close_;
-                    AppSetting.ud_items.status = StatusUpDownApp.StopForClosingApp;
+                    AppSetting.TransferManager.Eventupdateclosingform += AppSetting.UIclose.updatedata;
+                    AppSetting.TransferManager.Eventcloseapp += AppSetting.UIclose.Close_;
+                    AppSetting.TransferManager.status = StatusUpDownApp.StopForClosingApp;
                     AppSetting.UIclose.ShowDialog_();
                 }
                 mutex.ReleaseMutex();

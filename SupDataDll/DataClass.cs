@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading;
 
@@ -114,7 +115,6 @@ namespace SupDataDll
         public StatusTransfer CheckChangeStatus = StatusTransfer.Waiting;
         public string UploadID = "";//for remuse upload
         public string ErrorMsg = "";
-        [JsonIgnore]
         public long Transfer = 0;//byte[] was transfer
         public long OldTransfer = 0;//for caculate speed
         public int ChunkUploadSize = -1;// = -1 is download, >0 is chunk size upload
@@ -141,7 +141,7 @@ namespace SupDataDll
 
     public class UD_data_WPF : ITreeModel
     {
-        List<TransferGroup> ud_groups = new List<TransferGroup>();
+        ObservableCollection<TransferGroup> ud_groups = new ObservableCollection<TransferGroup>();
 
         public UD_data_WPF(TransferGroup group)
         {

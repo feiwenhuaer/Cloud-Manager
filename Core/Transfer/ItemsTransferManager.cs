@@ -63,6 +63,7 @@ namespace Core.Transfer
         #region Load List File
         public void LoadListItems()
         {
+            Console.WriteLine("Load group:" + fromfolder);
             this.group.col = new List<string> { fromfolder.Path_Raw, savefolder.Path_Raw, this.group.status.ToString(), "0/0", "", "", "" };
             AppSetting.uc_lv_ud_instance.AddNewGroup(group);
             foreach (NewTransferItem item in items)
@@ -160,7 +161,7 @@ namespace Core.Transfer
                 {
                     group.items.RemoveAt(i);
                     i--;
-                    break;
+                    continue;
                 }
                 else switch (group.items[i].status)
                     {
@@ -297,6 +298,7 @@ namespace Core.Transfer
             int x = (int)obj;
             try
             {
+                Console.WriteLine("Load items:"+group.items[x].From.ap.Path_Raw);
                 #region CreateStreamFrom
                 if (!fromfolder.PathIsUrl)
                 {

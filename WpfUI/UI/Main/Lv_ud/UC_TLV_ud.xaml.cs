@@ -54,19 +54,15 @@ namespace WpfUI.UI.Main.Lv_ud
 
         public void RefreshAll()
         {
-            if (!Dispatcher.CheckAccess())
-            {
-                Dispatcher.Invoke(new Action(() =>
-                {
-                    TLV_process.treeList.Model = TLV_process.data;
-                    TLV_done.treeList.Model = TLV_done.data;
-                }));
-            }
-            else
-            {
-                TLV_process.treeList.Model = TLV_process.data;
-                TLV_done.treeList.Model = TLV_done.data;
-            }
+            if (!Dispatcher.CheckAccess()) Dispatcher.Invoke(new Action(() => refresh()));
+            else refresh();
+        }
+
+        void refresh()
+        {
+            TLV_process.treeList.Model = TLV_process.data;
+            TLV_process.Refresh();
+            TLV_done.treeList.Model = TLV_done.data;
         }
 
         public void RemoveGroup(TransferGroup Group)

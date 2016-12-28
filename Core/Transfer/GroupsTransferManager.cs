@@ -85,7 +85,6 @@ namespace Core.Transfer
                         {
                             SaveData();
                             Console.WriteLine("shutdown");
-                            //Process.Start("shutdown.exe", "-s -t 30");
                             return;
                         }
 
@@ -101,25 +100,28 @@ namespace Core.Transfer
                     case StatusUpDownApp.StopForClosingApp:
                         #region Stop
                         Eventupdateclosingform(AppSetting.lang.GetText(LanguageKey.CloseThread.ToString()));
-                        int thrcount = 0;
+                        int ItemsRunningCount = 0;
                         foreach (ItemsTransferManager group in groups)
                         {
                             if (group.group.status == StatusTransfer.Running | group.group.status == StatusTransfer.Started |
                                 group.group.status == StatusTransfer.Waiting) group.group.status = StatusTransfer.Stop;
                             if (lockkillthr) KillThreads(group.ThreadsItemLoadWork);
                             group.ManagerItemsAndRefreshData();//clean thread
-                            thrcount += group.ThreadsItemLoadWork.Count;
+                            group.group.items.ForEach(s => 
+                            {
+                                if (s.status == StatusTransfer.Running | s.status == StatusTransfer.Waiting) { s.status = StatusTransfer.Stop; ItemsRunningCount++; }
+                            });
+                            ItemsRunningCount += group.ThreadsItemLoadWork.Count;
                         }
-                        thrcount += this.LoadGroupThreads.Count;
+                        ItemsRunningCount += this.LoadGroupThreads.Count;
                         //if (lockkillthr) KillThreads(threads);
-                        if (thrcount == 0) this.status = StatusUpDownApp.SavingData;
+                        if (ItemsRunningCount == 0) this.status = StatusUpDownApp.SavingData;
                         else if (CurrentMillis.Millis - timestamp > 5000 & !lockkillthr) lockkillthr = true;
                         #endregion
                         break;
                     case StatusUpDownApp.SavingData:
                         #region SavingData
                         Eventupdateclosingform(AppSetting.lang.GetText(LanguageKey.SaveData.ToString()));
-                        //Thread.Sleep(200);
                         SaveData();
                         Eventcloseapp();
                         #endregion

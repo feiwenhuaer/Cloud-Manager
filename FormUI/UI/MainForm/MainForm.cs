@@ -174,11 +174,9 @@ namespace FormUI.UI.MainForm
             Setting_UI.reflection_eventtocore._SaveSetting();
             Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.ReloadLang);
             //Menu ToolStrip
-            filesToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.ToolStrip_files);
             cloudToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.ToolStrip_cloud);
             settingsToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.ToolStrip_settings);
             settingsToolStripMenuItem1.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.ToolStrip_settings_setting);
-            exitToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.ToolStrip_files_exit);
             addToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.ToolStrip_cloud_add);
             removeToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.ToolStrip_cloud_remove);
 

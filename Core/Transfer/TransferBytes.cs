@@ -48,9 +48,13 @@ namespace Core.Transfer
                     {
                         if (item.To.ap.TypeCloud == CloudName.Dropbox)
                         {
-                            if (SaveUploadDropbox()) item.status = StatusTransfer.Done;
-                            else item.status = StatusTransfer.Error;
+                            if (!SaveUploadDropbox())
+                            {
+                                item.status = StatusTransfer.Error;
+                                return;
+                            }
                         }
+                        item.status = StatusTransfer.Done;
                     }
                     else item.status = StatusTransfer.Stop;
                     return;
@@ -73,7 +77,12 @@ namespace Core.Transfer
                 }
                 #endregion
             }
-            catch (Exception ex) { item.ErrorMsg = ex.Message; item.status = StatusTransfer.Error; }
+            catch (Exception ex)
+            {
+                if (AppSetting.TransferManager.status == StatusUpDownApp.StopForClosingApp | AppSetting.TransferManager.status == StatusUpDownApp.SavingData) return;
+                item.ErrorMsg = ex.Message;
+                item.status = StatusTransfer.Error;
+            }
         }
 
         int MakeNextChunkUploadInStreamTo(bool CreateNew = false)

@@ -9,22 +9,10 @@ namespace Core
 {
     public static class AppSetting
     {
-        public static void Load()
-        {
-            ReadWriteData.CreateFolderSaveData();// create folder %appdata%\\CloudManager
-            //load core
-            settings = new Settings();//load settings
-            settings.ReadSettings();
-            login = new Login();//login
-            ManageCloud = new CloudManager();//explorer
-            Get_mimeType.Load();//mimeType (google drive upload)
-            ud_items = new GroupsTransferManager();//transfer file
-            lang = new Languages(settings.GetSettingsAsString(SettingsKey.lang));//load language
-        }
         //can't static class (because event)
         public static Settings settings;//setting
         public static Login login;//login
-        public static GroupsTransferManager ud_items;//upload download
+        public static GroupsTransferManager TransferManager;//upload download
         public static CloudManager ManageCloud;
         public static Languages lang;
         //instance
