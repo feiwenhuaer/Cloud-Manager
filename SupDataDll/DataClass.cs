@@ -94,8 +94,8 @@ namespace SupDataDll
         public long OldTransfer = 0;
         public long Timestamp = 0;
         //Status
-        public StatusUpDown status = StatusUpDown.Loading;
-        public StatusUpDown CheckChangeStatus = StatusUpDown.Loading;
+        public StatusTransfer status = StatusTransfer.Loading;
+        public StatusTransfer CheckChangeStatus = StatusTransfer.Loading;
         public ChangeTLV change = ChangeTLV.Processing;
         //Items
         public List<TransferItem> items = new List<TransferItem>();
@@ -110,8 +110,8 @@ namespace SupDataDll
         public long Timestamp = 0;
         public UD_item_work_info From = new UD_item_work_info();
         public UD_item_work_info To = new UD_item_work_info();
-        public StatusUpDown status = StatusUpDown.Waiting;
-        public StatusUpDown CheckChangeStatus = StatusUpDown.Waiting;
+        public StatusTransfer status = StatusTransfer.Waiting;
+        public StatusTransfer CheckChangeStatus = StatusTransfer.Waiting;
         public string UploadID = "";//for remuse upload
         public string ErrorMsg = "";
         [JsonIgnore]

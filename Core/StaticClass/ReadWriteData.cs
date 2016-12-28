@@ -18,6 +18,7 @@ namespace Core.StaticClass
         public static TextReader Read(string filename)
         {
             FileStream RawStream = new FileStream(Path + "\\" + filename, FileMode.Open, FileAccess.Read);
+            if (RawStream.Length == 0) return null;
             byte[] crypt = new byte[1];
             byte[] Buffer = new byte[RawStream.Length - 1];
             RawStream.Read(crypt, 0, 1);

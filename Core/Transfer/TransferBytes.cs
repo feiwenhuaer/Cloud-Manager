@@ -23,7 +23,7 @@ namespace Core.Transfer
             if (item.ChunkUploadSize > 0) MakeNextChunkUploadInStreamTo(true);
             else this.item.To.stream = AppSetting.ManageCloud.GetFileStream(item.To.ap.Path_Raw, null, false, item.Transfer);//download to disk
             //begin transfer
-            item.status = StatusUpDown.Running;
+            item.status = StatusTransfer.Running;
             item.From.stream.BeginRead(item.buffer, 0, item.buffer.Length, new AsyncCallback(GetFrom), 0);
         }
 
@@ -39,20 +39,20 @@ namespace Core.Transfer
                 #endregion
 
                 #region transfer done/force stop.
-                if (item.Transfer == item.From.Size | item.status != StatusUpDown.Running)//transfer done/force stop.
+                if (item.Transfer == item.From.Size | item.status != StatusTransfer.Running)//transfer done/force stop.
                 {
                     item.TransferRequest = item.Transfer;
                     try { item.From.stream.Close(); } catch { }
                     try { item.To.stream.Close(); } catch { }
-                    if (item.status == StatusUpDown.Running)
+                    if (item.status == StatusTransfer.Running)
                     {
                         if (item.To.ap.TypeCloud == CloudName.Dropbox)
                         {
-                            if (SaveUploadDropbox()) item.status = StatusUpDown.Done;
-                            else item.status = StatusUpDown.Error;
+                            if (SaveUploadDropbox()) item.status = StatusTransfer.Done;
+                            else item.status = StatusTransfer.Error;
                         }
                     }
-                    else item.status = StatusUpDown.Stop;
+                    else item.status = StatusTransfer.Stop;
                     return;
                 }
                 #endregion
@@ -73,7 +73,7 @@ namespace Core.Transfer
                 }
                 #endregion
             }
-            catch (Exception ex) { item.ErrorMsg = ex.Message; item.status = StatusUpDown.Error; }
+            catch (Exception ex) { item.ErrorMsg = ex.Message; item.status = StatusTransfer.Error; }
         }
 
         int MakeNextChunkUploadInStreamTo(bool CreateNew = false)

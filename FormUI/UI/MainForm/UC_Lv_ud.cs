@@ -64,7 +64,7 @@ namespace FormUI.UI.MainForm
                 {
                     foreach (var child in item.items)
                     {
-                        if (child.status == StatusUpDown.Running | child.status != child.CheckChangeStatus)
+                        if (child.status == StatusTransfer.Running | child.status != child.CheckChangeStatus)
                         {
                             TLV_ud.RefreshObject(child);
                             child.CheckChangeStatus = child.status;
@@ -249,13 +249,13 @@ namespace FormUI.UI.MainForm
                 if (parents.Count == 1) numberOfParallelDownloadsToolStripMenuItem.Enabled = true;
                 foreach (var parent in parents)
                 {
-                    if (parent.status == StatusUpDown.Stop | parent.status == StatusUpDown.Waiting) startToolStripMenuItem.Enabled = true;
-                    if (parent.status == StatusUpDown.Waiting | parent.status == StatusUpDown.Running) stopToolStripMenuItem.Enabled = true;
-                    if (parent.status == StatusUpDown.Stop) waitingToolStripMenuItem.Enabled = true;
-                    if (parent.status == StatusUpDown.Removing) removeToolStripMenuItem.Enabled = true;
+                    if (parent.status == StatusTransfer.Stop | parent.status == StatusTransfer.Waiting) startToolStripMenuItem.Enabled = true;
+                    if (parent.status == StatusTransfer.Waiting | parent.status == StatusTransfer.Running) stopToolStripMenuItem.Enabled = true;
+                    if (parent.status == StatusTransfer.Stop) waitingToolStripMenuItem.Enabled = true;
+                    if (parent.status == StatusTransfer.Removing) removeToolStripMenuItem.Enabled = true;
                     if (errorToolStripMenuItem.Enabled == false) foreach (var child in parent.items)
                         {
-                            if (child.status == StatusUpDown.Error)
+                            if (child.status == StatusTransfer.Error)
                             {
                                 errorToolStripMenuItem.Enabled = true;
                                 break;
@@ -268,10 +268,10 @@ namespace FormUI.UI.MainForm
             {
                 foreach (var child in childs)
                 {
-                    if (child.status == StatusUpDown.Waiting | child.status == StatusUpDown.Stop | child.status == StatusUpDown.Error) startToolStripMenuItem.Enabled = true;
-                    if (child.status == StatusUpDown.Running | child.status == StatusUpDown.Stop | child.status == StatusUpDown.Started) waitingToolStripMenuItem.Enabled = true;
-                    if (child.status == StatusUpDown.Started | child.status == StatusUpDown.Running | child.status == StatusUpDown.Waiting) stopToolStripMenuItem.Enabled = true;
-                    if (child.status == StatusUpDown.Removing) removeToolStripMenuItem.Enabled = false;
+                    if (child.status == StatusTransfer.Waiting | child.status == StatusTransfer.Stop | child.status == StatusTransfer.Error) startToolStripMenuItem.Enabled = true;
+                    if (child.status == StatusTransfer.Running | child.status == StatusTransfer.Stop | child.status == StatusTransfer.Started) waitingToolStripMenuItem.Enabled = true;
+                    if (child.status == StatusTransfer.Started | child.status == StatusTransfer.Running | child.status == StatusTransfer.Waiting) stopToolStripMenuItem.Enabled = true;
+                    if (child.status == StatusTransfer.Removing) removeToolStripMenuItem.Enabled = false;
                 }
             }
         }
@@ -287,68 +287,68 @@ namespace FormUI.UI.MainForm
         }
 
         #region ChangeStatus
-        private void ChangeStatus(StatusUpDown val)
+        private void ChangeStatus(StatusTransfer val)
         {
             if (childs != null && childs.Count != 0)
             {
                 foreach (var child in childs)
                 {
                     //set Started when item is Stop,Waiting
-                    if (val == StatusUpDown.Started && (child.status == StatusUpDown.Stop | child.status == StatusUpDown.Waiting |
-                                                        child.status == StatusUpDown.Error))
+                    if (val == StatusTransfer.Started && (child.status == StatusTransfer.Stop | child.status == StatusTransfer.Waiting |
+                                                        child.status == StatusTransfer.Error))
                     {
                         child.status = val;
                         TransferGroup pr = olv.GetParent(child) as TransferGroup;
-                        if (pr != null && (pr.status != StatusUpDown.Running | pr.status != StatusUpDown.Loading | pr.status != StatusUpDown.Removing)) pr.status = val;
+                        if (pr != null && (pr.status != StatusTransfer.Running | pr.status != StatusTransfer.Loading | pr.status != StatusTransfer.Removing)) pr.status = val;
                     }
                     //set Stop child
-                    if (val == StatusUpDown.Stop && (child.status != StatusUpDown.Done | child.status != StatusUpDown.Error | child.status != StatusUpDown.Stop)) child.status = val;
+                    if (val == StatusTransfer.Stop && (child.status != StatusTransfer.Done | child.status != StatusTransfer.Error | child.status != StatusTransfer.Stop)) child.status = val;
                     //set Waiting child
-                    if (val == StatusUpDown.Waiting && child.status != StatusUpDown.Done) child.status = val;
+                    if (val == StatusTransfer.Waiting && child.status != StatusTransfer.Done) child.status = val;
 
-                    if (val == StatusUpDown.Remove) child.status = val;
+                    if (val == StatusTransfer.Remove) child.status = val;
                 }
             }
             if (parents != null && parents.Count != 0)
             {
                 foreach (var parent in parents)
                 {
-                    if (val == StatusUpDown.Started && (parent.status != StatusUpDown.Running)) parent.status = val;
-                    if (val == StatusUpDown.Stop && (parent.status != StatusUpDown.Done | parent.status != StatusUpDown.Loading | parent.status != StatusUpDown.Stop)) parent.status = val;
-                    if (val == StatusUpDown.Waiting && (parent.status != StatusUpDown.Done | parent.status != StatusUpDown.Removing)) parent.status = val;
-                    if (val == StatusUpDown.Remove) parent.status = val;
+                    if (val == StatusTransfer.Started && (parent.status != StatusTransfer.Running)) parent.status = val;
+                    if (val == StatusTransfer.Stop && (parent.status != StatusTransfer.Done | parent.status != StatusTransfer.Loading | parent.status != StatusTransfer.Stop)) parent.status = val;
+                    if (val == StatusTransfer.Waiting && (parent.status != StatusTransfer.Done | parent.status != StatusTransfer.Removing)) parent.status = val;
+                    if (val == StatusTransfer.Remove) parent.status = val;
                 }
             }
         }
 
         private void startToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ChangeStatus(StatusUpDown.Started);
+            ChangeStatus(StatusTransfer.Started);
         }
 
         private void stopToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ChangeStatus(StatusUpDown.Stop);
+            ChangeStatus(StatusTransfer.Stop);
         }
 
         private void waitingToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ChangeStatus(StatusUpDown.Waiting);
+            ChangeStatus(StatusTransfer.Waiting);
         }
 
         private void removeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             DialogResult rs = MessageBox.Show(this, "Are you sure to remove?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (rs == DialogResult.Yes) ChangeStatus(StatusUpDown.Remove);
+            if (rs == DialogResult.Yes) ChangeStatus(StatusTransfer.Remove);
         }
 
-        void ErrorSetForce(StatusUpDown val)
+        void ErrorSetForce(StatusTransfer val)
         {
             foreach (var parent in parents)
             {
                 foreach (var child in parent.items)
                 {
-                    if (child.status == StatusUpDown.Error)
+                    if (child.status == StatusTransfer.Error)
                     {
                         child.status = val;
                     }
@@ -358,12 +358,12 @@ namespace FormUI.UI.MainForm
 
         private void forceStartToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ErrorSetForce(StatusUpDown.Started);
+            ErrorSetForce(StatusTransfer.Started);
         }
 
         private void forceWaitingToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ErrorSetForce(StatusUpDown.Waiting);
+            ErrorSetForce(StatusTransfer.Waiting);
         }
         #endregion
     }

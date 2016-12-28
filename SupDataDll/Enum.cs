@@ -41,7 +41,7 @@ namespace SupDataDll
         DoneToProcessing,
         Processing
     }
-    public enum StatusUpDown
+    public enum StatusTransfer
     {
         Loading,//AddItem -> loading info (before Started)
 

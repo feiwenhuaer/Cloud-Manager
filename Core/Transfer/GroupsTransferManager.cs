@@ -55,20 +55,20 @@ namespace Core.Transfer
                         count = 0;
                         groups.ForEach(s =>
                         {
-                            if (s.group.status == StatusUpDown.Running) count_group_running++;
-                            else if (s.group.status == StatusUpDown.Started | s.group.status == StatusUpDown.Waiting | s.group.status == StatusUpDown.Loading) count++;
+                            if (s.group.status == StatusTransfer.Running) count_group_running++;
+                            else if (s.group.status == StatusTransfer.Started | s.group.status == StatusTransfer.Waiting | s.group.status == StatusTransfer.Loading) count++;
                         });
 
                         for (int i = 0; i < groups.Count; i++)
                         {
-                            if (AuToStartGroupMode && groups[i].group.status == StatusUpDown.Waiting && count_group_running < int.Parse(AppSetting.settings.GetSettingsAsString(SettingsKey.MaxGroupsDownload)))//auto
+                            if (AuToStartGroupMode && groups[i].group.status == StatusTransfer.Waiting && count_group_running < int.Parse(AppSetting.settings.GetSettingsAsString(SettingsKey.MaxGroupsDownload)))//auto
                             {
                                 int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.MaxItemsInGroupDownload), out groups[i].group.MaxItemsDownload);
-                                groups[i].group.status = StatusUpDown.Started;
+                                groups[i].group.status = StatusTransfer.Started;
                                 count_group_running++;
                             }
 
-                            if (groups[i].group.status == StatusUpDown.Removing & groups[i].ThreadsItemLoadWork.Count == 0)
+                            if (groups[i].group.status == StatusTransfer.Removing & groups[i].ThreadsItemLoadWork.Count == 0)
                             {
                                 AppSetting.uc_lv_ud_instance.RemoveGroup(this.groups[i].group);
                                 this.groups.RemoveAt(i);
@@ -104,8 +104,8 @@ namespace Core.Transfer
                         int thrcount = 0;
                         foreach (ItemsTransferManager group in groups)
                         {
-                            if (group.group.status == StatusUpDown.Running | group.group.status == StatusUpDown.Started |
-                                group.group.status == StatusUpDown.Waiting) group.group.status = StatusUpDown.Stop;
+                            if (group.group.status == StatusTransfer.Running | group.group.status == StatusTransfer.Started |
+                                group.group.status == StatusTransfer.Waiting) group.group.status = StatusTransfer.Stop;
                             if (lockkillthr) KillThreads(group.ThreadsItemLoadWork);
                             group.ManagerItemsAndRefreshData();//clean thread
                             thrcount += group.ThreadsItemLoadWork.Count;
@@ -179,11 +179,15 @@ namespace Core.Transfer
         {
             if (ReadWriteData.Exists(ReadWriteData.File_DataUploadDownload))
             {
-                List<JsonDataSaveGroup> json_groups = JsonConvert.DeserializeObject<List<JsonDataSaveGroup>>(ReadWriteData.Read(ReadWriteData.File_DataUploadDownload).ReadToEnd());
-                foreach (JsonDataSaveGroup json_group in json_groups)
+                var readerjson = ReadWriteData.Read(ReadWriteData.File_DataUploadDownload);
+                if (readerjson != null)
                 {
-                    ItemsTransferManager group = new ItemsTransferManager(json_group);
-                    this.groups.Add(group);
+                    List<JsonDataSaveGroup> json_groups = JsonConvert.DeserializeObject<List<JsonDataSaveGroup>>(readerjson.ReadToEnd());
+                    foreach (JsonDataSaveGroup json_group in json_groups)
+                    {
+                        ItemsTransferManager group = new ItemsTransferManager(json_group);
+                        this.groups.Add(group);
+                    }
                 }
             }
         }
@@ -195,7 +199,7 @@ namespace Core.Transfer
             List<JsonDataSaveGroup> json_groups = new List<JsonDataSaveGroup>();
             for (int i = 0; i < groups.Count; i++)
             {
-                if (groups[i].group.status == StatusUpDown.Loading) continue;
+                if (groups[i].group.status == StatusTransfer.Loading) continue;
                 JsonDataSaveGroup json_item = new JsonDataSaveGroup();
                 json_item.fromfolder_raw = groups[i].fromfolder.Path_Raw;
                 json_item.savefolder_raw = groups[i].savefolder.Path_Raw;

@@ -36,10 +36,10 @@ namespace Core.Transfer
             this.AreCut = group_json.AreCut;
             this.savefolder = new AnalyzePath(group_json.savefolder_raw);
 
-            this.group.status = (group_json.Group.status == StatusUpDown.Done | group_json.Group.status == StatusUpDown.Error) ? group_json.Group.status : StatusUpDown.Stop;
+            this.group.status = (group_json.Group.status == StatusTransfer.Done | group_json.Group.status == StatusTransfer.Error) ? group_json.Group.status : StatusTransfer.Stop;
             foreach (TransferItem item in this.group.items)
             {
-                if (item.status == StatusUpDown.Running) item.status = StatusUpDown.Stop;
+                if (item.status == StatusTransfer.Running) item.status = StatusTransfer.Stop;
                 item.col[3] = item.status.ToString();
                 item.From.ap = new AnalyzePath(item.From.path);
                 item.To.ap = new AnalyzePath(item.To.path);
@@ -78,7 +78,7 @@ namespace Core.Transfer
                             ));
                 }
             }
-            group.status = StatusUpDown.Waiting;
+            group.status = StatusTransfer.Waiting;
         }
         List<TransferItem> ListAllItemInFolder(string path_rawItem, string id = "")
         {
@@ -120,7 +120,7 @@ namespace Core.Transfer
             //group & UI
             group.TotalFileLength += size;
             ud_item.SizeString = UnitConventer.ConvertSize(size, 2, UnitConventer.unit_size);
-            ud_item.status = StatusUpDown.Waiting;
+            ud_item.status = StatusTransfer.Waiting;
             //To
             ud_item.To.path = AnalyzePath.GetPathTo(fromfolder.PathIsUrl ? ud_item.From.ap.Path_Raw : (new AnalyzePath(ud_item.From.ap.Path_Raw)).GetPath(), fromfolder, savefolder);
             ud_item.To.ap = new AnalyzePath(ud_item.To.path);
@@ -143,10 +143,10 @@ namespace Core.Transfer
 
             switch (group.status)
             {
-                case StatusUpDown.Loading: return;
-                case StatusUpDown.Started: group.status = StatusUpDown.Running; group.Timestamp = CurrentMillis.Millis; break;
-                case StatusUpDown.Remove: group.status = StatusUpDown.Removing; return;
-                case StatusUpDown.Removing: return;
+                case StatusTransfer.Loading: return;
+                case StatusTransfer.Started: group.status = StatusTransfer.Running; group.Timestamp = CurrentMillis.Millis; break;
+                case StatusTransfer.Remove: group.status = StatusTransfer.Removing; return;
+                case StatusTransfer.Removing: return;
             }
 
             #region Count
@@ -156,7 +156,7 @@ namespace Core.Transfer
             int count_item_stop = 0;
             for (int i = 0; i < group.items.Count; i++)
             {
-                if (group.items[i].status == StatusUpDown.Remove)
+                if (group.items[i].status == StatusTransfer.Remove)
                 {
                     group.items.RemoveAt(i);
                     i--;
@@ -164,15 +164,15 @@ namespace Core.Transfer
                 }
                 else switch (group.items[i].status)
                     {
-                        case StatusUpDown.Running: count_item_running++; break;
-                        case StatusUpDown.Done: count_item_done++; break;
-                        case StatusUpDown.Error: count_item_error++; break;
-                        case StatusUpDown.Stop: count_item_stop++; break;
+                        case StatusTransfer.Running: count_item_running++; break;
+                        case StatusTransfer.Done: count_item_done++; break;
+                        case StatusTransfer.Error: count_item_error++; break;
+                        case StatusTransfer.Stop: count_item_stop++; break;
                         default: break;
                     }
 
                 //clear speed download when not running
-                if (group.items[i].status != StatusUpDown.Running)
+                if (group.items[i].status != StatusTransfer.Running)
                 {
                     if (!string.IsNullOrEmpty(group.items[i].col[4])) group.items[i].col[4] = "";
                     if (!string.IsNullOrEmpty(group.items[i].col[5])) group.items[i].col[5] = "";
@@ -181,31 +181,31 @@ namespace Core.Transfer
             #endregion
 
             #region Running group
-            if (this.group.status == StatusUpDown.Running && count_item_done + count_item_error + count_item_stop != this.group.items.Count)
+            if (this.group.status == StatusTransfer.Running && count_item_done + count_item_error + count_item_stop != this.group.items.Count)
             {
                 long Group_TotalTransfer = 0;
                 for (int i = 0; i < group.items.Count; i++)//start item waiting and Started(force)
                 {
                     Group_TotalTransfer += group.items[i].Transfer;
-                    if (this.group.items[i].status == StatusUpDown.Started)// start item force start
+                    if (this.group.items[i].status == StatusTransfer.Started)// start item force start
                     {
                         Thread thr = new Thread(WorkThread);
-                        this.group.items[i].status = StatusUpDown.Running;
+                        this.group.items[i].status = StatusTransfer.Running;
                         thr.Start(i);
                         ThreadsItemLoadWork.Add(thr);
                         count_item_running++;
                     }
-                    if (group.items[i].status == StatusUpDown.Waiting && count_item_running < group.MaxItemsDownload)//start item waiting
+                    if (group.items[i].status == StatusTransfer.Waiting && count_item_running < group.MaxItemsDownload)//start item waiting
                     {
                         Thread thr = new Thread(WorkThread);
-                        group.items[i].status = StatusUpDown.Running;
+                        group.items[i].status = StatusTransfer.Running;
                         group.items[i].Timestamp = Stopwatch.GetTimestamp();
                         thr.Start(i);
                         ThreadsItemLoadWork.Add(thr);
                         count_item_running++;
                     }
                     #region caculate speed & time left item
-                    if (this.group.items[i].status == StatusUpDown.Running)
+                    if (this.group.items[i].status == StatusTransfer.Running)
                     {
                         long size_transfer = group.items[i].Transfer - group.items[i].OldTransfer;
                         long time_milisec = CurrentMillis.Millis - group.items[i].Timestamp;
@@ -248,7 +248,7 @@ namespace Core.Transfer
             }
             else
             {
-                if (this.group.status == StatusUpDown.Running)
+                if (this.group.status == StatusTransfer.Running)
                 {
                     if (this.AreCut && count_item_done == this.group.items.Count)// remove cut
                     {
@@ -261,17 +261,17 @@ namespace Core.Transfer
                         Thread thr = new Thread(AppSetting.ManageCloud.Delete);
                         thr.Start(list);
                     }
-                    this.group.status = StatusUpDown.Done;//Done group
+                    this.group.status = StatusTransfer.Done;//Done group
                 }
             }
             #endregion
 
             #region Change LV
-            if (this.group.change == ChangeTLV.Processing && (this.group.status == StatusUpDown.Done |
-                this.group.status == StatusUpDown.Error | this.group.status == StatusUpDown.Stop))
+            if (this.group.change == ChangeTLV.Processing && (this.group.status == StatusTransfer.Done |
+                this.group.status == StatusTransfer.Error | this.group.status == StatusTransfer.Stop))
                 this.group.change = ChangeTLV.ProcessingToDone;
-            if (this.group.change == ChangeTLV.Done && (this.group.status == StatusUpDown.Started | this.group.status == StatusUpDown.Running |
-                this.group.status == StatusUpDown.Waiting | this.group.status == StatusUpDown.Loading))
+            if (this.group.change == ChangeTLV.Done && (this.group.status == StatusTransfer.Started | this.group.status == StatusTransfer.Running |
+                this.group.status == StatusTransfer.Waiting | this.group.status == StatusTransfer.Loading))
                 this.group.change = ChangeTLV.DoneToProcessing;
             #endregion
 
@@ -383,12 +383,12 @@ namespace Core.Transfer
                         #endregion
                 }
             }
-            catch (Exception ex) { group.items[x].ErrorMsg = ex.Message; group.items[x].status = StatusUpDown.Error; return; }
+            catch (Exception ex) { group.items[x].ErrorMsg = ex.Message; group.items[x].status = StatusTransfer.Error; return; }
         }
 
         bool IsStillDownloading(int x)
         {
-            return ((group.status == StatusUpDown.Running || group.status == StatusUpDown.Waiting || group.status == StatusUpDown.Started) && group.items[x].status == StatusUpDown.Running);
+            return ((group.status == StatusTransfer.Running || group.status == StatusTransfer.Waiting || group.status == StatusTransfer.Started) && group.items[x].status == StatusTransfer.Running);
         }
     }
 }
