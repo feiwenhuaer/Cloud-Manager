@@ -7,7 +7,7 @@ using System.Windows.Data;
 
 namespace WpfUI.Class
 {
-    public class TreeViewLineConverter : IValueConverter
+    public class TreeListViewLineConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {

@@ -29,19 +29,22 @@ namespace WpfUI.UI.Main.Lv_ud
                 uimain = value;
             }
         }
-
+        List<TransferGroup> groups = new List<TransferGroup>();
         public int AddNewGroup(TransferGroup Group)
         {
             Group.col[2] = Group.status.ToString();
-            if (Group.change == ChangeTLV.Processing)
-            {
-                if (TLV_process.data == null) TLV_process.data = new UD_data_WPF(Group);
-                else TLV_process.data.Add(Group);
-            }
+            if (groups.IndexOf(Group) >= 0) refresh();
             else
             {
-                if (TLV_done.data == null) TLV_done.data = new UD_data_WPF(Group);
-                else TLV_done.data.Add(Group);
+                groups.Add(Group);
+                if (Group.change == ChangeTLV.Processing)
+                {
+                    TLV_process.data.Add(Group);
+                }
+                else
+                {
+                    TLV_done.data.Add(Group);
+                }
             }
             return 0;
         }
@@ -60,13 +63,13 @@ namespace WpfUI.UI.Main.Lv_ud
 
         void refresh()
         {
-            TLV_process.treeList.Model = TLV_process.data;
-            TLV_process.Refresh();
             TLV_done.treeList.Model = TLV_done.data;
+            TLV_process.treeList.Model = TLV_process.data;
         }
 
         public void RemoveGroup(TransferGroup Group)
         {
+            groups.Remove(Group);
             if (Group.change == ChangeTLV.Processing) TLV_process.data.Remove(Group);
             else TLV_done.data.Remove(Group);
         }

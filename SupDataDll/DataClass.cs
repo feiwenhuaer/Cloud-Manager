@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Threading;
 
@@ -139,24 +140,16 @@ namespace SupDataDll
         public long Size = -1;
     }
 
-    public class UD_data_WPF : ITreeModel
+    public class TransferDataTLVWPF: ITreeModel
     {
-        ObservableCollection<TransferGroup> ud_groups = new ObservableCollection<TransferGroup>();
-
-        public UD_data_WPF(TransferGroup group)
-        {
-            ud_groups.Add(group);
-        }
-
-
+        ObservableCollection<TransferGroup> groups_ = new ObservableCollection<TransferGroup>();
         public void Add(TransferGroup ud_group)
         {
-            ud_groups.Add(ud_group);
+            if (groups_.IndexOf(ud_group) < 0) groups_.Add(ud_group);
         }
         public void Remove(TransferGroup ud_group)
         {
-            if (ud_groups.IndexOf(ud_group) > -1)
-                ud_groups.Remove(ud_group);
+            if (groups_.IndexOf(ud_group) > -1) groups_.Remove(ud_group);
         }
 
 
@@ -165,7 +158,7 @@ namespace SupDataDll
             var pr = parent as TransferGroup;
             if (parent == null)
             {
-                foreach (TransferGroup group in ud_groups)
+                foreach (TransferGroup group in groups_)
                 {
                     yield return group;
                 }

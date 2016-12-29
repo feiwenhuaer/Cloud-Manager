@@ -26,9 +26,14 @@ namespace Aga.Controls
 			OnReset();
 		}
 
+        public void RefeshData()
+        {
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        }
+
 		private void OnReset()
 		{
-			OnPropertyChanged("Count");
+            OnPropertyChanged("Count");
 			OnPropertyChanged("Item[]");
 			OnCollectionChanged(new NotifyCollectionChangedEventArgs(
 				NotifyCollectionChangedAction.Reset));

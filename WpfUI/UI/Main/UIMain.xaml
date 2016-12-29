@@ -9,7 +9,7 @@
         Title="UIMain" Height="590.778" Width="1181.411" Closing="Window_Closing" WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
-        <c:TreeViewLineConverter x:Key="LineConverter"/>
+        <c:TreeListViewLineConverter x:Key="LineConverter"/>
         <!-- Toggle Button -->
         <Style x:Key="ExpandCollapseToggleStyle" TargetType="ToggleButton">
             <Setter Property="Focusable" Value="False"/>

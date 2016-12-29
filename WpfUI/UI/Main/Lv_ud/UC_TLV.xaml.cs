@@ -8,16 +8,14 @@ namespace WpfUI.UI.Main.Lv_ud
     /// </summary>
     public partial class UC_TLV :UserControl
     {
-        public UD_data_WPF data;
+        public TransferDataTLVWPF data;
 
         public UC_TLV()
         {
             InitializeComponent();
-        }
-
-        public void Refresh()
-        {
-            treeList.UpdateLayout();
+            this.DataContext = this;
+            data = new TransferDataTLVWPF();
+            treeList.Model = data;
         }
 
         private void treeList_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)

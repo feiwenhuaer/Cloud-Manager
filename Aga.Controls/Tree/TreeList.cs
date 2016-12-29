@@ -32,16 +32,20 @@ namespace Aga.Controls.Tree
 		public ITreeModel Model
 		{
 		  get { return _model; }
-		  set 
-		  {
-			  if (_model != value)
-			  {
-				  _model = value;
-				  _root.Children.Clear();
-				  Rows.Clear();
-				  CreateChildrenNodes(_root);
-			  }
-		  }
+		  set
+            {
+                if (_model != value)//change data
+                {
+                    _model = value;
+                    _root.Children.Clear();
+                    Rows.Clear();
+                }
+                else//refresh data
+                {
+                    Rows.RefeshData();
+                }
+                CreateChildrenNodes(_root);
+            }
 		}
 
 		private TreeNode _root;
@@ -152,13 +156,27 @@ namespace Aga.Controls.Tree
 			{
 				int rowIndex = Rows.IndexOf(node);
 				node.ChildrenSource = children as INotifyCollectionChanged;
+                Collection<TreeNode> newnode = new Collection<TreeNode>();
 				foreach (object obj in children)
 				{
 					TreeNode child = new TreeNode(this, obj);
 					child.HasChildren = HasChildren(child);
-					node.Children.Add(child);
+                    bool flag = true;
+                    foreach(TreeNode n in node.Children)
+                    {
+                        if (n.Tag == obj)
+                        {
+                            flag = false;
+                            break;
+                        }
+                    }
+                    if (flag)
+                    {
+                        node.Children.Add(child);
+                        newnode.Add(child);
+                    }
 				}
-				Rows.InsertRange(rowIndex + 1, node.Children.ToArray());
+                if (newnode.Count > 0) Rows.InsertRange(rowIndex + 1, node.Children.ToArray());
 			}
 		}
 

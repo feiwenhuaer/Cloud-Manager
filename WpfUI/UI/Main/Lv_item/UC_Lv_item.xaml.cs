@@ -370,5 +370,16 @@ namespace WpfUI.UI.Main.Lv_item
             LV_items.SelectedItems.Clear();
         }
         #endregion
+
+        private void textBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if(e.Key == Key.Enter)
+            {
+                OldPathLV nextpath = new OldPathLV("", textBox.Text);
+                Clear();
+                HistoryPathID.Add(nextpath);
+                Next();
+            }
+        }
     }
 }
