@@ -26,8 +26,8 @@ namespace Aga.Controls.Tree
 			get;
 			private set;
 		} 
-
-
+        
+        //input data
 		private ITreeModel _model;
 		public ITreeModel Model
 		{
@@ -48,13 +48,15 @@ namespace Aga.Controls.Tree
             }
 		}
 
-		private TreeNode _root;
+        //Root TreeNode
+        private TreeNode _root;
 		internal TreeNode Root
 		{
 			get { return _root; }
 		}
 
-		public ReadOnlyCollection<TreeNode> Nodes
+        //Groups TreeNode ( Root > Groups)
+        public ReadOnlyCollection<TreeNode> Nodes
 		{
 			get { return Root.Nodes; }
 		}
@@ -152,32 +154,52 @@ namespace Aga.Controls.Tree
 		internal void CreateChildrenNodes(TreeNode node)
 		{
 			var children = GetChildren(node);
-			if (children != null)
-			{
-				int rowIndex = Rows.IndexOf(node);
-				node.ChildrenSource = children as INotifyCollectionChanged;
+            if (children != null)
+            {
+                int rowIndex = Rows.IndexOf(node);
+                node.ChildrenSource = children as INotifyCollectionChanged;
                 Collection<TreeNode> newnode = new Collection<TreeNode>();
-				foreach (object obj in children)
-				{
-					TreeNode child = new TreeNode(this, obj);
-					child.HasChildren = HasChildren(child);
-                    bool flag = true;
-                    foreach(TreeNode n in node.Children)
+                foreach (object obj in children)
+                {
+                    TreeNode child = new TreeNode(this, obj);
+                    child.HasChildren = HasChildren(child);
+                    bool flag_new = true;
+                    foreach (TreeNode n in node.Children)
                     {
                         if (n.Tag == obj)
                         {
-                            flag = false;
+                            flag_new = false;
                             break;
                         }
                     }
-                    if (flag)
+                    if (flag_new)
                     {
                         node.Children.Add(child);
                         newnode.Add(child);
                     }
-				}
+                }
                 if (newnode.Count > 0) Rows.InsertRange(rowIndex + 1, newnode.ToArray());
-			}
+                //clear remove node
+                for (int i = 0; i < node.Children.Count; i++)//childs node
+                {
+                    bool flag_remove = true;
+                    foreach(object obj in children)//from model data
+                    {
+                        if (node.Children[i].Tag == obj)
+                        {
+                            flag_remove = false;
+                            break;
+                        }
+                    }
+                    if (flag_remove)//clear group
+                    {
+                        foreach (TreeNode n in node.Children[i].Children) Rows.Remove(n);//clear show row
+                        Rows.Remove(node.Children[i]);//clear group
+                        node.Children.RemoveAt(i);
+                        i--;
+                    }
+                }
+            }
 		}
 
 		private void CreateChildrenRows(TreeNode node)

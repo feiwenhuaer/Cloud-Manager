@@ -63,6 +63,22 @@ namespace WpfUI.UI.Main.Lv_ud
 
         void refresh()
         {
+            foreach(TransferGroup item in groups)
+            {
+                if (item.change == ChangeTLV.DoneToProcessing)
+                {
+                    TLV_done.data.Remove(item);
+                    TLV_process.data.Add(item);
+                    item.change = ChangeTLV.Processing;
+                }
+
+                if (item.change == ChangeTLV.ProcessingToDone)
+                {
+                    TLV_process.data.Remove(item);
+                    TLV_done.data.Add(item);
+                    item.change = ChangeTLV.Done;
+                }
+            }
             TLV_done.treeList.Model = TLV_done.data;
             TLV_process.treeList.Model = TLV_process.data;
         }

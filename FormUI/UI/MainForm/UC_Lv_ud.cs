@@ -33,15 +33,8 @@ namespace FormUI.UI.MainForm
 
         public void RefreshAll()
         {
-            try
-            {
-                if (InvokeRequired)
-                {
-                    Invoke(new Action(() => DoRefresh()));
-                }
+                if (InvokeRequired)Invoke(new Action(() => DoRefresh()));
                 else DoRefresh();
-            }
-            catch (InvalidAsynchronousStateException ex) { }
         }
 
         void DoRefresh()
