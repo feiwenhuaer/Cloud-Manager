@@ -94,11 +94,13 @@ namespace SupDataDll
         //Speed & timeleft
         public long TotalFileLength = 0;
         public long OldTransfer = 0;
+        [JsonIgnore]
         public long Timestamp = 0;
         //Status
-        public StatusTransfer status = StatusTransfer.Loading;
-        public StatusTransfer CheckChangeStatus = StatusTransfer.Loading;
-        public ChangeTLV change = ChangeTLV.Processing;
+        public StatusTransfer status = StatusTransfer.Loading;//status
+        [JsonIgnore]
+        public StatusTransfer CheckChangeStatus = StatusTransfer.Loading;//for refresh, if (CheckChangeStatus != status | status == StatusTransfer.Running) then refesh
+        public ChangeTLV change = ChangeTLV.Processing;//for change TLV
         //Items
         public List<TransferItem> items = new List<TransferItem>();
     }
@@ -107,12 +109,14 @@ namespace SupDataDll
     {
         //Show UI
         public List<string> col { get; set; }
+        [JsonIgnore]
         public string SizeString = "";
         [JsonIgnore]
         public long Timestamp = 0;
         public UD_item_work_info From = new UD_item_work_info();
         public UD_item_work_info To = new UD_item_work_info();
         public StatusTransfer status = StatusTransfer.Waiting;
+        [JsonIgnore]
         public StatusTransfer CheckChangeStatus = StatusTransfer.Waiting;
         public string UploadID = "";//for remuse upload
         public string ErrorMsg = "";

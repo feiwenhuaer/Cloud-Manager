@@ -41,6 +41,7 @@ namespace Core.Transfer
             {
                 if (item.status == StatusTransfer.Running) item.status = StatusTransfer.Stop;
                 item.col[3] = item.status.ToString();
+                item.SizeString = UnitConventer.ConvertSize(item.From.Size, 2, UnitConventer.unit_size); 
                 item.From.ap = new AnalyzePath(item.From.path);
                 item.To.ap = new AnalyzePath(item.To.path);
             }
@@ -148,6 +149,12 @@ namespace Core.Transfer
                 case StatusTransfer.Started: group.status = StatusTransfer.Running; group.Timestamp = CurrentMillis.Millis; break;
                 case StatusTransfer.Remove: group.status = StatusTransfer.Removing; return;
                 case StatusTransfer.Removing: return;
+            }
+
+            if (group.status != StatusTransfer.Running)
+            {
+                if (!string.IsNullOrEmpty(group.col[4])) group.col[4] = "";
+                if (!string.IsNullOrEmpty(group.col[5])) group.col[5] = "";
             }
 
             #region Count
