@@ -176,7 +176,7 @@ namespace Aga.Controls.Tree
                         newnode.Add(child);
                     }
 				}
-                if (newnode.Count > 0) Rows.InsertRange(rowIndex + 1, node.Children.ToArray());
+                if (newnode.Count > 0) Rows.InsertRange(rowIndex + 1, newnode.ToArray());
 			}
 		}
 
