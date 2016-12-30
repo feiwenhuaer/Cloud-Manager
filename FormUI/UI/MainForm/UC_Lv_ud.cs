@@ -91,7 +91,7 @@ namespace FormUI.UI.MainForm
             removeToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_remove);
             startToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_start);
             stopToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_stop);
-            waitingToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_wating);
+            waitingToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_waiting);
             errorToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_error);
             forceStartToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_forcestart);
             forceWaitingToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_forcewaiting);
@@ -294,12 +294,14 @@ namespace FormUI.UI.MainForm
                         TransferGroup pr = olv.GetParent(child) as TransferGroup;
                         if (pr != null && (pr.status != StatusTransfer.Running | pr.status != StatusTransfer.Loading | pr.status != StatusTransfer.Removing)) pr.status = val;
                     }
+                    else
                     //set Stop child
-                    if (val == StatusTransfer.Stop && (child.status != StatusTransfer.Done | child.status != StatusTransfer.Error | child.status != StatusTransfer.Stop)) child.status = val;
+                        if (val == StatusTransfer.Stop && (child.status != StatusTransfer.Done | child.status != StatusTransfer.Error | child.status != StatusTransfer.Stop)) child.status = val;
+                    else
                     //set Waiting child
-                    if (val == StatusTransfer.Waiting && child.status != StatusTransfer.Done) child.status = val;
-
-                    if (val == StatusTransfer.Remove) child.status = val;
+                        if (val == StatusTransfer.Waiting && child.status != StatusTransfer.Done) child.status = val;
+                    else
+                        if (val == StatusTransfer.Remove) child.status = val;
                 }
             }
             if (parents != null && parents.Count != 0)
@@ -307,8 +309,11 @@ namespace FormUI.UI.MainForm
                 foreach (var parent in parents)
                 {
                     if (val == StatusTransfer.Started && (parent.status != StatusTransfer.Running)) parent.status = val;
+                    else
                     if (val == StatusTransfer.Stop && (parent.status != StatusTransfer.Done | parent.status != StatusTransfer.Loading | parent.status != StatusTransfer.Stop)) parent.status = val;
+                    else
                     if (val == StatusTransfer.Waiting && (parent.status != StatusTransfer.Done | parent.status != StatusTransfer.Removing)) parent.status = val;
+                    else
                     if (val == StatusTransfer.Remove) parent.status = val;
                 }
             }

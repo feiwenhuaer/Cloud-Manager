@@ -84,44 +84,29 @@ namespace SupDataDll
         public Type_FileFolder type;
     }
     
-    public class TransferGroup
+    public class TransferGroup: Transfer
     {
         // MaxItemDownload
         public int MaxItemsDownload = 2;
         //TreeListView
         public string Name = "";//TreeListView Form
-        public List<string> col { get; set; }
         //Speed & timeleft
         public long TotalFileLength = 0;
-        public long OldTransfer = 0;
-        [JsonIgnore]
-        public long Timestamp = 0;
         //Status
-        public StatusTransfer status = StatusTransfer.Loading;//status
-        [JsonIgnore]
-        public StatusTransfer CheckChangeStatus = StatusTransfer.Loading;//for refresh, if (CheckChangeStatus != status | status == StatusTransfer.Running) then refesh
         public ChangeTLV change = ChangeTLV.Processing;//for change TLV
         //Items
         public List<TransferItem> items = new List<TransferItem>();
     }
 
-    public class TransferItem
+    public class TransferItem: Transfer
     {
-        //Show UI
-        public List<string> col { get; set; }
         [JsonIgnore]
         public string SizeString = "";
-        [JsonIgnore]
-        public long Timestamp = 0;
         public UD_item_work_info From = new UD_item_work_info();
         public UD_item_work_info To = new UD_item_work_info();
-        public StatusTransfer status = StatusTransfer.Waiting;
-        [JsonIgnore]
-        public StatusTransfer CheckChangeStatus = StatusTransfer.Waiting;
         public string UploadID = "";//for remuse upload
         public string ErrorMsg = "";
         public long Transfer = 0;//byte[] was transfer
-        public long OldTransfer = 0;//for caculate speed
         public int ChunkUploadSize = -1;// = -1 is download, >0 is chunk size upload
         public long TransferRequest = 0;//Save pos chunk upload success
         [JsonIgnore]
@@ -130,6 +115,17 @@ namespace SupDataDll
         public int byteread = 0;
         [JsonIgnore]
         public byte[] buffer;//buffer
+    }
+
+    public abstract class Transfer
+    {
+        [JsonIgnore]
+        public long Timestamp = 0;
+        public List<string> col { get; set; }
+        public StatusTransfer status = StatusTransfer.Waiting;
+        [JsonIgnore]
+        public StatusTransfer CheckChangeStatus = StatusTransfer.Waiting;
+        public long OldTransfer = 0;//for caculate speed
     }
 
     

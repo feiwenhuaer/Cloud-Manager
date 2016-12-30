@@ -81,6 +81,7 @@ namespace Core.Transfer
                 }
             }
             group.status = StatusTransfer.Waiting;
+            items.Clear();
         }
         List<TransferItem> ListAllItemInFolder(string path_rawItem, string id = "")
         {
@@ -166,6 +167,14 @@ namespace Core.Transfer
             {
                 if (group.items[i].status == StatusTransfer.Remove)
                 {
+                    foreach(TransferBytes tb in ItemsTransfer)
+                    {
+                        if(tb.item == group.items[i])
+                        {
+                            ItemsTransfer.Remove(tb);
+                            break;
+                        }
+                    }
                     group.items.RemoveAt(i);
                     i--;
                     continue;

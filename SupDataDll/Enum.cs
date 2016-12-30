@@ -89,7 +89,7 @@ namespace SupDataDll
         ToolStrip_files_exit, ToolStrip_cloud_add, ToolStrip_cloud_remove, ToolStrip_settings_setting,//child ^
         //UC_lv_ud
         TP_processing, TP_done,// tabpage
-        TSMI_ChangeStatus, TSMI_numberOfParallelDownloads, TSMI_remove, TSMI_start, TSMI_stop, TSMI_wating, TSMI_error, TSMI_forcestart, TSMI_forcewaiting,//menu
+        TSMI_ChangeStatus, TSMI_numberOfParallelDownloads, TSMI_remove, TSMI_start, TSMI_stop, TSMI_waiting, TSMI_error, TSMI_forcestart, TSMI_forcewaiting,//menu
         //Uc_lv_item
         newtab, addtab, removetab,//newtab
         TB_path,

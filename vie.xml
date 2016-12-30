@@ -30,7 +30,7 @@
     <KEY NAME="TSMI_remove" VALUE="Gỡ bỏ" />
     <KEY NAME="TSMI_start" VALUE="Bắt đầu" />
     <KEY NAME="TSMI_stop" VALUE="Dừng lại" />
-    <KEY NAME="TSMI_wating" VALUE="Chờ" />
+    <KEY NAME="TSMI_waiting" VALUE="Chờ" />
     <KEY NAME="TSMI_error" VALUE="Lỗi" />
     <KEY NAME="TSMI_forcestart" VALUE="Bắt đầu" />
     <KEY NAME="TSMI_forcewaiting" VALUE="Bắt đầu chờ" />

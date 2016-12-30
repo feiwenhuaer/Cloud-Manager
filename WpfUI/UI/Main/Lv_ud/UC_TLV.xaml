@@ -11,7 +11,7 @@
     <UserControl.Resources>
     </UserControl.Resources>
 
-    <Tree:TreeList x:Name="treeList" MouseDown="treeList_MouseDown">
+    <Tree:TreeList x:Name="treeList" MouseDown="treeList_MouseDown" ContextMenuOpening="treeList_ContextMenuOpening">
         <Tree:TreeList.View>
             <GridView>
                 <GridViewColumn Header="From" Width="250">
@@ -32,5 +32,27 @@
                 <GridViewColumn Header="Error" Width="250" DisplayMemberBinding="{Binding col[6]}"/>
             </GridView>
         </Tree:TreeList.View>
+        <Tree:TreeList.ContextMenu>
+            <ContextMenu>
+                <ContextMenu.Resources>
+                    <ControlTemplate x:Key="MenuSeparatorTemplate">
+                        <Separator  IsEnabled="False"/>
+                    </ControlTemplate>
+                </ContextMenu.Resources>
+                <ContextMenu.ItemContainerStyle>
+                    <Style TargetType="{x:Type MenuItem}">
+                        <Setter Property="Header" Value="{Binding Text}" />
+                        <Setter Property="IsEnabled" Value="{Binding IsEnabled}"/>
+                        <Setter Property="ItemsSource" Value="{Binding Child}"/>
+                        <EventSetter Event="Click" Handler="TV_MenuItem_Click"/>                        
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding }" Value="{x:Null}">
+                                <Setter Property="Template" Value="{StaticResource MenuSeparatorTemplate}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ContextMenu.ItemContainerStyle>
+            </ContextMenu>
+        </Tree:TreeList.ContextMenu>
     </Tree:TreeList>
 </UserControl>

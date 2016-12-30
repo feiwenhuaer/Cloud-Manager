@@ -60,7 +60,6 @@ namespace WpfUI.Class
         public LanguageKey Key { get; set; }
         public Image Img { get; set; }
         public CloudName Type { get; set; }
-
         
         private void NotifyPropertyChange(string name)
         {

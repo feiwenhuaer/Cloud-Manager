@@ -13,7 +13,7 @@ namespace Core.Transfer
 {
     public class TransferBytes
     {
-        TransferItem item;
+        public TransferItem item { get; private set; }
         object clientTo;
         public TransferBytes(TransferItem item, object clientTo)
         {

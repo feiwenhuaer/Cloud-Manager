@@ -30,7 +30,7 @@
     <KEY NAME="TSMI_remove" VALUE="Remove" />
     <KEY NAME="TSMI_start" VALUE="Start" />
     <KEY NAME="TSMI_stop" VALUE="Stop" />
-    <KEY NAME="TSMI_wating" VALUE="Wating" />
+    <KEY NAME="TSMI_waiting" VALUE="Waiting" />
     <KEY NAME="TSMI_error" VALUE="Error" />
     <KEY NAME="TSMI_forcestart" VALUE="Force Start" />
     <KEY NAME="TSMI_forcewaiting" VALUE="Force Waiting" />
