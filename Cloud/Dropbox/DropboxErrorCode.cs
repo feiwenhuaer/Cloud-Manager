@@ -1,6 +1,6 @@
-﻿namespace DropboxHttpRequest
+﻿namespace Cloud.Dropbox
 {
-    public static class ErrorCode
+    public static class DropboxErrorCode
     {
         public static string ErrorText(int err)
         {

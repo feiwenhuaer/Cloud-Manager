@@ -1,13 +1,10 @@
-﻿using Core.cloud;
-using DropboxHttpRequest;
-using GoogleDriveHttprequest;
+﻿using Cloud.Dropbox;
+using Cloud.GoogleDrive;
+using Core.cloud;
 using Newtonsoft.Json;
 using SupDataDll;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace Core.Transfer
 {

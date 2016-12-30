@@ -1,12 +1,8 @@
-﻿using SupDataDll.UiInheritance.Oauth;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Cloud.Dropbox.Oauth;
 
 namespace WpfUI.UI.Oauth
 {
-    public class OauthDB: UiOauth, interfaceDB
+    public class OauthDB: UiOauth, UIinterfaceDB
     {
         public OauthDB()
         {

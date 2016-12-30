@@ -1,4 +1,4 @@
-﻿namespace DropboxHttpRequest
+﻿namespace Cloud.Dropbox
 {
     public enum DropboxUploadMode
     {
@@ -28,7 +28,7 @@
 
     public enum DropboxPreviewReceived
     {
-        html,pdf
+        html, pdf
     }
 
     internal enum TypeRequest

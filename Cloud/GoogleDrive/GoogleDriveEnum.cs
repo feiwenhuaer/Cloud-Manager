@@ -1,5 +1,34 @@
-﻿namespace GoogleDriveHttprequest
+﻿namespace Cloud.GoogleDrive
 {
+    public enum CorpusEnum
+    {
+        DEFAULT, DOMAIN
+    }
+
+    public enum OrderByEnum
+    {
+        createdDate, folder, lastViewedByMeDate, modifiedByMeDate, modifiedDate, quotaBytesUsed, recency, sharedWithMeDate, starred, title
+    }
+    public enum ProjectionEnum
+    {
+        BASIC, FULL
+    }
+
+    public enum SpacesEnum
+    {
+        drive, appDataFolder, photos
+    }
+
+    public enum TypeReturn
+    {
+        string_, streamresponse_, streamupload_, header_response
+    }
+
+    public enum uploadType
+    {
+        media, multipart, resumable
+    }
+    
     enum TypeRequest
     {
         POST,

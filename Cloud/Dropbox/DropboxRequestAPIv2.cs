@@ -1,21 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Net;
-using System.IO;
+﻿using CustomHttpRequest;
 using Newtonsoft.Json;
-using CustomHttpRequest;
-using DropboxHttpRequest;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Text;
 
-namespace DropboxHttpRequest
+namespace Cloud.Dropbox
 {
     public class DropboxRequestAPIv2
     {
         private string access_token;
-        public string AccessToken { get { return access_token;} set { access_token = value; } }
+        public string AccessToken { get { return access_token; } set { access_token = value; } }
         private string uid;
         public string Uid { get { return uid; } private set { uid = value; } }
-        
+
         const int portListenMax = 22439;
         const int portListenMin = 22430;
         #region DropboxRequestAPIv2
@@ -47,15 +46,15 @@ namespace DropboxHttpRequest
             this.access_token = json.access_token;
         }
 
-        private string GetAccessToken_(string key_authorize,int port = -1)
+        private string GetAccessToken_(string key_authorize, int port = -1)
         {
             BuildURL build = new BuildURL("https://api.dropboxapi.com/1/oauth2/token");
             build.AddParameter("code", key_authorize);
             build.AddParameter("client_id", Appkey.ApiKey);
             build.AddParameter("client_secret", Appkey.ApiSecret);
             build.AddParameter("grant_type", "authorization_code");
-            if(port != -1) build.AddParameter("redirect_uri", string.Format("http%3A%2F%2Flocalhost%3A{0}",port.ToString()));
-            HttpRequest_ rq = new HttpRequest_(build.Url,TypeRequest.POST.ToString());
+            if (port != -1) build.AddParameter("redirect_uri", string.Format("http%3A%2F%2Flocalhost%3A{0}", port.ToString()));
+            HttpRequest_ rq = new HttpRequest_(build.Url, TypeRequest.POST.ToString());
             rq.AddHeader("HOST: api.dropboxapi.com");
             rq.AddHeader("Content-Length: 0");
             return rq.GetTextDataResponse(true, true);
@@ -91,7 +90,7 @@ namespace DropboxHttpRequest
             return result;
         }
 
-        
+
         #region info_account // done
         public string GetCurrentAccount()
         {
@@ -111,14 +110,14 @@ namespace DropboxHttpRequest
             rq.AddHeader("HOST", "api.dropboxapi.com");
             rq.AddHeader("Authorization", "Bearer " + access_token);
             rq.AddHeader("Content-Type", "application/json");
-            
+
             if (reqData != null)
             {
                 rq.AddHeader("Content-Length", reqData.Length.ToString());
                 Stream st = rq.SendHeader_And_GetStream();
                 st.Write(reqData, 0, reqData.Length);
                 st.Flush();
-                rq.ReadHeaderResponse_and_GetStreamResponse(false,true);
+                rq.ReadHeaderResponse_and_GetStreamResponse(false, true);
                 return rq.ReadDataResponseText();
             }
             else
@@ -130,7 +129,7 @@ namespace DropboxHttpRequest
         }
 
         #region my account
-        public string GetMetadata(string path,Boolean include_media_info = false)
+        public string GetMetadata(string path, Boolean include_media_info = false)
         {
             BuildJson build = new BuildJson();
             build.AddChildStringNodes("path", path);
@@ -139,11 +138,11 @@ namespace DropboxHttpRequest
             return RequestUrl2("https://api.dropboxapi.com/2/files/get_metadata", Encoding.UTF8.GetBytes(build.GetJson));
         }
 
-        public string ListFolder(string path, bool include_media_info = false, bool recursive = false, bool include_deleted = false,bool include_has_explicit_shared_members = false)
+        public string ListFolder(string path, bool include_media_info = false, bool recursive = false, bool include_deleted = false, bool include_has_explicit_shared_members = false)
         {
             string data = string.Format("\"path\": \"{0}\",\"recursive\": {1},\"include_media_info\": {2},\"include_deleted\": {3},\"include_has_explicit_shared_members\": {4}",
-                path,recursive.ToString().ToLower(),include_media_info.ToString().ToLower(), include_deleted.ToString().ToLower(), include_has_explicit_shared_members.ToString().ToLower());
-            
+                path, recursive.ToString().ToLower(), include_media_info.ToString().ToLower(), include_deleted.ToString().ToLower(), include_has_explicit_shared_members.ToString().ToLower());
+
             return RequestUrl2("https://api.dropboxapi.com/2/files/list_folder", Encoding.UTF8.GetBytes("{" + data + "}"));
         }
 
@@ -154,7 +153,7 @@ namespace DropboxHttpRequest
             return RequestUrl2("https://api.dropboxapi.com/2/files/list_folder/continue", Encoding.UTF8.GetBytes(build.GetJson));
         }
 
-        public string list_folder_get_latest_cursor(string path, Boolean include_media_info = false, Boolean recursive = false,Boolean include_deleted = false)
+        public string list_folder_get_latest_cursor(string path, Boolean include_media_info = false, Boolean recursive = false, Boolean include_deleted = false)
         {
             BuildJson build = new BuildJson();
 
@@ -231,7 +230,7 @@ namespace DropboxHttpRequest
         #endregion
 
         #region revisions
-        public string list_revisions(string path,int limit)
+        public string list_revisions(string path, int limit)
         {
             BuildJson build = new BuildJson();
             build.AddChildStringNodes("path", path);
@@ -309,7 +308,7 @@ namespace DropboxHttpRequest
 
         public string sharing_share_folder(string path, DropboxMemberPolicy member_policy = DropboxMemberPolicy.team,
             DropboxAclUpdatePolicy acl_update_policy = DropboxAclUpdatePolicy.editors, DropboxSharedLinkPolicy shared_link_policy = DropboxSharedLinkPolicy.members
-            ,Boolean force_async = false)
+            , Boolean force_async = false)
         {
             BuildJson build = new BuildJson();
             build.AddChildStringNodes("path", path);
@@ -363,9 +362,9 @@ namespace DropboxHttpRequest
             }
             settings.AddChildStringNodes("expires", expires.ToLongTimeString());
             build.AddChildNodes("settings", settings.GetJson);
-            
+
             return RequestUrl2("https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings", Encoding.UTF8.GetBytes(build.GetJson));
-            
+
         }
         public string sharing_create_shared_link_with_settings(string path, DropboxRequestedVisibility requested_visibility, string link_password = null)
         {
@@ -379,7 +378,7 @@ namespace DropboxHttpRequest
                 settings.AddChildStringNodes("link_password", link_password);
             }
 
-            build.AddChildNodes("settings",settings.GetJson);
+            build.AddChildNodes("settings", settings.GetJson);
 
             return RequestUrl2("https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings", Encoding.UTF8.GetBytes(build.GetJson));
         }
@@ -469,7 +468,7 @@ namespace DropboxHttpRequest
         #endregion
 
         #region up/download
-        public Stream Download(string path,long startpos = 0,long endpos=0,int timeout = 2147483647)// unsupport multi
+        public Stream Download(string path, long startpos = 0, long endpos = 0, int timeout = 2147483647)// unsupport multi
         {
             custom_request = new HttpRequest_("https://content.dropboxapi.com/2/files/download", "POST");
             custom_request.AddHeader("HOST: content.dropboxapi.com");
@@ -477,12 +476,12 @@ namespace DropboxHttpRequest
             custom_request.AddHeader("Dropbox-API-Arg", "{\"path\": \"" + path + "\"}");
             if (endpos > 0)
             {
-                custom_request.AddHeader("Range", "bytes="+startpos.ToString() +"-" + endpos.ToString());
+                custom_request.AddHeader("Range", "bytes=" + startpos.ToString() + "-" + endpos.ToString());
             }
-            return custom_request.ReadHeaderResponse_and_GetStreamResponse(true,true);
+            return custom_request.ReadHeaderResponse_and_GetStreamResponse(true, true);
         }
 
-        public string upload_session_start(byte[] buffer,int buffer_length = -1,bool close = false)
+        public string upload_session_start(byte[] buffer, int buffer_length = -1, bool close = false)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://content.dropboxapi.com/2/files/upload_session/start");
             request.Method = "POST";
@@ -491,7 +490,7 @@ namespace DropboxHttpRequest
             request.ContentLength = buffer_length == -1 ? buffer.Length : buffer_length;
             WebHeaderCollection myWebHeaderCollection = request.Headers;
             myWebHeaderCollection.Add("Authorization", "Bearer " + access_token);
-            myWebHeaderCollection.Add("Dropbox-API-Arg", "{\"close\": "+ close.ToString().ToLower() + "}");
+            myWebHeaderCollection.Add("Dropbox-API-Arg", "{\"close\": " + close.ToString().ToLower() + "}");
             using (Stream dataStream = request.GetRequestStream())
             {
                 dataStream.Write(buffer, 0, buffer_length == -1 ? buffer.Length : buffer_length);
@@ -505,11 +504,11 @@ namespace DropboxHttpRequest
             return result;
         }
         public HttpRequest_ custom_request;
-        public Stream upload_session_append(string session_id,long length_chunk,long offset)
+        public Stream upload_session_append(string session_id, long length_chunk, long offset)
         {
             custom_request = new HttpRequest_("https://content.dropboxapi.com/2/files/upload_session/append", "POST");
             custom_request.AddHeader("HOST", "content.dropboxapi.com");
-            custom_request.AddHeader("Content-Type","application/octet-stream");
+            custom_request.AddHeader("Content-Type", "application/octet-stream");
             custom_request.AddHeader("Content-Length", length_chunk.ToString());
             custom_request.AddHeader("Authorization", "Bearer " + access_token);
 
@@ -523,10 +522,10 @@ namespace DropboxHttpRequest
 
         public string GetResponse_upload_session_append()
         {
-            return custom_request.GetTextDataResponse(false,false);
+            return custom_request.GetTextDataResponse(false, false);
         }
-        
-        public string upload_session_append(byte[] buffer, string session_id, long offset, int buffer_length = -1,int timeout = 2147483647)// can't multi
+
+        public string upload_session_append(byte[] buffer, string session_id, long offset, int buffer_length = -1, int timeout = 2147483647)// can't multi
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://content.dropboxapi.com/2/files/upload_session/append");
             request.Method = "POST";
@@ -554,7 +553,7 @@ namespace DropboxHttpRequest
             return result;
         }
 
-        public string upload_session_append_v2(byte[] buffer, string session_id, long offset,int buffer_length =-1, bool close = false, int timeout = 2147483647)
+        public string upload_session_append_v2(byte[] buffer, string session_id, long offset, int buffer_length = -1, bool close = false, int timeout = 2147483647)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://content.dropboxapi.com/2/files/upload_session/append_v2");
             request.Method = "POST";
@@ -586,11 +585,11 @@ namespace DropboxHttpRequest
             stream.Close();
             return result;
         }
-        
+
         private string EncodeUnicode(string input)
         {
             string str = "";
-            foreach(char chr in input)
+            foreach (char chr in input)
             {
                 if (((ushort)chr) < 127) str += chr;
                 else str += "\\u" + ((ushort)chr).ToString("X");
@@ -612,7 +611,7 @@ namespace DropboxHttpRequest
             BuildJson cursor = new BuildJson();
             cursor.AddChildStringNodes("session_id", session_id);
             cursor.AddChildNodes("offset", offset.ToString());
-            
+
             BuildJson commit = new BuildJson();
             commit.AddChildStringNodes("path", EncodeUnicode(path));
             commit.AddChildStringNodes("mode", mode.ToString());
@@ -620,10 +619,10 @@ namespace DropboxHttpRequest
             commit.AddChildNodes("mute", mute.ToString().ToLower());
 
             BuildJson apiarg = new BuildJson();
-            apiarg.AddChildNodes("cursor",cursor.GetJson);
+            apiarg.AddChildNodes("cursor", cursor.GetJson);
             apiarg.AddChildNodes("commit", commit.GetJson);
 
-            myWebHeaderCollection.Add("Dropbox-API-Arg",apiarg.GetJson);
+            myWebHeaderCollection.Add("Dropbox-API-Arg", apiarg.GetJson);
             request.ContentLength = 0;
             if (buffer != null)
             {
@@ -643,7 +642,7 @@ namespace DropboxHttpRequest
             return result;
         }
 
-        public string upload_session_finish_batch(string[] session_id,long[] offset,string[] path, DropboxUploadMode[] mode, Boolean autorename = true, Boolean mute = false, int timeout = 2147483647)
+        public string upload_session_finish_batch(string[] session_id, long[] offset, string[] path, DropboxUploadMode[] mode, Boolean autorename = true, Boolean mute = false, int timeout = 2147483647)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://api.dropboxapi.com/2/files/upload_session/finish_batch");
             request.Method = "POST";
@@ -668,7 +667,7 @@ namespace DropboxHttpRequest
                 BuildJson cursor = new BuildJson();
                 cursor.AddChildStringNodes("session_id", session_id[index]);
                 cursor.AddChildNodes("offset", offset[index].ToString());
-                
+
                 BuildJson commit = new BuildJson();
                 commit.AddChildStringNodes("path", EncodeUnicode(path[index]));
 
@@ -682,7 +681,7 @@ namespace DropboxHttpRequest
                 entrie.AddChildNodes("commit", commit.GetJson);
                 entries.Add(entrie.GetJson);
             }
-            data.AddListChildNodes("entries",entries);
+            data.AddListChildNodes("entries", entries);
 
             byte[] buffer = Encoding.UTF8.GetBytes(data.GetJson);
             request.ContentLength = buffer.Length;
@@ -700,7 +699,7 @@ namespace DropboxHttpRequest
             return result;
         }
 
-        public string upload(byte[] buffer,string path,int buffer_length = -1,DropboxUploadMode mode = DropboxUploadMode.add,bool autorename = true,bool mute = false, int timeout = Int32.MaxValue)
+        public string upload(byte[] buffer, string path, int buffer_length = -1, DropboxUploadMode mode = DropboxUploadMode.add, bool autorename = true, bool mute = false, int timeout = Int32.MaxValue)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://content.dropboxapi.com/2/files/upload");
             request.Method = "POST";
@@ -709,7 +708,7 @@ namespace DropboxHttpRequest
             request.ContentLength = buffer_length == -1 ? buffer.Length : buffer_length;
             WebHeaderCollection myWebHeaderCollection = request.Headers;
             myWebHeaderCollection.Add("Authorization", "Bearer " + access_token);
-            myWebHeaderCollection.Add("Dropbox-API-Arg", "{\"path\": \""+ EncodeUnicode(path) + "\",\"mode\": \""+ mode .ToString()+ "\",\"autorename\": "+ autorename .ToString().ToLower()+ ",\"mute\": "+ mute .ToString().ToLower()+ "}");
+            myWebHeaderCollection.Add("Dropbox-API-Arg", "{\"path\": \"" + EncodeUnicode(path) + "\",\"mode\": \"" + mode.ToString() + "\",\"autorename\": " + autorename.ToString().ToLower() + ",\"mute\": " + mute.ToString().ToLower() + "}");
             using (Stream dataStream = request.GetRequestStream())
             {
                 dataStream.Write(buffer, 0, buffer_length == -1 ? buffer.Length : buffer_length);

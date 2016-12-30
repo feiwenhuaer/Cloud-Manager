@@ -1,4 +1,4 @@
-﻿namespace GoogleDriveHttprequest
+﻿namespace Cloud.GoogleDrive
 {
     public static class Scope
     {
@@ -32,7 +32,7 @@
         {
             get { return "https://www.googleapis.com/auth/drive.metadata.readonly"; }
         }
-        
+
         public static string DriveAppdata
         {
             get { return "https://www.googleapis.com/auth/drive.appdata"; }
@@ -42,7 +42,7 @@
         {
             get { return "https://www.googleapis.com/auth/drive.metadata"; }
         }
-        
+
         public static string DrivePhotosReadonly
         {
             get { return "https://www.googleapis.com/auth/drive.photos.readonly"; }

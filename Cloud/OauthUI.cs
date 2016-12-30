@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace SupDataDll.UiInheritance.Oauth
+﻿namespace Cloud
 {
     public interface OauthUI
     {

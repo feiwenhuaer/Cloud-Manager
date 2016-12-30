@@ -1,16 +1,14 @@
-﻿using System;
-using System.Text;
-using GoogleDriveHttprequest.Oauth;
-using System.IO;
-using System.Web;
-using System.Threading;
+﻿using Cloud.GoogleDrive.Oauth;
 using CustomHttpRequest;
-using System.Text.RegularExpressions;
+using System;
 using System.Collections.Generic;
-//using CustomHttpRequest;
-//https://developers.google.com/drive/v2/reference/about#resource-representations
+using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Web;
 
-namespace GoogleDriveHttprequest
+namespace Cloud.GoogleDrive
 {
     public class DriveAPIHttprequestv2
     {
@@ -29,7 +27,7 @@ namespace GoogleDriveHttprequest
             get { return token; }
             set { token = value; }
         }
-        
+
         public DriveAPIHttprequestv2(TokenGoogleDrive token)
         {
             this.token = token;
@@ -43,7 +41,7 @@ namespace GoogleDriveHttprequest
             this.token.refresh_token = refresh_token;
         }
 
-        private object Request(string url, TypeRequest typerequest, TypeReturn typereturn = TypeReturn.string_,byte[] bytedata = null,string[] moreheader = null)
+        private object Request(string url, TypeRequest typerequest, TypeReturn typereturn = TypeReturn.string_, byte[] bytedata = null, string[] moreheader = null)
         {
             request = new HttpRequest_(url, typerequest.ToString());
             request.debug = Debug;
@@ -52,12 +50,12 @@ namespace GoogleDriveHttprequest
             request.AddHeader("Authorization", "Bearer " + token.access_token);
             if (moreheader != null)
             {
-                foreach(string h in moreheader)
+                foreach (string h in moreheader)
                 {
                     request.AddHeader(h);
                 }
             }
-            if ((typerequest == TypeRequest.POST | typerequest == TypeRequest.DELETE ) & bytedata == null) request.AddHeader("Content-Length: 0");
+            if ((typerequest == TypeRequest.POST | typerequest == TypeRequest.DELETE) & bytedata == null) request.AddHeader("Content-Length: 0");
             if (bytedata != null & (typerequest == TypeRequest.POST | typerequest == TypeRequest.PATCH))
             {
                 request.AddHeader("Content-Length: " + bytedata.Length.ToString());
@@ -71,38 +69,40 @@ namespace GoogleDriveHttprequest
             {
                 if (typereturn == TypeReturn.header_response)
                 {
-                    string temp = request.GetTextDataResponse(false,true);
+                    string temp = request.GetTextDataResponse(false, true);
                     return request.HeaderReceive;
                 }
                 if (typereturn == TypeReturn.streamresponse_) return request.ReadHeaderResponse_and_GetStreamResponse(true, true);//get stream response
                 else if (typereturn == TypeReturn.streamupload_) return request.SendHeader_And_GetStream();//get stream upload
                 else { request.SendHeader_And_GetStream(); return request.GetTextDataResponse(true, true); }//text data response
             }
-            catch(HttpException ex)
+            catch (HttpException ex)
             {
                 //string temp = request.HeaderReceive;
                 string textdata = request.TextDataResponse;
                 //Console.WriteLine(temp + "\r\n" + textdata);
                 if (ex.GetHttpCode() == 401)
                 {
-                    
+
                     if (Monitor.TryEnter(SyncRefreshToken))
                     {
-                        try{
+                        try
+                        {
                             Monitor.Enter(SyncRefreshToken);
                             token = oauth.RefreshToken();
                             TokenRenewEvent.Invoke(token, this.Email);//, this.PassWord);
-                        } finally { Monitor.Exit(SyncRefreshToken); }                        
-                        return Request(url, typerequest, typereturn, bytedata,moreheader);
+                        }
+                        finally { Monitor.Exit(SyncRefreshToken); }
+                        return Request(url, typerequest, typereturn, bytedata, moreheader);
                     }
                     else
                     {
-                        try{Monitor.Enter(SyncRefreshToken);}
+                        try { Monitor.Enter(SyncRefreshToken); }
                         finally { Monitor.Exit(SyncRefreshToken); }
                         return Request(url, typerequest, typereturn, bytedata, moreheader);
                     }
                 }
-                if(ex.GetHttpCode() == 403 & acknowledgeAbuse)
+                if (ex.GetHttpCode() == 403 & acknowledgeAbuse)
                 {
                     return Request(url + "&acknowledgeAbuse=true", typerequest, typereturn, bytedata, moreheader);
                 }
@@ -110,7 +110,7 @@ namespace GoogleDriveHttprequest
                 {
                     return textdata;
                 }
-                if(ex.GetHttpCode() == 308 && typerequest == TypeRequest.PUT && typereturn == TypeReturn.streamupload_)
+                if (ex.GetHttpCode() == 308 && typerequest == TypeRequest.PUT && typereturn == TypeReturn.streamupload_)
                 {
                     return request.GetStream();
                 }
@@ -146,21 +146,21 @@ namespace GoogleDriveHttprequest
                 }
             }
             if (parameters.Length == 0) return (string)Request(url, TypeRequest.GET);
-            return (string)Request(url, TypeRequest.GET, TypeReturn.string_,Encoding.UTF8.GetBytes(parameters));
+            return (string)Request(url, TypeRequest.GET, TypeReturn.string_, Encoding.UTF8.GetBytes(parameters));
         }
 
 
         #region Files
         public string Files_list(OrderByEnum[] order, string q = null, CorpusEnum corpus = CorpusEnum.DEFAULT,
-                                ProjectionEnum projection = ProjectionEnum.BASIC,string pageToken = null,
-                                int maxResults = 1000,SpacesEnum spaces = SpacesEnum.drive)
+                                ProjectionEnum projection = ProjectionEnum.BASIC, string pageToken = null,
+                                int maxResults = 1000, SpacesEnum spaces = SpacesEnum.drive)
         {
             string url = string.Format(
                 "https://www.googleapis.com/drive/v2/files?orderBy={0}&corpus={1}&projection={2}&maxResults={3}&spaces={4}",
-                HttpUtility.UrlEncode(OrderBy.Get(order), Encoding.UTF8), 
-                corpus.ToString(), 
-                projection.ToString(), 
-                maxResults.ToString(), 
+                HttpUtility.UrlEncode(OrderBy.Get(order), Encoding.UTF8),
+                corpus.ToString(),
+                projection.ToString(),
+                maxResults.ToString(),
                 spaces.ToString()
                 );
             if (pageToken != null) url += "&pageToken=" + pageToken;
@@ -168,15 +168,15 @@ namespace GoogleDriveHttprequest
             return (string)Request(url, TypeRequest.GET);
         }
 
-        public Stream Files_get(string fileId,long PosStart = 0,long endpos = 0)//,string alt = "media",bool acknowledgeAbuse = true,
-            //ProjectionEnum projection = ProjectionEnum.BASIC,bool updateViewedDate = false)
+        public Stream Files_get(string fileId, long PosStart = 0, long endpos = 0)//,string alt = "media",bool acknowledgeAbuse = true,
+                                                                                  //ProjectionEnum projection = ProjectionEnum.BASIC,bool updateViewedDate = false)
         {
             string url = string.Format("https://www.googleapis.com/drive/v2/files/{0}?alt=media", fileId);
-            string[] moreheader = { "Range: bytes=" + PosStart.ToString() + "-" + endpos.ToString()};
-            return (Stream)Request(url, TypeRequest.GET,TypeReturn.streamresponse_,null,(endpos != 0)?moreheader:null);
+            string[] moreheader = { "Range: bytes=" + PosStart.ToString() + "-" + endpos.ToString() };
+            return (Stream)Request(url, TypeRequest.GET, TypeReturn.streamresponse_, null, (endpos != 0) ? moreheader : null);
         }
 
-        public string Files_insert_resumable_getUploadID(string jsondata,string typefileupload,long filesize)
+        public string Files_insert_resumable_getUploadID(string jsondata, string typefileupload, long filesize)
         {
             string url = string.Format("https://www.googleapis.com/upload/drive/v2/files?uploadType={0}", uploadType.resumable.ToString());
             string[] moreheader = {
@@ -197,7 +197,7 @@ namespace GoogleDriveHttprequest
             throw new Exception("Can't get data: \r\n" + data);
         }
 
-        public Stream Files_insert_resumable(string url_uploadid,long posstart,long posend,long filesize)
+        public Stream Files_insert_resumable(string url_uploadid, long posstart, long posend, long filesize)
         {
             List<string> moreheader = new List<string>(){ "Content-Length: " + (posend - posstart + 1).ToString(),
                 "Content-Type: image/jpeg",
@@ -209,25 +209,25 @@ namespace GoogleDriveHttprequest
 
         public string GetResponse_Files_insert_resumable()
         {
-            Console.WriteLine(request.GetTextDataResponse(false,false));
+            Console.WriteLine(request.GetTextDataResponse(false, false));
             return request.HeaderReceive;
         }
-        
+
         public string Files_delete(string fileId)
         {
-            return (string)Request("https://www.googleapis.com/drive/v2/files/" + fileId + "?key=" + APPkey.APIKey, TypeRequest.DELETE, TypeReturn.string_,null,null);
+            return (string)Request("https://www.googleapis.com/drive/v2/files/" + fileId + "?key=" + APPkey.APIKey, TypeRequest.DELETE, TypeReturn.string_, null, null);
         }
 
-        public string CreateFolder(string name,string parent_id)
+        public string CreateFolder(string name, string parent_id)
         {
             string data = "{\"mimeType\": \"application/vnd.google-apps.folder\", \"title\": \"" + name + "\", \"parents\": [{\"id\": \"" + parent_id + "\"}]}";
-            return (string)Request("https://www.googleapis.com/drive/v2/files", TypeRequest.POST, TypeReturn.string_,Encoding.UTF8.GetBytes(data), 
+            return (string)Request("https://www.googleapis.com/drive/v2/files", TypeRequest.POST, TypeReturn.string_, Encoding.UTF8.GetBytes(data),
                 new string[] { "Content-Type: application/json" });
         }
-       
+
         public string ItemTrash(string id)
         {
-            return (string)Request("https://www.googleapis.com/drive/v2/files/"+id+"/trash?fields=labels%2Ftrashed&key=" + APPkey.APIKey, TypeRequest.POST, TypeReturn.string_,null,null);
+            return (string)Request("https://www.googleapis.com/drive/v2/files/" + id + "/trash?fields=labels%2Ftrashed&key=" + APPkey.APIKey, TypeRequest.POST, TypeReturn.string_, null, null);
         }
 
         public string EditMetaData(string iditem, string json_data = null)//json_data = null is get metadata
@@ -244,50 +244,4 @@ namespace GoogleDriveHttprequest
 
     }
 
-
-    public enum CorpusEnum
-    {
-        DEFAULT, DOMAIN
-    }
-
-    public enum OrderByEnum
-    {
-        createdDate, folder, lastViewedByMeDate, modifiedByMeDate, modifiedDate, quotaBytesUsed, recency, sharedWithMeDate, starred, title
-    }
-    public class OrderBy
-    {
-        public static string Get(OrderByEnum[] orderby, int desc = -1)
-        {
-            string s = "";
-            int sub_desc = 0;
-            foreach (OrderByEnum e in orderby)
-            {
-                if (desc == -1) s += e.ToString() + ",";
-                else if (desc == sub_desc) s += e.ToString() + " desc,";
-                else s += e.ToString() + ",";
-                sub_desc++;
-            }
-            return s.TrimEnd(',');
-        }
-    }
-
-    public enum ProjectionEnum
-    {
-        BASIC, FULL
-    }
-
-    public enum SpacesEnum
-    {
-        drive, appDataFolder, photos
-    }
-
-    public enum TypeReturn
-    {
-        string_,streamresponse_,streamupload_,header_response
-    }
-    
-    public enum uploadType
-    {
-        media, multipart, resumable
-    }
 }

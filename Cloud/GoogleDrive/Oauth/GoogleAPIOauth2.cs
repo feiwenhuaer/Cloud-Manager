@@ -1,14 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
-using Newtonsoft.Json;
-using System.Windows.Forms;
-using SupDataDll.UiInheritance.Oauth;
 
-namespace GoogleDriveHttprequest.Oauth
+namespace Cloud.GoogleDrive.Oauth
 {
     public class GoogleAPIOauth2
     {
@@ -55,7 +53,7 @@ namespace GoogleDriveHttprequest.Oauth
             get { return tokencode; }
         }
         #endregion
-        public GoogleAPIOauth2(){}
+        public GoogleAPIOauth2() { }
         public GoogleAPIOauth2(string[] scopes)
         {
             this.scopes = scopes;
@@ -64,7 +62,7 @@ namespace GoogleDriveHttprequest.Oauth
         {
             this.refresh_token = refresh_token;
         }
-        
+
         public void GetCode(OauthUI ui, object owner)
         {
             state = randomDataBase64url(32);
@@ -74,7 +72,7 @@ namespace GoogleDriveHttprequest.Oauth
 
             redirectURI = string.Format("http://{0}:{1}/", IPAddress.Loopback, GetRandomUnusedPort());
             string authorizationRequest = string.Format("{0}?response_type=code&scope={1}&redirect_uri={2}&client_id={3}&state={4}&code_challenge={5}&code_challenge_method={6}",
-                authorizationEndpoint,scopepara,Uri.EscapeDataString(redirectURI), APPkey.ClientID,state,code_challenge,code_challenge_method);
+                authorizationEndpoint, scopepara, Uri.EscapeDataString(redirectURI), APPkey.ClientID, state, code_challenge, code_challenge_method);
 
             listener = new HttpListener();
             listener.Prefixes.Add(redirectURI);
@@ -86,10 +84,10 @@ namespace GoogleDriveHttprequest.Oauth
                 ui.ShowUI(owner);
                 listener.BeginGetContext(new AsyncCallback(RecieveCode), null);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 tokencode.IsError = true;
-                MessageBox.Show("redirectURI:" + redirectURI +"\r\n" + ex.Message + "\r\n" + ex.StackTrace);
+                Console.WriteLine("Oauth error:" + ex.Message + "\r\nSource:" + ex.Source);
             }
         }
 
@@ -106,12 +104,12 @@ namespace GoogleDriveHttprequest.Oauth
             if (ls.Request.QueryString.Get("error") != null | ls.Request.QueryString.Get("code") == null | ls.Request.QueryString.Get("state") == null)
             {
                 this.tokencode.IsError = true;
-                try { listener.Close(); }catch { }
+                try { listener.Close(); } catch { }
                 throw new Exception(ls.Request.RawUrl);
             }
             tokencode.Code = ls.Request.QueryString.Get("code");
             var incoming_state = ls.Request.QueryString.Get("state");
-            if(incoming_state != state)
+            if (incoming_state != state)
             {
                 this.tokencode.IsError = true;
                 try { listener.Close(); } catch { }
@@ -154,7 +152,7 @@ namespace GoogleDriveHttprequest.Oauth
         {
             if (string.IsNullOrEmpty(this.refresh_token)) throw new Exception("refresh_token can't be null");
             string tokenRequestBody = string.Format("client_id={0}&client_secret={1}&refresh_token={2}&grant_type=refresh_token",
-                                                    APPkey.ClientID, APPkey.Clientsecret,this.refresh_token);
+                                                    APPkey.ClientID, APPkey.Clientsecret, this.refresh_token);
             HttpWebRequest tokenRequest = (HttpWebRequest)WebRequest.Create(tokenEndpoint);
             tokenRequest.Method = "POST";
             tokenRequest.ContentType = "application/x-www-form-urlencoded";
@@ -203,7 +201,7 @@ namespace GoogleDriveHttprequest.Oauth
                 listener.Stop();
             }
         }
-        
+
         /// <summary>
         /// Returns URI-safe data with a given input length.
         /// </summary>

@@ -1,12 +1,10 @@
-﻿using DropboxHttpRequest;
-using SupDataDll.UiInheritance.Oauth;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 
-namespace DropboxHttpRequest.Oauthv2
+namespace Cloud.Dropbox.Oauth
 {
     public class DropboxOauthv2
     {
@@ -35,12 +33,12 @@ namespace DropboxHttpRequest.Oauthv2
 
         HttpListener listener;
         int port = -1;
-        public void GetCode(OauthUI ui,object owner)
+        public void GetCode(OauthUI ui, object owner)
         {
             port = GetFirstAvailableRandomPort(MinPortRange, MaxPortRange);
             listener = new HttpListener();
             redirectURI = string.Format(LoopbackCallback, port);
-            listener.Prefixes.Add(redirectURI +"/");
+            listener.Prefixes.Add(redirectURI + "/");
             string urloauth = string.Format("https://www.dropbox.com/1/oauth2/authorize?client_id={0}&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A{1}"
                 , Appkey.ApiKey, port.ToString());
             try
@@ -50,7 +48,8 @@ namespace DropboxHttpRequest.Oauthv2
                 ui.CheckUrl = redirectURI;
                 ui.ShowUI(owner);
                 listener.BeginGetContext(new AsyncCallback(RecieveCode), null);
-            }catch
+            }
+            catch
             {
                 TokenCallBack.Invoke(null);
             }
@@ -76,7 +75,7 @@ namespace DropboxHttpRequest.Oauthv2
             client.GetAccessToken(code, port);
             TokenCallBack.Invoke(client.AccessToken);
         }
-        
+
         internal static int GetFirstAvailableRandomPort(int startPort, int stopPort)
         {
             Random r = new Random();

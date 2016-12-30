@@ -86,13 +86,9 @@
     <None Include="Resources\SettingDefault.xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DropboxHttprequest\DropboxHttprequest.csproj">
-      <Project>{368a4fe1-8348-498f-997d-19ccd34a8a1c}</Project>
-      <Name>DropboxHttprequest</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GoogleDriveHttprequest\GoogleDriveHttprequest.csproj">
-      <Project>{0aefa63d-8c09-4d16-97c6-a4645b9e03d7}</Project>
-      <Name>GoogleDriveHttprequest</Name>
+    <ProjectReference Include="..\Cloud\Cloud.csproj">
+      <Project>{0B8A1A7D-0267-48A9-BAD6-DCDE5104D660}</Project>
+      <Name>Cloud</Name>
     </ProjectReference>
     <ProjectReference Include="..\SupDataDll\SupDataDll.csproj">
       <Project>{700eed73-135e-422d-a06e-738d3ad057a1}</Project>

@@ -1,17 +1,13 @@
-﻿using Core.cloud;
+﻿using Cloud.Dropbox;
+using Cloud.GoogleDrive;
+using Core.cloud;
 using Core.StaticClass;
-using DropboxHttpRequest;
-using GoogleDriveHttprequest;
 using Newtonsoft.Json;
 using SupDataDll;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Web;
 
 namespace Core.Transfer
 {
@@ -92,7 +88,7 @@ namespace Core.Transfer
                 if (fromfolder.PathIsUrl) list = AppSetting.ManageCloud.GetItemsList("", id);
                 else list = AppSetting.ManageCloud.GetItemsList(path_rawItem, id);//UnauthorizedAccessException
             }
-            catch (UnauthorizedAccessException ex) { return ud_items; }
+            catch (UnauthorizedAccessException) { return ud_items; }
 
             foreach (FileFolder ffitem in list.Items)
             {

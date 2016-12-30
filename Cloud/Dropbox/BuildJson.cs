@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 
-namespace DropboxHttpRequest
+namespace Cloud.Dropbox
 {
     public class BuildJson
     {
         private string json = null;
-        public string GetJson { get { return "{"+json+"}"; } }
+        public string GetJson { get { return "{" + json + "}"; } }
 
         public void AddChildNodes(string Nodes, string Value)
         {
@@ -23,7 +23,7 @@ namespace DropboxHttpRequest
         {
             if (json != null)
             {
-                json += ", \"" + Nodes + "\": \"" + Value +"\"";
+                json += ", \"" + Nodes + "\": \"" + Value + "\"";
             }
             else
             {
@@ -45,7 +45,7 @@ namespace DropboxHttpRequest
 
         private string GetValueFromList(List<string> ListValue)
         {
-            string data=null;
+            string data = null;
             foreach (string Value in ListValue)
             {
                 if (data != null)

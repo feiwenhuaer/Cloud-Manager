@@ -399,7 +399,7 @@ namespace FormUI.UI.MainForm
             {
                 list = Setting_UI.reflection_eventtocore._ListIteamRequest(o.path, o.id);
             }
-            catch(ThreadAbortException ex)
+            catch(ThreadAbortException)
             {
                 exception = true;
             }

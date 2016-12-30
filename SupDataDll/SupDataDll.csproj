@@ -56,9 +56,6 @@
     <Compile Include="DataClass.cs" />
     <Compile Include="Enum.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UiInheritance\Oauth\interfaceDB.cs" />
-    <Compile Include="UiInheritance\Oauth\interfaceGD.cs" />
-    <Compile Include="UiInheritance\Oauth\OauthUI.cs" />
     <Compile Include="UiInheritance\SettingUI.cs" />
     <Compile Include="UiInheritance\UIClosing.cs" />
     <Compile Include="UiInheritance\UIDelete.cs" />

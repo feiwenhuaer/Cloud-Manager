@@ -1,12 +1,8 @@
-﻿using SupDataDll.UiInheritance.Oauth;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Cloud.Dropbox.Oauth;
 
 namespace FormUI.UI.Oauth
 {
-    public class OauthDB: UIOauth, interfaceDB
+    public class OauthDB: UIOauth, UIinterfaceDB
     {
         public OauthDB()
         {

@@ -1,4 +1,4 @@
-﻿namespace GoogleDriveHttprequest
+﻿namespace Cloud.GoogleDrive
 {
     public static class mimeType
     {

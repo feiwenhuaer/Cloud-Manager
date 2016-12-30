@@ -1,4 +1,4 @@
-﻿namespace DropboxHttpRequest
+﻿namespace Cloud.Dropbox
 {
     class BuildURL
     {
@@ -12,9 +12,9 @@
 
         public void AddParameter(string key, string value)
         {
-            if (url.IndexOf("?") > 0) 
+            if (url.IndexOf("?") > 0)
             {
-                url += "&" + key +"=" +value;
+                url += "&" + key + "=" + value;
                 return;
             }
             url += "?" + key + "=" + value;

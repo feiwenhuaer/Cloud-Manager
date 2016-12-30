@@ -120,9 +120,9 @@
       <Project>{d17cd489-1b14-47eb-8c22-c189d078aec9}</Project>
       <Name>Aga.Controls</Name>
     </ProjectReference>
-    <ProjectReference Include="..\GoogleDriveHttprequest\GoogleDriveHttprequest.csproj">
-      <Project>{0AEFA63D-8C09-4D16-97C6-A4645B9E03D7}</Project>
-      <Name>GoogleDriveHttprequest</Name>
+    <ProjectReference Include="..\Cloud\Cloud.csproj">
+      <Project>{0B8A1A7D-0267-48A9-BAD6-DCDE5104D660}</Project>
+      <Name>Cloud</Name>
     </ProjectReference>
     <ProjectReference Include="..\SupDataDll\SupDataDll.csproj">
       <Project>{700eed73-135e-422d-a06e-738d3ad057a1}</Project>

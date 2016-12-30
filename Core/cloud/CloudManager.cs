@@ -1,15 +1,14 @@
 ﻿using SupDataDll;
 using System.IO;
-using DropboxHttpRequest;
-using GoogleDriveHttprequest.Oauth;
-using GoogleDriveHttprequest;
 using Newtonsoft.Json;
 using System;
 using Core.StaticClass;
 using System.Threading;
-using DropboxHttpRequest.Oauthv2;
-using SupDataDll.UiInheritance;
-using SupDataDll.UiInheritance.Oauth;
+using Cloud;
+using Cloud.Dropbox.Oauth;
+using Cloud.GoogleDrive;
+using Cloud.GoogleDrive.Oauth;
+using Cloud.Dropbox;
 
 namespace Core.cloud
 {
@@ -131,7 +130,7 @@ namespace Core.cloud
                     DropboxOauthv2 oauth_dropbox = new DropboxOauthv2();
                     oauth_dropbox.TokenCallBack += Oauth_dropbox_TokenCallBack;
 
-                    type_oauthUI = LoadDllUI.GetTypeInterface(typeof(interfaceDB));
+                    type_oauthUI = LoadDllUI.GetTypeInterface(typeof(UIinterfaceDB));
                     instanceUI = (OauthUI)Activator.CreateInstance(type_oauthUI);
 
                     oauth_dropbox.GetCode(instanceUI, AppSetting.UIMain);
@@ -141,7 +140,7 @@ namespace Core.cloud
                     GoogleAPIOauth2 oauth_gd = new GoogleAPIOauth2(scope);
                     oauth_gd.TokenCallBack += Oauth_gd_TokenCallBack;
 
-                    type_oauthUI = LoadDllUI.GetTypeInterface(typeof(interfaceGD));
+                    type_oauthUI = LoadDllUI.GetTypeInterface(typeof(UIinterfaceGD));
                     instanceUI = (OauthUI)Activator.CreateInstance(type_oauthUI);
 
                     oauth_gd.GetCode(instanceUI, AppSetting.UIMain);

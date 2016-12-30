@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GoogleDriveHttprequest.JsonClass
+namespace Cloud.GoogleDrive.JsonClass
 {
     public class GD_Files_list
     {

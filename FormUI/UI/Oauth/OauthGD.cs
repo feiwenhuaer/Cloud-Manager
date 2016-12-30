@@ -1,12 +1,8 @@
-﻿using SupDataDll.UiInheritance.Oauth;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Cloud.GoogleDrive.Oauth;
 
 namespace FormUI.UI.Oauth
 {
-    public class OauthGD : UIOauth, interfaceGD
+    public class OauthGD : UIOauth, UIinterfaceGD
     {
         public OauthGD()
         {

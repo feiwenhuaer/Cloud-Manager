@@ -4,13 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{368A4FE1-8348-498F-997D-19CCD34A8A1C}</ProjectGuid>
+    <ProjectGuid>{0B8A1A7D-0267-48A9-BAD6-DCDE5104D660}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DropboxHttprequest</RootNamespace>
-    <AssemblyName>DropboxHttprequest</AssemblyName>
+    <RootNamespace>Cloud</RootNamespace>
+    <AssemblyName>Cloud</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,27 +31,34 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AllEnum.cs" />
-    <Compile Include="Appkey.cs" />
-    <Compile Include="BuildJson.cs" />
-    <Compile Include="BuildURL.cs" />
-    <Compile Include="DropboxRequestAPIv2.cs" />
-    <Compile Include="DropboxSharingMember.cs" />
-    <Compile Include="ErrorCode.cs" />
-    <Compile Include="Oauthv2\DropboxOauthv2.cs" />
+    <Compile Include="Dropbox\Appkey.cs" />
+    <Compile Include="Dropbox\BuildJson.cs" />
+    <Compile Include="Dropbox\BuildURL.cs" />
+    <Compile Include="Dropbox\DropboxEnum.cs" />
+    <Compile Include="Dropbox\DropboxErrorCode.cs" />
+    <Compile Include="Dropbox\Oauth\DropboxOauthv2.cs" />
+    <Compile Include="Dropbox\DropboxRequestAPIv2.cs" />
+    <Compile Include="Dropbox\DropboxSharingMember.cs" />
+    <Compile Include="Dropbox\Oauth\UIinterfaceDB.cs" />
+    <Compile Include="GoogleDrive\APPkey.cs" />
+    <Compile Include="GoogleDrive\DriveAPIHttprequestv2.cs" />
+    <Compile Include="GoogleDrive\GoogleDriveEnum.cs" />
+    <Compile Include="GoogleDrive\JsonClass\File_list.cs" />
+    <Compile Include="GoogleDrive\mimeType.cs" />
+    <Compile Include="GoogleDrive\Oauth\GoogleAPIOauth2.cs" />
+    <Compile Include="GoogleDrive\Oauth\UIinterfaceGD.cs" />
+    <Compile Include="GoogleDrive\OrderBy.cs" />
+    <Compile Include="GoogleDrive\Scope.cs" />
+    <Compile Include="GoogleDrive\TokenGoogleDrive.cs" />
+    <Compile Include="OauthUI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -58,11 +66,8 @@
       <Project>{1d279a6b-ce8d-4184-b9ab-bc24c6f69045}</Project>
       <Name>CustomHttpRequest</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SupDataDll\SupDataDll.csproj">
-      <Project>{700EED73-135E-422D-A06E-738D3AD057A1}</Project>
-      <Name>SupDataDll</Name>
-    </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

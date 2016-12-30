@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("DropboxHttprequest")]
+[assembly: AssemblyTitle("Cloud")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("DropboxHttprequest")]
+[assembly: AssemblyProduct("Cloud")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("368a4fe1-8348-498f-997d-19ccd34a8a1c")]
+[assembly: Guid("0b8a1a7d-0267-48a9-bad6-dcde5104d660")]
 
 // Version information for an assembly consists of the following four values:
 //

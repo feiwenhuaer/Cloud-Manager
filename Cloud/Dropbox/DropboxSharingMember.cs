@@ -1,4 +1,4 @@
-﻿namespace DropboxHttpRequest
+﻿namespace Cloud.Dropbox
 {
     public class DropboxSharingMember
     {
