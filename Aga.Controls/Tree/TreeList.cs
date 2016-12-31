@@ -42,11 +42,63 @@ namespace Aga.Controls.Tree
                 }
                 else//refresh data
                 {
+                    ClearRemovedNodes(_root);
                     Rows.RefeshData();
                 }
                 CreateChildrenNodes(_root);
             }
-		}
+        }
+        //when Model != Root.Child
+        void ClearRemovedNodes(TreeNode node)
+        {
+            if (node != null && node.Children.Count > 0)
+            {
+                IEnumerable child = GetChildren(node);
+                if (IEnumerableIsNullOrEmpty(child))
+                {
+                    node.Children.Clear();
+                    return;
+                }
+
+                for (int i = 0; i < node.Children.Count; i++)
+                {
+                    bool flag = true;
+                    foreach (object obj in child)
+                    {
+                        if (node.Children[i].Tag == obj) { flag = false; break; }
+                    }
+
+                    if (flag)
+                    {
+                        ClearNodeAndChildInRows(node.Children[i]);
+                        node.Children.RemoveAt(i);
+                        i--;
+                    }
+                    else ClearRemovedNodes(node.Children[i]);
+                }
+            }
+        }
+
+        static bool IEnumerableIsNullOrEmpty(IEnumerable source)
+        {
+            if (source != null)
+            {
+                foreach (object obj in source)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        void ClearNodeAndChildInRows(TreeNode node)
+        {
+            if (node.HasChildren) for (int i = 0; i < node.Children.Count; i++)
+                {
+                    ClearNodeAndChildInRows(node.Children[i]);
+                }
+            Rows.Remove(node);
+        }
+
 
         //Root TreeNode
         private TreeNode _root;
@@ -153,13 +205,13 @@ namespace Aga.Controls.Tree
 
 		internal void CreateChildrenNodes(TreeNode node)
 		{
-			var children = GetChildren(node);
-            if (children != null)
+			var childrens = GetChildren(node);
+            if (childrens != null)
             {
                 int rowIndex = Rows.IndexOf(node);
-                node.ChildrenSource = children as INotifyCollectionChanged;
+                node.ChildrenSource = childrens as INotifyCollectionChanged;
                 Collection<TreeNode> newnode = new Collection<TreeNode>();
-                foreach (object obj in children)
+                foreach (object obj in childrens)
                 {
                     TreeNode child = new TreeNode(this, obj);
                     child.HasChildren = HasChildren(child);
@@ -179,30 +231,10 @@ namespace Aga.Controls.Tree
                     }
                 }
                 if (newnode.Count > 0) Rows.InsertRange(rowIndex + 1, newnode.ToArray());
-                //clear remove node
-                for (int i = 0; i < node.Children.Count; i++)//childs node
-                {
-                    bool flag_remove = true;
-                    foreach(object obj in children)//from model data
-                    {
-                        if (node.Children[i].Tag == obj)
-                        {
-                            flag_remove = false;
-                            break;
-                        }
-                    }
-                    if (flag_remove)//clear group
-                    {
-                        foreach (TreeNode n in node.Children[i].Children) Rows.Remove(n);//clear item show row
-                        Rows.Remove(node.Children[i]);//clear group show row
-                        node.Children.RemoveAt(i);
-                        i--;
-                    }
-                }
             }
 		}
-
-		private void CreateChildrenRows(TreeNode node)
+        
+        private void CreateChildrenRows(TreeNode node)
 		{
 			int index = Rows.IndexOf(node);
 			if (index >= 0 || node == _root) // ignore invisible nodes

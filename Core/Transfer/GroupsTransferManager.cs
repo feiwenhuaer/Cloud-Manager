@@ -132,7 +132,7 @@ namespace Core.Transfer
         }
 
         //from Reflection_UI
-        public void AddItems(List<NewTransferItem> items, string fromfolder_raw, string savefolder_raw, bool AreCut)
+        public void AddItems(List<AddNewTransferItem> items, string fromfolder_raw, string savefolder_raw, bool AreCut)
         {
             ItemsTransferManager gr = new ItemsTransferManager(items, fromfolder_raw, savefolder_raw, AreCut);
             groups.Add(gr);

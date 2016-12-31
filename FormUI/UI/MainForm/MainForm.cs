@@ -56,9 +56,9 @@ namespace FormUI.UI.MainForm
                 DialogResult rs = sfd.ShowDialog();
                 if (rs == DialogResult.OK | rs == DialogResult.Yes)
                 {
-                    NewTransferItem uditem = new NewTransferItem(filename,rp.ID,"", Type_FileFolder.File,filesize);
+                    AddNewTransferItem uditem = new AddNewTransferItem(filename,rp.ID,"", Type_FileFolder.File,filesize);
                     AnalyzePath ap = new AnalyzePath(sfd.FileName);
-                    Setting_UI.reflection_eventtocore._AddItem(new List<NewTransferItem>() { uditem }, rp.Path_Raw, ap.Parent, false);
+                    Setting_UI.reflection_eventtocore._AddItem(new List<AddNewTransferItem>() { uditem }, rp.Path_Raw, ap.Parent, false);
                 }
             }));
         }
@@ -265,7 +265,7 @@ namespace FormUI.UI.MainForm
             ClipBoard_.Clear();
             ClipBoard_.AreCut = AreCut;
 
-            NewTransferItem item = new NewTransferItem(TV_item.SelectedNode.Text,"","", Type_FileFolder.Folder);
+            AddNewTransferItem item = new AddNewTransferItem(TV_item.SelectedNode.Text,"","", Type_FileFolder.Folder);
 
             TreeNode parent_node = GetRootParent(TV_item.SelectedNode);
             bool arecloud = parent_node.Text.IndexOf('@') >= 0 ? true : false;
@@ -329,8 +329,8 @@ namespace FormUI.UI.MainForm
             DialogResult result = fbd.ShowDialog();
             if (result == DialogResult.OK | result == DialogResult.Yes)
             {
-                List<NewTransferItem> list_item_from = new List<NewTransferItem>();
-                list_item_from.Add(new NewTransferItem(TV_item.SelectedNode.Text, "", "", Type_FileFolder.Folder));                
+                List<AddNewTransferItem> list_item_from = new List<AddNewTransferItem>();
+                list_item_from.Add(new AddNewTransferItem(TV_item.SelectedNode.Text, "", "", Type_FileFolder.Folder));                
                 Setting_UI.reflection_eventtocore._AddItem(list_item_from, ((CloudName)GetRootParent(TV_item.SelectedNode).ImageIndex).ToString() +":"+ TV_item.SelectedNode.Parent.FullPath.Replace('\\','/'),
                     fbd.SelectedPath,false);
             }
@@ -343,8 +343,8 @@ namespace FormUI.UI.MainForm
             DialogResult result = fbd.ShowDialog();
             if (result == DialogResult.OK | result == DialogResult.Yes)
             {
-                List<NewTransferItem> list_item_from = new List<NewTransferItem>();
-                list_item_from.Add(new NewTransferItem(TV_item.SelectedNode.Text, "", "", Type_FileFolder.Folder));
+                List<AddNewTransferItem> list_item_from = new List<AddNewTransferItem>();
+                list_item_from.Add(new AddNewTransferItem(TV_item.SelectedNode.Text, "", "", Type_FileFolder.Folder));
                 Setting_UI.reflection_eventtocore._AddItem(list_item_from, fbd.SelectedPath,((CloudName)GetRootParent(TV_item.SelectedNode).ImageIndex).ToString() + ":" + TV_item.SelectedNode.Parent.FullPath.Replace('\\', '/'),false);
             }
         }
@@ -358,12 +358,12 @@ namespace FormUI.UI.MainForm
             DialogResult result = ofd.ShowDialog();
             if (result == DialogResult.OK | result == DialogResult.Yes)
             {
-                List<NewTransferItem> list_item_from = new List<NewTransferItem>();
+                List<AddNewTransferItem> list_item_from = new List<AddNewTransferItem>();
                 string root = Path.GetDirectoryName(ofd.FileNames[0]);
                 foreach (string a in ofd.SafeFileNames)
                 {
                     FileInfo info = new FileInfo(root + "\\" + a);
-                    NewTransferItem item = new NewTransferItem(a,"","", Type_FileFolder.File, info.Length);
+                    AddNewTransferItem item = new AddNewTransferItem(a,"","", Type_FileFolder.File, info.Length);
                     list_item_from.Add(item);
                 }
                 Setting_UI.reflection_eventtocore._AddItem(list_item_from, root,

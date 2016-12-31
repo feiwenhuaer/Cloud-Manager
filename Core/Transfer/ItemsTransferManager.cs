@@ -19,7 +19,7 @@ namespace Core.Transfer
         List<TransferBytes> ItemsTransfer = new List<TransferBytes>();
 
         //loading
-        List<NewTransferItem> items;
+        List<AddNewTransferItem> items;
         public AnalyzePath fromfolder;
         public AnalyzePath savefolder;
         
@@ -45,7 +45,7 @@ namespace Core.Transfer
             RefreshGroupDataToShow(-1);
         }
         //load from user
-        public ItemsTransferManager(List<NewTransferItem> items, string fromfolder_raw, string savefolder_raw, bool AreCut = false)
+        public ItemsTransferManager(List<AddNewTransferItem> items, string fromfolder_raw, string savefolder_raw, bool AreCut = false)
         {
             if (items.Count == 0) throw new Exception("List<NewTransferItem> items count = 0");
             if (string.IsNullOrEmpty(fromfolder_raw)) throw new ArgumentNullException(fromfolder_raw);
@@ -63,7 +63,7 @@ namespace Core.Transfer
             Console.WriteLine("Load group:" + fromfolder);
             this.group.col = new List<string> { fromfolder.Path_Raw, savefolder.Path_Raw, this.group.status.ToString(), "0/0", "", "", "" };
             AppSetting.uc_lv_ud_instance.AddNewGroup(group);
-            foreach (NewTransferItem item in items)
+            foreach (AddNewTransferItem item in items)
             {
                 if (item.type == Type_FileFolder.File)
                     group.items.Add(LoadFile(fromfolder.PathIsUrl ? fromfolder.ID : fromfolder.Path_Raw, item.name, item.size, item.id));
@@ -267,7 +267,7 @@ namespace Core.Transfer
                     {
                         DeleteItems list = new DeleteItems();
                         list.PernamentDelete = false;
-                        foreach (NewTransferItem item in items)
+                        foreach (AddNewTransferItem item in items)
                         {
                             list.items.Add(fromfolder.Path_Raw + (fromfolder.PathIsCloud ? "/" : "\\") + item.name);
                         }

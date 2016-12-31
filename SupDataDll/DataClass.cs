@@ -67,9 +67,9 @@ namespace SupDataDll
     #endregion
 
     #region Transfer
-    public class NewTransferItem
+    public class AddNewTransferItem
     {
-        public NewTransferItem(string name,string id,string mimeType, Type_FileFolder type,long size = -1)
+        public AddNewTransferItem(string name,string id,string mimeType, Type_FileFolder type,long size = -1)
         {
             this.name = name;
             this.id = id;
@@ -102,8 +102,8 @@ namespace SupDataDll
     {
         [JsonIgnore]
         public string SizeString = "";
-        public UD_item_work_info From = new UD_item_work_info();
-        public UD_item_work_info To = new UD_item_work_info();
+        public FileTransferInfo From = new FileTransferInfo();
+        public FileTransferInfo To = new FileTransferInfo();
         public string UploadID = "";//for remuse upload
         public string ErrorMsg = "";
         public long Transfer = 0;//byte[] was transfer
@@ -127,9 +127,8 @@ namespace SupDataDll
         public StatusTransfer CheckChangeStatus = StatusTransfer.Waiting;
         public long OldTransfer = 0;//for caculate speed
     }
-
     
-    public class UD_item_work_info
+    public class FileTransferInfo
     {
         [JsonIgnore]
         public AnalyzePath ap;
