@@ -193,8 +193,8 @@ namespace Aga.Controls.Tree
                     }
                     if (flag_remove)//clear group
                     {
-                        foreach (TreeNode n in node.Children[i].Children) Rows.Remove(n);//clear show row
-                        Rows.Remove(node.Children[i]);//clear group
+                        foreach (TreeNode n in node.Children[i].Children) Rows.Remove(n);//clear item show row
+                        Rows.Remove(node.Children[i]);//clear group show row
                         node.Children.RemoveAt(i);
                         i--;
                     }
