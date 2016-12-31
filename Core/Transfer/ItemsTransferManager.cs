@@ -159,6 +159,7 @@ namespace Core.Transfer
             int count_item_done = 0;
             int count_item_error = 0;
             int count_item_stop = 0;
+            int count_item_remove = 0;
             for (int i = 0; i < group.items.Count; i++)
             {
                 if (group.items[i].status == StatusTransfer.Remove)
@@ -173,6 +174,7 @@ namespace Core.Transfer
                     }
                     group.items.RemoveAt(i);
                     i--;
+                    count_item_remove++;
                     continue;
                 }
                 else switch (group.items[i].status)
@@ -288,12 +290,12 @@ namespace Core.Transfer
                 this.group.change = ChangeTLV.DoneToProcessing;
             #endregion
 
-            RefreshGroupDataToShow(count_item_done);
+            RefreshGroupDataToShow(count_item_done,count_item_remove);
         }
 
-        void RefreshGroupDataToShow(int count_item_done)
+        void RefreshGroupDataToShow(int count_item_done,int remove = 0)
         {
-            if (count_item_done != -1 & group.col[3].IndexOf("100% (") < 0 & group.items.Count != 0)
+            if ((count_item_done != -1 && group.col[3].IndexOf("100% (") < 0 && group.items.Count != 0) | remove !=0)
                 group.col[3] = Math.Round((double)count_item_done * 100 / group.items.Count, 2).ToString() + "% (" + count_item_done.ToString() + "/" + group.items.Count.ToString() + ")";
             group.col[2] = group.status.ToString();
             for (int i = 0; i < group.items.Count; i++)
