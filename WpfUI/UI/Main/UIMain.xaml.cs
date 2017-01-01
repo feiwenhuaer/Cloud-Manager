@@ -20,16 +20,14 @@ namespace WpfUI.UI.Main
     /// </summary>
     public partial class UIMain : Window, SupDataDll.UiInheritance.UIMain
     {
-        bool reloadui = false;
         #region interface
         public bool AreReloadUI
         {
             get
             {
-                return reloadui;
+                return Setting_UI.ReloadUI_Flag;
             }
         }
-
         public void AddNewCloudToTV(string email, CloudName type)
         {
             //if (Dispatcher.CheckAccess())
@@ -83,7 +81,12 @@ namespace WpfUI.UI.Main
         }
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            Setting_UI.reflection_eventtocore._ExitApp();
+            Setting_UI.ManagerThreads.CloseAll();
+            if (!Setting_UI.ReloadUI_Flag)
+            {
+                Setting_UI.ExitAPP_Flag = true;
+                Setting_UI.reflection_eventtocore._ExitApp();
+            }
         }
         void LoadLanguage()
         {
@@ -440,7 +443,7 @@ namespace WpfUI.UI.Main
             ContextMenuDataModel data = item.DataContext as ContextMenuDataModel;
             Setting_UI.reflection_eventtocore._SetSetting(SettingsKey.UI_dll_file, data.Text);
             Setting_UI.reflection_eventtocore._SaveSetting();
-            this.reloadui = true;
+            Setting_UI.ReloadUI_Flag = true;
             this.Close();
         }
         private void ChangeLang_click(object sender, RoutedEventArgs e)

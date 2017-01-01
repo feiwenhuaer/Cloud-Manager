@@ -72,8 +72,14 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Setting_UI.cs" />
+    <Compile Include="UI\ChangeNumberItemsTransfer.xaml.cs">
+      <DependentUpon>ChangeNumberItemsTransfer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Closing.xaml.cs">
       <DependentUpon>Closing.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Lib\numericupdown.xaml.cs">
+      <DependentUpon>numericupdown.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Oauth\OauthDB.cs" />
     <Compile Include="UI\Oauth\OauthGD.cs" />
@@ -155,7 +161,15 @@
     <None Include="Resources\search 64x64.png" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="UI\ChangeNumberItemsTransfer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\Closing.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Lib\numericupdown.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

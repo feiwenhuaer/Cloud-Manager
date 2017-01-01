@@ -32,6 +32,7 @@ namespace WpfUI.UI.Main.Lv_ud
         List<TransferGroup> groups = new List<TransferGroup>();
         public int AddNewGroup(TransferGroup Group)
         {
+            if (Setting_UI.ExitAPP_Flag) return -1;
             Group.col[2] = Group.status.ToString();
             if (groups.IndexOf(Group) >= 0) refresh();
             else
@@ -57,6 +58,7 @@ namespace WpfUI.UI.Main.Lv_ud
 
         public void RefreshAll()
         {
+            if (Setting_UI.ExitAPP_Flag) return;
             if (!Dispatcher.CheckAccess()) Dispatcher.Invoke(new Action(() => refresh()));
             else refresh();
         }
@@ -85,6 +87,7 @@ namespace WpfUI.UI.Main.Lv_ud
 
         public void RemoveGroup(TransferGroup Group)
         {
+            if (Setting_UI.ExitAPP_Flag) return;
             groups.Remove(Group);
             if (Group.change == ChangeTLV.Processing) TLV_process.data.Remove(Group);
             else TLV_done.data.Remove(Group);

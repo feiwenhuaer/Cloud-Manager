@@ -15,9 +15,15 @@ namespace FormUI.UI.MainForm
 {
     public partial class MainForm : System.Windows.Forms.Form, SupDataDll.UiInheritance.UIMain
     {
-        bool ReloadUI = false;
         #region interface
         UserControl LV_Ud_control;
+        public bool AreReloadUI
+        {
+            get
+            {
+                return Setting_UI.ReloadUI_Flag;
+            }
+        }
         public void load_uC_Lv_ud(UIUC_TLV_ud control)
         {
             LV_Ud_control = (UserControl)control;
@@ -32,14 +38,6 @@ namespace FormUI.UI.MainForm
             else AddNewCloudToTV_(email, type);
         }
         
-        public bool AreReloadUI
-        {
-            get
-            {
-                return ReloadUI;
-            }
-        }
-
         public void ShowDialog_()
         {
             this.ShowDialog();
@@ -104,7 +102,11 @@ namespace FormUI.UI.MainForm
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             Setting_UI.ManagerThreads.CloseAll();
-            if(!ReloadUI) Setting_UI.reflection_eventtocore._ExitApp();
+            if (!Setting_UI.ReloadUI_Flag)
+            {
+                Setting_UI.ExitAPP_Flag = true;
+                Setting_UI.reflection_eventtocore._ExitApp();
+            }
         }
         #endregion
 
@@ -518,7 +520,7 @@ namespace FormUI.UI.MainForm
                 if (setting.IsChangeLang) LoadLanguage();
                 if(setting.IsChangeUI)
                 {
-                    ReloadUI = true;
+                    Setting_UI.ReloadUI_Flag = true;
                     this.Close();
                 }
             }
@@ -561,7 +563,7 @@ namespace FormUI.UI.MainForm
         {
             ToolStripMenuItem item = (ToolStripMenuItem)sender;
             Setting_UI.reflection_eventtocore._SetSetting(SettingsKey.UI_dll_file, item.Text);
-            this.ReloadUI = true;
+            Setting_UI.ReloadUI_Flag = true;
             this.Close();
         }
         //add cloud

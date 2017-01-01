@@ -17,6 +17,7 @@ namespace FormUI.UI.MainForm
 
         public int AddNewGroup(TransferGroup group_work)
         {
+            if (Setting_UI.ExitAPP_Flag) return -1;
             group_work.col[2] = group_work.status.ToString();
             Groups.Add(group_work);
             if (group_work.change == ChangeTLV.Processing) TLV_ud.AddObject(group_work);
@@ -26,6 +27,7 @@ namespace FormUI.UI.MainForm
 
         public void RemoveGroup(TransferGroup Group)
         {
+            if (Setting_UI.ExitAPP_Flag) return;
             TLV_ud.RemoveObject(Groups[Groups.IndexOf(Group)]);
             TLV_done.RemoveObject(Groups[Groups.IndexOf(Group)]);
             Groups.Remove(Group);
@@ -33,7 +35,8 @@ namespace FormUI.UI.MainForm
 
         public void RefreshAll()
         {
-                if (InvokeRequired)Invoke(new Action(() => DoRefresh()));
+            if (Setting_UI.ExitAPP_Flag) return;
+            if (InvokeRequired)Invoke(new Action(() => DoRefresh()));
                 else DoRefresh();
         }
 
@@ -273,7 +276,7 @@ namespace FormUI.UI.MainForm
         {
             if (parents != null && parents.Count == 1)
             {
-                ChangeNumberItemDownload f = new ChangeNumberItemDownload(parents[0].MaxItemsDownload);
+                ChangeNumberItemsTransfer f = new ChangeNumberItemsTransfer(parents[0].MaxItemsDownload);
                 f.ShowDialog(mainform);
                 if (f.NumberItems != parents[0].MaxItemsDownload) parents[0].MaxItemsDownload = f.NumberItems;
             }

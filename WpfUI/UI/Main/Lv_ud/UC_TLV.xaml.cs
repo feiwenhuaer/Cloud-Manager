@@ -78,7 +78,6 @@ namespace WpfUI.UI.Main.Lv_ud
             if(seleecteditems!= null)
             {
                 if (seleecteditems.Count > 0) remove.IsEnabled = true;
-                if (seleecteditems.Count == 1) numberOfParallelDownloads.IsEnabled = true;
                 groups = new List<TransferGroup>();
                 items = new List<TransferItem>();
                 foreach (var item in seleecteditems)
@@ -98,6 +97,7 @@ namespace WpfUI.UI.Main.Lv_ud
                         SetIsEnableMenuTLV(ti as Transfer);
                     }
                 }
+                if(groups.Count == 1 & items.Count == 0) numberOfParallelDownloads.IsEnabled = true;
             }
         }
         void SetIsEnableMenuTLV(Transfer t)
@@ -117,7 +117,7 @@ namespace WpfUI.UI.Main.Lv_ud
         {
             MenuItem menu = sender as MenuItem;
             ContextMenuDataModel model = menu.DataContext as ContextMenuDataModel;
-            if (model.Key == LanguageKey.TSMI_numberOfParallelDownloads) ChangeNumberOfParallelDownloads();
+            if (model != null && model.Key == LanguageKey.TSMI_numberOfParallelDownloads) ChangeNumberOfParallelDownloads();
             else
             {
                 switch(model.Key)
@@ -139,7 +139,12 @@ namespace WpfUI.UI.Main.Lv_ud
                
         void ChangeNumberOfParallelDownloads()
         {
-
+            ChangeNumberItemsTransfer u = new ChangeNumberItemsTransfer(groups[0].MaxItemsDownload);
+            u.ShowDialog();
+            if(u.Flags)
+            {
+                groups[0].MaxItemsDownload = u.Number;
+            }
         }
 
         void ChangeStatus(StatusTransfer val)

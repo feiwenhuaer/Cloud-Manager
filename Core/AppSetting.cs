@@ -16,6 +16,7 @@ namespace Core
         public static CloudManager ManageCloud;
         public static Languages lang;
         //instance
+        public static SettingUI UISetting;
         public static UILogin UILogin;
         public static UIMain UIMain;
         public static UIUC_TLV_ud uc_lv_ud_instance;

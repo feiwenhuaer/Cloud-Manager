@@ -1,6 +1,6 @@
 ﻿namespace FormUI.UI
 {
-    partial class ChangeNumberItemDownload
+    partial class ChangeNumberItemsTransfer
     {
         /// <summary>
         /// Required designer variable.

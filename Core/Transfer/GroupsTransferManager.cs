@@ -197,7 +197,6 @@ namespace Core.Transfer
         string temp_jsonSaveData = "";
         public void SaveData()
         {
-            if (this.groups.Count == 0) return;
             List<JsonDataSaveGroup> json_groups = new List<JsonDataSaveGroup>();
             for (int i = 0; i < groups.Count; i++)
             {

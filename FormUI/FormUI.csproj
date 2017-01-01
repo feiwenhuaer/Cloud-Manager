@@ -52,11 +52,11 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Setting_UI.cs" />
-    <Compile Include="UI\ChangeNumberItemDownload.cs">
+    <Compile Include="UI\ChangeNumberItemsTransfer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\ChangeNumberItemDownload.Designer.cs">
-      <DependentUpon>ChangeNumberItemDownload.cs</DependentUpon>
+    <Compile Include="UI\ChangeNumberItemsTransfer.Designer.cs">
+      <DependentUpon>ChangeNumberItemsTransfer.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\ClosingForm.cs">
       <SubType>Form</SubType>
@@ -159,8 +159,8 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\ChangeNumberItemDownload.resx">
-      <DependentUpon>ChangeNumberItemDownload.cs</DependentUpon>
+    <EmbeddedResource Include="UI\ChangeNumberItemsTransfer.resx">
+      <DependentUpon>ChangeNumberItemsTransfer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\CreateFolderForm.resx">
       <DependentUpon>CreateFolderForm.cs</DependentUpon>

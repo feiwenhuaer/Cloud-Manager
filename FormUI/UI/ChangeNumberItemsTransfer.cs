@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace FormUI.UI
 {
-    public partial class ChangeNumberItemDownload : System.Windows.Forms.Form
+    public partial class ChangeNumberItemsTransfer : System.Windows.Forms.Form
     {
-        public ChangeNumberItemDownload(int numberitems)
+        public ChangeNumberItemsTransfer(int numberitems)
         {
             InitializeComponent();
             this.numberitems = numberitems;

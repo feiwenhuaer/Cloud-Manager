@@ -235,7 +235,7 @@ namespace Core.Transfer
                             if (speed != 0)
                             {
                                 long length_left = group.items[i].From.Size - group.items[i].Transfer;
-                                long secondleft = length_left / decimal.ToInt64(speed);
+                                long secondleft = decimal.ToInt64(((decimal)length_left / speed));
                                 group.items[i].col[5] = CurrentMillis.GetTimeBySecond((int)secondleft);
                             }
                         }

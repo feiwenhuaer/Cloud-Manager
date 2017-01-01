@@ -9,5 +9,7 @@ namespace SupDataDll.UiInheritance
     {
         public static Reflection_EventToCore reflection_eventtocore = new Reflection_EventToCore();
         public static ManagerThread ManagerThreads = new ManagerThread();
+        public static bool ReloadUI_Flag = false;
+        public static bool ExitAPP_Flag = false;
     }
 }
