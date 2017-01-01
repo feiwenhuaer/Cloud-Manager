@@ -4,13 +4,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfUI.UI"
-        mc:Ignorable="d"
-        Title="Create Folder" Height="123.529" Width="348.53" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+        mc:Ignorable="d" WindowStyle="None"  Background="DarkGray"
+        Title="Create Folder" Height="88.432" Width="348.53" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
     <Grid>
         <Label x:Name="label" Content="Name:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="85"/>
         <TextBox x:Name="textBox" Height="23" Margin="100,14,10,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" TextChanged="textBox_TextChanged"/>
         <Button x:Name="BT_create" Content="Create" Margin="35,52,233,0" VerticalAlignment="Top" Click="BT_create_Click"/>
-        <Button x:Name="BT_cancel" Content="Cancel" Margin="234,52,35,23" Click="BT_cancel_Click"/>
+        <Button x:Name="BT_cancel" Content="Cancel" Margin="234,52,35,0" Click="BT_cancel_Click" Height="20" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>

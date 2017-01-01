@@ -81,6 +81,9 @@
     <Compile Include="UI\Lib\numericupdown.xaml.cs">
       <DependentUpon>numericupdown.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\MultiRename.xaml.cs">
+      <DependentUpon>MultiRename.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Oauth\OauthDB.cs" />
     <Compile Include="UI\Oauth\OauthGD.cs" />
     <Compile Include="UI\Oauth\UiOauth.xaml.cs">
@@ -170,6 +173,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Lib\numericupdown.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\MultiRename.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

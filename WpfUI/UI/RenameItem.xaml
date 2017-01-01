@@ -4,8 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfUI.UI"
-        mc:Ignorable="d"
-        Title="Rename" Height="146.691" Width="423.53" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+        mc:Ignorable="d" WindowStyle="None" Background="DarkGray"
+        Title="Rename" Height="102.025" Width="423.53" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="110"/>
@@ -15,10 +15,10 @@
             <RowDefinition Height="10"/>
             <RowDefinition Height="175*"/>
         </Grid.RowDefinitions>
-        <Label x:Name="LB_oldname" Content="Old name:" Margin="10,10,0,0" Grid.Row="1" VerticalAlignment="Top" Height="26"/>
-        <Label x:Name="LB_newname" Content="New name:" Margin="10,36,10,0" Grid.Row="1" VerticalAlignment="Top"/>
-        <TextBlock x:Name="TB_oldname" Grid.Column="1" Height="23" Margin="0,15,10,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Text="22" Background="WhiteSmoke"/>
-        <TextBox x:Name="TB_newname" Grid.Column="1" Height="23" Margin="0,40,10,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" KeyDown="TB_newname_KeyDown" TextChanged="TB_newname_TextChanged"/>
+        <Label x:Name="LB_oldname" Content="Old name:" Margin="10,8,0,0" VerticalAlignment="Top" Height="26" Grid.RowSpan="2"/>
+        <Label x:Name="LB_newname" Content="New name:" Margin="10,27,10,0" Grid.Row="1" VerticalAlignment="Top"/>
+        <TextBlock x:Name="TB_oldname" Grid.Column="1" Height="23" Margin="0,0,10,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Background="WhiteSmoke"/>
+        <TextBox x:Name="TB_newname" Grid.Column="1" Height="23" Margin="0,29,10,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" KeyDown="TB_newname_KeyDown" TextChanged="TB_newname_TextChanged"/>
         <Button x:Name="BT_change" Content="Change" HorizontalAlignment="Left" Margin="70,0,0,10" Grid.Row="1" Width="75" Height="20" VerticalAlignment="Bottom" Grid.ColumnSpan="2" Click="BT_change_Click"/>
         <Button x:Name="BT_cancel" Content="Cancel" Grid.Column="1" Margin="0,0,70,10" Grid.Row="1" HorizontalAlignment="Right" Width="75" Height="20" VerticalAlignment="Bottom" Click="BT_cancel_Click"/>
     </Grid>
