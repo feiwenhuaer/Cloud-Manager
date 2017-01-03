@@ -78,6 +78,7 @@ namespace WpfUI.UI.Main
             Newtab();
             MenuItem_Cloud_Load();
             LoadLanguage();
+            Setting_UI.ReloadUI_Flag = false;
         }
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {

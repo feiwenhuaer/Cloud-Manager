@@ -77,6 +77,7 @@ namespace FormUI.UI.MainForm
         }
         private void MainForm_Load(object sender, EventArgs e)
         {
+            Setting_UI.ReloadUI_Flag = false;
             LoadLanguage();
             AddNewTabControl();
             TV_item.BeginUpdate();

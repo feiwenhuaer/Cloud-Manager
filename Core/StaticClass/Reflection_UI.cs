@@ -7,12 +7,11 @@ namespace Core.StaticClass
 {
     public static class Reflection_UI
     {
-        public static object instance_ListAccountCloud;
         public static void Load_Setting_UI()
         {
             //add event handler
             #region AddEventHandler reflection_eventtocore
-            Type Type_setting = LoadDllUI.GetTypeInterface(typeof(SupDataDll.UiInheritance.SettingUI));
+            Type Type_setting = LoadDllUI.GetTypeInterface(typeof(SettingUI));
             Type Type_reflection_eventtocore = Type_setting.BaseType.GetField("reflection_eventtocore").FieldType;
             object instance_reflection_eventtocore = Type_setting.BaseType.GetField("reflection_eventtocore").GetValue(null);
             List<object[]> listloadevent = new List<object[]>() {

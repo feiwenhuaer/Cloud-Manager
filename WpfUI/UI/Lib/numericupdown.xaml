@@ -10,12 +10,21 @@
         <StackPanel Orientation="Vertical" Margin="0" HorizontalAlignment="Right">
             <Button x:Name="cmdUp" x:FieldModifier="private" Margin="0" Width="15" Click="cmdUp_Click"  Height="10" Padding="0">
                 <Button.Content>
-                    <Label Content="^" Margin="0,-3,0,0" Padding="0"/>
+                    <Label Content="v" Margin="-0.5,0,0,-6" Padding="0" RenderTransformOrigin="0.5,0.5">
+                        <Label.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform/>
+                                <SkewTransform/>
+                                <RotateTransform Angle="180"/>
+                                <TranslateTransform/>
+                            </TransformGroup>
+                        </Label.RenderTransform>
+                    </Label>
                 </Button.Content>
             </Button>
             <Button x:Name="cmdDown" x:FieldModifier="private" Margin="0,0,0,0" Width="15" Click="cmdDown_Click"  Height="10" Padding="0">
                 <Button.Content>
-                    <Label Content="˅" Margin="0,-3,0,0" Padding="0"/>
+                    <Label Content="˅" Margin="-0.5,-4,0,0" Padding="0"/>
                 </Button.Content>
             </Button>
         </StackPanel>
