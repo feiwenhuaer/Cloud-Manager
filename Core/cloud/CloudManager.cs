@@ -10,7 +10,7 @@ using Cloud.GoogleDrive;
 using Cloud.GoogleDrive.Oauth;
 using Cloud.Dropbox;
 
-namespace Core.cloud
+namespace Core.Cloud
 {
     public class CloudManager
     {

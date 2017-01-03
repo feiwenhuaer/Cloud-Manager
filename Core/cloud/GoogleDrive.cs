@@ -7,7 +7,7 @@ using System.IO;
 using System.Xml;
 
 
-namespace Core.cloud
+namespace Core.Cloud
 {
     internal static class GoogleDrive
     {

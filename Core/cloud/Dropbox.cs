@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Web;
 
-namespace Core.cloud
+namespace Core.Cloud
 {
     internal static class Dropbox
     {

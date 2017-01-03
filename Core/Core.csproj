@@ -44,10 +44,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppSetting.cs" />
-    <Compile Include="cloud\CloudManager.cs" />
-    <Compile Include="cloud\Dropbox.cs" />
-    <Compile Include="cloud\GoogleDrive.cs" />
-    <Compile Include="cloud\LocalDisk.cs" />
+    <Compile Include="Cloud\CloudManager.cs" />
+    <Compile Include="Cloud\Dropbox.cs" />
+    <Compile Include="Cloud\GoogleDrive.cs" />
+    <Compile Include="Cloud\LocalDisk.cs" />
     <Compile Include="EncodeDecode\Convert_bytearr_class.cs" />
     <Compile Include="EncodeDecode\Crypto.cs" />
     <Compile Include="EncodeDecode\StringToMD5.cs" />

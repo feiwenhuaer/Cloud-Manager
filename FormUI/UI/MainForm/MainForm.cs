@@ -355,8 +355,8 @@ namespace FormUI.UI.MainForm
         {
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Multiselect = true;
-            ofd.Filter = "All files (*.*)|*.*";
-            ofd.InitialDirectory = "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}";//my computer
+            ofd.Filter = PCPath.FilterAllFiles;
+            ofd.InitialDirectory = PCPath.Mycomputer;
             
             DialogResult result = ofd.ShowDialog();
             if (result == DialogResult.OK | result == DialogResult.Yes)

@@ -281,7 +281,7 @@ namespace WpfUI.UI.Main.Lv_item
         {
             DeleteItems items = new DeleteItems();
             string s = AnalyzePath.IsCloud(textBox.Text) ? "/" : "\\";
-            foreach (LV_data data in LV_items.SelectedItems as List<LV_data>)
+            foreach (LV_data data in LV_items.SelectedItems)
             {
                 items.items.Add(textBox.Text + s + data.Name);
             }
@@ -308,7 +308,7 @@ namespace WpfUI.UI.Main.Lv_item
             DialogResult result = fbd.ShowDialog();
             if (result != DialogResult.OK | result != DialogResult.Yes) return;
             List<AddNewTransferItem> listitems = new List<AddNewTransferItem>();
-            foreach (LV_data item in LV_items.SelectedItems as List<LV_data>)
+            foreach (LV_data item in LV_items.SelectedItems)
             {
                 listitems.Add(new AddNewTransferItem(item.Name, item.id, item.mimeType, item.Type, item.Size));
             }
@@ -328,8 +328,8 @@ namespace WpfUI.UI.Main.Lv_item
         {
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Multiselect = true;
-            ofd.Filter = "All files (*.*)|*.*";
-            ofd.InitialDirectory = "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}";
+            ofd.Filter = PCPath.FilterAllFiles;
+            ofd.InitialDirectory = PCPath.Mycomputer;
             DialogResult result = ofd.ShowDialog();
             if (result != DialogResult.OK | result != DialogResult.Yes) return;
             List<AddNewTransferItem> items = new List<AddNewTransferItem>();

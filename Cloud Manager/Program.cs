@@ -6,7 +6,7 @@ using System.IO;
 using System.Threading;
 using System.Windows.Forms;
 using SupDataDll.UiInheritance;
-using Core.cloud;
+using Core.Cloud;
 using Core.Transfer;
 
 namespace Cloud_Manager
@@ -17,6 +17,7 @@ namespace Cloud_Manager
         [STAThread]
         static void Main(string[] arg)
         {
+            
             if (mutex.WaitOne(TimeSpan.Zero, true))
             {
                 Application.EnableVisualStyles();

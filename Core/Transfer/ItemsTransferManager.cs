@@ -1,6 +1,6 @@
 ﻿using Cloud.Dropbox;
 using Cloud.GoogleDrive;
-using Core.cloud;
+using Core.Cloud;
 using Core.StaticClass;
 using Newtonsoft.Json;
 using SupDataDll;

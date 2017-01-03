@@ -3,7 +3,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace Core.cloud
+namespace Core.Cloud
 {
     internal static class LocalDisk
     {
