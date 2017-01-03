@@ -36,9 +36,9 @@ namespace WpfUI.UI.Main.Lv_item
             LV_items.Height = double.NaN;
             LV_items.Width = double.NaN;
 
-            image_back.Source = Setting_UI.GetImage(Properties.Resources.back_icon).Source;
-            image_next.Source = Setting_UI.GetImage(Properties.Resources.next_icon).Source;
-            image_search.Source = Setting_UI.GetImage(Properties.Resources.search_64x64, image_search.Width, image_search.Height).Source;
+            image_back.Source = Setting_UI.GetImage(SupDataDll.Properties.Resources.back_icon).Source;
+            image_next.Source = Setting_UI.GetImage(SupDataDll.Properties.Resources.next_icon).Source;
+            image_search.Source = Setting_UI.GetImage(SupDataDll.Properties.Resources.search_64x64, image_search.Width, image_search.Height).Source;
             UILanguage();
             lv_data = new ObservableCollection<LV_data>();
             LV_items.ItemsSource = lv_data;

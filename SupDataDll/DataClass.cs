@@ -11,11 +11,6 @@ using System.Threading;
 namespace SupDataDll
 {
     #region Account
-    public class ListAccountCloud
-    {
-        public List<CloudEmail_Type> account = new List<CloudEmail_Type>();
-    }
-
     public class CloudEmail_Type
     {
         public string Email;

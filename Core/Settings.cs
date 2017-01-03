@@ -2,6 +2,7 @@
 using Core.StaticClass;
 using SupDataDll;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -84,12 +85,12 @@ namespace Core
             SettingsNode.AppendChild(NewSetting);
         }
 
-        public ListAccountCloud GetListAccountCloud()
+        public List<CloudEmail_Type> GetListAccountCloud()
         {
-            ListAccountCloud list = new ListAccountCloud();
+            List<CloudEmail_Type> list = new List<CloudEmail_Type>();
             foreach (XmlNode node in GetCloudDataList())
             {
-                list.account.Add(new CloudEmail_Type()
+                list.Add(new CloudEmail_Type()
                 {
                     Email = node.Attributes["Email"].Value,
                     Type = (CloudName)Enum.Parse(typeof(CloudName), node.Attributes["CloudName"].Value)

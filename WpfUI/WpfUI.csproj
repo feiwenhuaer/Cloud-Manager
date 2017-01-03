@@ -61,11 +61,6 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
@@ -114,10 +109,6 @@
     <Compile Include="UI\UILogin.xaml.cs">
       <DependentUpon>UILogin.xaml</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -137,31 +128,6 @@
       <Project>{700eed73-135e-422d-a06e-738d3ad057a1}</Project>
       <Name>SupDataDll</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup />
-  <ItemGroup>
-    <None Include="Resources\back-icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Dropbox256x256.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\folder_closed64x64.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Google-Drive-Icon256x256.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\hard-drive-disk-icon 256x256.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\MegaSync.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\next-icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\search 64x64.png" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="UI\ChangeNumberItemsTransfer.xaml">

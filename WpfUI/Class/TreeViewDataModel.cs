@@ -10,7 +10,7 @@ namespace WpfUI.Class
 {
     public class TreeViewDataModel : INotifyPropertyChanged, IEnumerable
     {
-        public TreeViewDataModel(TreeViewDataModel Parent)
+        public TreeViewDataModel(TreeViewDataModel Parent = null)
         {
             if (Parent != null) this.Parent = Parent;
         }

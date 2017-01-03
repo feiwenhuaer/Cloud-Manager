@@ -228,7 +228,7 @@
             // PB_Next
             // 
             this.PB_Next.Dock = System.Windows.Forms.DockStyle.Right;
-            this.PB_Next.Image = global::FormUI.Properties.Resources.next_icon;
+            this.PB_Next.Image = SupDataDll.Properties.Resources.next_icon;
             this.PB_Next.Location = new System.Drawing.Point(1103, 0);
             this.PB_Next.Margin = new System.Windows.Forms.Padding(0);
             this.PB_Next.Name = "PB_Next";
@@ -241,7 +241,7 @@
             // PB_Search
             // 
             this.PB_Search.Dock = System.Windows.Forms.DockStyle.Right;
-            this.PB_Search.Image = global::FormUI.Properties.Resources.search_64x64;
+            this.PB_Search.Image = SupDataDll.Properties.Resources.search_64x64;
             this.PB_Search.Location = new System.Drawing.Point(1123, 0);
             this.PB_Search.Margin = new System.Windows.Forms.Padding(0);
             this.PB_Search.Name = "PB_Search";
@@ -254,7 +254,7 @@
             // PB_Back
             // 
             this.PB_Back.Dock = System.Windows.Forms.DockStyle.Left;
-            this.PB_Back.Image = global::FormUI.Properties.Resources.back_icon;
+            this.PB_Back.Image = SupDataDll.Properties.Resources.back_icon;
             this.PB_Back.Location = new System.Drawing.Point(35, 0);
             this.PB_Back.Margin = new System.Windows.Forms.Padding(0);
             this.PB_Back.Name = "PB_Back";

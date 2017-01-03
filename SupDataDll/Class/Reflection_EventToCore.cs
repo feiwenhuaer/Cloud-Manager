@@ -94,11 +94,11 @@ namespace SupDataDll
         /// Get List Cloud Account
         /// </summary>
         /// <returns></returns>
-        public ListAccountCloud _GetListAccountCloud()
+        public List<CloudEmail_Type> _GetListAccountCloud()
         {
             return EventGetListAccountCloud();
         }
-        public delegate ListAccountCloud GetListAccountCloud();
+        public delegate List<CloudEmail_Type> GetListAccountCloud();
         public event GetListAccountCloud EventGetListAccountCloud;
         /// <summary>
         /// Oauth for add cloud account

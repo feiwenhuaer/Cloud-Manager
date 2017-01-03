@@ -24,13 +24,13 @@ namespace WpfUI.Class
         public ContextMenuDataModel(string Name,CloudName Img_type)
         {
             this.Text = Name;
-            this.Img = Setting_UI.GetImage(TreeviewDataItem.list_bm[(int)Img_type]);
+            this.Img = Setting_UI.GetImage(ListBitmapImageResource.list_bm_cloud[(int)Img_type]);
             this.Type = Img_type;
         }
         public ContextMenuDataModel(CloudName Name_n_Img_type)
         {
             this.Text = Name_n_Img_type.ToString();
-            this.Img = Setting_UI.GetImage(TreeviewDataItem.list_bm[(int)Name_n_Img_type]);
+            this.Img = Setting_UI.GetImage(ListBitmapImageResource.list_bm_cloud[(int)Name_n_Img_type]);
             this.Type = Name_n_Img_type;
         }
 

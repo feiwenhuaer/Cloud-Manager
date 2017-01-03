@@ -99,12 +99,18 @@ namespace WpfUI.UI.Main
         private void TV_LoadDisk()
         {
             foreach (var drive in DriveInfo.GetDrives())
-                TreeObservableCollection.Add(new TreeViewDataModel(null) { DisplayData = new TreeviewDataItem(drive.RootDirectory.ToString().Replace("\\", null), CloudName.LocalDisk) });
+                TreeObservableCollection.Add(new TreeViewDataModel()
+                {
+                    DisplayData = new TreeviewDataItem(drive.RootDirectory.ToString().Replace("\\", null),
+                                                        CloudName.LocalDisk, 
+                                                        (DiskType)(int)drive.DriveType)
+                });
+            
         }
         private void TV_LoadCloud()
         {
-            foreach (CloudEmail_Type cloud in Setting_UI.reflection_eventtocore._GetListAccountCloud().account)
-                TreeObservableCollection.Add(new TreeViewDataModel(null) { DisplayData = new TreeviewDataItem(cloud.Email, cloud.Type) });
+            foreach (CloudEmail_Type cloud in Setting_UI.reflection_eventtocore._GetListAccountCloud())
+                TreeObservableCollection.Add(new TreeViewDataModel() { DisplayData = new TreeviewDataItem(cloud.Email, cloud.Type) });
         }
         TreeViewDataModel Get_TVDataMoldel(TreeViewItem item)
         {
@@ -390,7 +396,7 @@ namespace WpfUI.UI.Main
         private void MenuCloud_SubmenuOpened(object sender, RoutedEventArgs e)
         {
             CloudsRemove = new ObservableCollection<ContextMenuDataModel>();
-            foreach (CloudEmail_Type cloud in Setting_UI.reflection_eventtocore._GetListAccountCloud().account)
+            foreach (CloudEmail_Type cloud in Setting_UI.reflection_eventtocore._GetListAccountCloud())
             {
                 CloudsRemove.Add(new ContextMenuDataModel(cloud.Email, cloud.Type));
             }

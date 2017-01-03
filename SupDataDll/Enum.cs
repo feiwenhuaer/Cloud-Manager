@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -12,15 +13,6 @@ namespace SupDataDll
         Cloud = 4,
         UrlFolder = 8,
         UrlFile = 16
-    }
-    public enum CloudName
-    {
-        LocalDisk = 0,
-        Folder = 1,
-        Dropbox = 2,
-        GoogleDrive = 3,
-        Mega = 4,
-        MediaFire = 5
     }
     public enum Type_FileFolder
     {

@@ -89,7 +89,7 @@ namespace FormUI.UI.MainForm
                 nodes.SelectedImageIndex = nodes.ImageIndex;
                 TV_item.Nodes.Add(nodes);
             }
-            foreach (CloudEmail_Type cloud in Setting_UI.reflection_eventtocore._GetListAccountCloud().account)
+            foreach (CloudEmail_Type cloud in Setting_UI.reflection_eventtocore._GetListAccountCloud())
             {
                 TreeNode nodes = new TreeNode(cloud.Email);
                 nodes.ImageIndex = (int)cloud.Type;
@@ -577,7 +577,7 @@ namespace FormUI.UI.MainForm
         private void cloudToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
         {
             removeToolStripMenuItem.DropDownItems.Clear();
-            foreach (CloudEmail_Type cloud in Setting_UI.reflection_eventtocore._GetListAccountCloud().account)
+            foreach (CloudEmail_Type cloud in Setting_UI.reflection_eventtocore._GetListAccountCloud())
             {
                 ToolStripMenuItem item = new ToolStripMenuItem(cloud.Type.ToString()+":"+ cloud.Email);
                 item.Click += RemoveCloudItem_Click;
