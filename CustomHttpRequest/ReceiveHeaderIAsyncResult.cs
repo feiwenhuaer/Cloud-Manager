@@ -19,9 +19,7 @@ namespace CustomHttpRequest
                 return AsyncState_;
             }
         }
-
-
-
+        
         public WaitHandle AsyncWaitHandle
         {
             get
