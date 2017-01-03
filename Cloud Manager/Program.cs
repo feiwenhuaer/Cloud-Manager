@@ -57,7 +57,7 @@ namespace Cloud_Manager
                         AppSetting.uc_lv_ud_instance = null;
                         //reload dll ui
                         LoadDllUI.Load();//reload dll
-                        Reflection_UI.Load_Setting_UI();//Load Setting_UI and event
+                        //Reflection_UI.Load_Setting_UI();//Load Setting_UI and event
                         Reflection_UI.Load_UIMain();//create instance main and LV_ud
                         AppSetting.settings.SaveSettings();
                         GC.Collect();
