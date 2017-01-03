@@ -211,6 +211,7 @@ namespace WpfUI.UI.Main.Lv_item
                 if (HistoryPathID_index == -1) { data.IsEnabled = false; continue; }
                 switch (data.Key)
                 {
+                    case LanguageKey.TSMI_refresh: data.IsEnabled = true; break;
                     case LanguageKey.TSMI_open: if (selected_count != 1) data.IsEnabled = false; else data.IsEnabled = true; break;
                     case LanguageKey.TSMI_cut: if (selected_count == 0) data.IsEnabled = false; else data.IsEnabled = true; break;
                     case LanguageKey.TSMI_copy: if (selected_count == 0) data.IsEnabled = false; else data.IsEnabled = true; break;
