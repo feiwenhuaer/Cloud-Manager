@@ -66,6 +66,8 @@ namespace WpfUI.UI
             foreach(LV_renameData item in lv_data)
             {
                 item.To = StringResult(item.From, startnumber, formatnumber);
+                AnalyzePath ap = new AnalyzePath(item.To);
+                item.Newname = ap.NameLastItem;
                 startnumber++;
             }
         }
@@ -85,7 +87,10 @@ namespace WpfUI.UI
             {
                 try
                 {
-                    if (Setting_UI.reflection_eventtocore._RenameItem(ap.AddRawChildPath(item.From), item.To, item.ID)) item.Result = "Success";
+                    AnalyzePath ap = new AnalyzePath(item.From);
+                    if (ap.TypeCloud == CloudName.GoogleDrive ?
+                        Setting_UI.reflection_eventtocore._MoveItem(null, null, item.ID, null, null,item.Newname, ap.Email, CloudName.GoogleDrive):
+                        Setting_UI.reflection_eventtocore._MoveItem(item.From, item.To, item.ID, null, null, null, null)) item.Result = "Success";
                     else { item.Result = "Failed"; isfalse = true; }
                 }catch (Exception ex) { item.Result = ex.Message; isfalse = true; }
             }
@@ -123,6 +128,8 @@ namespace WpfUI.UI
         }
 
         public string ID { get; set; }
+
+        public string Newname { get; set; }
 
         private void NotifyPropertyChange(string name)
         {

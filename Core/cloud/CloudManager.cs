@@ -171,28 +171,52 @@ namespace Core.Cloud
         }
         #endregion
 
-        public bool RenameItem(string path,string newname, string id = null)
+        public bool MoveItem(string path_from, string path_to, string id, string parent_id_from, string parent_id_to, string newname, string Email, CloudName type = CloudName.Folder, bool Copy = false)
         {
-            if (string.IsNullOrEmpty(path) && id == null) throw new ArgumentNullException("path");
-            try
+            if(!string.IsNullOrEmpty(Email) && type == CloudName.GoogleDrive && !string.IsNullOrEmpty(id))//GoogleDrive
             {
-                AnalyzePath rp = new AnalyzePath(path);
-                string Real_path = rp.GetPath();
-                switch (rp.TypeCloud)
+                if (!string.IsNullOrEmpty(newname) && Copy == false)
+                    return GoogleDrive.ReNameItem(newname, id, Email);// Rename GoogleDrive
+                else if(!string.IsNullOrEmpty(parent_id_from) && !string.IsNullOrEmpty(parent_id_to))//Move/Copy GoogleDrive
                 {
-                    case CloudName.Dropbox:
-                        return Dropbox.Rename(path, newname);
-                    case CloudName.GoogleDrive:
-                        return GoogleDrive.ReNameItem(newname, id, rp.Email);
-                    case CloudName.LocalDisk:
-                        return LocalDisk.Rename(rp.Parent, rp.NameLastItem, newname);
-                    default:
-                        throw new UnknowCloudNameException("Error Unknow Cloud Type: " + rp.TypeCloud.ToString());
+                    GD_item json = JsonConvert.DeserializeObject<GD_item>(GoogleDrive.MoveItem(Email, id, parent_id_from, parent_id_to, Copy));
+                    foreach (GD_parent pr in json.parents)
+                    {
+                        if (pr.id == parent_id_to) return true;
+                    }
+                    return false;
                 }
             }
-            catch{ return false; }
+            else if (!string.IsNullOrEmpty(path_from) & !string.IsNullOrEmpty(path_to))
+            {
+                AnalyzePath ap_from = new AnalyzePath(path_from);
+                AnalyzePath ap_to = new AnalyzePath(path_to);
+                if (ap_from.TypeCloud != ap_to.TypeCloud | ap_from.TypeCloud == CloudName.LocalDisk | ap_to.TypeCloud == CloudName.LocalDisk) throw new Exception("Type Cloud not match or can't be LocalDisk.");
+                if (ap_from.Email != ap_to.Email) throw new Exception("Path not same account.");
+
+                switch (ap_from.TypeCloud)
+                {
+                    case CloudName.Dropbox: //Move/Rename Dropbox
+                        return Dropbox.Move(ap_from.GetPath(), ap_to.GetPath(), ap_from.Email);
+
+                    case CloudName.GoogleDrive: // Move GoogleDrive
+                        if (string.IsNullOrEmpty(id)) throw new Exception("ID is null");
+                        GD_item json = JsonConvert.DeserializeObject<GD_item>(GoogleDrive.MoveItem(ap_from.Email, id, parent_id_from, parent_id_to, Copy));
+                        foreach (GD_parent pr in json.parents)
+                        {
+                            if (pr.id == parent_id_to) return true;
+                        }
+                        return false;
+
+                    case CloudName.LocalDisk: //Move/Rename LocalDisk
+                        return LocalDisk.Move(ap_from.GetPath(), ap_to.GetPath());
+
+                    default: throw new UnknowCloudNameException("Error Unknow Cloud Type: " + ap_from.TypeCloud.ToString());
+                }
+            }
+            throw new Exception("Error, some info wrong.");
         }
-        
+
         public void Delete(object items_)
         {
             DeleteItems items = items_ as DeleteItems;

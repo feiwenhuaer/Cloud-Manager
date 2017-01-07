@@ -95,12 +95,12 @@ namespace Core.Cloud
             }
         }
 
-        public static bool Rename(string root,string oldname,string newname)
+        public static bool Move(string from,string to)
         {
-            FileInfo info = new FileInfo(root + "\\" + oldname);
-            if (info.Exists) { info.MoveTo(root + "\\" + newname); return true; }
-            DirectoryInfo dinfo = new DirectoryInfo(root + "\\" + oldname);
-            if (dinfo.Exists) { dinfo.MoveTo(root + "\\" + newname); return true; }
+            FileInfo info = new FileInfo(from);
+            if (info.Exists) { info.MoveTo(to); return true; }
+            DirectoryInfo dinfo = new DirectoryInfo(from);
+            if (dinfo.Exists) { dinfo.MoveTo(to); return true; }
             return false;         
         }
 

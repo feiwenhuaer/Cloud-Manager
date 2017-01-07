@@ -137,18 +137,26 @@ namespace SupDataDll
         public event Login EventLogin;
 
         /// <summary>
-        /// Rename item (if id != null then path will dismiss)
+        /// Move/Rename Disk/Dropbox : path_from,path_to |
+        /// Move GoogleDrive: { path_from,path_to,id} or { Email,id,type,parent_id_from,parent_id_to} |
+        /// Rename GoogleDrive: Email,id,type,newname
         /// </summary>
-        /// <param name="path"></param>
-        /// <param name="newname"></param>
+        /// <param name="path_from"></param>
+        /// <param name="path_to"></param>
         /// <param name="id"></param>
+        /// <param name="parent_id_from"></param>
+        /// <param name="parent_id_to"></param>
+        /// <param name="newname"></param>
+        /// <param name="Email"></param>
+        /// <param name="type"></param>
+        /// <param name="Copy"></param>
         /// <returns></returns>
-        public bool _RenameItem(string path, string newname, string id = null)
+        public bool _MoveItem(string path_from, string path_to, string id, string parent_id_from, string parent_id_to, string newname, string Email, CloudName type = CloudName.Folder, bool Copy = false)
         {
-            return EventRenameItem(path, newname, id);
+            return EventMoveItem(path_from,path_to,id,parent_id_from,parent_id_to,newname,Email,type,Copy);
         }
-        public delegate bool RenameItem(string path, string newname, string id);
-        public event RenameItem EventRenameItem;
+        public delegate bool RenameItem(string path_from, string path_to, string id, string parent_id_from, string parent_id_to, string newname, string Email, CloudName type = CloudName.Folder, bool Copy = false);
+        public event RenameItem EventMoveItem;
         /// <summary>
         /// Delete List items
         /// </summary>

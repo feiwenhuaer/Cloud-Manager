@@ -11,16 +11,15 @@ namespace Core.Cloud
 {
     internal static class GoogleDrive
     {
-        private static object sync_GDcache = new object();
-        private static List<GD_item> cache_gd = new List<GD_item>();
-        private static object sync_root = new object();
-        private static List<RootID> root = new List<RootID>();
-        private static OrderByEnum[] en = { OrderByEnum.folder, OrderByEnum.title, OrderByEnum.createdDate };
-        private static char[] listcannot = new char[] { '/', '\\', ':', '?', '*', '"', '<', '>', '|', '\'' };
-        private static string[] mimeTypeGoogleRemove = new string[] {mimeType.audio, mimeType.drawing, mimeType.file,mimeType.form,mimeType.fusiontable,
+        static object sync_GDcache = new object();
+        static List<GD_item> cache_gd = new List<GD_item>();
+        static object sync_root = new object();
+        static List<RootID> root = new List<RootID>();
+        static OrderByEnum[] en = { OrderByEnum.folder, OrderByEnum.title, OrderByEnum.createdDate };
+        static char[] listcannot = new char[] { '/', '\\', ':', '?', '*', '"', '<', '>', '|', '\'' };
+        static string[] mimeTypeGoogleRemove = new string[] {mimeType.audio, mimeType.drawing, mimeType.file,mimeType.form,mimeType.fusiontable,
             mimeType.map,mimeType.presentation,mimeType.script,mimeType.sites,mimeType.unknown,mimeType.video,mimeType.photo};
-        
-        private static DriveAPIHttprequestv2 GetAPIv2(string Email)
+        static DriveAPIHttprequestv2 GetAPIv2(string Email)
         {
             DriveAPIHttprequestv2 gdclient = new DriveAPIHttprequestv2(JsonConvert.DeserializeObject<TokenGoogleDrive>(AppSetting.settings.GetToken(Email, CloudName.GoogleDrive)));
             gdclient.Email = Email;
@@ -77,7 +76,7 @@ namespace Core.Cloud
             return list;
         }
 
-        private static object sync_createfolder = new object();
+        static object sync_createfolder = new object();
         public static string CreateFolder(string Raw_path,string parentid = null,string Email = null,string name = null)
         {
             AnalyzePath rp = new AnalyzePath(Raw_path);
@@ -174,7 +173,7 @@ namespace Core.Cloud
             return parent_ID;
         }
 
-        private static GD_Files_list Check_n_AddToCache(GD_Files_list list_,string Email,string parent_id = null,bool read_only =false)
+        static GD_Files_list Check_n_AddToCache(GD_Files_list list_,string Email,string parent_id = null,bool read_only =false)
         {
             //delete mimeType item not support
             for (int i = 0; i < list_.items.Count; i++)
@@ -334,7 +333,7 @@ namespace Core.Cloud
             return list_;
         }
 
-        private static string GetTitleByID(string id, string Email = "")
+        static string GetTitleByID(string id, string Email = "")
         {
             lock (sync_GDcache)
             {
@@ -346,7 +345,7 @@ namespace Core.Cloud
             return null;
         }
 
-        private static int GetIndexByID(string id, string Email = "")
+        static int GetIndexByID(string id, string Email = "")
         {
             int index = 0;
             lock (sync_GDcache)
@@ -360,7 +359,7 @@ namespace Core.Cloud
             return -1;
         }
 
-        private static void AddAndEditGDcache(GD_item item_)
+        static void AddAndEditGDcache(GD_item item_)
         {
             if (string.IsNullOrEmpty(item_.Email)) throw new ArgumentNullException(item_.Email);
             int index = 0;
@@ -392,8 +391,9 @@ namespace Core.Cloud
             else return false;
         }
 
-        public static string MoveItem(DriveAPIHttprequestv2 gdclient, string iditem, string idoldparent, string idnewparent, bool copy = false)
+        public static string MoveItem(string Email, string iditem, string idoldparent, string idnewparent, bool copy = false)
         {
+            DriveAPIHttprequestv2 gdclient = GetAPIv2(Email);
             GD_item item_metadata = JsonConvert.DeserializeObject<GD_item>(gdclient.EditMetaData(iditem));
             if (!copy) foreach (GD_parent parent in item_metadata.parents)
                 {
@@ -412,7 +412,7 @@ namespace Core.Cloud
             return gdclient.EditMetaData(JsonConvert.SerializeObject(item_metadata));
         }
 
-        private static string GetRootID(string email)
+        static string GetRootID(string email)
         {
             lock (sync_root)
             {
@@ -424,7 +424,7 @@ namespace Core.Cloud
             return null;
         }
 
-        private static void AddRoot(string email, string id)
+        static void AddRoot(string email, string id)
         {
             lock (sync_root)
             {

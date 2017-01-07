@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SupDataDll;
+using System;
 using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
@@ -71,7 +72,11 @@ namespace FormUI.UI
         }
         void Rename()
         {
-            if (Setting_UI.reflection_eventtocore._RenameItem(raw_path, TB_newname.Text, id))
+            AnalyzePath ap = new AnalyzePath(raw_path);
+            if (ap.TypeCloud == CloudName.GoogleDrive ?
+                        Setting_UI.reflection_eventtocore._MoveItem(null, null, id, null, null, TB_newname.Text, ap.Email, CloudName.GoogleDrive):
+                        Setting_UI.reflection_eventtocore._MoveItem(ap.AddRawChildPath(oldname), ap.AddRawChildPath(TB_newname.Text), id, null, null, null, null)                        
+                )
             {
                 Invoke(new Action(() =>
                 {

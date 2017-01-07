@@ -23,7 +23,7 @@ namespace Core.StaticClass
             ,new object[] { Type_reflection_eventtocore, "EventGetSetting", AppSetting.settings, "GetSettingsAsString", instance_reflection_eventtocore }
 
             ,new object[] { Type_reflection_eventtocore, "EventGetTextLanguage", AppSetting.lang, "GetText", instance_reflection_eventtocore }
-            ,new object[] { Type_reflection_eventtocore, "EventRenameItem", AppSetting.ManageCloud, "RenameItem", instance_reflection_eventtocore }
+            ,new object[] { Type_reflection_eventtocore, "EventMoveItem", AppSetting.ManageCloud, "MoveItem", instance_reflection_eventtocore }
             ,new object[] { Type_reflection_eventtocore, "EventDeleteAccountCloud", AppSetting.settings, "RemoveCloud", instance_reflection_eventtocore }
             ,new object[] { Type_reflection_eventtocore ,"EventListIteamRequest",AppSetting.ManageCloud, "GetItemsList", instance_reflection_eventtocore }
             ,new object[] { Type_reflection_eventtocore, "EventLogin", AppSetting.login, "Login_EventLoginCallBack", instance_reflection_eventtocore}

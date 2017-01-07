@@ -318,6 +318,15 @@ namespace SupDataDll
         {
             return path_raw + (IsCloud(path_raw) ? "/" : "\\") + name;
         }
+
+        public AnalyzePath GetParent()
+        {
+            if (string.IsNullOrEmpty(Parent)) return null;
+            else
+            {
+                return new AnalyzePath(Parent);
+            }
+        }
         #endregion
     }
 }

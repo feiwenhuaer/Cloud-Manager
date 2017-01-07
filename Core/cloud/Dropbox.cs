@@ -113,12 +113,11 @@ namespace Core.Cloud
             else return true;
         }
 
-        public static bool Rename(string path_raw,string newname)
+        public static bool Move(string PathFrom,string PathTo,string Email)
         {
-            AnalyzePath ap = new AnalyzePath(path_raw);
-            DropboxRequestAPIv2 client = GetAPIv2(ap.Email);
-            dynamic json = JsonConvert.DeserializeObject(client.move(ap.GetPath(), ap.Parent +"/" + newname));
-            return (ap.Parent + "/" + newname) == (string)(json.path_display);
+            DropboxRequestAPIv2 client = GetAPIv2(Email);
+            dynamic json = JsonConvert.DeserializeObject(client.move(PathFrom, PathTo));
+            return PathTo == (string)(json.path_display);
         }
 
         private static object sync_CreateFolder = new object();
