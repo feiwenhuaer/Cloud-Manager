@@ -15,7 +15,7 @@ namespace Cloud.GoogleDrive
         public string Email = "";
         public string PassWord;
         bool acknowledgeAbuse = true;
-        TokenGoogleDrive token = new TokenGoogleDrive();
+        TokenGoogleDrive token;
         GoogleAPIOauth2 oauth;
         private static object SyncRefreshToken = new object();
         public HttpRequest_ request;
@@ -37,8 +37,7 @@ namespace Cloud.GoogleDrive
         {
             if ((string.IsNullOrEmpty(access_token) | string.IsNullOrEmpty(refresh_token)) == true) throw new Exception("Value input can't be null.");
             oauth = new GoogleAPIOauth2(refresh_token);
-            this.token.access_token = access_token;
-            this.token.refresh_token = refresh_token;
+            this.token = new TokenGoogleDrive() { access_token = access_token, refresh_token = refresh_token };
         }
 
         private object Request(string url, TypeRequest typerequest, TypeReturn typereturn = TypeReturn.string_, byte[] bytedata = null, string[] moreheader = null)
@@ -168,8 +167,7 @@ namespace Cloud.GoogleDrive
             return (string)Request(url, TypeRequest.GET);
         }
 
-        public Stream Files_get(string fileId, long PosStart = 0, long endpos = 0)//,string alt = "media",bool acknowledgeAbuse = true,
-                                                                                  //ProjectionEnum projection = ProjectionEnum.BASIC,bool updateViewedDate = false)
+        public Stream Files_get(string fileId, long PosStart = 0, long endpos = 0)
         {
             string url = string.Format("https://www.googleapis.com/drive/v2/files/{0}?alt=media", fileId);
             string[] moreheader = { "Range: bytes=" + PosStart.ToString() + "-" + endpos.ToString() };
