@@ -63,18 +63,12 @@ namespace Core.Transfer
             Console.WriteLine("Load group:" + fromfolder);
             this.group.col = new List<string> { fromfolder.Path_Raw, savefolder.Path_Raw, this.group.status.ToString(), "0/0", "", "", "" };
             AppSetting.uc_lv_ud_instance.AddNewGroup(group);
+            string path = fromfolder.PathIsUrl ? fromfolder.TypeCloud.ToString() + ":" + AppSetting.settings.GetDefaultCloud(fromfolder.TypeCloud) + "?id=" + fromfolder.ID : fromfolder.Path_Raw;
+
             foreach (AddNewTransferItem item in items)
             {
-                if (item.type == Type_FileFolder.File)
-                    group.items.Add(LoadFile(fromfolder.PathIsUrl ? fromfolder.ID : fromfolder.Path_Raw, item.name, item.size, item.id));
-                else
-                {
-                    group.items.AddRange(
-                        ListAllItemInFolder(
-                            fromfolder.PathIsUrl ? fromfolder.ID + "/" + item.name : fromfolder.Path_Raw + (fromfolder.PathIsCloud ? "/" : "\\") + item.name,
-                            item.id
-                            ));
-                }
+                if (item.type == Type_FileFolder.File) group.items.Add(LoadFile(path,item.name,item.size,item.id));
+                else group.items.AddRange(ListAllItemInFolder(path + (fromfolder.PathIsCloud ? "/" : "\\") + item.name,item.id));
             }
             group.status = StatusTransfer.Waiting;
             items.Clear();
@@ -107,7 +101,8 @@ namespace Core.Transfer
             }
             return ud_items;
         }
-        //Path_Parent : id/folder/folder or GD:a@gmail.com/folder/folder
+
+        //Path_Parent : GD:default@gmail.com?id=id/folder/folder or GD:a@gmail.com/folder/folder
         TransferItem LoadFile(string Path_Parent, string FileName, long size, string FileId)//Path_raw path parent folder of file
         {
             TransferItem ud_item = new TransferItem();
@@ -121,7 +116,7 @@ namespace Core.Transfer
             ud_item.SizeString = UnitConventer.ConvertSize(size, 2, UnitConventer.unit_size);
             ud_item.status = StatusTransfer.Waiting;
             //To
-            ud_item.To.path = AnalyzePath.GetPathTo(fromfolder.PathIsUrl ? ud_item.From.ap.Path_Raw : (new AnalyzePath(ud_item.From.ap.Path_Raw)).GetPath(), fromfolder, savefolder);
+            ud_item.To.path = AnalyzePath.GetPathTo(fromfolder.PathIsUrl ? ud_item.From.ap.Path_Raw : ud_item.From.ap.GetPath(), fromfolder, savefolder);
             ud_item.To.ap = new AnalyzePath(ud_item.To.path);
             ud_item.col = new List<string> { ud_item.From.ap.Path_Raw, ud_item.To.ap.Path_Raw, ud_item.status.ToString(), "", "", "", "" };
             return ud_item;

@@ -10,7 +10,7 @@ namespace SupDataDll
     public class AnalyzePath
     {
         #region Field
-        public string Email { get { return email; } }
+        public string Email { get { if (string.IsNullOrEmpty(email)) throw new ArgumentNullException("Email"); else return email; } }
         private string email = "";
 
         public string Path_Raw { get { return path_raw; } }
@@ -20,7 +20,7 @@ namespace SupDataDll
         public TypePath TypePath { get { return typepath; } }
         private TypePath typepath = TypePath.Cloud;
 
-        public string Query { get { return q; } }
+        public string Query { get { if (string.IsNullOrEmpty(q)) throw new ArgumentNullException("Query"); else return q; } }
         private string q = "";
 
         public CloudName TypeCloud { get { return type; } }
@@ -31,13 +31,13 @@ namespace SupDataDll
 
         public bool PathIsUrl { get { return IsUrl(path_raw); } }
 
-        public string Parent { get { return path_parent; } }
+        public string Parent { get { if (string.IsNullOrEmpty(path_parent)) throw new ArgumentNullException("Parent"); else return path_parent; } }
         private string path_parent = "";
 
-        public string NameLastItem { get { return namelastitem; } }
+        public string NameLastItem { get { if (string.IsNullOrEmpty(namelastitem)) throw new ArgumentNullException("NameLastItem"); else return namelastitem; } }
         private string namelastitem = "";
 
-        public string ID { get { return id; } }
+        public string ID { get { if (string.IsNullOrEmpty(id)) throw new ArgumentNullException("ID"); else return id; } }
         private string id = "";
 
         public bool IsFolder { get { return isFolder; } set { isFolder = value; } }
@@ -46,17 +46,17 @@ namespace SupDataDll
 
         #region const
         private const string Rg_cloud = "^\\w+:(\\w|\\.|@)+",//GoogleDrive:tqk2811@gmail.com
-        Rg_cloudname = "^\\w+",//GoogleDrive[:
+        Rg_CloudName = "^\\w+",//GoogleDrive[:
         Rg_email = "(?<=:)(\\w|\\.)+@(\\w|\\.)+",// :]tqk2.sa_dsa@abc.com 
-        Rg_pathcloud = "\\/.+$", // GoogleDrive:tqk2811@gmail.com]/abc/def/ad
-        Rg_lastitem = "((?!\\/)\\S)+$",//ad
-        Rg_url_GD = "^https:\\/\\/drive\\.google\\.com",
-        Rg_url_idfolder = "(?<=drive\\/folders\\/)[A-Z0-9]\\w+",
-        Rg_url_idfolderopen = "(?<=\\?id\\=)[A-Z0-9]\\w+",
-        Rg_url_idfile = "(?<=file\\/d\\/)[A-Z0-9]\\w+",
-        Rg_cloud_id = "(?<=id=)\\w+",
+        Rg_PathCloud = "\\/.+$", // GoogleDrive:tqk2811@gmail.com]/abc/def/ad
+        Rg_LastItem = "((?!\\/)\\S)+$",//ad
+        Rg_url_GD = "^https:\\/\\/drive\\.google\\.com",//https://drive.google.com......
+        Rg_url_idFolder = "(?<=\\/folders\\/)[A-Za-z0-9-_]+",//drive/folders/id_folder or drive.google.com/drive/u/0/folders/id
+        Rg_url_idFolderOpen = "(?<=\\?id\\=)[A-Za-z0-9-_]+",
+        Rg_url_idFile = "(?<=file\\/d\\/)[A-Za-z0-9-_]+",
+        Rg_cloud_id = "(?<=id=)\\S+",
         Rg_cloud_query = "(?<=q=).+",
-        Rg_Disk_lastitem = "(?<=\\\\)(.(?!\\\\))+$";
+        Rg_Disk_LastItem = "(?<=\\\\)(.(?!\\\\))+$";
 
         #endregion
 
@@ -73,7 +73,7 @@ namespace SupDataDll
         /// <summary>
         /// If rootfrom is url -> pathfrom format: IDparent/filename
         /// </summary>
-        /// <param name="pathfrom">/abc/def.txt or \abc\def.txt or IDparent/folder.../filename (rootfrom is url)</param>
+        /// <param name="pathfrom">GD:email?id=xab/abc/def.txt or \abc\def.txt or IDparent/folder.../filename (rootfrom is url)</param>
         /// <param name="rootfrom"></param>
         /// <param name="rootto"></param>
         /// <returns></returns>
@@ -82,21 +82,18 @@ namespace SupDataDll
             string temp = rootto.PathIsCloud ? "/" : "\\";
             string de_temp = rootto.PathIsCloud ? "\\" : "/";
             // if from is url
-            if (IsUrl(rootfrom.Path_Raw) & rootfrom.TypePath == TypePath.UrlFolder)// id/folder.../filename.txt, Url, E:\testfolder
+            if (IsUrl(rootfrom.Path_Raw) && (rootfrom.TypePath == TypePath.UrlFolder | rootfrom.TypePath == TypePath.UrlFile))
             {
-                string[] pathfrom_arr = pathfrom.Split('/');
-                if (pathfrom_arr[0] != rootfrom.ID) throw new Exception("id:" + pathfrom_arr[0] +" not indexof " + rootfrom.Path_Raw);// check id
-                string temppath = pathfrom.Remove(0, pathfrom_arr[0].Length + 1);// remove id
-                return RemoveDup((rootto.path_raw + temp + temppath).Replace(de_temp, temp), temp); // ->E:\testfolder\folder...\filename.txt
+                Regex rg = new Regex("(?<=\\?id\\=).+$");
+                Match m = rg.Match(pathfrom);
+                if(m.Success)
+                {
+                    string[] pathfrom_arr = m.Value.Split('/');
+                    if (pathfrom_arr[0] != rootfrom.ID) throw new Exception("id:" + pathfrom_arr[0] + " not indexof " + rootfrom.Path_Raw);// check id
+                    string temppath = m.Value.Remove(0, pathfrom_arr[0].Length + 1);// remove id
+                    return RemoveDup((rootto.path_raw + temp + temppath).Replace(de_temp, temp), temp); // ->E:\testfolder\folder...\filename.txt
+                }
             }
-
-            if (IsUrl(rootfrom.Path_Raw) & rootfrom.TypePath == TypePath.UrlFile)// id/folder.../filename.txt, Url, E:\testfolder
-            {
-                string[] pathfrom_arr = pathfrom.Split('/');
-                if (pathfrom_arr[0] != rootfrom.ID) throw new Exception("id:" + pathfrom_arr[0] + " not indexof " + rootfrom.Path_Raw);// check id
-                if (pathfrom_arr.Length != 2) throw new Exception("pathfrom format error: " + pathfrom);
-                return RemoveDup((rootto.path_raw + temp + pathfrom_arr[1]).Replace(de_temp,temp), temp);
-            }   
             
             //if from root folder (cloud)
             if (string.IsNullOrEmpty(rootfrom.GetPath()))// Ex: /abc.txt ,  , E:\newfolder
@@ -178,7 +175,7 @@ namespace SupDataDll
         private void GetDiskPath()
         {
             if (path_raw.Length == 2) path_raw += "\\";
-            Regex rg = new Regex(Rg_Disk_lastitem);
+            Regex rg = new Regex(Rg_Disk_LastItem);
             Match match = rg.Match(path_raw);
             if (match.Success)
             {
@@ -197,7 +194,7 @@ namespace SupDataDll
             match = rg.Match(path_raw);
             if (match.Success)
             {
-                rg = new Regex(Rg_cloudname);
+                rg = new Regex(Rg_CloudName);
                 match = rg.Match(path_raw);
                 if (match.Success) type = (CloudName)Enum.Parse(typeof(CloudName), match.Value); //CloudName
 
@@ -205,12 +202,12 @@ namespace SupDataDll
                 match = rg.Match(path_raw);
                 if (match.Success) email = match.Value;//email
 
-                rg = new Regex(Rg_pathcloud);
+                rg = new Regex(Rg_PathCloud);
                 match = rg.Match(path_raw);
                 if (match.Success)
                 {
                     pathcloud = match.Value;//path cloud
-                    rg = new Regex(Rg_lastitem);
+                    rg = new Regex(Rg_LastItem);
                     match = rg.Match(path_raw);
                     if (match.Success) {
                         namelastitem = match.Value;//name last item
@@ -254,7 +251,7 @@ namespace SupDataDll
             {
                 type = CloudName.GoogleDrive;
 
-                rg = new Regex(Rg_url_idfolder);
+                rg = new Regex(Rg_url_idFolder);
                 match = rg.Match(path_raw);
                 if (match.Success)
                 {
@@ -264,7 +261,7 @@ namespace SupDataDll
                     return;
                 }
 
-                rg = new Regex(Rg_url_idfolderopen);
+                rg = new Regex(Rg_url_idFolderOpen);
                 match = rg.Match(path_raw);
                 if (match.Success)
                 {
@@ -274,7 +271,7 @@ namespace SupDataDll
                     return;
                 }
 
-                rg = new Regex(Rg_url_idfile);
+                rg = new Regex(Rg_url_idFile);
                 match = rg.Match(path_raw);
                 if (match.Success)
                 {
@@ -286,6 +283,7 @@ namespace SupDataDll
                 }
             }
             #endregion
+            
             throw new Exception("Path error: " + path_raw);
         }
 

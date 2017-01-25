@@ -49,6 +49,8 @@ namespace FormUI.UI.MainForm
             index_collumn_Id = LV_item.Columns["LV_CH_Id"].Index;
             index_cullumn_size = LV_item.Columns["LV_CH_Size"].Index;
             index_cullumn_mimeType = LV_item.Columns["LV_CH_mimeType"].Index;
+
+            TB_Path.Text = "https://drive.google.com/drive/u/0/folders/0B-yiWN2AF_cIeHZaTWVsU2duSVU";
         }
 
         public void AddListViewItem(List<ItemLV> list)

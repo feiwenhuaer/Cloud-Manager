@@ -32,8 +32,8 @@ namespace Core.Cloud
                             return GoogleDrive.GetListFileFolder(rp.GetPath(), rp.Email, id);
                         case TypePath.UrlFolder:
                             string email = AppSetting.settings.GetDefaultCloud(CloudName.GoogleDrive);
-                            dynamic j = JsonConvert.DeserializeObject(GoogleDrive.GetMetadataItem(email, id));
-                            ListItemFileFolder fd = GoogleDrive.GetListFileFolder(null, email, id, false, true);
+                            dynamic j = JsonConvert.DeserializeObject(GoogleDrive.GetMetadataItem(email, rp.ID));
+                            ListItemFileFolder fd = GoogleDrive.GetListFileFolder(null, email, rp.ID, false, true);
                             fd.NameFolder = j.title;
                             return fd;
                         case TypePath.CloudQuery:
