@@ -12,19 +12,21 @@ namespace Core.Transfer
 {
     public class GroupsTransferManager
     {
-        public Thread MainThread;
-        public StatusUpDownApp status = StatusUpDownApp.Pause; //UploadDownloadItems
         public List<ItemsTransferManager> groups = new List<ItemsTransferManager>();
-        public List<Thread> LoadGroupThreads = new List<Thread>();
-        public bool AuToStartGroupMode = true;
-        public bool Loop = true;
-        long timestamp;
+        
+        #region Start up app
+        public Thread MainThread;
+        //Start after login
         public void Start()
         {
             MainThread = new Thread(LoadMainThread);
             MainThread.Start();
         }
 
+        long timestamp;
+        public bool Loop = true;
+        public bool AuToStartGroupMode = true;
+        public StatusUpDownApp status = StatusUpDownApp.Pause; //UploadDownloadItems
         private void LoadMainThread()
         {
             int count_group_running = 0;
@@ -68,7 +70,7 @@ namespace Core.Transfer
                                 count_group_running++;
                             }
 
-                            if (groups[i].group.status == StatusTransfer.Removing & groups[i].ThreadsItemLoadWork.Count == 0)
+                            if (groups[i].group.status == StatusTransfer.Remove & groups[i].ThreadsItemLoadWork.Count == 0)
                             {
                                 AppSetting.uc_lv_ud_instance.RemoveGroup(this.groups[i].group);
                                 this.groups.RemoveAt(i);
@@ -130,8 +132,10 @@ namespace Core.Transfer
                 }
             }
         }
+        #endregion
 
-        //from Reflection_UI
+        #region Add new items from UI
+        public List<Thread> LoadGroupThreads = new List<Thread>();
         public void AddItems(List<AddNewTransferItem> items, string fromfolder_raw, string savefolder_raw, bool AreCut)
         {
             ItemsTransferManager gr = new ItemsTransferManager(items, fromfolder_raw, savefolder_raw, AreCut);
@@ -140,8 +144,9 @@ namespace Core.Transfer
             thr.Start();
             LoadGroupThreads.Add(thr);
         }
+        #endregion
 
-        //add data to TLV when create new ui
+        #region load/reload UI -> add groups to treelistview
         public void LoadGroupToListView()
         {
             foreach (ItemsTransferManager gr in groups)
@@ -149,6 +154,7 @@ namespace Core.Transfer
                 AppSetting.uc_lv_ud_instance.AddNewGroup(gr.group);
             }
         }
+        #endregion
 
         #region Kill thread
         void KillThreads(List<Thread> thrs)
@@ -177,6 +183,7 @@ namespace Core.Transfer
         #endregion
 
         #region Save/Read Data When Close/Open program
+        string temp_jsonSaveData = "";
         public void ReadData()
         {
             if (ReadWriteData.Exists(ReadWriteData.File_DataUploadDownload))
@@ -193,8 +200,6 @@ namespace Core.Transfer
                 }
             }
         }
-
-        string temp_jsonSaveData = "";
         public void SaveData()
         {
             List<JsonDataSaveGroup> json_groups = new List<JsonDataSaveGroup>();

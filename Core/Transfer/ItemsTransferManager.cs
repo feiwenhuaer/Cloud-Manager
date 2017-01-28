@@ -17,13 +17,11 @@ namespace Core.Transfer
         public List<Thread> ThreadsItemLoadWork = new List<Thread>();
         public TransferGroup group = new TransferGroup();
         List<TransferBytes> ItemsTransfer = new List<TransferBytes>();
-
-        //loading
+        
+        #region Declare
         List<AddNewTransferItem> items;
         public AnalyzePath fromfolder;
         public AnalyzePath savefolder;
-        
-        #region Declare
         //load from save data
         internal ItemsTransferManager(JsonDataSaveGroup group_json)
         {
@@ -57,7 +55,7 @@ namespace Core.Transfer
         }
         #endregion
 
-        #region Load List File
+        #region Load List File Info
         public void LoadListItems()
         {
             Console.WriteLine("Load group:" + fromfolder);
@@ -71,7 +69,7 @@ namespace Core.Transfer
                 else group.items.AddRange(ListAllItemInFolder(path + (fromfolder.PathIsCloud ? "/" : "\\") + item.name,item.id));
             }
             group.status = StatusTransfer.Waiting;
-            items.Clear();
+            items.Clear();// clear Declare memory
         }
         List<TransferItem> ListAllItemInFolder(string path_rawItem, string id = "")
         {
@@ -139,8 +137,7 @@ namespace Core.Transfer
             {
                 case StatusTransfer.Loading: return;
                 case StatusTransfer.Started: group.status = StatusTransfer.Running; group.Timestamp = CurrentMillis.Millis; break;
-                case StatusTransfer.Remove: group.status = StatusTransfer.Removing; return;
-                case StatusTransfer.Removing: return;
+                case StatusTransfer.Remove: return;
             }
 
             if (group.status != StatusTransfer.Running)
@@ -345,7 +342,7 @@ namespace Core.Transfer
                 {
                     case CloudName.LocalDisk:
                         #region LocalDisk
-                        ItemsTransfer.Add(new TransferBytes(group.items[x], null));
+                        ItemsTransfer.Add(new TransferBytes(group.items[x], group));
                         return;
                     #endregion
 
@@ -365,7 +362,7 @@ namespace Core.Transfer
                             group.items[x].UploadID = json.session_id;
                             group.items[x].Transfer += group.items[x].byteread;
                         }
-                        ItemsTransfer.Add(new TransferBytes(group.items[x], client));
+                        ItemsTransfer.Add(new TransferBytes(group.items[x], group, client));
                         return;
                     #endregion
 
@@ -389,17 +386,12 @@ namespace Core.Transfer
                             string jsondata = "{\"title\": \"" + group.items[x].From.ap.NameLastItem + "\", \"mimeType\": \"" + mimeType + "\", \"parents\": [{\"id\": \"" + parentid + "\"}]}";
                             group.items[x].UploadID = gdclient.Files_insert_resumable_getUploadID(jsondata, mimeType, group.items[x].From.Size);
                         }
-                        ItemsTransfer.Add(new TransferBytes(group.items[x], gdclient));
+                        ItemsTransfer.Add(new TransferBytes(group.items[x], group, gdclient));
                         return;
                         #endregion
                 }
             }
             catch (Exception ex) { group.items[x].ErrorMsg = ex.Message; group.items[x].status = StatusTransfer.Error; return; }
-        }
-
-        bool IsStillDownloading(int x)
-        {
-            return ((group.status == StatusTransfer.Running || group.status == StatusTransfer.Waiting || group.status == StatusTransfer.Started) && group.items[x].status == StatusTransfer.Running);
         }
     }
 }

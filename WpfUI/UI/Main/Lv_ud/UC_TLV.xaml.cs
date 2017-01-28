@@ -155,7 +155,7 @@ namespace WpfUI.UI.Main.Lv_ud
                 {
                     it.status = val;
                     TransferGroup pr = GetParentItem(it);
-                    if (pr != null && (pr.status != StatusTransfer.Running | pr.status != StatusTransfer.Loading | pr.status != StatusTransfer.Removing)) pr.status = val;
+                    if (pr != null && (pr.status != StatusTransfer.Running | pr.status != StatusTransfer.Loading | pr.status != StatusTransfer.Remove)) pr.status = val;
                 }
                 else
                     //set Stop child
@@ -173,7 +173,7 @@ namespace WpfUI.UI.Main.Lv_ud
                 else
                    if (val == StatusTransfer.Stop && (gr.status != StatusTransfer.Done | gr.status != StatusTransfer.Loading | gr.status != StatusTransfer.Stop)) gr.status = val;
                 else
-                   if (val == StatusTransfer.Waiting && (gr.status != StatusTransfer.Done | gr.status != StatusTransfer.Removing)) gr.status = val;
+                   if (val == StatusTransfer.Waiting && (gr.status != StatusTransfer.Done | gr.status != StatusTransfer.Remove)) gr.status = val;
                 else
                    if (val == StatusTransfer.Remove) gr.status = val;
             }

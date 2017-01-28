@@ -46,7 +46,7 @@ namespace SupDataDll
         Running,//transfer
         Done,//complete
         Error,//error transfer
-        Removing,
+        //Removing,
 
         //get set
         Stop//stop

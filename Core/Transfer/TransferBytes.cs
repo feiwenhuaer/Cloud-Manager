@@ -10,12 +10,14 @@ namespace Core.Transfer
 {
     public class TransferBytes
     {
+        TransferGroup group;
         public TransferItem item { get; private set; }
         object clientTo;
-        public TransferBytes(TransferItem item, object clientTo)
+        public TransferBytes(TransferItem item,TransferGroup group, object clientTo = null)
         {
             this.item = item;
-            this.clientTo = clientTo;
+            this.group = group;
+            if (clientTo != null) this.clientTo = clientTo;
             //Make Stream To
             if (item.ChunkUploadSize > 0) MakeNextChunkUploadInStreamTo(true);
             else this.item.To.stream = AppSetting.ManageCloud.GetFileStream(item.To.ap.Path_Raw, null, false, item.Transfer);//download to disk
@@ -36,24 +38,31 @@ namespace Core.Transfer
                 #endregion
 
                 #region transfer done/force stop.
-                if (item.Transfer == item.From.Size | item.status != StatusTransfer.Running)//transfer done/force stop.
+                if (item.Transfer == item.From.Size | item.status != StatusTransfer.Running | group.status != StatusTransfer.Running)//transfer done/force stop.
                 {
-                    item.TransferRequest = item.Transfer;
-                    try { item.From.stream.Close(); } catch { }
-                    try { item.To.stream.Close(); } catch { }
-                    if (item.status == StatusTransfer.Running)
+                    if (item.ChunkUploadSize < 0 | item.Transfer == item.From.Size) item.TransferRequest = item.Transfer;//save last pos if download or done
+                    try { item.From.stream.Close(); } catch { }//close stream if can
+                    try { item.To.stream.Close(); } catch { }//close stream if can
+
+                    switch (group.status)
                     {
+                        case StatusTransfer.Waiting: item.status = StatusTransfer.Waiting;break;
+                        case StatusTransfer.Running: break;
+                        default: item.status = StatusTransfer.Stop; break;
+                    }
+                    if(item.status == StatusTransfer.Remove)
+                    {
+                        group.items.Remove(item);
+                    }else if (item.status == StatusTransfer.Running & group.status == StatusTransfer.Running)
+                    {
+                        item.status = StatusTransfer.Done;
                         if (item.To.ap.TypeCloud == CloudName.Dropbox)
                         {
-                            if (!SaveUploadDropbox())
-                            {
-                                item.status = StatusTransfer.Error;
-                                return;
-                            }
+                            if (!SaveUploadDropbox()) item.status = StatusTransfer.Error;
                         }
-                        item.status = StatusTransfer.Done;
                     }
                     else item.status = StatusTransfer.Stop;
+                    Dispose();
                     return;
                 }
                 #endregion
@@ -123,6 +132,14 @@ namespace Core.Transfer
                 item.ErrorMsg = "File size was upload not match.";
                 return false;
             }
+        }
+
+        void Dispose()
+        {
+            group = null;
+            item = null;
+            clientTo = null;
+            GC.SuppressFinalize(this);
         }
     }
 }
