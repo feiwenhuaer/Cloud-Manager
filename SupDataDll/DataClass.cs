@@ -105,8 +105,6 @@ namespace SupDataDll
         public int ChunkUploadSize = -1;// = -1 is download, >0 is chunk size upload
         public long TransferRequest = 0;//Save pos chunk upload success
         [JsonIgnore]
-        public Thread item_work;
-        [JsonIgnore]
         public int byteread = 0;
         [JsonIgnore]
         public byte[] buffer;//buffer

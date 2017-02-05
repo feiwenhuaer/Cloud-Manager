@@ -10,13 +10,14 @@ namespace Core.Transfer
 {
     public class TransferBytes
     {
-        TransferGroup group;
+        ItemsTransferManager GroupManager;
         public TransferItem item { get; private set; }
         object clientTo;
-        public TransferBytes(TransferItem item,TransferGroup group, object clientTo = null)
+        public TransferBytes(TransferItem item, ItemsTransferManager GroupManager, object clientTo = null)
         {
+            if (item.From.Size == 0) { item.ErrorMsg = "File size zero."; Dispose(); }
             this.item = item;
-            this.group = group;
+            this.GroupManager = GroupManager;
             if (clientTo != null) this.clientTo = clientTo;
             //Make Stream To
             if (item.ChunkUploadSize > 0) MakeNextChunkUploadInStreamTo(true);
@@ -38,13 +39,13 @@ namespace Core.Transfer
                 #endregion
 
                 #region transfer done/force stop.
-                if (item.Transfer == item.From.Size | item.status != StatusTransfer.Running | group.status != StatusTransfer.Running)//transfer done/force stop.
+                if (item.Transfer == item.From.Size | item.status != StatusTransfer.Running | GroupManager.GroupData.status != StatusTransfer.Running)//transfer done/force stop.
                 {
                     if (item.ChunkUploadSize < 0 | item.Transfer == item.From.Size) item.TransferRequest = item.Transfer;//save last pos if download or done
                     try { item.From.stream.Close(); } catch { }//close stream if can
                     try { item.To.stream.Close(); } catch { }//close stream if can
 
-                    switch (group.status)
+                    switch (GroupManager.GroupData.status)
                     {
                         case StatusTransfer.Waiting: item.status = StatusTransfer.Waiting;break;
                         case StatusTransfer.Running: break;
@@ -52,8 +53,9 @@ namespace Core.Transfer
                     }
                     if(item.status == StatusTransfer.Remove)
                     {
-                        group.items.Remove(item);
-                    }else if (item.status == StatusTransfer.Running & group.status == StatusTransfer.Running)
+                        GroupManager.GroupData.items.Remove(item);
+                    }
+                    else if (item.status == StatusTransfer.Running & GroupManager.GroupData.status == StatusTransfer.Running)
                     {
                         item.status = StatusTransfer.Done;
                         if (item.To.ap.TypeCloud == CloudName.Dropbox)
@@ -88,6 +90,7 @@ namespace Core.Transfer
                 if (AppSetting.TransferManager.status == StatusUpDownApp.StopForClosingApp | AppSetting.TransferManager.status == StatusUpDownApp.SavingData) return;
                 item.ErrorMsg = ex.Message;
                 item.status = StatusTransfer.Error;
+                Dispose();
             }
         }
 
@@ -136,10 +139,10 @@ namespace Core.Transfer
 
         void Dispose()
         {
-            group = null;
+            GroupManager.ItemsTransferWork.Remove(this);
+            GroupManager = null;
             item = null;
             clientTo = null;
-            GC.SuppressFinalize(this);
         }
     }
 }

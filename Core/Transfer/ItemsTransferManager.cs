@@ -15,8 +15,8 @@ namespace Core.Transfer
     {
         public bool AreCut = false;//delete from after transfer
         public List<Thread> ThreadsItemLoadWork = new List<Thread>();
-        public TransferGroup group = new TransferGroup();
-        List<TransferBytes> ItemsTransfer = new List<TransferBytes>();
+        public TransferGroup GroupData = new TransferGroup();
+        public List<TransferBytes> ItemsTransferWork = new List<TransferBytes>();
         
         #region Declare
         List<AddNewTransferItem> items;
@@ -25,13 +25,13 @@ namespace Core.Transfer
         //load from save data
         internal ItemsTransferManager(JsonDataSaveGroup group_json)
         {
-            this.group = group_json.Group;
+            this.GroupData = group_json.Group;
             this.fromfolder = new AnalyzePath(group_json.fromfolder_raw);
             this.AreCut = group_json.AreCut;
             this.savefolder = new AnalyzePath(group_json.savefolder_raw);
 
-            this.group.status = (group_json.Group.status == StatusTransfer.Done | group_json.Group.status == StatusTransfer.Error) ? group_json.Group.status : StatusTransfer.Stop;
-            foreach (TransferItem item in this.group.items)
+            this.GroupData.status = (group_json.Group.status == StatusTransfer.Done | group_json.Group.status == StatusTransfer.Error) ? group_json.Group.status : StatusTransfer.Stop;
+            foreach (TransferItem item in this.GroupData.items)
             {
                 if (item.status == StatusTransfer.Running) item.status = StatusTransfer.Stop;
                 item.col[3] = item.status.ToString();
@@ -39,7 +39,7 @@ namespace Core.Transfer
                 item.From.ap = new AnalyzePath(item.From.path);
                 item.To.ap = new AnalyzePath(item.To.path);
             }
-            this.group.change = ChangeTLV.Done;
+            this.GroupData.change = ChangeTLV.Done;
             RefreshGroupDataToShow(-1);
         }
         //load from user
@@ -59,16 +59,16 @@ namespace Core.Transfer
         public void LoadListItems()
         {
             Console.WriteLine("Load group:" + fromfolder);
-            this.group.col = new List<string> { fromfolder.Path_Raw, savefolder.Path_Raw, this.group.status.ToString(), "0/0", "", "", "" };
-            AppSetting.uc_lv_ud_instance.AddNewGroup(group);
+            this.GroupData.col = new List<string> { fromfolder.Path_Raw, savefolder.Path_Raw, this.GroupData.status.ToString(), "0/0", "", "", "" };
+            AppSetting.uc_lv_ud_instance.AddNewGroup(GroupData);
             string path = fromfolder.PathIsUrl ? fromfolder.TypeCloud.ToString() + ":" + AppSetting.settings.GetDefaultCloud(fromfolder.TypeCloud) + "?id=" + fromfolder.ID : fromfolder.Path_Raw;
 
             foreach (AddNewTransferItem item in items)
             {
-                if (item.type == Type_FileFolder.File) group.items.Add(LoadFile(path,item.name,item.size,item.id));
-                else group.items.AddRange(ListAllItemInFolder(path + (fromfolder.PathIsCloud ? "/" : "\\") + item.name,item.id));
+                if (item.type == Type_FileFolder.File) GroupData.items.Add(LoadFile(path,item.name,item.size,item.id));
+                else GroupData.items.AddRange(ListAllItemInFolder(path + (fromfolder.PathIsCloud ? "/" : "\\") + item.name,item.id));
             }
-            group.status = StatusTransfer.Waiting;
+            GroupData.status = StatusTransfer.Waiting;
             items.Clear();// clear Declare memory
         }
         List<TransferItem> ListAllItemInFolder(string path_rawItem, string id = "")
@@ -110,7 +110,7 @@ namespace Core.Transfer
             ud_item.From.Fileid = FileId;
             ud_item.From.Size = size;
             //group & UI
-            group.TotalFileLength += size;
+            GroupData.TotalFileLength += size;
             ud_item.SizeString = UnitConventer.ConvertSize(size, 2, UnitConventer.unit_size);
             ud_item.status = StatusTransfer.Waiting;
             //To
@@ -133,17 +133,17 @@ namespace Core.Transfer
                 }
             }
 
-            switch (group.status)
+            switch (GroupData.status)
             {
                 case StatusTransfer.Loading: return;
-                case StatusTransfer.Started: group.status = StatusTransfer.Running; group.Timestamp = CurrentMillis.Millis; break;
+                case StatusTransfer.Started: GroupData.status = StatusTransfer.Running; GroupData.Timestamp = CurrentMillis.Millis; break;
                 case StatusTransfer.Remove: return;
             }
 
-            if (group.status != StatusTransfer.Running)
+            if (GroupData.status != StatusTransfer.Running)
             {
-                if (!string.IsNullOrEmpty(group.col[4])) group.col[4] = "";
-                if (!string.IsNullOrEmpty(group.col[5])) group.col[5] = "";
+                if (!string.IsNullOrEmpty(GroupData.col[4])) GroupData.col[4] = "";
+                if (!string.IsNullOrEmpty(GroupData.col[5])) GroupData.col[5] = "";
             }
 
             #region Count
@@ -152,24 +152,24 @@ namespace Core.Transfer
             int count_item_error = 0;
             int count_item_stop = 0;
             int count_item_remove = 0;
-            for (int i = 0; i < group.items.Count; i++)
+            for (int i = 0; i < GroupData.items.Count; i++)
             {
-                if (group.items[i].status == StatusTransfer.Remove)
+                if (GroupData.items[i].status == StatusTransfer.Remove)
                 {
-                    foreach(TransferBytes tb in ItemsTransfer)
+                    foreach(TransferBytes tb in ItemsTransferWork)
                     {
-                        if(tb.item == group.items[i])
+                        if(tb.item == GroupData.items[i])
                         {
-                            ItemsTransfer.Remove(tb);
+                            ItemsTransferWork.Remove(tb);
                             break;
                         }
                     }
-                    group.items.RemoveAt(i);
+                    GroupData.items.RemoveAt(i);
                     i--;
                     count_item_remove++;
                     continue;
                 }
-                else switch (group.items[i].status)
+                else switch (GroupData.items[i].status)
                     {
                         case StatusTransfer.Running: count_item_running++; break;
                         case StatusTransfer.Done: count_item_done++; break;
@@ -179,85 +179,93 @@ namespace Core.Transfer
                     }
 
                 //clear speed download when not running
-                if (group.items[i].status != StatusTransfer.Running)
+                if (GroupData.items[i].status != StatusTransfer.Running)
                 {
-                    if (!string.IsNullOrEmpty(group.items[i].col[4])) group.items[i].col[4] = "";
-                    if (!string.IsNullOrEmpty(group.items[i].col[5])) group.items[i].col[5] = "";
+                    if (!string.IsNullOrEmpty(GroupData.items[i].col[4])) GroupData.items[i].col[4] = "";
+                    if (!string.IsNullOrEmpty(GroupData.items[i].col[5])) GroupData.items[i].col[5] = "";
                 }
             }
             #endregion
 
             #region Running group
-            if (this.group.status == StatusTransfer.Running && count_item_done + count_item_error + count_item_stop != this.group.items.Count)
+            if (this.GroupData.status == StatusTransfer.Running && this.GroupData.items.Count !=0 && 
+                count_item_done + count_item_error + count_item_stop != this.GroupData.items.Count)
             {
                 long Group_TotalTransfer = 0;
-                for (int i = 0; i < group.items.Count; i++)//start item waiting and Started(force)
+                for (int i = 0; i < GroupData.items.Count; i++)//start item waiting and Started(force)
                 {
-                    Group_TotalTransfer += group.items[i].Transfer;
-                    if (this.group.items[i].status == StatusTransfer.Started)// start item force start
+                    Group_TotalTransfer += GroupData.items[i].Transfer;
+                    #region start item force start
+                    if (this.GroupData.items[i].status == StatusTransfer.Started)
                     {
                         Thread thr = new Thread(WorkThread);
-                        this.group.items[i].status = StatusTransfer.Running;
+                        this.GroupData.items[i].status = StatusTransfer.Running;
                         thr.Start(i);
                         ThreadsItemLoadWork.Add(thr);
                         count_item_running++;
                     }
-                    if (group.items[i].status == StatusTransfer.Waiting && count_item_running < group.MaxItemsDownload)//start item waiting
+                    #endregion
+
+                    #region start item waiting
+                    if (GroupData.items[i].status == StatusTransfer.Waiting && count_item_running < GroupData.MaxItemsDownload)
                     {
                         Thread thr = new Thread(WorkThread);
-                        group.items[i].status = StatusTransfer.Running;
-                        group.items[i].Timestamp = Stopwatch.GetTimestamp();
+                        GroupData.items[i].status = StatusTransfer.Running;
+                        GroupData.items[i].Timestamp = Stopwatch.GetTimestamp();
                         thr.Start(i);
                         ThreadsItemLoadWork.Add(thr);
                         count_item_running++;
                     }
+                    #endregion
+
                     #region caculate speed & time left item
-                    if (this.group.items[i].status == StatusTransfer.Running)
+                    if (this.GroupData.items[i].status == StatusTransfer.Running)
                     {
-                        long size_transfer = group.items[i].Transfer - group.items[i].OldTransfer;
-                        long time_milisec = CurrentMillis.Millis - group.items[i].Timestamp;
+                        long size_transfer = GroupData.items[i].Transfer - GroupData.items[i].OldTransfer;
+                        long time_milisec = CurrentMillis.Millis - GroupData.items[i].Timestamp;
                         if (time_milisec != 0 & time_milisec >= 500)
                         {
                             //speed
-                            group.items[i].Timestamp = CurrentMillis.Millis;
-                            group.items[i].OldTransfer = group.items[i].Transfer;
+                            GroupData.items[i].Timestamp = CurrentMillis.Millis;
+                            GroupData.items[i].OldTransfer = GroupData.items[i].Transfer;
                             decimal speed = (decimal)size_transfer * 1000 / time_milisec;
-                            group.items[i].col[4] = UnitConventer.ConvertSize(speed, 2, UnitConventer.unit_speed);
+                            GroupData.items[i].col[4] = UnitConventer.ConvertSize(speed, 2, UnitConventer.unit_speed);
                             //time 
                             if (speed != 0)
                             {
-                                long length_left = group.items[i].From.Size - group.items[i].Transfer;
+                                long length_left = GroupData.items[i].From.Size - GroupData.items[i].Transfer;
                                 long secondleft = decimal.ToInt64(((decimal)length_left / speed));
-                                group.items[i].col[5] = CurrentMillis.GetTimeBySecond((int)secondleft);
+                                GroupData.items[i].col[5] = CurrentMillis.GetTimeBySecond((int)secondleft);
                             }
                         }
                     }
                     #endregion
                 }
                 #region caculate speed & time left group
-                long time_milisec_group = CurrentMillis.Millis - group.Timestamp;
+                long time_milisec_group = CurrentMillis.Millis - GroupData.Timestamp;
                 if (time_milisec_group != 0 & time_milisec_group >= 500)
                 {
                     //speed
-                    group.Timestamp = CurrentMillis.Millis;
-                    decimal speed_group = (decimal)(Group_TotalTransfer - group.OldTransfer) * 1000 / time_milisec_group;
-                    group.OldTransfer = Group_TotalTransfer;
-                    group.col[4] = UnitConventer.ConvertSize(speed_group, 2, UnitConventer.unit_speed);
+                    GroupData.Timestamp = CurrentMillis.Millis;
+                    decimal speed_group = (decimal)(Group_TotalTransfer - GroupData.OldTransfer) * 1000 / time_milisec_group;
+                    GroupData.OldTransfer = Group_TotalTransfer;
+                    GroupData.col[4] = UnitConventer.ConvertSize(speed_group, 2, UnitConventer.unit_speed);
                     //time left
                     if (speed_group != 0)
                     {
-                        long length_left_group = group.TotalFileLength - Group_TotalTransfer;
+                        long length_left_group = GroupData.TotalFileLength - Group_TotalTransfer;
                         long secondleft_group = length_left_group / decimal.ToInt64(speed_group);
-                        group.col[5] = CurrentMillis.GetTimeBySecond((int)secondleft_group);
+                        GroupData.col[5] = CurrentMillis.GetTimeBySecond((int)secondleft_group);
                     }
                 }
                 #endregion
             }
             else
             {
-                if (this.group.status == StatusTransfer.Running)
+                if (this.GroupData.status == StatusTransfer.Running)
                 {
-                    if (this.AreCut && count_item_done == this.group.items.Count)// remove cut
+                    #region Remove Items_From If Cut (if done 100%)
+                    if (this.AreCut && count_item_done == this.GroupData.items.Count)
                     {
                         DeleteItems list = new DeleteItems();
                         list.PernamentDelete = false;
@@ -268,34 +276,35 @@ namespace Core.Transfer
                         Thread thr = new Thread(AppSetting.ManageCloud.Delete);
                         thr.Start(list);
                     }
-                    this.group.status = StatusTransfer.Done;//Done group
+                    #endregion
+                    this.GroupData.status = StatusTransfer.Done;//Done group
                 }
             }
             #endregion
 
             #region Change LV
-            if (this.group.change == ChangeTLV.Processing && (this.group.status == StatusTransfer.Done |
-                this.group.status == StatusTransfer.Error | this.group.status == StatusTransfer.Stop))
-                this.group.change = ChangeTLV.ProcessingToDone;
-            if (this.group.change == ChangeTLV.Done && (this.group.status == StatusTransfer.Started | this.group.status == StatusTransfer.Running |
-                this.group.status == StatusTransfer.Waiting | this.group.status == StatusTransfer.Loading))
-                this.group.change = ChangeTLV.DoneToProcessing;
+            if (this.GroupData.change == ChangeTLV.Processing && (this.GroupData.status == StatusTransfer.Done |
+                this.GroupData.status == StatusTransfer.Error | this.GroupData.status == StatusTransfer.Stop))
+                this.GroupData.change = ChangeTLV.ProcessingToDone;
+            if (this.GroupData.change == ChangeTLV.Done && (this.GroupData.status == StatusTransfer.Started | this.GroupData.status == StatusTransfer.Running |
+                this.GroupData.status == StatusTransfer.Waiting | this.GroupData.status == StatusTransfer.Loading))
+                this.GroupData.change = ChangeTLV.DoneToProcessing;
             #endregion
 
             RefreshGroupDataToShow(count_item_done,count_item_remove);
         }
 
-        void RefreshGroupDataToShow(int count_item_done,int remove = 0)
+        void RefreshGroupDataToShow(int count_item_done,int count_item_remove = 0)
         {
-            if ((count_item_done != -1 && group.col[3].IndexOf("100% (") < 0 && group.items.Count != 0) | remove !=0)
-                group.col[3] = Math.Round((double)count_item_done * 100 / group.items.Count, 2).ToString() + "% (" + count_item_done.ToString() + "/" + group.items.Count.ToString() + ")";
-            group.col[2] = group.status.ToString();
-            for (int i = 0; i < group.items.Count; i++)
+            if ((count_item_done != -1 && GroupData.col[3].IndexOf("100% (") < 0 && GroupData.items.Count != 0) | count_item_remove !=0)
+                GroupData.col[3] = Math.Round((double)count_item_done * 100 / GroupData.items.Count, 2).ToString() + "% (" + count_item_done.ToString() + "/" + GroupData.items.Count.ToString() + ")";
+            GroupData.col[2] = GroupData.status.ToString();
+            for (int i = 0; i < GroupData.items.Count; i++)
             {
-                group.items[i].col[2] = group.items[i].status.ToString();
-                if (group.items[i].col[3].IndexOf("100% (") < 0 & group.items[i].From.Size != 0)
-                    group.items[i].col[3] = Math.Round((double)group.items[i].Transfer * 100 / group.items[i].From.Size, 2).ToString() + "% (" + UnitConventer.ConvertSize(group.items[i].Transfer, 2, UnitConventer.unit_size) + "/" + group.items[i].SizeString + ")";
-                group.items[i].col[6] = group.items[i].ErrorMsg;
+                GroupData.items[i].col[2] = GroupData.items[i].status.ToString();
+                if (GroupData.items[i].col[3].IndexOf("100% (") < 0 & GroupData.items[i].From.Size != 0)
+                    GroupData.items[i].col[3] = Math.Round((double)GroupData.items[i].Transfer * 100 / GroupData.items[i].From.Size, 2).ToString() + "% (" + UnitConventer.ConvertSize(GroupData.items[i].Transfer, 2, UnitConventer.unit_size) + "/" + GroupData.items[i].SizeString + ")";
+                GroupData.items[i].col[6] = GroupData.items[i].ErrorMsg;
             }
         }
 
@@ -304,24 +313,24 @@ namespace Core.Transfer
             int x = (int)obj;
             try
             {
-                Console.WriteLine("Load items:"+group.items[x].From.ap.Path_Raw);
+                Console.WriteLine("Load items:"+GroupData.items[x].From.ap.Path_Raw);
                 #region CreateStreamFrom
                 if (!fromfolder.PathIsUrl)
                 {
                     //group.items[x].From.ap = new AnalyzePath(group.items[x].From.path);
-                    group.items[x].From.stream = AppSetting.ManageCloud.GetFileStream(group.items[x].From.ap.Path_Raw,
-                        group.items[x].From.Fileid,
-                        group.items[x].To.ap.PathIsCloud,
-                        group.items[x].TransferRequest,
-                        group.items[x].From.Size - 1);
+                    GroupData.items[x].From.stream = AppSetting.ManageCloud.GetFileStream(GroupData.items[x].From.ap.Path_Raw,
+                        GroupData.items[x].From.Fileid,
+                        GroupData.items[x].To.ap.PathIsCloud,
+                        GroupData.items[x].TransferRequest,
+                        GroupData.items[x].From.Size - 1);
                 }
                 else
                 {
-                    group.items[x].From.stream = AppSetting.ManageCloud.GetFileStream("",
-                        group.items[x].From.Fileid,
-                        group.items[x].To.ap.PathIsCloud,
-                        group.items[x].TransferRequest,
-                        group.items[x].From.Size - 1,
+                    GroupData.items[x].From.stream = AppSetting.ManageCloud.GetFileStream("",
+                        GroupData.items[x].From.Fileid,
+                        GroupData.items[x].To.ap.PathIsCloud,
+                        GroupData.items[x].TransferRequest,
+                        GroupData.items[x].From.Size - 1,
                         fromfolder.TypeCloud,
                         AppSetting.settings.GetDefaultCloud(fromfolder.TypeCloud));
                 }
@@ -329,20 +338,20 @@ namespace Core.Transfer
 
                 int buffer_length = 32;//default
                 int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.BufferSize), out buffer_length);//get buffer_length from setting
-                group.items[x].buffer = new byte[buffer_length * 1024];//create buffer
+                GroupData.items[x].buffer = new byte[buffer_length * 1024];//create buffer
 
-                group.items[x].byteread = 0;
+                GroupData.items[x].byteread = 0;
                 string token = "";
-                if (group.items[x].To.ap.PathIsCloud) token = AppSetting.settings.GetToken(group.items[x].To.ap.Email, group.items[x].To.ap.TypeCloud);
+                if (GroupData.items[x].To.ap.PathIsCloud) token = AppSetting.settings.GetToken(GroupData.items[x].To.ap.Email, GroupData.items[x].To.ap.TypeCloud);
                 //this.group.items[x].UploadID = "";//remuse
-                group.items[x].Transfer = group.items[x].OldTransfer = group.items[x].TransferRequest;//remuse
-                group.items[x].ErrorMsg = "";//clear error
-                group.items[x].Timestamp = CurrentMillis.Millis;
-                switch (group.items[x].To.ap.TypeCloud)
+                GroupData.items[x].Transfer = GroupData.items[x].OldTransfer = GroupData.items[x].TransferRequest;//remuse
+                GroupData.items[x].ErrorMsg = "";//clear error
+                GroupData.items[x].Timestamp = CurrentMillis.Millis;
+                switch (GroupData.items[x].To.ap.TypeCloud)
                 {
                     case CloudName.LocalDisk:
                         #region LocalDisk
-                        ItemsTransfer.Add(new TransferBytes(group.items[x], group));
+                        ItemsTransferWork.Add(new TransferBytes(GroupData.items[x], this));
                         return;
                     #endregion
 
@@ -351,47 +360,47 @@ namespace Core.Transfer
 
                         int chunksizedb = 25;//default
                         int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.Dropbox_ChunksSize), out chunksizedb);
-                        group.items[x].ChunkUploadSize = chunksizedb * 1024 * 1024;
+                        GroupData.items[x].ChunkUploadSize = chunksizedb * 1024 * 1024;
 
                         DropboxRequestAPIv2 client = new DropboxRequestAPIv2(token);
 
-                        if (string.IsNullOrEmpty(group.items[x].UploadID))//create upload id
+                        if (string.IsNullOrEmpty(GroupData.items[x].UploadID))//create upload id
                         {
-                            group.items[x].byteread = group.items[x].From.stream.Read(group.items[x].buffer, 0, group.items[x].buffer.Length);
-                            dynamic json = JsonConvert.DeserializeObject(client.upload_session_start(group.items[x].buffer, group.items[x].byteread));
-                            group.items[x].UploadID = json.session_id;
-                            group.items[x].Transfer += group.items[x].byteread;
+                            GroupData.items[x].byteread = GroupData.items[x].From.stream.Read(GroupData.items[x].buffer, 0, GroupData.items[x].buffer.Length);
+                            dynamic json = JsonConvert.DeserializeObject(client.upload_session_start(GroupData.items[x].buffer, GroupData.items[x].byteread));
+                            GroupData.items[x].UploadID = json.session_id;
+                            GroupData.items[x].Transfer += GroupData.items[x].byteread;
                         }
-                        ItemsTransfer.Add(new TransferBytes(group.items[x], group, client));
+                        ItemsTransferWork.Add(new TransferBytes(GroupData.items[x], this, client));
                         return;
                     #endregion
 
                     case CloudName.GoogleDrive:
                         #region GoogleDrive
                         DriveAPIHttprequestv2 gdclient = new DriveAPIHttprequestv2(JsonConvert.DeserializeObject<TokenGoogleDrive>(token));
-                        gdclient.Email = group.items[x].To.ap.Email;
+                        gdclient.Email = GroupData.items[x].To.ap.Email;
                         gdclient.TokenRenewEvent += GoogleDrive.Gdclient_TokenRenewEvent;
 
-                        if (GoogleDrive.CreateFolder(group.items[x].To.ap.TypeCloud.ToString() + ":" + group.items[x].To.ap.Email + group.items[x].To.ap.Parent) != group.items[x].To.ap.Parent)
-                            throw new Exception("Can't create folder: " + group.items[x].To.ap.TypeCloud.ToString() + ":" + group.items[x].To.ap.Email + group.items[x].To.ap.Parent);
+                        if (GoogleDrive.CreateFolder(GroupData.items[x].To.ap.TypeCloud.ToString() + ":" + GroupData.items[x].To.ap.Email + GroupData.items[x].To.ap.Parent) != GroupData.items[x].To.ap.Parent)
+                            throw new Exception("Can't create folder: " + GroupData.items[x].To.ap.TypeCloud.ToString() + ":" + GroupData.items[x].To.ap.Email + GroupData.items[x].To.ap.Parent);
                         
                         int chunksizeGD = 5;//default
                         int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.GD_ChunksSize), out chunksizeGD);
-                        group.items[x].ChunkUploadSize = chunksizeGD * 1024 * 1024;
+                        GroupData.items[x].ChunkUploadSize = chunksizeGD * 1024 * 1024;
                         
-                        if (string.IsNullOrEmpty(group.items[x].UploadID))//create upload id
+                        if (string.IsNullOrEmpty(GroupData.items[x].UploadID))//create upload id
                         {
-                            string parentid = GoogleDrive.GetIdOfPath(group.items[x].To.ap.Parent, group.items[x].To.ap.Email);
-                            string mimeType = Get_mimeType.Get_mimeType_From_FileExtension(group.items[x].To.ap.GetExtensionFile());
-                            string jsondata = "{\"title\": \"" + group.items[x].From.ap.NameLastItem + "\", \"mimeType\": \"" + mimeType + "\", \"parents\": [{\"id\": \"" + parentid + "\"}]}";
-                            group.items[x].UploadID = gdclient.Files_insert_resumable_getUploadID(jsondata, mimeType, group.items[x].From.Size);
+                            string parentid = GoogleDrive.GetIdOfPath(GroupData.items[x].To.ap.Parent, GroupData.items[x].To.ap.Email);
+                            string mimeType = Get_mimeType.Get_mimeType_From_FileExtension(GroupData.items[x].To.ap.GetExtensionFile());
+                            string jsondata = "{\"title\": \"" + GroupData.items[x].From.ap.NameLastItem + "\", \"mimeType\": \"" + mimeType + "\", \"parents\": [{\"id\": \"" + parentid + "\"}]}";
+                            GroupData.items[x].UploadID = gdclient.Files_insert_resumable_getUploadID(jsondata, mimeType, GroupData.items[x].From.Size);
                         }
-                        ItemsTransfer.Add(new TransferBytes(group.items[x], group, gdclient));
+                        ItemsTransferWork.Add(new TransferBytes(GroupData.items[x], this, gdclient));
                         return;
                         #endregion
                 }
             }
-            catch (Exception ex) { group.items[x].ErrorMsg = ex.Message; group.items[x].status = StatusTransfer.Error; return; }
+            catch (Exception ex) { GroupData.items[x].ErrorMsg = ex.Message; GroupData.items[x].status = StatusTransfer.Error; return; }
         }
     }
 }

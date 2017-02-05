@@ -12,7 +12,7 @@ namespace Core.Transfer
 {
     public class GroupsTransferManager
     {
-        public List<ItemsTransferManager> groups = new List<ItemsTransferManager>();
+        public List<ItemsTransferManager> GroupsWork = new List<ItemsTransferManager>();
         
         #region Start up app
         public Thread MainThread;
@@ -55,30 +55,32 @@ namespace Core.Transfer
                         //count
                         count_group_running = 0;
                         count = 0;
-                        groups.ForEach(s =>
+                        GroupsWork.ForEach(s =>
                         {
-                            if (s.group.status == StatusTransfer.Running) count_group_running++;
-                            else if (s.group.status == StatusTransfer.Started | s.group.status == StatusTransfer.Waiting | s.group.status == StatusTransfer.Loading) count++;
+                            if (s.GroupData.status == StatusTransfer.Running) count_group_running++;
+                            else if (s.GroupData.status == StatusTransfer.Started | s.GroupData.status == StatusTransfer.Waiting | s.GroupData.status == StatusTransfer.Loading) count++;
                         });
 
-                        for (int i = 0; i < groups.Count; i++)
+                        for (int i = 0; i < GroupsWork.Count; i++)
                         {
-                            if (AuToStartGroupMode && groups[i].group.status == StatusTransfer.Waiting && count_group_running < int.Parse(AppSetting.settings.GetSettingsAsString(SettingsKey.MaxGroupsDownload)))//auto
+                            if (AuToStartGroupMode && GroupsWork[i].GroupData.status == StatusTransfer.Waiting && count_group_running < int.Parse(AppSetting.settings.GetSettingsAsString(SettingsKey.MaxGroupsDownload)))//auto
                             {
-                                int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.MaxItemsInGroupDownload), out groups[i].group.MaxItemsDownload);
-                                groups[i].group.status = StatusTransfer.Started;
+                                int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.MaxItemsInGroupDownload), out GroupsWork[i].GroupData.MaxItemsDownload);
+                                GroupsWork[i].GroupData.status = StatusTransfer.Started;
                                 count_group_running++;
                             }
 
-                            if (groups[i].group.status == StatusTransfer.Remove & groups[i].ThreadsItemLoadWork.Count == 0)
+                            if (GroupsWork[i].GroupData.status == StatusTransfer.Remove & GroupsWork[i].ThreadsItemLoadWork.Count == 0 &
+                                GroupsWork[i].ItemsTransferWork.Count == 0)
                             {
-                                AppSetting.uc_lv_ud_instance.RemoveGroup(this.groups[i].group);
-                                this.groups.RemoveAt(i);
+                                AppSetting.uc_lv_ud_instance.RemoveGroup(this.GroupsWork[i].GroupData);
+                                GroupsWork[i].GroupData.items.Clear();
+                                this.GroupsWork.RemoveAt(i);
                                 i--;
                                 continue;
                             }
 
-                            groups[i].ManagerItemsAndRefreshData();
+                            GroupsWork[i].ManagerItemsAndRefreshData();
                         }
 
                         if (!flag_shutdown && count_group_running > 0 && AppSetting.settings.GetSettingsAsString(SettingsKey.ShutdownWhenDone) == "1") flag_shutdown = true;
@@ -103,13 +105,13 @@ namespace Core.Transfer
                         #region Stop
                         Eventupdateclosingform(AppSetting.lang.GetText(LanguageKey.CloseThread.ToString()));
                         int ItemsRunningCount = 0;
-                        foreach (ItemsTransferManager group in groups)
+                        foreach (ItemsTransferManager group in GroupsWork)
                         {
-                            if (group.group.status == StatusTransfer.Running | group.group.status == StatusTransfer.Started |
-                                group.group.status == StatusTransfer.Waiting) group.group.status = StatusTransfer.Stop;
+                            if (group.GroupData.status == StatusTransfer.Running | group.GroupData.status == StatusTransfer.Started |
+                                group.GroupData.status == StatusTransfer.Waiting) group.GroupData.status = StatusTransfer.Stop;
                             if (lockkillthr) KillThreads(group.ThreadsItemLoadWork);
                             group.ManagerItemsAndRefreshData();//clean thread
-                            group.group.items.ForEach(s => 
+                            group.GroupData.items.ForEach(s => 
                             {
                                 if (s.status == StatusTransfer.Running | s.status == StatusTransfer.Waiting) { s.status = StatusTransfer.Stop; ItemsRunningCount++; }
                             });
@@ -139,8 +141,8 @@ namespace Core.Transfer
         public void AddItems(List<AddNewTransferItem> items, string fromfolder_raw, string savefolder_raw, bool AreCut)
         {
             ItemsTransferManager gr = new ItemsTransferManager(items, fromfolder_raw, savefolder_raw, AreCut);
-            groups.Add(gr);
-            Thread thr = new Thread(groups[groups.IndexOf(gr)].LoadListItems);
+            GroupsWork.Add(gr);
+            Thread thr = new Thread(GroupsWork[GroupsWork.IndexOf(gr)].LoadListItems);
             thr.Start();
             LoadGroupThreads.Add(thr);
         }
@@ -149,9 +151,9 @@ namespace Core.Transfer
         #region load/reload UI -> add groups to treelistview
         public void LoadGroupToListView()
         {
-            foreach (ItemsTransferManager gr in groups)
+            foreach (ItemsTransferManager gr in GroupsWork)
             {
-                AppSetting.uc_lv_ud_instance.AddNewGroup(gr.group);
+                AppSetting.uc_lv_ud_instance.AddNewGroup(gr.GroupData);
             }
         }
         #endregion
@@ -195,7 +197,7 @@ namespace Core.Transfer
                     foreach (JsonDataSaveGroup json_group in json_groups)
                     {
                         ItemsTransferManager group = new ItemsTransferManager(json_group);
-                        this.groups.Add(group);
+                        this.GroupsWork.Add(group);
                     }
                 }
             }
@@ -203,14 +205,14 @@ namespace Core.Transfer
         public void SaveData()
         {
             List<JsonDataSaveGroup> json_groups = new List<JsonDataSaveGroup>();
-            for (int i = 0; i < groups.Count; i++)
+            for (int i = 0; i < GroupsWork.Count; i++)
             {
-                if (groups[i].group.status == StatusTransfer.Loading) continue;
+                if (GroupsWork[i].GroupData.status == StatusTransfer.Loading) continue;
                 JsonDataSaveGroup json_item = new JsonDataSaveGroup();
-                json_item.fromfolder_raw = groups[i].fromfolder.Path_Raw;
-                json_item.savefolder_raw = groups[i].savefolder.Path_Raw;
-                json_item.Group = groups[i].group;
-                json_item.AreCut = groups[i].AreCut;
+                json_item.fromfolder_raw = GroupsWork[i].fromfolder.Path_Raw;
+                json_item.savefolder_raw = GroupsWork[i].savefolder.Path_Raw;
+                json_item.Group = GroupsWork[i].GroupData;
+                json_item.AreCut = GroupsWork[i].AreCut;
                 json_groups.Add(json_item);
             }
             string json = JsonConvert.SerializeObject(json_groups);
