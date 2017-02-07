@@ -4,6 +4,7 @@ using Core.StaticClass;
 using SupDataDll;
 using SupDataDll.UiInheritance;
 using Core.Transfer;
+using Cloud;
 
 namespace Core
 {
@@ -21,7 +22,7 @@ namespace Core
         public static UIMain UIMain;
         public static UIUC_TLV_ud uc_lv_ud_instance;
         public static UIClosing UIclose;
-
+        public static OauthUI UIOauth;
         //pass
         public static string Pass;
 

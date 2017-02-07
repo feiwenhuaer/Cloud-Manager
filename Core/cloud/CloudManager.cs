@@ -123,7 +123,6 @@ namespace Core.Cloud
         public void Oauth(CloudName type)
         {
             Type type_oauthUI;
-            OauthUI instanceUI;
             switch (type)
             {
                 case CloudName.Dropbox:
@@ -131,9 +130,9 @@ namespace Core.Cloud
                     oauth_dropbox.TokenCallBack += Oauth_dropbox_TokenCallBack;
 
                     type_oauthUI = LoadDllUI.GetTypeInterface(typeof(UIinterfaceDB));
-                    instanceUI = (OauthUI)Activator.CreateInstance(type_oauthUI);
+                    AppSetting.UIOauth = (OauthUI)Activator.CreateInstance(type_oauthUI);
 
-                    oauth_dropbox.GetCode(instanceUI, AppSetting.UIMain);
+                    oauth_dropbox.GetCode(AppSetting.UIOauth, AppSetting.UIMain);
                     break;
                 case CloudName.GoogleDrive:
                     string[] scope = new string[] { Scope.Drive, Scope.DriveFile, Scope.DriveMetadata };
@@ -141,9 +140,9 @@ namespace Core.Cloud
                     oauth_gd.TokenCallBack += Oauth_gd_TokenCallBack;
 
                     type_oauthUI = LoadDllUI.GetTypeInterface(typeof(UIinterfaceGD));
-                    instanceUI = (OauthUI)Activator.CreateInstance(type_oauthUI);
+                    AppSetting.UIOauth = (OauthUI)Activator.CreateInstance(type_oauthUI);
 
-                    oauth_gd.GetCode(instanceUI, AppSetting.UIMain);
+                    oauth_gd.GetCode(AppSetting.UIOauth, AppSetting.UIMain);
                     break;
                 default: throw new Exception("Not support");
             }

@@ -7,11 +7,18 @@ namespace FormUI.UI.Oauth
 {
     public partial class UIOauth : Form, OauthUI
     {
+        bool isclosed = false;
         string url;
         string url_check;
         public UIOauth()
         {
             InitializeComponent();
+            this.FormClosed += UIOauth_FormClosed;
+        }
+
+        private void UIOauth_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            isclosed = true;
         }
 
         public string CheckUrl
@@ -30,16 +37,19 @@ namespace FormUI.UI.Oauth
             }
         }
 
-        public void ShowUI(object owner)
+        public void CloseUI()
         {
-            Thread thr = new Thread(ShowDiag);
-            thr.Start();
+            if(!isclosed)
+            {
+                this.Close();
+                isclosed = true;
+            }
         }
 
-        private void ShowDiag()
+        public void ShowUI(object owner)
         {
-            if (InvokeRequired) this.Invoke(new Action(() => this.ShowDialog()));
-            else this.ShowDialog();
+            if (owner != null) this.Show((Form)owner);
+            else this.Show();
         }
 
         private void UIOauth_Load(object sender, EventArgs e)

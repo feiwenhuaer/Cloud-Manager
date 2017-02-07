@@ -48,6 +48,7 @@
             this.ClientSize = new System.Drawing.Size(479, 499);
             this.Controls.Add(this.webBrowser1);
             this.Name = "UIOauth";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "UIOauth";
             this.Load += new System.EventHandler(this.UIOauth_Load);
             this.ResumeLayout(false);

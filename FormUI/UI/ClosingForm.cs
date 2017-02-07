@@ -14,6 +14,7 @@ namespace FormUI.UI
         public ClosingForm()
         {
             InitializeComponent();
+            
         }
 
         public void updatedata(string text)

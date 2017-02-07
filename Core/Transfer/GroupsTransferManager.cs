@@ -12,6 +12,7 @@ namespace Core.Transfer
 {
     public class GroupsTransferManager
     {
+        public static int TimeRefresh = 500;
         public List<ItemsTransferManager> GroupsWork = new List<ItemsTransferManager>();
         
         #region Start up app
@@ -37,7 +38,6 @@ namespace Core.Transfer
             ReadData();
             while (Loop)
             {
-                GC.Collect();
                 Thread.Sleep(100);
                 if (status == StatusUpDownApp.Pause) continue;
                 for (int i = 0; i < LoadGroupThreads.Count; i++)
@@ -92,13 +92,12 @@ namespace Core.Transfer
                             return;
                         }
 
-                        if (CurrentMillis.Millis - timestamp > 500)
+                        if (CurrentMillis.Millis - timestamp > TimeRefresh)
                         {
                             timestamp = CurrentMillis.Millis;
                             AppSetting.uc_lv_ud_instance.RefreshAll();
+                            SaveData();
                         }
-
-                        SaveData();
                         #endregion
                         break;
                     case StatusUpDownApp.StopForClosingApp:
@@ -107,8 +106,13 @@ namespace Core.Transfer
                         int ItemsRunningCount = 0;
                         foreach (ItemsTransferManager group in GroupsWork)
                         {
-                            if (group.GroupData.status == StatusTransfer.Running | group.GroupData.status == StatusTransfer.Started |
-                                group.GroupData.status == StatusTransfer.Waiting) group.GroupData.status = StatusTransfer.Stop;
+                            switch (group.GroupData.status)
+                            {
+                                case StatusTransfer.Running:
+                                case StatusTransfer.Started:
+                                case StatusTransfer.Waiting: group.GroupData.status = StatusTransfer.Stop; break;
+                                default:break;
+                            }
                             if (lockkillthr) KillThreads(group.ThreadsItemLoadWork);
                             group.ManagerItemsAndRefreshData();//clean thread
                             group.GroupData.items.ForEach(s => 
@@ -128,15 +132,18 @@ namespace Core.Transfer
                         Eventupdateclosingform(AppSetting.lang.GetText(LanguageKey.SaveData.ToString()));
                         SaveData();
                         Eventcloseapp();
+#if DEBUG
+                        Console.WriteLine("GroupsTransferManager Thread Closed.");
+#endif
                         #endregion
                         return;
                     default: break;
                 }
             }
         }
-        #endregion
+#endregion
 
-        #region Add new items from UI
+#region Add new items from UI
         public List<Thread> LoadGroupThreads = new List<Thread>();
         public void AddItems(List<AddNewTransferItem> items, string fromfolder_raw, string savefolder_raw, bool AreCut)
         {
@@ -146,9 +153,9 @@ namespace Core.Transfer
             thr.Start();
             LoadGroupThreads.Add(thr);
         }
-        #endregion
+#endregion
 
-        #region load/reload UI -> add groups to treelistview
+#region load/reload UI -> add groups to treelistview
         public void LoadGroupToListView()
         {
             foreach (ItemsTransferManager gr in GroupsWork)
@@ -156,9 +163,9 @@ namespace Core.Transfer
                 AppSetting.uc_lv_ud_instance.AddNewGroup(gr.GroupData);
             }
         }
-        #endregion
+#endregion
 
-        #region Kill thread
+#region Kill thread
         void KillThreads(List<Thread> thrs)
         {
             for (int i = 0; i < thrs.Count; i++)
@@ -171,9 +178,9 @@ namespace Core.Transfer
         {
             thr.Abort();
         }
-        #endregion
+#endregion
 
-        #region Closing Form
+#region Closing Form
         public void Exit()
         {
             timestamp = CurrentMillis.Millis;
@@ -182,9 +189,9 @@ namespace Core.Transfer
         public event updateclosingform Eventupdateclosingform;
         public delegate void closeapp();
         public event closeapp Eventcloseapp;
-        #endregion
+#endregion
 
-        #region Save/Read Data When Close/Open program
+#region Save/Read Data When Close/Open program
         string temp_jsonSaveData = "";
         public void ReadData()
         {
@@ -220,6 +227,6 @@ namespace Core.Transfer
             else temp_jsonSaveData = json;
             ReadWriteData.Write(ReadWriteData.File_DataUploadDownload, Encoding.UTF8.GetBytes(json));
         }
-        #endregion
+#endregion
     }
 }

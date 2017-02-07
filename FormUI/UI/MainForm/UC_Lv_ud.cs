@@ -42,44 +42,44 @@ namespace FormUI.UI.MainForm
 
         void DoRefresh()
         {
-            foreach (TransferGroup item in Groups)
+            foreach (TransferGroup group in Groups)
             {
-                if (item.change == ChangeTLV.Done)
+                switch(group.change)
                 {
-                    foreach (var child in item.items)
-                    {
-                        if (child.status != child.CheckChangeStatus)
+                    case ChangeTLV.Done:
+                        //foreach (var child in group.items)
+                        //{
+                        //    if (child.status != child.CheckChangeStatus)
+                        //    {
+                        //        TLV_done.RefreshObject(child);
+                        //        child.CheckChangeStatus = child.status;
+                        //    }
+                        //}
+                        TLV_done.RefreshObject(group);
+                        break;
+
+                    case ChangeTLV.Processing:
+                        foreach (var child in group.items)
                         {
-                            TLV_done.RefreshObject(child);
-                            child.CheckChangeStatus = child.status;
+                            if (child.status == StatusTransfer.Running | child.status != child.CheckChangeStatus)
+                            {
+                                TLV_ud.RefreshObject(child);
+                                child.CheckChangeStatus = child.status;
+                            }
                         }
-                    }
-                }
+                        break;
 
-                if (item.change == ChangeTLV.Processing)
-                {
-                    foreach (var child in item.items)
-                    {
-                        if (child.status == StatusTransfer.Running | child.status != child.CheckChangeStatus)
-                        {
-                            TLV_ud.RefreshObject(child);
-                            child.CheckChangeStatus = child.status;
-                        }
-                    }
-                }
+                    case ChangeTLV.DoneToProcessing:
+                        TLV_done.RemoveObject(Groups[Groups.IndexOf(group)]);
+                        TLV_ud.AddObject(Groups[Groups.IndexOf(group)]);
+                        group.change = ChangeTLV.Processing;
+                        break;
 
-                if (item.change == ChangeTLV.DoneToProcessing)
-                {
-                    TLV_done.RemoveObject(Groups[Groups.IndexOf(item)]);
-                    TLV_ud.AddObject(Groups[Groups.IndexOf(item)]);
-                    item.change = ChangeTLV.Processing;
-                }
-
-                if (item.change == ChangeTLV.ProcessingToDone)
-                {
-                    TLV_ud.RemoveObject(Groups[Groups.IndexOf(item)]);
-                    TLV_done.AddObject(Groups[Groups.IndexOf(item)]);
-                    item.change = ChangeTLV.Done;
+                    case ChangeTLV.ProcessingToDone:
+                        TLV_ud.RemoveObject(Groups[Groups.IndexOf(group)]);
+                        TLV_done.AddObject(Groups[Groups.IndexOf(group)]);
+                        group.change = ChangeTLV.Done;
+                        break;
                 }
             }
         }

@@ -10,11 +10,18 @@ namespace WpfUI.UI.Oauth
     /// </summary>
     public partial class UiOauth : Window, OauthUI
     {
+        bool isclosed = false;
         string url;
         string url_check;
         public UiOauth()
         {
             InitializeComponent();
+            this.Closed += UiOauth_Closed;
+        }
+
+        private void UiOauth_Closed(object sender, EventArgs e)
+        {
+            isclosed = true;
         }
 
         #region interface
@@ -58,6 +65,15 @@ namespace WpfUI.UI.Oauth
             if (e.Uri.ToString().IndexOf(url_check) == 0)
             {
                 this.Close();
+            }
+        }
+
+        public void CloseUI()
+        {
+            if(!isclosed)
+            {
+                this.Close();
+                isclosed = true;
             }
         }
     }

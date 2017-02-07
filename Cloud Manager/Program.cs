@@ -22,9 +22,9 @@ namespace Cloud_Manager
             {
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
-
+#if DEBUG
                 DeleteFile_dev();// dev mode
-
+#endif
                 //load instance class
                 ReadWriteData.CreateFolderSaveData();// create folder %appdata%\\CloudManager
                 Get_mimeType.Load();//mimeType (google drive upload)
@@ -52,6 +52,7 @@ namespace Cloud_Manager
                     AppSetting.UIMain.ShowDialog_();
                     if (AppSetting.UIMain.AreReloadUI)//if reload ui
                     {
+                        AppSetting.UIOauth.CloseUI();
                         AppSetting.TransferManager.status = StatusUpDownApp.Pause;
                         //clean memory
                         AppSetting.UIMain = null;

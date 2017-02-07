@@ -146,7 +146,7 @@ namespace Core.Transfer
                 if (!string.IsNullOrEmpty(GroupData.col[5])) GroupData.col[5] = "";
             }
 
-            #region Count
+            #region Count & Remove
             int count_item_running = 0;
             int count_item_done = 0;
             int count_item_error = 0;
@@ -156,14 +156,6 @@ namespace Core.Transfer
             {
                 if (GroupData.items[i].status == StatusTransfer.Remove)
                 {
-                    foreach(TransferBytes tb in ItemsTransferWork)
-                    {
-                        if(tb.item == GroupData.items[i])
-                        {
-                            ItemsTransferWork.Remove(tb);
-                            break;
-                        }
-                    }
                     GroupData.items.RemoveAt(i);
                     i--;
                     count_item_remove++;
@@ -223,7 +215,7 @@ namespace Core.Transfer
                     {
                         long size_transfer = GroupData.items[i].Transfer - GroupData.items[i].OldTransfer;
                         long time_milisec = CurrentMillis.Millis - GroupData.items[i].Timestamp;
-                        if (time_milisec != 0 & time_milisec >= 500)
+                        if (time_milisec != 0 & time_milisec >= GroupsTransferManager.TimeRefresh)
                         {
                             //speed
                             GroupData.items[i].Timestamp = CurrentMillis.Millis;
@@ -243,11 +235,11 @@ namespace Core.Transfer
                 }
                 #region caculate speed & time left group
                 long time_milisec_group = CurrentMillis.Millis - GroupData.Timestamp;
-                if (time_milisec_group != 0 & time_milisec_group >= 500)
+                if (time_milisec_group != 0 & time_milisec_group >= GroupsTransferManager.TimeRefresh)
                 {
                     //speed
                     GroupData.Timestamp = CurrentMillis.Millis;
-                    decimal speed_group = (decimal)(Group_TotalTransfer - GroupData.OldTransfer) * 1000 / time_milisec_group;
+                    decimal speed_group = ((decimal)(Group_TotalTransfer - GroupData.OldTransfer)) * 1000 / time_milisec_group;
                     GroupData.OldTransfer = Group_TotalTransfer;
                     GroupData.col[4] = UnitConventer.ConvertSize(speed_group, 2, UnitConventer.unit_speed);
                     //time left

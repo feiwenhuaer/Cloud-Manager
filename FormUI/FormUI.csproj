@@ -153,6 +153,9 @@
     <EmbeddedResource Include="UI\ChangeNumberItemsTransfer.resx">
       <DependentUpon>ChangeNumberItemsTransfer.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\ClosingForm.resx">
+      <DependentUpon>ClosingForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\CreateFolderForm.resx">
       <DependentUpon>CreateFolderForm.cs</DependentUpon>
     </EmbeddedResource>
