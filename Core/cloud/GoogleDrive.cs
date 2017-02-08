@@ -1,27 +1,29 @@
 ﻿using Cloud.GoogleDrive;
+using Core.StaticClass;
 using Newtonsoft.Json;
 using SupDataDll;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Xml;
-
+using static Cloud.GoogleDrive.DriveAPIHttprequestv2;
 
 namespace Core.Cloud
 {
     internal static class GoogleDrive
     {
         static object sync_GDcache = new object();
-        static List<GD_item> cache_gd = new List<GD_item>();
+        static List<GD_item> cache_gd;
         static object sync_root = new object();
         static List<RootID> root = new List<RootID>();
         static OrderByEnum[] en = { OrderByEnum.folder, OrderByEnum.title, OrderByEnum.createdDate };
-        static char[] listcannot = new char[] { '/', '\\', ':', '?', '*', '"', '<', '>', '|', '\'' };
+        static char[] listcannot = new char[] { '/', '\\', ':', '?', '*', '"', '<', '>', '|' };
         static string[] mimeTypeGoogleRemove = new string[] {mimeType.audio, mimeType.drawing, mimeType.file,mimeType.form,mimeType.fusiontable,
             mimeType.map,mimeType.presentation,mimeType.script,mimeType.sites,mimeType.unknown,mimeType.video,mimeType.photo};
-        static DriveAPIHttprequestv2 GetAPIv2(string Email)
+        static DriveAPIHttprequestv2 GetAPIv2(string Email, GD_LimitExceededDelegate LimitExceeded = null)
         {
-            DriveAPIHttprequestv2 gdclient = new DriveAPIHttprequestv2(JsonConvert.DeserializeObject<TokenGoogleDrive>(AppSetting.settings.GetToken(Email, CloudName.GoogleDrive)));
+            DriveAPIHttprequestv2 gdclient = new DriveAPIHttprequestv2(JsonConvert.DeserializeObject<TokenGoogleDrive>(AppSetting.settings.GetToken(Email, CloudName.GoogleDrive)), LimitExceeded);
             gdclient.Email = Email;
             gdclient.TokenRenewEvent += Gdclient_TokenRenewEvent;
             return gdclient;
@@ -60,8 +62,7 @@ namespace Core.Cloud
         public static GD_Files_list Search(string query, string Email, string parent_id = null, bool read_only = false)
         {
             DriveAPIHttprequestv2 gdclient = GetAPIv2(Email);
-            string temp = gdclient.Files_list(en, query);
-            return Check_n_AddToCache(JsonConvert.DeserializeObject<GD_Files_list>(temp),Email, parent_id,read_only);
+            return Check_n_AddToCache(JsonConvert.DeserializeObject<GD_Files_list>(gdclient.Files_list(en, query)),Email, parent_id,read_only);
         }
 
         public static ListItemFileFolder GetListFolderRecusive(string path, string id,string Email)
@@ -175,14 +176,19 @@ namespace Core.Cloud
 
         static GD_Files_list Check_n_AddToCache(GD_Files_list list_,string Email,string parent_id = null,bool read_only =false)
         {
-            //delete mimeType item not support
             for (int i = 0; i < list_.items.Count; i++)
             {
                 list_.items[i].Email = Email;
+                //if(list_.items[i].userPermission.role != rolePermissions.owner)  //remove item user not have permission writer or owner
+                //{
+                //    list_.items.RemoveAt(i);
+                //    i--;
+                //}
+
                 if (list_.items[i].mimeType == mimeType.folder) continue;
                 foreach (string item in mimeTypeGoogleRemove)
                 {
-                    if (list_.items[i].mimeType == item)
+                    if (list_.items[i].mimeType == item)//delete item has mimeType item not support
                     {
                         list_.items.RemoveAt(i);
                         i--;
@@ -190,11 +196,11 @@ namespace Core.Cloud
                     }
                 }
             }
+            
 
             //remove deleted item id on cache
             if (parent_id != null)
             {
-
                 if (parent_id == "root")
                 {
                     foreach(var id_pr in list_.items[0].parents)
@@ -380,6 +386,18 @@ namespace Core.Cloud
             }
         }
         
+        public static void ReadCache()
+        {
+            if (ReadWriteData.Exists(ReadWriteData.Cache_GD))
+                try { cache_gd = JsonConvert.DeserializeObject<List<GD_item>>(ReadWriteData.Read(ReadWriteData.Cache_GD).ReadToEnd()); } catch { cache_gd = new List<GD_item>(); }
+            else cache_gd = new List<GD_item>();
+        }
+
+        public static void SaveCache()
+        {
+            ReadWriteData.Write(ReadWriteData.Cache_GD, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cache_gd)));
+        }
+
         public static bool ReNameItem(string newname, string id,string Email)
         {
             DriveAPIHttprequestv2 gdclient = GetAPIv2(Email);
@@ -532,6 +550,8 @@ namespace Core.Cloud
         public string fullFileExtension;
 
         public string Email;
+        public permissionsResource userPermission;
+        public List<permissionsResource> permissions;
     }
 
     public class GD_parent
@@ -563,5 +583,24 @@ namespace Core.Cloud
         {
 
         }
+    }
+
+    public class permissionsResource
+    {
+        public string id;
+        public string name;
+        public rolePermissions role;
+        public List<rolePermissions> additionalRoles;
+        public typePermissions type;
+    }
+
+    public enum rolePermissions
+    {
+        owner, reader, writer
+    }
+
+    public enum typePermissions
+    {
+        user,group,domain,anyone
     }
 }

@@ -10,6 +10,8 @@ using System.Web;
 
 namespace Cloud.GoogleDrive
 {
+    public delegate void TokenRenewCallback(TokenGoogleDrive token, string Email);
+    public delegate void GD_LimitExceededDelegate();
     public class DriveAPIHttprequestv2
     {
         const string Host = "HOST: www.googleapis.com";
@@ -27,20 +29,22 @@ namespace Cloud.GoogleDrive
 
         GoogleAPIOauth2 oauth;
         static object SyncRefreshToken = new object();
+        static object LimitExceeded = new object();
+
 
         public HttpRequest_ request { get; set; }
 
-        public delegate void TokenRenewCallback(TokenGoogleDrive token, string Email);
         public event TokenRenewCallback TokenRenewEvent;
 
+        public GD_LimitExceededDelegate limit;
+
         public bool Debug = false;
-
         
-
-        public DriveAPIHttprequestv2(TokenGoogleDrive token)
+        public DriveAPIHttprequestv2(TokenGoogleDrive token, GD_LimitExceededDelegate LimitExceeded = null)
         {
             this.token = token;
             oauth = new GoogleAPIOauth2(token.refresh_token);
+            this.limit = LimitExceeded;
         }
 
         private object Request(string url, TypeRequest typerequest, TypeReturn typereturn = TypeReturn.string_, byte[] bytedata = null, string[] moreheader = null)
@@ -92,7 +96,7 @@ namespace Cloud.GoogleDrive
                             {
                                 Monitor.Enter(SyncRefreshToken);
                                 token = oauth.RefreshToken();
-                                TokenRenewEvent.Invoke(token, this.Email);//, this.PassWord);
+                                TokenRenewEvent.Invoke(token, this.Email);
                             }
                             finally { Monitor.Exit(SyncRefreshToken); }
                             return Request(url, typerequest, typereturn, bytedata, moreheader);
@@ -107,19 +111,31 @@ namespace Cloud.GoogleDrive
                         Error403 err = (Error403)Enum.Parse(typeof(Error403), message.error.errors[0].reason);
                         switch(err)
                         {
+                            case Error403.forbidden:
                             case Error403.appNotAuthorizedToFile:
                             case Error403.domainPolicy:
                             case Error403.insufficientFilePermissions:
+#if DEBUG
+                                Console.WriteLine("ex.Message");
+#endif
+                                break;
 
                             case Error403.dailyLimitExceeded:
                             case Error403.rateLimitExceeded:
                             case Error403.sharingRateLimitExceeded:
                             case Error403.userRateLimitExceeded:
+                                if (limit != null) limit.Invoke();
+#if DEBUG
+                                Console.WriteLine(err.ToString());
+#endif
+                                try { Monitor.Enter(LimitExceeded); Thread.Sleep(5000); } finally { Monitor.Exit(LimitExceeded); }
+                                return Request(url, typerequest, typereturn, bytedata, moreheader);
+
                             case Error403.abuse: if (acknowledgeAbuse_) return Request(url + "&acknowledgeAbuse=true", typerequest, typereturn, bytedata, moreheader); else break;
                             default: break;
                         }
                         break;
-                    case 308: if(typerequest == TypeRequest.PUT && typereturn == TypeReturn.streamupload_) return request.GetStream(); break;
+                    case 308: if(typerequest == TypeRequest.PUT && typereturn == TypeReturn.streamupload_) return request.GetStream(); else break;
                     default: break;
                 }
                 throw ex;
@@ -156,8 +172,7 @@ namespace Cloud.GoogleDrive
             if (parameters.Length == 0) return (string)Request(url, TypeRequest.GET);
             return (string)Request(url, TypeRequest.GET, TypeReturn.string_, Encoding.UTF8.GetBytes(parameters));
         }
-
-
+        
         #region Files
         public string Files_list(OrderByEnum[] order, string q = null, CorpusEnum corpus = CorpusEnum.DEFAULT,
                                 ProjectionEnum projection = ProjectionEnum.BASIC, string pageToken = null,
@@ -247,8 +262,7 @@ namespace Cloud.GoogleDrive
         }
 
         #endregion
-
-
+        
     }
 
 }

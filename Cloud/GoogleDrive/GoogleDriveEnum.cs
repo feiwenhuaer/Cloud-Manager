@@ -106,6 +106,7 @@
         insufficientFilePermissions,
         domainPolicy,
 
+        forbidden,
         abuse//malware
     }
 }

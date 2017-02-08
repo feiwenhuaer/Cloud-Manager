@@ -45,6 +45,7 @@ namespace Cloud_Manager
                 AppSetting.UILogin.ShowDialog_();
                 if (!string.IsNullOrEmpty(AppSetting.Pass))
                 {
+                    CloudManager.Load();
                     AppSetting.TransferManager.Start();
                     Reflection_UI.Load_UIMain();
                     showMainForm:

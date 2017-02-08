@@ -14,6 +14,11 @@ namespace Core.Cloud
 {
     public class CloudManager
     {
+        public static void Load()
+        {
+            GoogleDrive.ReadCache();
+        }
+
         public ListItemFileFolder GetItemsList(string path, string id)
         {
             ListItemFileFolder data = new ListItemFileFolder();

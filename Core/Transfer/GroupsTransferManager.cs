@@ -141,9 +141,9 @@ namespace Core.Transfer
                 }
             }
         }
-#endregion
+        #endregion
 
-#region Add new items from UI
+        #region Add new items from UI
         public List<Thread> LoadGroupThreads = new List<Thread>();
         public void AddItems(List<AddNewTransferItem> items, string fromfolder_raw, string savefolder_raw, bool AreCut)
         {
@@ -153,9 +153,9 @@ namespace Core.Transfer
             thr.Start();
             LoadGroupThreads.Add(thr);
         }
-#endregion
+        #endregion
 
-#region load/reload UI -> add groups to treelistview
+        #region load/reload UI -> add groups to treelistview
         public void LoadGroupToListView()
         {
             foreach (ItemsTransferManager gr in GroupsWork)
@@ -163,9 +163,9 @@ namespace Core.Transfer
                 AppSetting.uc_lv_ud_instance.AddNewGroup(gr.GroupData);
             }
         }
-#endregion
+        #endregion
 
-#region Kill thread
+        #region Kill thread
         void KillThreads(List<Thread> thrs)
         {
             for (int i = 0; i < thrs.Count; i++)
@@ -178,9 +178,9 @@ namespace Core.Transfer
         {
             thr.Abort();
         }
-#endregion
+        #endregion
 
-#region Closing Form
+        #region Closing Form
         public void Exit()
         {
             timestamp = CurrentMillis.Millis;
@@ -189,9 +189,9 @@ namespace Core.Transfer
         public event updateclosingform Eventupdateclosingform;
         public delegate void closeapp();
         public event closeapp Eventcloseapp;
-#endregion
+        #endregion
 
-#region Save/Read Data When Close/Open program
+        #region Save/Read Data When Close/Open program
         string temp_jsonSaveData = "";
         public void ReadData()
         {
@@ -227,6 +227,6 @@ namespace Core.Transfer
             else temp_jsonSaveData = json;
             ReadWriteData.Write(ReadWriteData.File_DataUploadDownload, Encoding.UTF8.GetBytes(json));
         }
-#endregion
+        #endregion
     }
 }
