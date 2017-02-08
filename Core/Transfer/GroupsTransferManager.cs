@@ -20,6 +20,7 @@ namespace Core.Transfer
         //Start after login
         public void Start()
         {
+            ReadData();
             MainThread = new Thread(LoadMainThread);
             MainThread.Start();
         }
@@ -35,7 +36,6 @@ namespace Core.Transfer
             bool flag_shutdown = false;
             timestamp = CurrentMillis.Millis;
             bool lockkillthr = false;
-            ReadData();
             while (Loop)
             {
                 Thread.Sleep(100);

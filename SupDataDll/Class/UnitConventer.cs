@@ -19,9 +19,8 @@ namespace SupDataDll
                 decimal sizeitem = num / (decimal)Math.Pow(div, i);
                 if (sizeitem < 1)
                 {
-                    //if (i == 0) return num.ToString() + " " + unit[0];
-                    //else
-                        return Math.Round((num / (decimal)Math.Pow(div, i - 1)), round).ToString() + " " + unit[(int)i - 1];
+                    if (i == 0) return "0 " + unit[0];
+                    else return Math.Round((num / (decimal)Math.Pow(div, i - 1)), round).ToString() + " " + unit[(int)i - 1];
                 }
             }
             return Math.Round((decimal)num / (decimal)Math.Pow(div, unit.Length - 1), round).ToString() + " " + unit[unit.Length - 1];
