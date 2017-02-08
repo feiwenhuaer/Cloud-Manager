@@ -17,7 +17,7 @@ namespace Core.Transfer
         public List<Thread> ThreadsItemLoadWork = new List<Thread>();
         public TransferGroup GroupData = new TransferGroup();
         public List<TransferBytes> ItemsTransferWork = new List<TransferBytes>();
-        
+
         #region Declare
         List<AddNewTransferItem> items;
         public AnalyzePath fromfolder;
@@ -35,7 +35,7 @@ namespace Core.Transfer
             {
                 if (item.status == StatusTransfer.Running) item.status = StatusTransfer.Stop;
                 item.col[3] = item.status.ToString();
-                item.SizeString = UnitConventer.ConvertSize(item.From.Size, 2, UnitConventer.unit_size); 
+                item.SizeString = UnitConventer.ConvertSize(item.From.Size, 2, UnitConventer.unit_size);
                 item.From.ap = new AnalyzePath(item.From.path);
                 item.To.ap = new AnalyzePath(item.To.path);
             }
@@ -58,50 +58,39 @@ namespace Core.Transfer
         #region Load List File Info
         public void LoadListItems()
         {
-            Console.WriteLine("Load group:" + fromfolder);
+            this.GroupData.status = StatusTransfer.Loading;
             this.GroupData.col = new List<string> { fromfolder.Path_Raw, savefolder.Path_Raw, this.GroupData.status.ToString(), "0/0", "", "", "" };
             AppSetting.uc_lv_ud_instance.AddNewGroup(GroupData);
             string path = fromfolder.PathIsUrl ? fromfolder.TypeCloud.ToString() + ":" + AppSetting.settings.GetDefaultCloud(fromfolder.TypeCloud) + "?id=" + fromfolder.ID : fromfolder.Path_Raw;
-
             foreach (AddNewTransferItem item in items)
             {
-                if (item.type == Type_FileFolder.File) GroupData.items.Add(LoadFile(path,item.name,item.size,item.id));
-                else GroupData.items.AddRange(ListAllItemInFolder(path + (fromfolder.PathIsCloud ? "/" : "\\") + item.name,item.id));
+                if (item.type == Type_FileFolder.File) LoadFile(path, item.name, item.size, item.id);
+                else ListAllItemInFolder(path + (fromfolder.PathIsCloud ? "/" : "\\") + item.name, item.id);
             }
             GroupData.status = StatusTransfer.Waiting;
             items.Clear();// clear Declare memory
         }
-        List<TransferItem> ListAllItemInFolder(string path_rawItem, string id = "")
+
+
+        void ListAllItemInFolder(string path_rawItem, string id = "")
         {
             ListItemFileFolder list;
-            List<TransferItem> ud_items = new List<TransferItem>();
             try
             {
                 if (fromfolder.PathIsUrl) list = AppSetting.ManageCloud.GetItemsList("", id);
                 else list = AppSetting.ManageCloud.GetItemsList(path_rawItem, id);//UnauthorizedAccessException
             }
-            catch (UnauthorizedAccessException) { return ud_items; }
+            catch (UnauthorizedAccessException) { return; }
 
             foreach (FileFolder ffitem in list.Items)
             {
-                if (ffitem.Size == -1)//folder size = -1
-                    ud_items.AddRange(
-                        ListAllItemInFolder(
-                            fromfolder.PathIsUrl ? path_rawItem + "/" + ffitem.Name : path_rawItem + (fromfolder.PathIsCloud ? "/" : "\\") + ffitem.Name,
-                            ffitem.id));
-                else
-                    ud_items.Add(
-                        LoadFile(
-                            path_rawItem,
-                            ffitem.Name,
-                            ffitem.Size,
-                            ffitem.id));
+                if (ffitem.Size == -1) ListAllItemInFolder(fromfolder.PathIsUrl ? path_rawItem + "/" + ffitem.Name : path_rawItem + (fromfolder.PathIsCloud ? "/" : "\\") + ffitem.Name, ffitem.id);
+                else LoadFile(path_rawItem, ffitem.Name, ffitem.Size, ffitem.id);
             }
-            return ud_items;
         }
 
         //Path_Parent : GD:default@gmail.com?id=id/folder/folder or GD:a@gmail.com/folder/folder
-        TransferItem LoadFile(string Path_Parent, string FileName, long size, string FileId)//Path_raw path parent folder of file
+        void LoadFile(string Path_Parent, string FileName, long size, string FileId)//Path_raw path parent folder of file
         {
             TransferItem ud_item = new TransferItem();
             //From
@@ -117,7 +106,8 @@ namespace Core.Transfer
             ud_item.To.path = AnalyzePath.GetPathTo(fromfolder.PathIsUrl ? ud_item.From.ap.Path_Raw : ud_item.From.ap.GetPath(), fromfolder, savefolder);
             ud_item.To.ap = new AnalyzePath(ud_item.To.path);
             ud_item.col = new List<string> { ud_item.From.ap.Path_Raw, ud_item.To.ap.Path_Raw, ud_item.status.ToString(), "", "", "", "" };
-            return ud_item;
+            GroupData.items.Add(ud_item);
+            GroupData.col[3] = "0/" + GroupData.items.Count.ToString();
         }
         #endregion
 

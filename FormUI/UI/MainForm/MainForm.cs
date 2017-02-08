@@ -484,7 +484,7 @@ namespace FormUI.UI.MainForm
                     string extension = (string)splitPath.GetValue(splitPath.GetUpperBound(0));
                     if (string.IsNullOrEmpty(extension)) extension = ff.Name;
                     
-                    ListItem_LV.Add(new ItemLV() { str = new string[] { ff.Name, "File", ff.Size.ToString(), ff.Time_mod.ToString(TimeFormat), ff.mimeType, ff.id },
+                    ListItem_LV.Add(new ItemLV() { str = new string[] { ff.Name, "File",ff.Size.ToString(), ff.Time_mod.ToString(TimeFormat), ff.mimeType, ff.id },
                                     icon = iscloud ? IconReader.GetFileIcon("." + extension, IconReader.IconSize.Small, false) : null,
                                     filepath = iscloud ? string.Empty : (list.path_raw + "\\" + ff.Name).Replace("\\\\","\\")});
                     

@@ -155,14 +155,18 @@ namespace Core.Cloud
             string email = json.email;
             SaveToken(email, token, CloudName.Dropbox);
         }
-        private void Oauth_gd_TokenCallBack(TokenGoogleDrive token)
+        private void Oauth_gd_TokenCallBack(string token_)
         {
-            if (token.IsError) throw new Exception("Accesstoken:" + token.access_token + ",RefreshToken:" + token.refresh_token);
-            string token_text = JsonConvert.SerializeObject(token);
-            DriveAPIHttprequestv2 client = new DriveAPIHttprequestv2(token);
-            dynamic about = JsonConvert.DeserializeObject(client.About());
-            string email = about.user.emailAddress;
-            SaveToken(email, token_text, CloudName.GoogleDrive);
+            if (!string.IsNullOrEmpty(token_))
+            {
+                TokenGoogleDrive token = JsonConvert.DeserializeObject<TokenGoogleDrive>(token_);
+                if (token.IsError) throw new Exception("Accesstoken:" + token.access_token + ",RefreshToken:" + token.refresh_token);
+                string token_text = JsonConvert.SerializeObject(token);
+                DriveAPIHttprequestv2 client = new DriveAPIHttprequestv2(token);
+                dynamic about = JsonConvert.DeserializeObject(client.About());
+                string email = about.user.emailAddress;
+                SaveToken(email, token_text, CloudName.GoogleDrive);
+            }else throw new Exception("Oauth token GD failed.");
         }
         private void SaveToken(string email, string token, CloudName type)
         {

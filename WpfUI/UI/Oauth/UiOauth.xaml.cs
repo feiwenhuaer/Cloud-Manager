@@ -42,18 +42,9 @@ namespace WpfUI.UI.Oauth
 
         public void ShowUI(object owner)
         {
-            Thread thr = new Thread(ShowDiag);
-            thr.Start();
+            this.Show();
         }
         #endregion
-
-        void ShowDiag()
-        {
-            if(!Dispatcher.CheckAccess())
-            {
-                Dispatcher.Invoke(new Action(() => this.ShowDialog()));
-            }else this.ShowDialog();
-        }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {

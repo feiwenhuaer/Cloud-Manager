@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Cloud.GoogleDrive.Oauth
 {
-    public class GoogleAPIOauth2
+    public class GoogleAPIOauth2: OauthV2
     {
         #region Value
         string refresh_token = "";
@@ -18,30 +18,11 @@ namespace Cloud.GoogleDrive.Oauth
         const string userInfoEndpoint = "https://www.googleapis.com/oauth2/v3/userinfo";
         const string LoopbackCallback = "http://localhost:{0}/authorize/";
         string[] scopes = { Scope.Drive, Scope.DriveFile, Scope.DriveMetadata };
-        HttpListener listener;
-        private const string ClosePageResponse =
-@"<html>
-  <head><title>OAuth 2.0 Authentication Token Received</title></head>
-  <body>
-    Received verification code.
-    <script type='text/javascript'>
-      // This doesn't work on every browser.
-      window.setTimeout(function() {
-          window.open('', '_self', ''); 
-          window.close(); 
-        }, 1000);
-      if (window.opener) { window.opener.checkToken(); }
-    </script>
-  </body>
-</html>";
-        public delegate void DelegateToken(TokenGoogleDrive token);
-        public event DelegateToken TokenCallBack;
 
         string state;
         string code_verifier;
         string code_challenge;
         const string code_challenge_method = "S256";
-        string redirectURI;
         public string ErrorRefreshToken
         {
             get { return this.Error_refresh_token; }
@@ -71,36 +52,14 @@ namespace Cloud.GoogleDrive.Oauth
             string scopepara = Scope.GetParameters(this.scopes);
 
             redirectURI = string.Format("http://{0}:{1}/", IPAddress.Loopback, GetRandomUnusedPort());
-            string authorizationRequest = string.Format("{0}?response_type=code&scope={1}&redirect_uri={2}&client_id={3}&state={4}&code_challenge={5}&code_challenge_method={6}",
+            authorizationRequest = string.Format("{0}?response_type=code&scope={1}&redirect_uri={2}&client_id={3}&state={4}&code_challenge={5}&code_challenge_method={6}",
                 authorizationEndpoint, scopepara, Uri.EscapeDataString(redirectURI), APPkey.ClientID, state, code_challenge, code_challenge_method);
 
-            listener = new HttpListener();
-            listener.Prefixes.Add(redirectURI);
-            try
-            {
-                listener.Start();
-                ui.Url = authorizationRequest;
-                ui.CheckUrl = redirectURI;
-                ui.ShowUI(owner);
-                listener.BeginGetContext(new AsyncCallback(RecieveCode), null);
-            }
-            catch (Exception ex)
-            {
-                tokencode.IsError = true;
-                Console.WriteLine("Oauth error:" + ex.Message + "\r\nSource:" + ex.Source);
-            }
+            GetCode_(ui,owner,new HttpListenerContextRecieve(Rev));
         }
 
-        void RecieveCode(IAsyncResult rs)
+        void Rev(HttpListenerContext ls)
         {
-            HttpListenerContext ls = listener.EndGetContext(rs);
-            using (var writer = new StreamWriter(ls.Response.OutputStream))
-            {
-                writer.WriteLine(ClosePageResponse);
-                writer.Flush();
-            }
-            ls.Response.OutputStream.Close();
-            //listener.Close();
             if (ls.Request.QueryString.Get("error") != null | ls.Request.QueryString.Get("code") == null | ls.Request.QueryString.Get("state") == null)
             {
                 this.tokencode.IsError = true;
@@ -115,11 +74,7 @@ namespace Cloud.GoogleDrive.Oauth
                 try { listener.Close(); } catch { }
                 throw new Exception(ls.Request.RawUrl);
             }
-            GetToken(code_verifier, redirectURI);
-        }
 
-        void GetToken(string code_verifier, string redirectURI)
-        {
             string tokenRequestBody = string.Format("code={0}&redirect_uri={1}&client_id={2}&code_verifier={3}&client_secret={4}&scope=&grant_type=authorization_code",
                 this.tokencode.Code, System.Uri.EscapeDataString(redirectURI), APPkey.ClientID, code_verifier, APPkey.Clientsecret);
 
@@ -144,7 +99,7 @@ namespace Cloud.GoogleDrive.Oauth
                 this.tokencode.id_token = json.id_token;
                 if (string.IsNullOrEmpty(this.tokencode.access_token)) throw new ArgumentNullException(this.tokencode.access_token);
                 if (string.IsNullOrEmpty(this.tokencode.refresh_token)) throw new ArgumentNullException(this.tokencode.refresh_token);
-                TokenCallBack.Invoke(tokencode);
+                ReturnToken(responseText);
             }
         }
 

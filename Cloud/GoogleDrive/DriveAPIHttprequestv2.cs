@@ -12,6 +12,7 @@ namespace Cloud.GoogleDrive
 {
     public class DriveAPIHttprequestv2
     {
+        const string Host = "HOST: www.googleapis.com";
         public string Email = "";
         public string PassWord;
         bool acknowledgeAbuse = true;
@@ -33,19 +34,13 @@ namespace Cloud.GoogleDrive
             this.token = token;
             oauth = new GoogleAPIOauth2(token.refresh_token);
         }
-        public DriveAPIHttprequestv2(string access_token, string refresh_token)
-        {
-            if ((string.IsNullOrEmpty(access_token) | string.IsNullOrEmpty(refresh_token)) == true) throw new Exception("Value input can't be null.");
-            oauth = new GoogleAPIOauth2(refresh_token);
-            this.token = new TokenGoogleDrive() { access_token = access_token, refresh_token = refresh_token };
-        }
 
         private object Request(string url, TypeRequest typerequest, TypeReturn typereturn = TypeReturn.string_, byte[] bytedata = null, string[] moreheader = null)
         {
             request = new HttpRequest_(url, typerequest.ToString());
             request.debug = Debug;
             if (typereturn == TypeReturn.streamresponse_) request.ReceiveTimeout = 5000;
-            request.AddHeader("HOST: www.googleapis.com");
+            request.AddHeader(Host);
             request.AddHeader("Authorization", "Bearer " + token.access_token);
             if (moreheader != null)
             {
@@ -77,41 +72,47 @@ namespace Cloud.GoogleDrive
             }
             catch (HttpException ex)
             {
-                //string temp = request.HeaderReceive;
                 string textdata = request.TextDataResponse;
-                //Console.WriteLine(temp + "\r\n" + textdata);
-                if (ex.GetHttpCode() == 401)
+                GoogleDriveErrorMessage message = Newtonsoft.Json.JsonConvert.DeserializeObject<GoogleDriveErrorMessage>(ex.Message);
+                switch(message.error.code)
                 {
-
-                    if (Monitor.TryEnter(SyncRefreshToken))
-                    {
-                        try
+                    case 204: if (typerequest == TypeRequest.DELETE) return textdata; break;// delete result
+                    case 401:
+                        if (Monitor.TryEnter(SyncRefreshToken))
                         {
-                            Monitor.Enter(SyncRefreshToken);
-                            token = oauth.RefreshToken();
-                            TokenRenewEvent.Invoke(token, this.Email);//, this.PassWord);
+                            try
+                            {
+                                Monitor.Enter(SyncRefreshToken);
+                                token = oauth.RefreshToken();
+                                TokenRenewEvent.Invoke(token, this.Email);//, this.PassWord);
+                            }
+                            finally { Monitor.Exit(SyncRefreshToken); }
+                            return Request(url, typerequest, typereturn, bytedata, moreheader);
                         }
-                        finally { Monitor.Exit(SyncRefreshToken); }
-                        return Request(url, typerequest, typereturn, bytedata, moreheader);
-                    }
-                    else
-                    {
-                        try { Monitor.Enter(SyncRefreshToken); }
-                        finally { Monitor.Exit(SyncRefreshToken); }
-                        return Request(url, typerequest, typereturn, bytedata, moreheader);
-                    }
-                }
-                if (ex.GetHttpCode() == 403 & acknowledgeAbuse)
-                {
-                    return Request(url + "&acknowledgeAbuse=true", typerequest, typereturn, bytedata, moreheader);
-                }
-                if (typerequest == TypeRequest.DELETE && ex.GetHttpCode() == 204)// delete result
-                {
-                    return textdata;
-                }
-                if (ex.GetHttpCode() == 308 && typerequest == TypeRequest.PUT && typereturn == TypeReturn.streamupload_)
-                {
-                    return request.GetStream();
+                        else
+                        {
+                            try { Monitor.Enter(SyncRefreshToken); }
+                            finally { Monitor.Exit(SyncRefreshToken); }
+                            return Request(url, typerequest, typereturn, bytedata, moreheader);
+                        }
+                    case 403:
+                        Error403 err = (Error403)Enum.Parse(typeof(Error403), message.error.errors[0].reason);
+                        switch(err)
+                        {
+                            case Error403.appNotAuthorizedToFile:
+                            case Error403.domainPolicy:
+                            case Error403.insufficientFilePermissions:
+
+                            case Error403.dailyLimitExceeded:
+                            case Error403.rateLimitExceeded:
+                            case Error403.sharingRateLimitExceeded:
+                            case Error403.userRateLimitExceeded:
+                            default: break;
+                        }
+                        break;
+                        //if (acknowledgeAbuse) return Request(url + "&acknowledgeAbuse=true", typerequest, typereturn, bytedata, moreheader); break;
+                    case 308: if(typerequest == TypeRequest.PUT && typereturn == TypeReturn.streamupload_) return request.GetStream(); break;
+                    default: break;
                 }
                 throw ex;
             }

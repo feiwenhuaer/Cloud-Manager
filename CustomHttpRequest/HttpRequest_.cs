@@ -298,7 +298,7 @@ namespace CustomHttpRequest
                 int statuscode = GetCodeResponse();
                 if (statuscode == 200 | statuscode == 206) return st;
                 textdataresponse = ReadDataResponseText(CheckMethodTransfer());
-                throw new HttpException(statuscode, "Error code "+ statuscode.ToString()+"\r\n"+textdataresponse);
+                throw new HttpException(statuscode,textdataresponse);
             }
         }
         
@@ -366,7 +366,7 @@ namespace CustomHttpRequest
                 goto ReRequest;
             }
             if (!CheckStatusCode) return textdataresponse;
-            throw new HttpException(response_code, "Error code " + response_code.ToString() +"\r\n"+ textdataresponse);
+            throw new HttpException(response_code,textdataresponse);
         }
 
         /// <summary>

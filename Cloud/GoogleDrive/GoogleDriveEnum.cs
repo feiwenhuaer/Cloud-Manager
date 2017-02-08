@@ -96,4 +96,14 @@
     {
         mp4 = 0
     }
+    public enum Error403
+    {
+        dailyLimitExceeded,
+        userRateLimitExceeded,
+        rateLimitExceeded,
+        sharingRateLimitExceeded,
+        appNotAuthorizedToFile,
+        insufficientFilePermissions,
+        domainPolicy
+    }
 }

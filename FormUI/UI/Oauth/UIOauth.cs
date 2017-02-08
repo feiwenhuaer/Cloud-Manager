@@ -54,7 +54,10 @@ namespace FormUI.UI.Oauth
 
         private void UIOauth_Load(object sender, EventArgs e)
         {
-            webBrowser1.Navigate(url);
+            webBrowser1.Navigate(new Uri(url));
+#if DEBUG
+            Console.WriteLine("webBrowser1 Navigate url:" + url);
+#endif
         }
 
         private void webBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
@@ -63,6 +66,11 @@ namespace FormUI.UI.Oauth
             {
                 this.Close();
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            webBrowser1.Navigate(url);
         }
     }
 }

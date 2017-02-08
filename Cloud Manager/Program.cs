@@ -52,7 +52,7 @@ namespace Cloud_Manager
                     AppSetting.UIMain.ShowDialog_();
                     if (AppSetting.UIMain.AreReloadUI)//if reload ui
                     {
-                        AppSetting.UIOauth.CloseUI();
+                        if(AppSetting.UIOauth != null) AppSetting.UIOauth.CloseUI();
                         AppSetting.TransferManager.status = StatusUpDownApp.Pause;
                         //clean memory
                         AppSetting.UIMain = null;

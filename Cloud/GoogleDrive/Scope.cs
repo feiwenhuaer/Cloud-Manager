@@ -13,39 +13,12 @@
             return string.IsNullOrEmpty(s) ? null : s.Remove(s.Length - 3);
         }
 
-        public static string Drive
-        {
-            get { return "https://www.googleapis.com/auth/drive"; }
-        }
-
-        public static string DriveFile
-        {
-            get { return "https://www.googleapis.com/auth/drive.file"; }
-        }
-
-        public static string DriveReadonly
-        {
-            get { return "https://www.googleapis.com/auth/drive.readonly"; }
-        }
-
-        public static string DriveMetadataReadonly
-        {
-            get { return "https://www.googleapis.com/auth/drive.metadata.readonly"; }
-        }
-
-        public static string DriveAppdata
-        {
-            get { return "https://www.googleapis.com/auth/drive.appdata"; }
-        }
-
-        public static string DriveMetadata
-        {
-            get { return "https://www.googleapis.com/auth/drive.metadata"; }
-        }
-
-        public static string DrivePhotosReadonly
-        {
-            get { return "https://www.googleapis.com/auth/drive.photos.readonly"; }
-        }
+        public const string Drive = "https://www.googleapis.com/auth/drive";
+        public const string DriveFile = "https://www.googleapis.com/auth/drive.file";
+        public const string DriveReadonly = "https://www.googleapis.com/auth/drive.readonly";
+        public const string DriveMetadataReadonly = "https://www.googleapis.com/auth/drive.metadata.readonly";
+        public const string DriveAppdata = "https://www.googleapis.com/auth/drive.appdata";
+        public const string DriveMetadata = "https://www.googleapis.com/auth/drive.metadata";
+        public const string DrivePhotosReadonly = "https://www.googleapis.com/auth/drive.photos.readonly";
     }
 }
