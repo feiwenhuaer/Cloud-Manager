@@ -104,6 +104,8 @@
         sharingRateLimitExceeded,
         appNotAuthorizedToFile,
         insufficientFilePermissions,
-        domainPolicy
+        domainPolicy,
+
+        abuse//malware
     }
 }

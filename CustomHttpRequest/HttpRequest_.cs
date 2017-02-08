@@ -286,7 +286,8 @@ namespace CustomHttpRequest
                             buffer_header[(int)byte_receive - 2] == 13 && buffer_header[(int)byte_receive - 1] == 10) { break; }
                     } while (true);
                 }
-                catch (Exception ex) { throw ex; }
+                catch (Exception ex)
+                { throw ex; }
                 header_receive = Encoding.UTF8.GetString(buffer_header, 0, (int)byte_header_receive).TrimStart(' ');
                 debugwrite("header response.", header_receive);
                 WasReceiveHeader = true;

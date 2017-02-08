@@ -13,21 +13,29 @@ namespace Cloud.GoogleDrive
     public class DriveAPIHttprequestv2
     {
         const string Host = "HOST: www.googleapis.com";
-        public string Email = "";
-        public string PassWord;
-        bool acknowledgeAbuse = true;
+
+        public int ReceiveTimeout { set { ReceiveTimeout_ = value; } get { return ReceiveTimeout; } }
+        int ReceiveTimeout_ = 20000;
+        
+        public string Email { private get; set; }
+
+        public bool acknowledgeAbuse { get { return acknowledgeAbuse_; } set { acknowledgeAbuse_ = value; } }
+        bool acknowledgeAbuse_ = true;
+        
+        public TokenGoogleDrive GetToken { get { return token; } set { token = value; } }
         TokenGoogleDrive token;
+
         GoogleAPIOauth2 oauth;
-        private static object SyncRefreshToken = new object();
-        public HttpRequest_ request;
-        public delegate void TokenRenewCallback(TokenGoogleDrive token, string Email);//, string PassWord);
+        static object SyncRefreshToken = new object();
+
+        public HttpRequest_ request { get; set; }
+
+        public delegate void TokenRenewCallback(TokenGoogleDrive token, string Email);
         public event TokenRenewCallback TokenRenewEvent;
+
         public bool Debug = false;
-        public TokenGoogleDrive GetToken
-        {
-            get { return token; }
-            set { token = value; }
-        }
+
+        
 
         public DriveAPIHttprequestv2(TokenGoogleDrive token)
         {
@@ -39,7 +47,7 @@ namespace Cloud.GoogleDrive
         {
             request = new HttpRequest_(url, typerequest.ToString());
             request.debug = Debug;
-            if (typereturn == TypeReturn.streamresponse_) request.ReceiveTimeout = 5000;
+            if (typereturn == TypeReturn.streamresponse_) request.ReceiveTimeout = this.ReceiveTimeout_;
             request.AddHeader(Host);
             request.AddHeader("Authorization", "Bearer " + token.access_token);
             if (moreheader != null)
@@ -107,10 +115,10 @@ namespace Cloud.GoogleDrive
                             case Error403.rateLimitExceeded:
                             case Error403.sharingRateLimitExceeded:
                             case Error403.userRateLimitExceeded:
+                            case Error403.abuse: if (acknowledgeAbuse_) return Request(url + "&acknowledgeAbuse=true", typerequest, typereturn, bytedata, moreheader); else break;
                             default: break;
                         }
                         break;
-                        //if (acknowledgeAbuse) return Request(url + "&acknowledgeAbuse=true", typerequest, typereturn, bytedata, moreheader); break;
                     case 308: if(typerequest == TypeRequest.PUT && typereturn == TypeReturn.streamupload_) return request.GetStream(); break;
                     default: break;
                 }
