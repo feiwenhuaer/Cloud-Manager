@@ -227,7 +227,7 @@ namespace FormUI.UI.MainForm
             {
                 AnalyzePath ap = new AnalyzePath(TB_Path.Text);
                 Clear();
-                HistoryPathID.Add(new OldPathLV(ap.ID, TB_Path.Text));
+                HistoryPathID.Add(new OldPathLV(string.Empty, TB_Path.Text));
                 Next();
             }
         }

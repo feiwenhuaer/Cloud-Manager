@@ -153,7 +153,7 @@ namespace Core.Cloud
                 //find in cloud
                 if (string.IsNullOrEmpty(parent_ID_temp))//list recusive in cloud if not found
                 {
-                    list_ = Search("'" + parent_ID + "' in parents and title = '" + path_arr[i] + "' and mimeType = 'application/vnd.google-apps.folder' and trashed=false", Email);
+                    list_ = Search("'" + parent_ID + "' in parents and title = '" + path_arr[i].Replace("'", "\\'") + "' and mimeType = 'application/vnd.google-apps.folder' and trashed=false", Email);
                     foreach (var item in list_.items)
                     {
                         if (item.title == path_arr[i])
@@ -185,7 +185,6 @@ namespace Core.Cloud
                 //    list_.items.RemoveAt(i);
                 //    i--;
                 //}
-
                 if (list_.items[i].mimeType == mimeType.folder) continue;
                 foreach (string item in mimeTypeGoogleRemove)
                 {

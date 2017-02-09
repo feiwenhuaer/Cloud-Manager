@@ -101,7 +101,8 @@ namespace SupDataDll
         public FileTransferInfo From = new FileTransferInfo();
         public FileTransferInfo To = new FileTransferInfo();
         public string UploadID = "";//for remuse upload
-        public string ErrorMsg = "";
+        public string ErrorMsg { get { return errormsg; } set { errormsg = value.Replace("\r", "").Replace("\n", ""); } }
+        string errormsg = "";
         public long Transfer = 0;//byte[] was transfer
         public int ChunkUploadSize = -1;// = -1 is download, >0 is chunk size upload
         public long TransferRequest = 0;//Save pos chunk upload success

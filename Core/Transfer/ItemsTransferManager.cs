@@ -178,8 +178,7 @@ namespace Core.Transfer
                 {
                     Group_TotalTransfer += GroupData.items[i].Transfer;
                     #region start item force start
-                    if (this.GroupData.items[i].status == StatusTransfer.Started && this.GroupData.status == StatusTransfer.Running
-                        )
+                    if (this.GroupData.items[i].status == StatusTransfer.Started && this.GroupData.status == StatusTransfer.Running)
                     {
                         Thread thr = new Thread(WorkThread);
                         this.GroupData.items[i].status = StatusTransfer.Running;
@@ -287,7 +286,8 @@ namespace Core.Transfer
                 GroupData.items[i].col[2] = GroupData.items[i].status.ToString();
                 if (GroupData.items[i].col[3].IndexOf("100% (") < 0 & GroupData.items[i].From.Size != 0)
                     GroupData.items[i].col[3] = Math.Round((double)GroupData.items[i].Transfer * 100 / GroupData.items[i].From.Size, 2).ToString() + "% (" + UnitConventer.ConvertSize(GroupData.items[i].Transfer, 2, UnitConventer.unit_size) + "/" + GroupData.items[i].SizeString + ")";
-                GroupData.items[i].col[6] = GroupData.items[i].ErrorMsg;
+                
+                if (GroupData.items[i].ErrorMsg != GroupData.items[i].col[6]) GroupData.items[i].col[6] = GroupData.items[i].ErrorMsg;
             }
         }
 
@@ -384,7 +384,8 @@ namespace Core.Transfer
                         #endregion
                 }
             }
-            catch (Exception ex) { GroupData.items[x].ErrorMsg = ex.Message; GroupData.items[x].status = StatusTransfer.Error; return; }
+            catch (Exception ex)
+            { GroupData.items[x].ErrorMsg = ex.Message +ex.StackTrace; GroupData.items[x].status = StatusTransfer.Error; return; }
         }
     }
 }
