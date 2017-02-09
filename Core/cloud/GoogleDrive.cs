@@ -50,6 +50,7 @@ namespace Core.Cloud
             list.path_raw = CloudName.GoogleDrive.ToString() + ":" + Email + "/" + path;
             list.path_raw = list.path_raw.Replace("//", "/");
             list.id_folder = parent_ID;
+            SaveCache();
             return list;
         }
 
@@ -335,7 +336,6 @@ namespace Core.Cloud
             }
             #endregion
 
-            GC.Collect();
             return list_;
         }
 

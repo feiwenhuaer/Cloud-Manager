@@ -178,7 +178,8 @@ namespace Core.Transfer
                 {
                     Group_TotalTransfer += GroupData.items[i].Transfer;
                     #region start item force start
-                    if (this.GroupData.items[i].status == StatusTransfer.Started)
+                    if (this.GroupData.items[i].status == StatusTransfer.Started && this.GroupData.status == StatusTransfer.Running
+                        )
                     {
                         Thread thr = new Thread(WorkThread);
                         this.GroupData.items[i].status = StatusTransfer.Running;
@@ -295,7 +296,7 @@ namespace Core.Transfer
             int x = (int)obj;
             try
             {
-                Console.WriteLine("Load items:"+GroupData.items[x].From.ap.Path_Raw);
+                Console.WriteLine("Transfer items:"+GroupData.items[x].From.ap.Path_Raw);
                 #region CreateStreamFrom
                 if (!fromfolder.PathIsUrl)
                 {
@@ -329,6 +330,7 @@ namespace Core.Transfer
                 GroupData.items[x].Transfer = GroupData.items[x].OldTransfer = GroupData.items[x].TransferRequest;//remuse
                 GroupData.items[x].ErrorMsg = "";//clear error
                 GroupData.items[x].Timestamp = CurrentMillis.Millis;
+                if (GroupData.status != StatusTransfer.Running) return;
                 switch (GroupData.items[x].To.ap.TypeCloud)
                 {
                     case CloudName.LocalDisk:

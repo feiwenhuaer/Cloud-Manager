@@ -120,6 +120,9 @@ namespace Core.Transfer
                                 if (s.status == StatusTransfer.Running | s.status == StatusTransfer.Waiting) { s.status = StatusTransfer.Stop; ItemsRunningCount++; }
                             });
                             ItemsRunningCount += group.ThreadsItemLoadWork.Count;
+#if DEBUG
+                            Console.WriteLine("ItemsRunningCount:" + ItemsRunningCount.ToString());
+#endif
                         }
                         ItemsRunningCount += this.LoadGroupThreads.Count;
                         //if (lockkillthr) KillThreads(threads);
