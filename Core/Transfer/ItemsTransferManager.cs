@@ -365,8 +365,8 @@ namespace Core.Transfer
                         gdclient.Email = GroupData.items[x].To.ap.Email;
                         gdclient.TokenRenewEvent += GoogleDrive.Gdclient_TokenRenewEvent;
 
-                        if (GoogleDrive.CreateFolder(GroupData.items[x].To.ap.TypeCloud.ToString() + ":" + GroupData.items[x].To.ap.Email + GroupData.items[x].To.ap.Parent) != GroupData.items[x].To.ap.Parent)
-                            throw new Exception("Can't create folder: " + GroupData.items[x].To.ap.TypeCloud.ToString() + ":" + GroupData.items[x].To.ap.Email + GroupData.items[x].To.ap.Parent);
+                        if (GoogleDrive.CreateFolder(GroupData.items[x].To.ap.GetParent()) != GroupData.items[x].To.ap.Parent)
+                            throw new Exception("Can't create folder: " + GroupData.items[x].To.ap.Parent);
                         
                         int chunksizeGD = 5;//default
                         int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.GD_ChunksSize), out chunksizeGD);

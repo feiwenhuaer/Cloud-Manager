@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using SupDataDll.UiInheritance;
 using Core.Cloud;
 using Core.Transfer;
+using System.Runtime.InteropServices;
 
 namespace Cloud_Manager
 {

@@ -97,15 +97,14 @@ namespace Cloud.GoogleDrive
                                 Monitor.Enter(SyncRefreshToken);
                                 token = oauth.RefreshToken();
                                 TokenRenewEvent.Invoke(token, this.Email);
+                                return Request(url, typerequest, typereturn, bytedata, moreheader);
                             }
                             finally { Monitor.Exit(SyncRefreshToken); }
-                            return Request(url, typerequest, typereturn, bytedata, moreheader);
                         }
                         else
                         {
-                            try { Monitor.Enter(SyncRefreshToken); }
+                            try { Monitor.Enter(SyncRefreshToken); return Request(url, typerequest, typereturn, bytedata, moreheader); }
                             finally { Monitor.Exit(SyncRefreshToken); }
-                            return Request(url, typerequest, typereturn, bytedata, moreheader);
                         }
                     case 403:
                         Error403 err = (Error403)Enum.Parse(typeof(Error403), message.error.errors[0].reason);
@@ -116,7 +115,7 @@ namespace Cloud.GoogleDrive
                             case Error403.domainPolicy:
                             case Error403.insufficientFilePermissions:
 #if DEBUG
-                                Console.WriteLine("ex.Message");
+                                Console.WriteLine("Error403:" + textdata);
 #endif
                                 break;
 

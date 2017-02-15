@@ -116,7 +116,7 @@ namespace Core.Cloud
                 case CloudName.Dropbox:
                     return Dropbox.CreateFolder(Real_path, rp.Email);
                 case CloudName.GoogleDrive:
-                    return GoogleDrive.CreateFolder(path,parentid,Email,name);
+                    return GoogleDrive.CreateFolder(rp, parentid,Email,name);
                 case CloudName.LocalDisk:
                     return LocalDisk.CreateFolder(path);
                 default:

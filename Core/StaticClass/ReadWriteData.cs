@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Threading;
 
 namespace Core.StaticClass
 {
@@ -57,6 +58,20 @@ namespace Core.StaticClass
         public static bool Exists(string filename)
         {
             return File.Exists(Path + "\\" + filename);
+        }
+        static object sync_log = new object();
+        public static void WriteLog(string message)
+        {
+            try
+            {
+                Monitor.Enter(sync_log);
+                FileStream f = new FileStream(Path + "\\" + "log.txt", FileMode.OpenOrCreate, FileAccess.Write);
+                byte[] data = Encoding.UTF8.GetBytes("["+DateTime.Now.ToString("ss-mm-hh dd-MM-yyy") + "] : " + message +"\r\n");
+                f.Seek(0, SeekOrigin.End);
+                f.Write(data, 0, data.Length);
+                f.Close();
+            }
+            finally { Monitor.Exit(sync_log); }
         }
     }
 }

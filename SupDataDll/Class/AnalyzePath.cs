@@ -29,7 +29,8 @@ namespace SupDataDll
         public bool PathIsCloud { get { return path_is_cloud; } }
         private bool path_is_cloud = false;
 
-        public bool PathIsUrl { get { return IsUrl(path_raw); } }
+        public bool PathIsUrl { get { return isurl; } }
+        bool isurl = false;
 
         public string Parent { get { if (string.IsNullOrEmpty(path_parent)) throw new ArgumentNullException("Parent"); else return path_parent; } }
         private string path_parent = "";
@@ -40,8 +41,11 @@ namespace SupDataDll
         public string ID { get { if (string.IsNullOrEmpty(id)) throw new ArgumentNullException("ID"); else return id; } }
         private string id = "";
 
-        public bool IsFolder { get { return isFolder; } set { isFolder = value; } }
+        public bool IsFolder { get { return isFolder; } }
         private bool isFolder = true;
+
+        public bool HaveParent { get { return haveparent; } }
+        private bool haveparent = false;
         #endregion
 
         #region const
@@ -49,7 +53,7 @@ namespace SupDataDll
         Rg_CloudName = "^\\w+",//GoogleDrive[:
         Rg_email = "(?<=:)(\\w|\\.)+@(\\w|\\.)+",// :]tqk2.sa_dsa@abc.com 
         Rg_PathCloud = "\\/.+$", // GoogleDrive:tqk2811@gmail.com]/abc/def/ad
-        Rg_LastItem = "((?!\\/)\\S)+$",//ad
+        Rg_LastItem = "((?!\\/).)+$",//ad fas  ((?!\/).)+$
         Rg_url_GD = "^https:\\/\\/drive\\.google\\.com",//https://drive.google.com......
         Rg_url_idFolder = "(?<=\\/folders\\/)[A-Za-z0-9-_]+",//drive/folders/id_folder or drive.google.com/drive/u/0/folders/id
         Rg_url_idFolderOpen = "(?<=\\?id\\=)[A-Za-z0-9-_]+",
@@ -57,7 +61,6 @@ namespace SupDataDll
         Rg_cloud_id = "(?<=id=)\\S+",
         Rg_cloud_query = "(?<=q=).+",
         Rg_Disk_LastItem = "(?<=\\\\)(.(?!\\\\))+$";
-
         #endregion
 
         #region Static 
@@ -135,7 +138,7 @@ namespace SupDataDll
             throw new Exception(pathfrom + " not index of " + rootfrom.Path_Raw);
         }
 
-        static string RemoveDup(string newpath,string temp)
+        static string RemoveDup(string newpath,string temp)// replace \\ -> \ or // -> /
         {
             while (newpath.IndexOf(temp + temp) >= 0)
             {
@@ -143,44 +146,69 @@ namespace SupDataDll
             }
             return newpath;
         }
+
         public static bool IsCloud(string path)
         {
-            if (path.IndexOf("\\") >= 0)
+            if (path.IndexOf("\\") >= 0 & path.IndexOf("/") >= 0) throw new Exception("Path error: " + path + ".");
+            string[] pathsplit;
+            if (path.IndexOf("\\") >= 0)//local
             {
-                string[] pathsplit = path.TrimStart('\\').Split('\\');
-                if (pathsplit.Length > 0 && pathsplit[0].IndexOf('@') < 0) return false;
+                pathsplit = path.TrimStart('\\').Split('\\');
+                if (pathsplit.Length > 0 && pathsplit[0].Length > 1 && pathsplit[0][1] == ':') return false;// E:\ C:\ ( DiskName:\ )
             }
-            if (path.IndexOf('/') >= 0 & path.IndexOf('\\') < 0) return true;
-            if (!string.IsNullOrEmpty(path) && path.Length > 1 && path[path.Length - 1] == ':') return false;
-            if (path.IndexOf('@') > 0) return true;
+
+            if (path.IndexOf('/') >= 0)//cloud
+            {
+                pathsplit = path.TrimStart('/').Split('/');
+                if (pathsplit.Length > 0 )
+                {
+                    Regex rg = new Regex(Rg_cloud);
+                    Match m = rg.Match(pathsplit[0]);
+                    if (m.Success) return true;// [NameCloud]:[Email]
+                }
+            }
+            if (path.IndexOf('@') > 0 && path.IndexOf(':') > 0) return true;
+
+            if (path.Length > 1 && path[1] == ':') return false;
             throw new Exception("Path error: " + path);
         }
 
         public static bool IsUrl(string path)
         {
-            if (path.IndexOf("http") >= 0) return true;
-            return false;
+            if (path.ToLower().IndexOf("http") == 0) return true;
+            else return false;
         }
         #endregion
+
 
         #region Method
         public AnalyzePath(string path)
         {
-            path_raw = path.TrimEnd('/').TrimEnd('\\').Replace("\\\\","\\");
+            if (string.IsNullOrEmpty(path)) throw new Exception("Path is null.");
+            path_raw = path.TrimEnd('/').TrimEnd('\\').TrimStart('/').TrimStart('\\');
+            path_raw = RemoveDup(path_raw, "/");
+            path_raw = RemoveDup(path_raw, "\\");
+
             path_is_cloud = IsCloud(path_raw);
-            if (!IsUrl(path)) path_raw = path_raw.Replace("//", "/");
-            GetPath_();
+            isurl = IsUrl(path_raw);
+
+            if (path_is_cloud) GetRealCloudPath();
+            else GetDiskPath();
         }
 
         private void GetDiskPath()
         {
-            if (path_raw.Length == 2) path_raw += "\\";
+            if (path_raw.Length == 2) path_raw += "\\"; // C: -> C:\
             Regex rg = new Regex(Rg_Disk_LastItem);
             Match match = rg.Match(path_raw);
             if (match.Success)
             {
                 namelastitem = match.Value;
-                if(namelastitem.Length>0) path_parent = path_raw.Remove(path_raw.Length - namelastitem.Length, namelastitem.Length).TrimEnd('\\');
+                if (namelastitem.Length > 0)
+                {
+                    haveparent = true;
+                    path_parent = path_raw.Remove(path_raw.Length - namelastitem.Length, namelastitem.Length).TrimEnd('\\');
+                }
             }
         }
 
@@ -190,7 +218,7 @@ namespace SupDataDll
             Match match;
 
             #region GoogleDrive:abc@gmail.com / Dropbox:abc@yahoo.com
-            rg = new Regex(Rg_cloud);
+            rg = new Regex(Rg_cloud);//check cloud type [CloudName]:[Email]/..../...
             match = rg.Match(path_raw);
             if (match.Success)
             {
@@ -200,20 +228,23 @@ namespace SupDataDll
 
                 rg = new Regex(Rg_email);
                 match = rg.Match(path_raw);
-                if (match.Success) email = match.Value;//email
+                if (match.Success) email = match.Value;//Email
 
-                rg = new Regex(Rg_PathCloud);
+                rg = new Regex(Rg_PathCloud);//[Cloudname:Email]/.../..../.../.../...
                 match = rg.Match(path_raw);
                 if (match.Success)
                 {
-                    pathcloud = match.Value;//path cloud
+                    pathcloud = match.Value;//path cloud /abc/def/ghi/....
+
                     rg = new Regex(Rg_LastItem);
                     match = rg.Match(path_raw);
-                    if (match.Success) {
+                    if (match.Success)
+                    {
                         namelastitem = match.Value;//name last item
-                        if (pathcloud.TrimEnd('/').TrimStart('/').Length != namelastitem.Length)
+                        if (pathcloud.TrimEnd('/').TrimStart('/').Length != namelastitem.Length | !string.IsNullOrEmpty(namelastitem))
                         {
-                            path_parent = pathcloud.Remove(pathcloud.Length - namelastitem.Length - 1, namelastitem.Length + 1);
+                            haveparent = true;
+                            path_parent =  pathcloud.Remove(pathcloud.Length - namelastitem.Length - 1, namelastitem.Length + 1);
                         }
                     }
                     return;
@@ -225,7 +256,6 @@ namespace SupDataDll
                     if(match.Success)
                     {
                         id = match.Value;
-                        pathcloud = path_raw;
                         typepath = TypePath.CloudID;
                         return;
                     }
@@ -236,7 +266,6 @@ namespace SupDataDll
                     {
                         q = match.Value;
                         typepath = TypePath.CloudQuery;
-                        pathcloud = path_raw;
                         return;
                     }
                 }
@@ -250,13 +279,13 @@ namespace SupDataDll
             if (match.Success)
             {
                 type = CloudName.GoogleDrive;
+                pathcloud = path_raw;
 
                 rg = new Regex(Rg_url_idFolder);
                 match = rg.Match(path_raw);
                 if (match.Success)
                 {
                     id = match.Value;
-                    pathcloud = path_raw;
                     typepath = TypePath.UrlFolder;
                     return;
                 }
@@ -266,7 +295,6 @@ namespace SupDataDll
                 if (match.Success)
                 {
                     this.id = match.Value;
-                    pathcloud = path_raw;
                     typepath = TypePath.UrlFolder;
                     return;
                 }
@@ -277,7 +305,6 @@ namespace SupDataDll
                 {
                     this.id = match.Value;
                     isFolder = false;
-                    pathcloud = path_raw;
                     typepath = TypePath.UrlFile;
                     return;
                 }
@@ -293,18 +320,12 @@ namespace SupDataDll
             {
                 string[] temp_arr = NameLastItem.Split('.');
                 return temp_arr[temp_arr.Length - 1];
-            }
-            return NameLastItem;
+            }else return NameLastItem;
         }
 
         public string GetPath()
         {
             return (path_is_cloud ? pathcloud : path_raw);
-        }
-        private void GetPath_()
-        {
-            if (path_is_cloud) GetRealCloudPath();
-            else GetDiskPath();
         }
 
         public string ReplaceIDUrl(string newid)
@@ -319,11 +340,9 @@ namespace SupDataDll
 
         public AnalyzePath GetParent()
         {
-            if (string.IsNullOrEmpty(Parent)) return null;
-            else
-            {
-                return new AnalyzePath(Parent);
-            }
+            if (path_is_cloud) return new AnalyzePath(type.ToString() + ":" + email.ToString() + "/" + Parent);
+            return new AnalyzePath(Parent);
+
         }
         #endregion
     }

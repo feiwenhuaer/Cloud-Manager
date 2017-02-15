@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Xml;
 using static Cloud.GoogleDrive.DriveAPIHttprequestv2;
 
@@ -79,46 +80,47 @@ namespace Core.Cloud
         }
 
         static object sync_createfolder = new object();
-        public static string CreateFolder(string Raw_path,string parentid = null,string Email = null,string name = null)
+        public static string CreateFolder(AnalyzePath rp, string parentid = null, string Email = null, string name = null)
         {
-            AnalyzePath rp = new AnalyzePath(Raw_path);
             DriveAPIHttprequestv2 gdclient = GetAPIv2(rp.Email);
-            if (string.IsNullOrEmpty(rp.Parent)) return rp.GetPath();
+            //if (string.IsNullOrEmpty(rp.Parent)) return rp.GetPath();
             string parent_id = "";
-            lock (sync_createfolder)
+            try
             {
-                try
+                Monitor.Enter(sync_createfolder);
+                if (string.IsNullOrEmpty(parentid))
                 {
-                    if (string.IsNullOrEmpty(parentid))
-                    {
-                        parent_id = GetIdOfPath(rp.GetPath(), rp.Email);
-                        return rp.GetPath();
-                    }
-                    else
-                    {
-                        foreach(var item in Search("'" + parentid + "' in parents and trashed=false",Email).Convert().Items)
-                        {
-                            if (item.Name == name) return name;
-                        }
-                        GD_item it = JsonConvert.DeserializeObject<GD_item>(gdclient.CreateFolder(name, parentid));
-                        return it.title;
-                    }
+                    parent_id = GetIdOfPath(rp.GetPath(), rp.Email);
+                    return rp.GetPath();
                 }
-                catch (GD_PathNotFoundException gd_ex)
+                else
                 {
-                    string temp = rp.GetPath().Remove(0,gd_ex.FoundPath.Length).TrimStart('/');
-                    string[] temp_arr = temp.Split('/');
-                    parent_id = gd_ex.IdPath;
-                    string data = "";
-                    for (int i = 0; i < temp_arr.Length; i++)
+                    foreach (var item in Search("'" + parentid + "' in parents and trashed=false", Email).Convert().Items)
                     {
-                        data = gdclient.CreateFolder(temp_arr[i], parent_id);//create folder
-                        GD_item item = JsonConvert.DeserializeObject<GD_item>(data);
-                        parent_id = item.id;
+                        if (item.Name == name) return name;
                     }
-                    return (gd_ex.FoundPath + "/" + temp).Replace("//","/");
+                    GD_item it = JsonConvert.DeserializeObject<GD_item>(gdclient.CreateFolder(name, parentid));
+                    return it.title;
                 }
             }
+            catch (GD_PathNotFoundException gd_ex)
+            {
+                string temp = rp.GetPath().Remove(0, gd_ex.FoundPath.Length).TrimStart('/');
+                string[] temp_arr = temp.Split('/');
+                parent_id = gd_ex.IdPath;
+                string data = "";
+                for (int i = 0; i < temp_arr.Length; i++)
+                {
+                    data = gdclient.CreateFolder(temp_arr[i], parent_id);//create folder
+                    GD_item item = JsonConvert.DeserializeObject<GD_item>(data);
+                    parent_id = item.id;
+#if DEBUG
+                    ReadWriteData.WriteLog("Create folder name: " + temp_arr[i] + " at parent_id:" + parent_id);
+#endif
+                }
+                return (gd_ex.FoundPath + "/" + temp).Replace("//", "/");
+            }
+            finally { Monitor.Exit(sync_createfolder); }
         }
 
         public static string GetIdOfPath(string path,string Email)
