@@ -85,7 +85,9 @@ namespace Cloud.GoogleDrive
             catch (HttpException ex)
             {
                 string textdata = request.TextDataResponse;
-                GoogleDriveErrorMessage message = Newtonsoft.Json.JsonConvert.DeserializeObject<GoogleDriveErrorMessage>(ex.Message);
+                GoogleDriveErrorMessage message;
+                try { message = Newtonsoft.Json.JsonConvert.DeserializeObject<GoogleDriveErrorMessage>(ex.Message); }
+                catch { throw ex; }
                 switch(message.error.code)
                 {
                     case 204: if (typerequest == TypeRequest.DELETE) return textdata; break;// delete result

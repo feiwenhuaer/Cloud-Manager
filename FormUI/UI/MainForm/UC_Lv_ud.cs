@@ -59,12 +59,12 @@ namespace FormUI.UI.MainForm
                         break;
 
                     case ChangeTLV.Processing:
-                        foreach (var child in group.items)
+                        for (int i = 0; i < group.items.Count; i++)
                         {
-                            if (child.status == StatusTransfer.Running | child.status != child.CheckChangeStatus)
+                            if (group.items[i].status == StatusTransfer.Running | group.items[i].status != group.items[i].CheckChangeStatus)
                             {
-                                TLV_ud.RefreshObject(child);
-                                child.CheckChangeStatus = child.status;
+                                TLV_ud.RefreshObject(group.items[i]);
+                                group.items[i].CheckChangeStatus = group.items[i].status;
                             }
                         }
                         break;
@@ -240,16 +240,29 @@ namespace FormUI.UI.MainForm
 
             removeToolStripMenuItem.Enabled = true;
 
+            #region Group menu
             if (parents != null && parents.Count != 0)//parent menu
             {
                 if (parents.Count == 1) numberOfParallelDownloadsToolStripMenuItem.Enabled = true;
                 foreach (var parent in parents)
                 {
-                    if (parent.status == StatusTransfer.Stop | parent.status == StatusTransfer.Waiting) startToolStripMenuItem.Enabled = true;
-                    if (parent.status == StatusTransfer.Waiting | parent.status == StatusTransfer.Running) stopToolStripMenuItem.Enabled = true;
-                    if (parent.status == StatusTransfer.Stop) waitingToolStripMenuItem.Enabled = true;
-                    //if (parent.status == StatusTransfer.Removing) removeToolStripMenuItem.Enabled = true;
-                    if (errorToolStripMenuItem.Enabled == false) foreach (var child in parent.items)
+                    if(!startToolStripMenuItem.Enabled || !stopToolStripMenuItem.Enabled || !waitingToolStripMenuItem.Enabled) switch(parent.status)
+                    {
+                        case StatusTransfer.Stop:
+                                startToolStripMenuItem.Enabled = true;
+                                waitingToolStripMenuItem.Enabled = true;
+                                break;
+                        case StatusTransfer.Waiting:
+                                startToolStripMenuItem.Enabled = true;
+                                stopToolStripMenuItem.Enabled = true;
+                                break;
+                        case StatusTransfer.Running:
+                                stopToolStripMenuItem.Enabled = true;
+                                break;
+                        default:break;
+
+                    }
+                    if (!errorToolStripMenuItem.Enabled) foreach (var child in parent.items)
                         {
                             if (child.status == StatusTransfer.Error)
                             {
@@ -259,17 +272,39 @@ namespace FormUI.UI.MainForm
                         }
                 }
             }
+            #endregion
 
-            if (childs != null && childs.Count != 0)// child menu
+            #region child menu
+            if (childs != null && childs.Count != 0)
             {
                 foreach (var child in childs)
                 {
-                    if (child.status == StatusTransfer.Waiting | child.status == StatusTransfer.Stop | child.status == StatusTransfer.Error) startToolStripMenuItem.Enabled = true;
-                    if (child.status == StatusTransfer.Running | child.status == StatusTransfer.Stop | child.status == StatusTransfer.Started) waitingToolStripMenuItem.Enabled = true;
-                    if (child.status == StatusTransfer.Started | child.status == StatusTransfer.Running | child.status == StatusTransfer.Waiting) stopToolStripMenuItem.Enabled = true;
-                    //if (child.status == StatusTransfer.Removing) removeToolStripMenuItem.Enabled = false;
+                    switch(child.status)
+                    {
+                        case StatusTransfer.Started:
+                            stopToolStripMenuItem.Enabled = true;
+                            waitingToolStripMenuItem.Enabled = true;
+                            break;
+                        case StatusTransfer.Waiting:
+                            stopToolStripMenuItem.Enabled = true;
+                            startToolStripMenuItem.Enabled = true;
+                            break;
+                        case StatusTransfer.Running:
+                            stopToolStripMenuItem.Enabled = true;
+                            waitingToolStripMenuItem.Enabled = true;
+                            break;
+                        case StatusTransfer.Stop:
+                            startToolStripMenuItem.Enabled = true;
+                            waitingToolStripMenuItem.Enabled = true;
+                            break;
+                        case StatusTransfer.Error:
+                            startToolStripMenuItem.Enabled = true;
+                            break;
+                        default:break;
+                    }
                 }
             }
+            #endregion
         }
 
         private void numberOfParallelDownloadsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -290,16 +325,16 @@ namespace FormUI.UI.MainForm
                 foreach (var child in childs)
                 {
                     //set Started when item is Stop,Waiting
-                    if (val == StatusTransfer.Started && (child.status == StatusTransfer.Stop | child.status == StatusTransfer.Waiting |
+                    if (val == StatusTransfer.Started && (child.status == StatusTransfer.Stop || child.status == StatusTransfer.Waiting ||
                                                         child.status == StatusTransfer.Error))
                     {
                         child.status = val;
                         TransferGroup pr = olv.GetParent(child) as TransferGroup;
-                        if (pr != null && (pr.status != StatusTransfer.Running | pr.status != StatusTransfer.Loading | pr.status != StatusTransfer.Remove)) pr.status = val;
+                        if (pr != null && (pr.status != StatusTransfer.Running || pr.status != StatusTransfer.Loading || pr.status != StatusTransfer.Remove)) pr.status = val;
                     }
                     else
                     //set Stop child
-                        if (val == StatusTransfer.Stop && (child.status != StatusTransfer.Done | child.status != StatusTransfer.Error | child.status != StatusTransfer.Stop)) child.status = val;
+                        if (val == StatusTransfer.Stop && (child.status != StatusTransfer.Done || child.status != StatusTransfer.Error || child.status != StatusTransfer.Stop)) child.status = val;
                     else
                     //set Waiting child
                         if (val == StatusTransfer.Waiting && child.status != StatusTransfer.Done) child.status = val;

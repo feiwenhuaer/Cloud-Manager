@@ -13,13 +13,14 @@ namespace Core.Transfer
     public class GroupsTransferManager
     {
         public static int TimeRefresh = 500;
-        public List<ItemsTransferManager> GroupsWork = new List<ItemsTransferManager>();
+        List<ItemsTransferManager> GroupsWork;
         
         #region Start up app
         public Thread MainThread;
         //Start after login
         public void Start()
         {
+            GroupsWork = new List<ItemsTransferManager>();
             ReadData();
             MainThread = new Thread(LoadMainThread);
             MainThread.Start();
@@ -117,7 +118,7 @@ namespace Core.Transfer
                             group.ManagerItemsAndRefreshData();//clean thread
                             group.GroupData.items.ForEach(s => 
                             {
-                                if (s.status == StatusTransfer.Running | s.status == StatusTransfer.Waiting) { s.status = StatusTransfer.Stop; ItemsRunningCount++; }
+                                if (s.status == StatusTransfer.Running) { s.status = StatusTransfer.Stop; ItemsRunningCount++; }
                             });
                             ItemsRunningCount += group.ThreadsItemLoadWork.Count;
 #if DEBUG

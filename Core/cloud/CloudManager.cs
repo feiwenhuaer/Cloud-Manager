@@ -242,7 +242,8 @@ namespace Core.Cloud
                 if (cd.closedform) return;
                 bool Iserror = false;
                 deleteform.UpdateText(AppSetting.lang.GetText(LanguageKey.DeleteForm_updatetext_Deleting.ToString()) + item);
-                try {
+                try
+                {
                     AnalyzePath rp = new AnalyzePath(item);
                     string Real_path = "";
                     if (rp.PathIsCloud) Real_path = rp.GetPath();
@@ -259,7 +260,7 @@ namespace Core.Cloud
                             break;
                         default: throw new UnknowCloudNameException("Error Unknow Cloud Type: " + rp.TypeCloud.ToString());
                     }
-                    if (!Iserror) deleteform.UpdateText(AppSetting.lang.GetText(LanguageKey.DeleteForm_updatetext_Deleted.ToString())+ "\r\n");
+                    if (!Iserror) deleteform.UpdateText(AppSetting.lang.GetText(LanguageKey.DeleteForm_updatetext_Deleted.ToString()) + "\r\n");
                     else
                     {
                         deleteform.UpdateText(AppSetting.lang.GetText(LanguageKey.DeleteForm_updatetext_Error.ToString()) + "\r\n");
@@ -285,7 +286,7 @@ namespace Core.Cloud
                 while (!deleteform.AutoClose)
                 {
                     Thread.Sleep(100);
-                    if(cd.cancel)
+                    if (cd.cancel)
                     {
                         deleteform.Close_();
                     }
@@ -293,19 +294,19 @@ namespace Core.Cloud
             }
         }
 
-    }
-    public class CancelDelete
-    {
-        public bool cancel = false;
-        public bool closedform = false;
-        public void Deleteform_EventCancelDelegate()
+        class CancelDelete
         {
-            cancel = !cancel;
-        }
+            public bool cancel = false;
+            public bool closedform = false;
+            public void Deleteform_EventCancelDelegate()
+            {
+                cancel = !cancel;
+            }
 
-        public void Deleteform_EventCloseForm()
-        {
-            closedform = !closedform;
+            public void Deleteform_EventCloseForm()
+            {
+                closedform = !closedform;
+            }
         }
     }
 }

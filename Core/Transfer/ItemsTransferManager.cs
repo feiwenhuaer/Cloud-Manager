@@ -11,7 +11,7 @@ using System.Threading;
 
 namespace Core.Transfer
 {
-    public class ItemsTransferManager
+    class ItemsTransferManager
     {
         public bool AreCut = false;//delete from after transfer
         public List<Thread> ThreadsItemLoadWork = new List<Thread>();
@@ -170,106 +170,104 @@ namespace Core.Transfer
             #endregion
 
             #region Running group
-            if (this.GroupData.status == StatusTransfer.Running && this.GroupData.items.Count !=0 && 
-                count_item_done + count_item_error + count_item_stop != this.GroupData.items.Count)
+            if (this.GroupData.status == StatusTransfer.Running)
             {
-                long Group_TotalTransfer = 0;
-                for (int i = 0; i < GroupData.items.Count; i++)//start item waiting and Started(force)
+                if (this.GroupData.items.Count != 0 && count_item_done + count_item_error + count_item_stop != this.GroupData.items.Count)
                 {
-                    Group_TotalTransfer += GroupData.items[i].Transfer;
-                    #region start item force start
-                    if (this.GroupData.items[i].status == StatusTransfer.Started && this.GroupData.status == StatusTransfer.Running)
+                    long Group_TotalTransfer = 0;
+                    for (int i = 0; i < GroupData.items.Count; i++)//start item waiting and Started(force)
                     {
-                        Thread thr = new Thread(WorkThread);
-                        this.GroupData.items[i].status = StatusTransfer.Running;
-                        thr.Start(i);
-                        ThreadsItemLoadWork.Add(thr);
-                        count_item_running++;
-                    }
-                    #endregion
-
-                    #region start item waiting
-                    if (GroupData.items[i].status == StatusTransfer.Waiting && count_item_running < GroupData.MaxItemsDownload)
-                    {
-                        Thread thr = new Thread(WorkThread);
-                        GroupData.items[i].status = StatusTransfer.Running;
-                        GroupData.items[i].Timestamp = Stopwatch.GetTimestamp();
-                        thr.Start(i);
-                        ThreadsItemLoadWork.Add(thr);
-                        count_item_running++;
-                    }
-                    #endregion
-
-                    #region caculate speed & time left item
-                    if (this.GroupData.items[i].status == StatusTransfer.Running)
-                    {
-                        long size_transfer = GroupData.items[i].Transfer - GroupData.items[i].OldTransfer;
-                        long time_milisec = CurrentMillis.Millis - GroupData.items[i].Timestamp;
-                        if (time_milisec != 0 & time_milisec >= GroupsTransferManager.TimeRefresh)
+                        Group_TotalTransfer += GroupData.items[i].Transfer;
+                        #region start item force start
+                        if (this.GroupData.items[i].status == StatusTransfer.Started && this.GroupData.status == StatusTransfer.Running)
                         {
-                            //speed
-                            GroupData.items[i].Timestamp = CurrentMillis.Millis;
-                            GroupData.items[i].OldTransfer = GroupData.items[i].Transfer;
-                            decimal speed = (decimal)size_transfer * 1000 / time_milisec;
-                            GroupData.items[i].col[4] = UnitConventer.ConvertSize(speed, 2, UnitConventer.unit_speed);
-                            //time 
-                            if (speed != 0)
+                            Thread thr = new Thread(WorkThread);
+                            this.GroupData.items[i].status = StatusTransfer.Running;
+                            thr.Start(i);
+                            ThreadsItemLoadWork.Add(thr);
+                            count_item_running++;
+                        }
+                        #endregion
+
+                        #region start item waiting
+                        if (GroupData.items[i].status == StatusTransfer.Waiting && count_item_running < GroupData.MaxItemsDownload)
+                        {
+                            Thread thr = new Thread(WorkThread);
+                            GroupData.items[i].status = StatusTransfer.Running;
+                            GroupData.items[i].Timestamp = Stopwatch.GetTimestamp();
+                            thr.Start(i);
+                            ThreadsItemLoadWork.Add(thr);
+                            count_item_running++;
+                        }
+                        #endregion
+
+                        #region caculate speed & time left item
+                        if (this.GroupData.items[i].status == StatusTransfer.Running)
+                        {
+                            long size_transfer = GroupData.items[i].Transfer - GroupData.items[i].OldTransfer;
+                            long time_milisec = CurrentMillis.Millis - GroupData.items[i].Timestamp;
+                            if (time_milisec != 0 & time_milisec >= GroupsTransferManager.TimeRefresh)
                             {
-                                long length_left = GroupData.items[i].From.Size - GroupData.items[i].Transfer;
-                                long secondleft = decimal.ToInt64(((decimal)length_left / speed));
-                                GroupData.items[i].col[5] = CurrentMillis.GetTimeBySecond((int)secondleft);
+                                //speed
+                                GroupData.items[i].Timestamp = CurrentMillis.Millis;
+                                GroupData.items[i].OldTransfer = GroupData.items[i].Transfer;
+                                decimal speed = (decimal)size_transfer * 1000 / time_milisec;
+                                GroupData.items[i].col[4] = UnitConventer.ConvertSize(speed, 2, UnitConventer.unit_speed);
+                                //time 
+                                if (speed != 0)
+                                {
+                                    long length_left = GroupData.items[i].From.Size - GroupData.items[i].Transfer;
+                                    long secondleft = decimal.ToInt64(((decimal)length_left / speed));
+                                    GroupData.items[i].col[5] = CurrentMillis.GetTimeBySecond((int)secondleft);
+                                }
                             }
                         }
+                        #endregion
                     }
-                    #endregion
-                }
-                #region caculate speed & time left group
-                long time_milisec_group = CurrentMillis.Millis - GroupData.Timestamp;
-                if (time_milisec_group != 0 & time_milisec_group >= GroupsTransferManager.TimeRefresh)
-                {
-                    //speed
-                    GroupData.Timestamp = CurrentMillis.Millis;
-                    decimal speed_group = ((decimal)(Group_TotalTransfer - GroupData.OldTransfer)) * 1000 / time_milisec_group;
-                    GroupData.OldTransfer = Group_TotalTransfer;
-                    GroupData.col[4] = UnitConventer.ConvertSize(speed_group, 2, UnitConventer.unit_speed);
-                    //time left
-                    if (speed_group != 0)
+                    #region caculate speed & time left group
+                    long time_milisec_group = CurrentMillis.Millis - GroupData.Timestamp;
+                    if (time_milisec_group != 0 & time_milisec_group >= GroupsTransferManager.TimeRefresh)
                     {
-                        long length_left_group = GroupData.TotalFileLength - Group_TotalTransfer;
-                        long secondleft_group = length_left_group / decimal.ToInt64(speed_group);
-                        GroupData.col[5] = CurrentMillis.GetTimeBySecond((int)secondleft_group);
-                    }
-                }
-                #endregion
-            }
-            else
-            {
-                if (this.GroupData.status == StatusTransfer.Running)
-                {
-                    #region Remove Items_From If Cut (if done 100%)
-                    if (this.AreCut && count_item_done == this.GroupData.items.Count)
-                    {
-                        DeleteItems list = new DeleteItems();
-                        list.PernamentDelete = false;
-                        foreach (AddNewTransferItem item in items)
+                        //speed
+                        GroupData.Timestamp = CurrentMillis.Millis;
+                        decimal speed_group = ((decimal)(Group_TotalTransfer - GroupData.OldTransfer)) * 1000 / time_milisec_group;
+                        GroupData.OldTransfer = Group_TotalTransfer;
+                        GroupData.col[4] = UnitConventer.ConvertSize(speed_group, 2, UnitConventer.unit_speed);
+                        //time left
+                        if (speed_group != 0)
                         {
-                            list.items.Add(fromfolder.Path_Raw + (fromfolder.PathIsCloud ? "/" : "\\") + item.name);
+                            long length_left_group = GroupData.TotalFileLength - Group_TotalTransfer;
+                            long secondleft_group = length_left_group / decimal.ToInt64(speed_group);
+                            GroupData.col[5] = CurrentMillis.GetTimeBySecond((int)secondleft_group);
                         }
-                        Thread thr = new Thread(AppSetting.ManageCloud.Delete);
-                        thr.Start(list);
                     }
                     #endregion
-                    this.GroupData.status = StatusTransfer.Done;//Done group
+                }
+                else
+                {
+                    if (count_item_done == this.GroupData.items.Count)
+                    {
+                        this.GroupData.status = StatusTransfer.Done;//Done group
+                        if (this.AreCut)
+                        {
+                            //DeleteItems list = new DeleteItems();
+                            //list.PernamentDelete = false;
+                            //foreach (AddNewTransferItem item in items) list.items.Add(fromfolder.Path_Raw + (fromfolder.PathIsCloud ? "/" : "\\") + item.name);
+                            //Thread thr = new Thread(AppSetting.ManageCloud.Delete);
+                            //thr.Start(list);
+                        }
+                    }
+                    else this.GroupData.status = StatusTransfer.Error;
                 }
             }
             #endregion
 
             #region Change LV
-            if (this.GroupData.change == ChangeTLV.Processing && (this.GroupData.status == StatusTransfer.Done |
-                this.GroupData.status == StatusTransfer.Error | this.GroupData.status == StatusTransfer.Stop))
+            if (this.GroupData.change == ChangeTLV.Processing && (this.GroupData.status == StatusTransfer.Done ||
+                this.GroupData.status == StatusTransfer.Error || this.GroupData.status == StatusTransfer.Stop))
                 this.GroupData.change = ChangeTLV.ProcessingToDone;
-            if (this.GroupData.change == ChangeTLV.Done && (this.GroupData.status == StatusTransfer.Started | this.GroupData.status == StatusTransfer.Running |
-                this.GroupData.status == StatusTransfer.Waiting | this.GroupData.status == StatusTransfer.Loading))
+            if (this.GroupData.change == ChangeTLV.Done && (this.GroupData.status == StatusTransfer.Started || this.GroupData.status == StatusTransfer.Running ||
+                this.GroupData.status == StatusTransfer.Waiting || this.GroupData.status == StatusTransfer.Loading))
                 this.GroupData.change = ChangeTLV.DoneToProcessing;
             #endregion
 
@@ -341,8 +339,7 @@ namespace Core.Transfer
 
                     case CloudName.Dropbox:
                         #region Dropbox
-
-                        int chunksizedb = 25;//default
+                        int chunksizedb = 25;//default 25Mb
                         int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.Dropbox_ChunksSize), out chunksizedb);
                         GroupData.items[x].ChunkUploadSize = chunksizedb * 1024 * 1024;
 

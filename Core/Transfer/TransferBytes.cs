@@ -8,7 +8,7 @@ using System.IO;
 
 namespace Core.Transfer
 {
-    public class TransferBytes
+    class TransferBytes
     {
         ItemsTransferManager GroupManager;
         public TransferItem item { get; private set; }
@@ -39,9 +39,9 @@ namespace Core.Transfer
                 #endregion
 
                 #region transfer done/force stop.
-                if (item.Transfer == item.From.Size | item.status != StatusTransfer.Running | GroupManager.GroupData.status != StatusTransfer.Running)//transfer done/force stop.
+                if (item.Transfer == item.From.Size || item.status != StatusTransfer.Running || GroupManager.GroupData.status != StatusTransfer.Running)//transfer done/force stop.
                 {
-                    if (item.ChunkUploadSize < 0 | item.Transfer == item.From.Size) item.TransferRequest = item.Transfer;//save last pos if download or done
+                    if (item.ChunkUploadSize < 0 || item.Transfer == item.From.Size) item.TransferRequest = item.Transfer;//save last pos if download or done
                     try { item.From.stream.Close(); } catch { }//close stream if can
                     try { item.To.stream.Close(); } catch { }//close stream if can
 
@@ -51,17 +51,11 @@ namespace Core.Transfer
                         case StatusTransfer.Running: break;
                         default: item.status = StatusTransfer.Stop; break;
                     }
-                    if(item.status == StatusTransfer.Remove)
-                    {
-                        GroupManager.GroupData.items.Remove(item);
-                    }
-                    else if (item.status == StatusTransfer.Running & GroupManager.GroupData.status == StatusTransfer.Running)
+                    if(item.status == StatusTransfer.Remove) GroupManager.GroupData.items.Remove(item);
+                    else if (item.status == StatusTransfer.Running && GroupManager.GroupData.status == StatusTransfer.Running)
                     {
                         item.status = StatusTransfer.Done;
-                        if (item.To.ap.TypeCloud == CloudName.Dropbox)
-                        {
-                            if (!SaveUploadDropbox()) item.status = StatusTransfer.Error;
-                        }
+                        if (item.To.ap.TypeCloud == CloudName.Dropbox) if (!SaveUploadDropbox()) item.status = StatusTransfer.Error;
                     }
                     else item.status = StatusTransfer.Stop;
                     Dispose();
@@ -87,7 +81,7 @@ namespace Core.Transfer
             }
             catch (Exception ex)
             {
-                if (AppSetting.TransferManager.status == StatusUpDownApp.StopForClosingApp | AppSetting.TransferManager.status == StatusUpDownApp.SavingData) return;
+                if (AppSetting.TransferManager.status == StatusUpDownApp.StopForClosingApp || AppSetting.TransferManager.status == StatusUpDownApp.SavingData) return;
                 item.ErrorMsg = ex.Message;
                 item.status = StatusTransfer.Error;
                 Dispose();

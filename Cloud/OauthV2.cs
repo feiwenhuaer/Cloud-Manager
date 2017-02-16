@@ -3,10 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Permissions;
+using System.Security.Principal;
 using System.Text;
 
 namespace Cloud
 {
+    public delegate void DelegateToken(string token);
+    internal delegate void HttpListenerContextRecieve(HttpListenerContext ls);
+
     public abstract class OauthV2
     {
         internal const string ClosePageResponse =
@@ -27,12 +32,10 @@ namespace Cloud
         internal HttpListener listener;
         internal string redirectURI;
         internal string authorizationRequest;
-
-        public delegate void DelegateToken(string token);
+        
         public event DelegateToken TokenCallBack;
-        internal delegate void HttpListenerContextRecieve(HttpListenerContext ls);
-
-        internal void GetCode_(OauthUI ui, object owner,HttpListenerContextRecieve rev)
+        
+        internal void GetCode_(OauthUI ui, object owner, HttpListenerContextRecieve rev)
         {
             if (string.IsNullOrEmpty(authorizationRequest) | string.IsNullOrEmpty(redirectURI)) throw new Exception("Oauth:authorizationRequest or redirectURI is null.");
             listener = new HttpListener();
@@ -45,10 +48,7 @@ namespace Cloud
                 ui.ShowUI(owner);
                 listener.BeginGetContext(new AsyncCallback(RecieveCode), rev);
             }
-            catch
-            {
-                TokenCallBack.Invoke(null);
-            }
+            catch { TokenCallBack.Invoke(null); }
         }
 
         void RecieveCode(IAsyncResult rs)
