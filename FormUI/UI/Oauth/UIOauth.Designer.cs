@@ -37,18 +37,21 @@
             this.webBrowser1.Location = new System.Drawing.Point(0, 0);
             this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
             this.webBrowser1.Name = "webBrowser1";
-            this.webBrowser1.Size = new System.Drawing.Size(479, 499);
+            this.webBrowser1.Size = new System.Drawing.Size(584, 616);
             this.webBrowser1.TabIndex = 0;
+            this.webBrowser1.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.webBrowser1_DocumentCompleted);
             // 
             // UIOauth
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(479, 499);
+            this.ClientSize = new System.Drawing.Size(584, 616);
             this.Controls.Add(this.webBrowser1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "UIOauth";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "UIOauth";
+            this.Text = "UIOauth1cs";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.UIOauth_FormClosed);
             this.Load += new System.EventHandler(this.UIOauth_Load);
             this.ResumeLayout(false);
 

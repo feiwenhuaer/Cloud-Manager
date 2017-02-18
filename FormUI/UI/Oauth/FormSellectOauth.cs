@@ -61,9 +61,8 @@ namespace FormUI.UI.Oauth
         }
         private void PB_Mega_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Not support now", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            //Setting_UI.reflection_eventtocore.ShowFormOauth_(SupDataDll.CloudName.Mega);
-            //this.Close();
+            Setting_UI.reflection_eventtocore._ShowFormOauth(SupDataDll.CloudName.Mega);
+            this.Close();
         }
     }
 }

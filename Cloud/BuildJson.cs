@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace Cloud.Dropbox
+namespace Cloud
 {
-    public class BuildJson
+    internal class BuildJson
     {
         private string json = null;
         public string GetJson { get { return "{" + json + "}"; } }

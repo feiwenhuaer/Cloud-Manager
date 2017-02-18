@@ -39,16 +39,15 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Dropbox\Appkey.cs" />
-    <Compile Include="Dropbox\BuildJson.cs" />
-    <Compile Include="Dropbox\BuildURL.cs" />
+    <Compile Include="CloudAppKey.cs" />
+    <Compile Include="BuildJson.cs" />
+    <Compile Include="BuildURL.cs" />
     <Compile Include="Dropbox\DropboxEnum.cs" />
     <Compile Include="Dropbox\DropboxErrorCode.cs" />
     <Compile Include="Dropbox\Oauth\DropboxOauthv2.cs" />
     <Compile Include="Dropbox\DropboxRequestAPIv2.cs" />
     <Compile Include="Dropbox\DropboxSharingMember.cs" />
     <Compile Include="Dropbox\Oauth\UIinterfaceDB.cs" />
-    <Compile Include="GoogleDrive\APPkey.cs" />
     <Compile Include="GoogleDrive\DriveAPIHttprequestv2.cs" />
     <Compile Include="GoogleDrive\GoogleDriveEnum.cs" />
     <Compile Include="GoogleDrive\GoogleDriveErrorMessage.cs" />
@@ -59,6 +58,20 @@
     <Compile Include="GoogleDrive\OrderBy.cs" />
     <Compile Include="GoogleDrive\Scope.cs" />
     <Compile Include="GoogleDrive\TokenGoogleDrive.cs" />
+    <Compile Include="MegaNz\BigInteger.cs" />
+    <Compile Include="MegaNz\Crypto.cs" />
+    <Compile Include="MegaNz\Exceptions.cs" />
+    <Compile Include="MegaNz\Extensions.cs" />
+    <Compile Include="MegaNz\IAccountInformation.cs" />
+    <Compile Include="MegaNz\IMegaApiClient.cs" />
+    <Compile Include="MegaNz\INode.cs" />
+    <Compile Include="MegaNz\IHttpRequestClient.cs" />
+    <Compile Include="MegaNz\JsonSerialization.cs" />
+    <Compile Include="MegaNz\MegaAesCtrStream.cs" />
+    <Compile Include="MegaNz\MegaApiClient.cs" />
+    <Compile Include="MegaNz\Node.cs" />
+    <Compile Include="MegaNz\HttpRequestClient.cs" />
+    <Compile Include="MegaNz\Oauth\UIinterfaceMegaNz.cs" />
     <Compile Include="OauthUI.cs" />
     <Compile Include="OauthV2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -69,9 +82,7 @@
       <Name>CustomHttpRequest</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Mega\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

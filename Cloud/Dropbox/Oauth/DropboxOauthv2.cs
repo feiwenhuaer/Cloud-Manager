@@ -15,7 +15,7 @@ namespace Cloud.Dropbox.Oauth
         {
             port = GetFirstAvailableRandomPort(MinPortRange, MaxPortRange);
             redirectURI = string.Format(LoopbackCallback, port) + "/";
-            authorizationRequest = string.Format("https://www.dropbox.com/1/oauth2/authorize?client_id={0}&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A{1}", Appkey.ApiKey, port.ToString());
+            authorizationRequest = string.Format("https://www.dropbox.com/1/oauth2/authorize?client_id={0}&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A{1}", DropboxAppKey.ApiKey, port.ToString());
 
             GetCode_(ui, owner, new HttpListenerContextRecieve(Rev));
         }

@@ -17,29 +17,16 @@ namespace Cloud.Dropbox
 
         const int portListenMax = 22439;
         const int portListenMin = 22430;
-        #region DropboxRequestAPIv2
 
+        #region Constructors
         public DropboxRequestAPIv2() { }
         public DropboxRequestAPIv2(string access_token)
         {
             this.access_token = access_token;
         }
-
         #endregion
-
-        /*
-        public DropboxRequestAPIv1 GetAPIv1()
-        {
-            if (!string.IsNullOrEmpty(access_token))
-            {
-                return new DropboxRequestAPIv1(access_token);
-            }
-            return null;
-        }
-        */
-
+        
         #region authorsize
-
         public void GetAccessToken(string key_authorize, int port = -1)
         {
             dynamic json = JsonConvert.DeserializeObject(GetAccessToken_(key_authorize, port));
@@ -50,8 +37,8 @@ namespace Cloud.Dropbox
         {
             BuildURL build = new BuildURL("https://api.dropboxapi.com/1/oauth2/token");
             build.AddParameter("code", key_authorize);
-            build.AddParameter("client_id", Appkey.ApiKey);
-            build.AddParameter("client_secret", Appkey.ApiSecret);
+            build.AddParameter("client_id", DropboxAppKey.ApiKey);
+            build.AddParameter("client_secret", DropboxAppKey.ApiSecret);
             build.AddParameter("grant_type", "authorization_code");
             if (port != -1) build.AddParameter("redirect_uri", string.Format("http%3A%2F%2Flocalhost%3A{0}", port.ToString()));
             HttpRequest_ rq = new HttpRequest_(build.Url, TypeRequest.POST.ToString());

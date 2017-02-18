@@ -83,6 +83,12 @@
     <Compile Include="UI\Oauth\OauthGD.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\Oauth\OauthMegaNz.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\Oauth\OauthMegaNz.Designer.cs">
+      <DependentUpon>OauthMegaNz.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\Oauth\UIOauth.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -167,6 +173,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\MainForm\UC_LVitem.resx">
       <DependentUpon>UC_LVitem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\Oauth\OauthMegaNz.resx">
+      <DependentUpon>OauthMegaNz.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\Oauth\UIOauth.resx">
       <DependentUpon>UIOauth.cs</DependentUpon>

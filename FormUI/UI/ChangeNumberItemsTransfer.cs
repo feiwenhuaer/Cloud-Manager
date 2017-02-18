@@ -19,6 +19,7 @@ namespace FormUI.UI
             label1.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.ChangeNumberItemDownload);
             BT_Save.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.BT_save);
             BT_Cancel.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.BT_cancel);
+            numericUpDown1.Value = numberitems;
         }
         private int numberitems = 2;
         public int NumberItems { get { return numberitems; } }

@@ -1,6 +1,11 @@
 ﻿using Cloud;
 using System;
-using System.Threading;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 
 namespace FormUI.UI.Oauth
@@ -10,12 +15,7 @@ namespace FormUI.UI.Oauth
         bool isclosed = false;
         string url;
         string url_check;
-        public UIOauth()
-        {
-            InitializeComponent();
-            this.FormClosed += UIOauth_FormClosed;
-        }
-
+        
         private void UIOauth_FormClosed(object sender, FormClosedEventArgs e)
         {
             isclosed = true;
@@ -39,7 +39,7 @@ namespace FormUI.UI.Oauth
 
         public void CloseUI()
         {
-            if(!isclosed)
+            if (!isclosed)
             {
                 this.Close();
                 isclosed = true;
@@ -54,7 +54,7 @@ namespace FormUI.UI.Oauth
 
         private void UIOauth_Load(object sender, EventArgs e)
         {
-            webBrowser1.Navigate(new Uri(url));
+            webBrowser1.Navigate(url);
 #if DEBUG
             Console.WriteLine("webBrowser1 Navigate url:" + url);
 #endif
@@ -62,15 +62,10 @@ namespace FormUI.UI.Oauth
 
         private void webBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
         {
-            if(e.Url.ToString().IndexOf(url_check) == 0)
+            if (e.Url.ToString().IndexOf(url_check) == 0)
             {
                 this.Close();
             }
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            webBrowser1.Navigate(url);
         }
     }
 }

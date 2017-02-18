@@ -1,6 +1,6 @@
-﻿namespace Cloud.Dropbox
+﻿namespace Cloud
 {
-    class BuildURL
+    internal class BuildURL
     {
         private string url;
         public string Url { get { return url; } }
@@ -18,16 +18,6 @@
                 return;
             }
             url += "?" + key + "=" + value;
-        }
-
-        public void AddStringToUrl(string data)
-        {
-            this.url += data;
-        }
-
-        string Urlencode(string text)
-        {
-            return text.Replace("/", "%2F");
         }
     }
 }

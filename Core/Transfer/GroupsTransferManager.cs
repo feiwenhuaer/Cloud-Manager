@@ -3,16 +3,19 @@ using Newtonsoft.Json;
 using SupDataDll;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Permissions;
 using System.Text;
 using System.Threading;
 
 namespace Core.Transfer
 {
+    public delegate void updateclosingform(string text);
+    public delegate void closeapp();
     public class GroupsTransferManager
     {
         public static int TimeRefresh = 500;
+        public static int KillTheadTime = 15000000;
+
         List<ItemsTransferManager> GroupsWork;
         
         #region Start up app
@@ -27,7 +30,7 @@ namespace Core.Transfer
         }
 
         long timestamp;
-        public bool Loop = true;
+        bool Loop = true;
         public bool AuToStartGroupMode = true;
         public StatusUpDownApp status = StatusUpDownApp.Pause; //UploadDownloadItems
         private void LoadMainThread()
@@ -35,6 +38,7 @@ namespace Core.Transfer
             int count_group_running = 0;
             int count = 0;
             bool flag_shutdown = false;
+            bool flag_waitUIcloseShow = false;
             timestamp = CurrentMillis.Millis;
             bool lockkillthr = false;
             while (Loop)
@@ -104,6 +108,7 @@ namespace Core.Transfer
                     case StatusUpDownApp.StopForClosingApp:
                         #region Stop
                         Eventupdateclosingform(AppSetting.lang.GetText(LanguageKey.CloseThread.ToString()));
+                        if (!flag_waitUIcloseShow) { Thread.Sleep(1000); flag_waitUIcloseShow = true; }
                         int ItemsRunningCount = 0;
                         foreach (ItemsTransferManager group in GroupsWork)
                         {
@@ -128,17 +133,17 @@ namespace Core.Transfer
                         ItemsRunningCount += this.LoadGroupThreads.Count;
                         //if (lockkillthr) KillThreads(threads);
                         if (ItemsRunningCount == 0) this.status = StatusUpDownApp.SavingData;
-                        else if (CurrentMillis.Millis - timestamp > 5000 & !lockkillthr) lockkillthr = true;
+                        else if (CurrentMillis.Millis - timestamp > KillTheadTime & !lockkillthr) lockkillthr = true;
                         #endregion
                         break;
                     case StatusUpDownApp.SavingData:
                         #region SavingData
                         Eventupdateclosingform(AppSetting.lang.GetText(LanguageKey.SaveData.ToString()));
                         SaveData();
-                        Eventcloseapp();
 #if DEBUG
                         Console.WriteLine("GroupsTransferManager Thread Closed.");
 #endif
+                        Eventcloseapp();
                         #endregion
                         return;
                     default: break;
@@ -189,9 +194,7 @@ namespace Core.Transfer
         {
             timestamp = CurrentMillis.Millis;
         }
-        public delegate void updateclosingform(string text);
         public event updateclosingform Eventupdateclosingform;
-        public delegate void closeapp();
         public event closeapp Eventcloseapp;
         #endregion
 

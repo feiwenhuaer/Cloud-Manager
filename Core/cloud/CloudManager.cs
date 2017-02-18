@@ -9,6 +9,8 @@ using Cloud.Dropbox.Oauth;
 using Cloud.GoogleDrive;
 using Cloud.GoogleDrive.Oauth;
 using Cloud.Dropbox;
+using Cloud.MegaNz.Oauth;
+using Cloud.MegaNz;
 
 namespace Core.Cloud
 {
@@ -148,6 +150,26 @@ namespace Core.Cloud
                     AppSetting.UIOauth = (OauthUI)Activator.CreateInstance(type_oauthUI);
 
                     oauth_gd.GetCode(AppSetting.UIOauth, AppSetting.UIMain);
+                    break;
+                case CloudName.Mega:
+                    type_oauthUI = LoadDllUI.GetTypeInterface(typeof(UIinterfaceMegaNz));
+                    UIinterfaceMegaNz mega = (UIinterfaceMegaNz)Activator.CreateInstance(type_oauthUI);
+                    bool error = false;
+                    reoauthMega:
+                    if (!error) mega.ShowDialog_();
+                    else mega.ShowError("Wrong email or password.");
+                    if (mega.Success)
+                    {
+                        
+                        MegaApiClient.AuthInfos oauthinfo = MegaApiClient.GenerateAuthInfos(mega.Email, mega.Pass);
+                        MegaApiClient client = new MegaApiClient();
+                        try
+                        {
+                            client.Login(oauthinfo);
+                        }
+                        catch (Exception ex) { error = true; goto reoauthMega; }
+                        SaveToken(mega.Email, JsonConvert.SerializeObject(oauthinfo), CloudName.Mega);
+                    }
                     break;
                 default: throw new Exception("Not support");
             }

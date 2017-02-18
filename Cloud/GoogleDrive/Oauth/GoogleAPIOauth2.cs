@@ -53,7 +53,7 @@ namespace Cloud.GoogleDrive.Oauth
 
             redirectURI = string.Format("http://{0}:{1}/", IPAddress.Loopback, GetRandomUnusedPort());
             authorizationRequest = string.Format("{0}?response_type=code&scope={1}&redirect_uri={2}&client_id={3}&state={4}&code_challenge={5}&code_challenge_method={6}",
-                authorizationEndpoint, scopepara, Uri.EscapeDataString(redirectURI), APPkey.ClientID, state, code_challenge, code_challenge_method);
+                authorizationEndpoint, scopepara, Uri.EscapeDataString(redirectURI), GoogleDriveAppKey.ClientID, state, code_challenge, code_challenge_method);
 
             GetCode_(ui,owner,new HttpListenerContextRecieve(Rev));
         }
@@ -76,7 +76,7 @@ namespace Cloud.GoogleDrive.Oauth
             }
 
             string tokenRequestBody = string.Format("code={0}&redirect_uri={1}&client_id={2}&code_verifier={3}&client_secret={4}&scope=&grant_type=authorization_code",
-                this.tokencode.Code, System.Uri.EscapeDataString(redirectURI), APPkey.ClientID, code_verifier, APPkey.Clientsecret);
+                this.tokencode.Code, System.Uri.EscapeDataString(redirectURI), GoogleDriveAppKey.ClientID, code_verifier, GoogleDriveAppKey.Clientsecret);
 
             HttpWebRequest tokenRequest = (HttpWebRequest)WebRequest.Create(tokenEndpoint);
             tokenRequest.Method = "POST";
@@ -107,7 +107,7 @@ namespace Cloud.GoogleDrive.Oauth
         {
             if (string.IsNullOrEmpty(this.refresh_token)) throw new Exception("refresh_token can't be null");
             string tokenRequestBody = string.Format("client_id={0}&client_secret={1}&refresh_token={2}&grant_type=refresh_token",
-                                                    APPkey.ClientID, APPkey.Clientsecret, this.refresh_token);
+                                                    GoogleDriveAppKey.ClientID, GoogleDriveAppKey.Clientsecret, this.refresh_token);
             HttpWebRequest tokenRequest = (HttpWebRequest)WebRequest.Create(tokenEndpoint);
             tokenRequest.Method = "POST";
             tokenRequest.ContentType = "application/x-www-form-urlencoded";

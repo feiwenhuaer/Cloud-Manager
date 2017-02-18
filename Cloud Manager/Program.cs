@@ -8,7 +8,6 @@ using System.Windows.Forms;
 using SupDataDll.UiInheritance;
 using Core.Cloud;
 using Core.Transfer;
-using System.Runtime.InteropServices;
 
 namespace Cloud_Manager
 {
@@ -18,7 +17,6 @@ namespace Cloud_Manager
         [STAThread]
         static void Main(string[] arg)
         {
-            
             if (mutex.WaitOne(TimeSpan.Zero, true))
             {
                 Application.EnableVisualStyles();
