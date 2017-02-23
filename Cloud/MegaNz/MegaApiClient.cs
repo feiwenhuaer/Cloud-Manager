@@ -27,6 +27,8 @@
 
         private readonly IHttpRequestClient webClient;
 
+        public IEnumerable<INode> Nodes = null;
+
         private Node trashNode;
         private string sessionId;
         private byte[] masterKey;
@@ -261,8 +263,8 @@
             {
                 this.trashNode = nodes.First(n => n.Type == NodeType.Trash);
             }
-
-            return nodes.Distinct().Cast<INode>();
+            this.Nodes = nodes.Distinct().Cast<INode>();
+            return this.Nodes;
         }
 
         /// <summary>

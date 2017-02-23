@@ -93,7 +93,7 @@ namespace Core
                 list.Add(new CloudEmail_Type()
                 {
                     Email = node.Attributes["Email"].Value,
-                    Type = (CloudName)Enum.Parse(typeof(CloudName), node.Attributes["CloudName"].Value)
+                    Type = (CloudType)Enum.Parse(typeof(CloudType), node.Attributes["CloudName"].Value)
                 });
             }
             return list;
@@ -104,7 +104,7 @@ namespace Core
             return xmlSettings.DocumentElement.SelectSingleNode("UserAccount").ChildNodes;
         }
 
-        internal XmlNode GetCloud(string Email, CloudName cloudname)
+        internal XmlNode GetCloud(string Email, CloudType cloudname)
         {
             foreach (XmlNode node in GetCloudDataList())
             {
@@ -114,7 +114,7 @@ namespace Core
             return null;
         }
 
-        internal string GetToken(string Email, CloudName cloudname)
+        internal string GetToken(string Email, CloudType cloudname)
         {
             XmlNode node = GetCloud(Email, cloudname);
             if (node == null) return null;
@@ -132,7 +132,7 @@ namespace Core
             }
         }
 
-        public bool AddCloud(string Email, CloudName cloudname, string token, bool AreEncrypt, bool IsDefault = false)
+        public bool AddCloud(string Email, CloudType cloudname, string token, bool AreEncrypt, bool IsDefault = false)
         {
             if (GetToken(Email, cloudname) == null)
             {
@@ -170,7 +170,7 @@ namespace Core
             return false;
         }
 
-        public string GetDefaultCloud(CloudName cloudname)
+        public string GetDefaultCloud(CloudType cloudname)
         {
             foreach (XmlNode node in GetCloudDataList())
             {
@@ -188,7 +188,7 @@ namespace Core
             return null;
         }
 
-        public bool SetDefaultCloud(string Email, CloudName cloudname)
+        public bool SetDefaultCloud(string Email, CloudType cloudname)
         {
             XmlNode n = GetCloud(Email, cloudname);
             if (n != null)
@@ -203,7 +203,7 @@ namespace Core
             return false;
         }
 
-        public bool RemoveCloud(string Email, CloudName cloudname)
+        public bool RemoveCloud(string Email, CloudType cloudname)
         {
             XmlNode cloud = GetCloud(Email, cloudname);
             if (cloud != null)
@@ -248,7 +248,7 @@ namespace Core
                 {
                     foreach (XmlNode node in GetCloudDataList())
                     {
-                        string token = GetToken(node.Attributes["Email"].Value, (CloudName)Enum.Parse(typeof(CloudName), node.Attributes["CloudName"].Value));
+                        string token = GetToken(node.Attributes["Email"].Value, (CloudType)Enum.Parse(typeof(CloudType), node.Attributes["CloudName"].Value));
                         if (!string.IsNullOrEmpty(token)) ChangeToken(node, token, newpass);
                     }
                     SetSettingAsString(SettingsKey.Admin_password, StringToMD5.CreateMD5(newpass));

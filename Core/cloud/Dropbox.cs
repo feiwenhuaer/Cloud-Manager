@@ -5,16 +5,22 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Web;
+using System.Threading;
 
 namespace Core.Cloud
 {
     internal static class Dropbox
     {
-        public static ListItemFileFolder GetListFileFolder(string path,string Email)
+        #region field
+        private static object sync_CreateFolder = new object();
+        #endregion
+
+        #region Public Method
+        public static ExplorerNode GetListFileFolder(ExplorerNode node)
         {
-            if (path == "/") path = "";
             ListItemFileFolder list = new ListItemFileFolder();
-            DropboxRequestAPIv2 client = GetAPIv2(Email);
+            DropboxRequestAPIv2 client = GetAPIv2(node.GetRoot().RootInfo.Email);
+            string path = node.GetFullPathString();
             string data = client.ListFolder(path).Replace("\".tag\":", "\"tag\":");
             ListFolder json;
             try
@@ -22,83 +28,32 @@ namespace Core.Cloud
                 json = JsonConvert.DeserializeObject<ListFolder>(data);
             }
             catch { throw new Exception("Can't find folder: " + path + "\r\nError info:" + data); }
-            foreach (entrie ct in json.entries)
-            {
-                if (ct.tag == "folder")
-                {
-                    FileFolder item = new FileFolder();
-                    item.Name = ct.name;
-                    item.Size = -1;
-                    item.id = ct.id;
-                    list.Items.Add(item);
-                }
-            }
-            foreach (entrie ct in json.entries)
-            {
-                if (ct.tag == "file")
-                {
-                    FileFolder item = new FileFolder();
-                    item.Name = ct.name;
-                    item.Size = ct.size;
-                    item.id = ct.id;
-                    item.Time_mod = DateTime.Parse(ct.client_modified);
-                    list.Items.Add(item);
-                }
-            }
-            list.path_raw = CloudName.Dropbox.ToString() + ":" + Email + "/" + path;
-            list.path_raw = list.path_raw.Replace("//", "/");
-            return list;
+            node.Child.Clear();
+            foreach (entrie ct in json.entries) if (ct.tag == "folder") new ExplorerNode(new NodeInfo() { Name = ct.name, Size = -1, ID = ct.id }, node);
+            foreach (entrie ct in json.entries) if (ct.tag == "file") new ExplorerNode(new NodeInfo() { Name = ct.name, Size = ct.size, ID = ct.id, DateMod = DateTime.Parse(ct.client_modified) }, node);
+            return node;
         }
-
-        private static DropboxRequestAPIv2 GetAPIv2(string Email)
+        
+        public static Stream GetFileStream(ExplorerNode node,long Startpos,long endpos)
         {
-            return new DropboxRequestAPIv2(AppSetting.settings.GetToken(Email, CloudName.Dropbox));
+            DropboxRequestAPIv2 client = GetAPIv2(node.GetRoot().RootInfo.Email);
+            return client.Download(node.GetFullPathString(false), Startpos, endpos);
         }
-
-        public static Stream GetFileStream(string path,string Email,long Startpos,long endpos)
+        
+        public static string CreateFolder(ExplorerNode node)
         {
-            DropboxRequestAPIv2 client = GetAPIv2(Email);
-            return client.Download(path,Startpos, endpos);
-        }
-
-        public static ListItemFileFolder ListFolder(string path, string Email)
-        {
-            if (path == "/") path = "";
-            ListItemFileFolder list = new ListItemFileFolder();
-            DropboxRequestAPIv2 client = GetAPIv2(Email);
-
-            string data = client.ListFolder(path, false, true, false, true).Replace("\".tag\":", "\"tag\":");
-            ListFolder json = JsonConvert.DeserializeObject<ListFolder>(data);
-            foreach (entrie ct in json.entries)
-            {
-                if (ct.tag == "folder")
-                {
-                    FileFolder item = new FileFolder();
-                    item.Name = ct.name;
-                    item.Size = -1;
-                    item.id = ct.id;
-                    list.Items.Add(item);
-                    item.path_display = ct.path_display;
-                }
-            }
-            return list;
-        }
-
-        public static string CreateFolder(string path,string Email)
-        {
-            if (path == "/") path = "";
-            ListItemFileFolder list = new ListItemFileFolder();
-            DropboxRequestAPIv2 client = GetAPIv2(Email);
-            string data = client.create_folder(path);
-            dynamic json = JsonConvert.DeserializeObject(data);
+            if (node == node.GetRoot()) throw new Exception("Node is root.");
+            DropboxRequestAPIv2 client = GetAPIv2(node.GetRoot().RootInfo.Email);
+            dynamic json = JsonConvert.DeserializeObject(client.create_folder(node.GetFullPathString(false)));
             string path_display = json.path_display;
             return path_display;
         }
 
-        public static bool Delete(string path,string Email,bool PernamentDelete)
+        public static bool Delete(ExplorerNode node, bool PernamentDelete)
         {
-            DropboxRequestAPIv2 dropbox_client = GetAPIv2(Email);
+            DropboxRequestAPIv2 dropbox_client = GetAPIv2(node.GetRoot().RootInfo.Email);
             string path_display = "";
+            string path = node.GetFullPathString(false);
             if (PernamentDelete)
             {
                 dynamic json_response = JsonConvert.DeserializeObject(dropbox_client.permanently_delete(path));
@@ -113,70 +68,61 @@ namespace Core.Cloud
             else return true;
         }
 
-        public static bool Move(string PathFrom,string PathTo,string Email)
+        public static bool Move(ExplorerNode nodemove, ExplorerNode newparent, string newname = null)
         {
-            DropboxRequestAPIv2 client = GetAPIv2(Email);
-            dynamic json = JsonConvert.DeserializeObject(client.move(PathFrom, PathTo));
-            return PathTo == (string)(json.path_display);
+            if (nodemove.GetRoot().RootInfo.Email != newparent.GetRoot().RootInfo.Email || nodemove.GetRoot().RootInfo.Type != newparent.GetRoot().RootInfo.Type) throw new Exception("Cloud not match.");
+            DropboxRequestAPIv2 client = GetAPIv2(nodemove.GetRoot().RootInfo.Email);
+            dynamic json = JsonConvert.DeserializeObject(client.move(nodemove.GetFullPathString(false), newparent.GetFullPathString(false) + "/" + newname == null ? nodemove.Info.Name : newname));
+            return newparent.GetFullPathString(false) == (string)(json.path_display);
         }
-
-        private static object sync_CreateFolder = new object();
-
-        public static string AutoCreateFolder(string path, string Email)
+        
+        public static string AutoCreateFolder(ExplorerNode node)
         {
-            DropboxRequestAPIv2 client = GetAPIv2(Email);
-            lock (sync_CreateFolder)
+            if (node.Info.Size > 0) throw new Exception("Node is file.");
+            DropboxRequestAPIv2 client = GetAPIv2(node.GetRoot().RootInfo.Email);
+            try
             {
-                string[] path_arr = path.TrimEnd('/').TrimStart('/').Split('/');
-                int index_path_Exist = -1;
-                string path_ = "";
-                for (int i = path_arr.Length - 1; i >= 0; i--)
+                Monitor.Enter(sync_CreateFolder);
+
+                List<ExplorerNode> pathlist = node.GetFullPath();
+                int i;
+                for (i = 1; i < pathlist.Count; i++)
                 {
-                    path_ = "";
-                    for (int j = 0; j <= i; j++)
-                    {
-                        path_ += "/" + path_arr[j];
-                    }
                     try
                     {
-                        client.ListFolder(path_);
-                        index_path_Exist = i;
-                        break;
+                        client.ListFolder(pathlist[i].GetFullPathString(false));
                     }
                     catch (HttpException ex)
                     {
-                        if (ex.ErrorCode == 409)
-                        {
-                            continue;
-                        }
+                        if (ex.ErrorCode == 409) break;
+                        throw ex;
                     }
                 }
-                for (int i = index_path_Exist + 1; i < path_arr.Length; i++)
-                {
-                    path_ = "";
-                    for (int j = 0; j <= i; j++)
-                    {
-                        path_ += "/" + path_arr[j];
-                    }
-                    client.create_folder(path_);
-                }
-                return path_;
+                for (; i < pathlist.Count; i++) client.create_folder(pathlist[i].GetFullPathString(false));
+                return pathlist[i - 1].GetFullPathString(false);
             }
+            finally { Monitor.Exit(sync_CreateFolder); }
         }
-    }
+        #endregion
 
-    public class ListFolder
-    {
-        public List<entrie> entries;
-    }
-
-    public class entrie
-    {
-        public string id;
-        public string tag;
-        public string name;
-        public string client_modified = "";
-        public string path_display;
-        public long size = -2;
+        #region Private Method
+        private static DropboxRequestAPIv2 GetAPIv2(string Email)
+        {
+            return new DropboxRequestAPIv2(AppSetting.settings.GetToken(Email, CloudType.Dropbox));
+        }
+        class ListFolder
+        {
+            public List<entrie> entries;
+        }
+        class entrie
+        {
+            public string id;
+            public string tag;
+            public string name;
+            public string client_modified = "";
+            public string path_display;
+            public long size = -2;
+        }
+        #endregion
     }
 }

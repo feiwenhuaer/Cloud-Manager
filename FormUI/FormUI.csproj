@@ -77,6 +77,7 @@
     <Compile Include="UI\DeleteForm.Designer.cs">
       <DependentUpon>DeleteForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\MainForm\TreeNode_.cs" />
     <Compile Include="UI\Oauth\OauthDB.cs">
       <SubType>Form</SubType>
     </Compile>

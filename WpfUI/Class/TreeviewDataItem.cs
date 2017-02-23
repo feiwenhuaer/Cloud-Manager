@@ -10,20 +10,21 @@ namespace WpfUI.Class
 {
     public class TreeviewDataItem
     {
-        public string Name { get; set; }
+        public ExplorerNode Node { get; set; }
         public ImageSource ImgSource { get; set; }
-        public CloudName Type { get; set; }
+        public CloudType Type { get; set; }
 
-        public TreeviewDataItem(string name, CloudName cloud_type, DiskType disk_type = DiskType.Cloud)
+        public TreeviewDataItem(ExplorerNode Node)
         {
-            Name = name;
-            if (cloud_type != CloudName.LocalDisk) ImgSource = Setting_UI.GetImage(ListBitmapImageResource.list_bm_cloud[(int)cloud_type]).Source;
-            else
-            {
-                if (ListBitmapImageResource.list_bm_localdisk[(int)disk_type] != null) ImgSource = Setting_UI.GetImage(ListBitmapImageResource.list_bm_localdisk[(int)disk_type]).Source;
-                else ImgSource = Setting_UI.GetImage(ListBitmapImageResource.list_bm_cloud[(int)cloud_type]).Source;
-            }
-            Type = cloud_type;
+            this.Type = Node.GetRoot().RootInfo.Type;
+            //if (Node.GetRoot().RootInfo.Type != CloudType.LocalDisk)
+                ImgSource = Setting_UI.GetImage(ListBitmapImageResource.list_bm_cloud[(int)this.Type]).Source;
+            //else
+            //{
+            //    if (ListBitmapImageResource.list_bm_localdisk[(int)disk_type] != null) ImgSource = Setting_UI.GetImage(ListBitmapImageResource.list_bm_localdisk[(int)disk_type]).Source;
+            //    else ImgSource = Setting_UI.GetImage(ListBitmapImageResource.list_bm_cloud[(int)cloud_type]).Source;
+            //}
+            //Type = cloud_type;
         }
     }
 }

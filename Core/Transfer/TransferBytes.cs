@@ -15,13 +15,13 @@ namespace Core.Transfer
         object clientTo;
         public TransferBytes(TransferItem item, ItemsTransferManager GroupManager, object clientTo = null)
         {
-            if (item.From.Size == 0) { item.ErrorMsg = "File size zero."; Dispose(); }
+            if (item.From.node.Info.Size == 0) { item.ErrorMsg = "File size zero."; Dispose(); }
             this.item = item;
             this.GroupManager = GroupManager;
             if (clientTo != null) this.clientTo = clientTo;
             //Make Stream To
             if (item.ChunkUploadSize > 0) MakeNextChunkUploadInStreamTo(true);
-            else this.item.To.stream = AppSetting.ManageCloud.GetFileStream(item.To.ap.Path_Raw, null, false, item.Transfer);//download to disk
+            else this.item.To.stream = AppSetting.ManageCloud.GetFileStream(item.To.node, item.Transfer);//download to disk
             //begin transfer
             item.status = StatusTransfer.Running;
             item.From.stream.BeginRead(item.buffer, 0, item.buffer.Length, new AsyncCallback(GetFrom), 0);
@@ -39,9 +39,9 @@ namespace Core.Transfer
                 #endregion
 
                 #region transfer done/force stop.
-                if (item.Transfer == item.From.Size || item.status != StatusTransfer.Running || GroupManager.GroupData.status != StatusTransfer.Running)//transfer done/force stop.
+                if (item.Transfer == item.From.node.Info.Size || item.status != StatusTransfer.Running || GroupManager.GroupData.status != StatusTransfer.Running)//transfer done/force stop.
                 {
-                    if (item.ChunkUploadSize < 0 || item.Transfer == item.From.Size) item.TransferRequest = item.Transfer;//save last pos if download or done
+                    if (item.ChunkUploadSize < 0 || item.Transfer == item.From.node.Info.Size) item.TransferRequest = item.Transfer;//save last pos if download or done
                     try { item.From.stream.Close(); } catch { }//close stream if can
                     try { item.To.stream.Close(); } catch { }//close stream if can
 
@@ -55,7 +55,7 @@ namespace Core.Transfer
                     else if (item.status == StatusTransfer.Running && GroupManager.GroupData.status == StatusTransfer.Running)
                     {
                         item.status = StatusTransfer.Done;
-                        if (item.To.ap.TypeCloud == CloudName.Dropbox) if (!SaveUploadDropbox()) item.status = StatusTransfer.Error;
+                        if (item.To.node.GetRoot().RootInfo.Type == CloudType.Dropbox) if (!SaveUploadDropbox()) item.status = StatusTransfer.Error;
                     }
                     else item.status = StatusTransfer.Stop;
                     Dispose();
@@ -92,18 +92,18 @@ namespace Core.Transfer
         {
             if (item.ChunkUploadSize <= 0) throw new Exception("Not upload type");
             long pos_end = item.Transfer + item.ChunkUploadSize - 1;
-            if (pos_end >= item.From.Size) pos_end = item.From.Size - 1;
+            if (pos_end >= item.From.node.Info.Size) pos_end = item.From.node.Info.Size - 1;
 
-            switch (item.To.ap.TypeCloud)
+            switch (item.To.node.GetRoot().RootInfo.Type)
             {
-                case CloudName.Dropbox:
+                case CloudType.Dropbox:
                     if (!CreateNew) ((DropboxRequestAPIv2)clientTo).GetResponse_upload_session_append();//get data return from server
                     item.To.stream = ((DropboxRequestAPIv2)clientTo).upload_session_append(item.UploadID, pos_end - item.Transfer + 1, item.Transfer);
                     break;
 
-                case CloudName.GoogleDrive:
+                case CloudType.GoogleDrive:
                     if (!CreateNew) ((DriveAPIHttprequestv2)clientTo).GetResponse_Files_insert_resumable();//get data return from server
-                    item.To.stream = ((DriveAPIHttprequestv2)clientTo).Files_insert_resumable(item.UploadID, item.Transfer, pos_end, item.From.Size);
+                    item.To.stream = ((DriveAPIHttprequestv2)clientTo).Files_insert_resumable(item.UploadID, item.Transfer, pos_end, item.From.node.Info.Size);
                     break;
 
 
@@ -116,14 +116,10 @@ namespace Core.Transfer
         bool SaveUploadDropbox()
         {
             //create folder if not found
-            if (Dropbox.AutoCreateFolder(item.To.ap.GetPath(), item.To.ap.Email) != item.To.ap.GetPath())
-            {
-                item.ErrorMsg = "Failed to create folder: " + item.To.ap.GetPath();
-                return false;
-            }
-            dynamic json_ = JsonConvert.DeserializeObject(((DropboxRequestAPIv2)clientTo).upload_session_finish(null, item.UploadID, item.Transfer, item.To.ap.GetPath(), DropboxUploadMode.add));
+            Dropbox.AutoCreateFolder(item.To.node.Parent);
+            dynamic json_ = JsonConvert.DeserializeObject(((DropboxRequestAPIv2)clientTo).upload_session_finish(null, item.UploadID, item.Transfer, item.To.node.GetFullPathString(false), DropboxUploadMode.add));
             long size = json_.size;
-            if (size == item.From.Size) return true;
+            if (size == item.From.node.Info.Size) return true;
             else
             {
                 item.ErrorMsg = "File size was upload not match.";

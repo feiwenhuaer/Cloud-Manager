@@ -8,12 +8,10 @@ namespace FormUI.UI
 {
     public partial class RenameItem : Form
     {
-        public RenameItem(string raw_path, string id, string oldname)
+        public RenameItem(ExplorerNode node)
         {
             InitializeComponent();
-            this.raw_path = raw_path;
-            this.id = id;
-            this.oldname = oldname;
+            this.node = node;
         }
 
         #region Move Form
@@ -43,9 +41,7 @@ namespace FormUI.UI
         }
         #endregion
 
-        private string raw_path;
-        private string id;
-        private string oldname;
+        ExplorerNode node;
 
         private void BT_cancel_Click(object sender, EventArgs e)
         {
@@ -72,36 +68,36 @@ namespace FormUI.UI
         }
         void Rename()
         {
-            AnalyzePath ap = new AnalyzePath(raw_path);
-            if (ap.TypeCloud == CloudName.GoogleDrive ?
-                        Setting_UI.reflection_eventtocore._MoveItem(null, null, id, null, null, TB_newname.Text, ap.Email, CloudName.GoogleDrive):
-                        Setting_UI.reflection_eventtocore._MoveItem(ap.AddRawChildPath(oldname), ap.AddRawChildPath(TB_newname.Text), id, null, null, null, null)                        
-                )
-            {
-                Invoke(new Action(() =>
-                {
-                    MessageBox.Show(this, "Rename successful", "Message response", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    this.Close();
-                }));
+            //Setting_UI.reflection_eventtocore._MoveItem()
+            //AnalyzePath ap = new AnalyzePath(raw_path);
+            //if (ap.TypeCloud == CloudType.GoogleDrive ?
+            //            Setting_UI.reflection_eventtocore._MoveItem(null, null, id, null, null, TB_newname.Text, ap.Email, CloudType.GoogleDrive):
+            //            Setting_UI.reflection_eventtocore._MoveItem(ap.AddRawChildPath(oldname), ap.AddRawChildPath(TB_newname.Text), id, null, null, null, null)                        
+            //    )
+            //{
+            //    Invoke(new Action(() =>
+            //    {
+            //        MessageBox.Show(this, "Rename successful", "Message response", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //        this.Close();
+            //    }));
 
-            }
-            else
-            {
-                bool flag = false;
-                Invoke(new Action(() =>
-                {
-                    DialogResult result = MessageBox.Show(this, "Rename Error", "Message response", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
-                    if (result == DialogResult.Retry) flag = true;
-                    else this.Close();
-                }));
-                if (flag) Rename();
-            }
+            //}
+            //else
+            //{
+            //    bool flag = false;
+            //    Invoke(new Action(() =>
+            //    {
+            //        DialogResult result = MessageBox.Show(this, "Rename Error", "Message response", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
+            //        if (result == DialogResult.Retry) flag = true;
+            //        else this.Close();
+            //    }));
+            //    if (flag) Rename();
+            //}
         }
 
         private void RenameItem_Load(object sender, EventArgs e)
         {
-            TB_oldname.Text = oldname;
-            TB_newname.Text = oldname;
+            TB_oldname.Text = TB_newname.Text = this.node.Info.Name;
             CenterToParent();
             this.ActiveControl = TB_newname;
             this.BackColor = Setting_UI.Background;

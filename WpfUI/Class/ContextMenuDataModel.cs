@@ -21,13 +21,13 @@ namespace WpfUI.Class
             this.Key = Key;
             IsEnabled = true;
         }
-        public ContextMenuDataModel(string Name,CloudName Img_type)
+        public ContextMenuDataModel(string Name,CloudType Img_type)
         {
             this.Text = Name;
             this.Img = Setting_UI.GetImage(ListBitmapImageResource.list_bm_cloud[(int)Img_type]);
             this.Type = Img_type;
         }
-        public ContextMenuDataModel(CloudName Name_n_Img_type)
+        public ContextMenuDataModel(CloudType Name_n_Img_type)
         {
             this.Text = Name_n_Img_type.ToString();
             this.Img = Setting_UI.GetImage(ListBitmapImageResource.list_bm_cloud[(int)Name_n_Img_type]);
@@ -59,7 +59,7 @@ namespace WpfUI.Class
         public string Text { get; set; }
         public LanguageKey Key { get; set; }
         public Image Img { get; set; }
-        public CloudName Type { get; set; }
+        public CloudType Type { get; set; }
         
         private void NotifyPropertyChange(string name)
         {

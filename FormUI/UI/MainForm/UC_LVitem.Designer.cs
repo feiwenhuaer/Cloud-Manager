@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UC_LVitem));
             this.CMS_LVitem = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.refreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -216,19 +217,19 @@
             // 
             // TB_Path
             // 
-            this.TB_Path.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TB_Path.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TB_Path.Location = new System.Drawing.Point(55, 0);
-            this.TB_Path.Margin = new System.Windows.Forms.Padding(0);
-            this.TB_Path.Name = "TB_Path";
-            this.TB_Path.Size = new System.Drawing.Size(1048, 22);
-            this.TB_Path.TabIndex = 5;
-            this.TB_Path.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TB_Path_KeyDown);
+            //this.TB_Path.Dock = System.Windows.Forms.DockStyle.Fill;
+            //this.TB_Path.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            //this.TB_Path.Location = new System.Drawing.Point(55, 0);
+            //this.TB_Path.Margin = new System.Windows.Forms.Padding(0);
+            //this.TB_Path.Name = "TB_Path";
+            //this.TB_Path.Size = new System.Drawing.Size(1048, 22);
+            //this.TB_Path.TabIndex = 5;
+            //this.TB_Path.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TB_Path_KeyDown);
             // 
             // PB_Next
             // 
             this.PB_Next.Dock = System.Windows.Forms.DockStyle.Right;
-            this.PB_Next.Image = SupDataDll.Properties.Resources.next_icon;
+            this.PB_Next.Image = ((System.Drawing.Image)(resources.GetObject("PB_Next.Image")));
             this.PB_Next.Location = new System.Drawing.Point(1103, 0);
             this.PB_Next.Margin = new System.Windows.Forms.Padding(0);
             this.PB_Next.Name = "PB_Next";
@@ -241,7 +242,7 @@
             // PB_Search
             // 
             this.PB_Search.Dock = System.Windows.Forms.DockStyle.Right;
-            this.PB_Search.Image = SupDataDll.Properties.Resources.search_64x64;
+            this.PB_Search.Image = ((System.Drawing.Image)(resources.GetObject("PB_Search.Image")));
             this.PB_Search.Location = new System.Drawing.Point(1123, 0);
             this.PB_Search.Margin = new System.Windows.Forms.Padding(0);
             this.PB_Search.Name = "PB_Search";
@@ -254,7 +255,7 @@
             // PB_Back
             // 
             this.PB_Back.Dock = System.Windows.Forms.DockStyle.Left;
-            this.PB_Back.Image = SupDataDll.Properties.Resources.back_icon;
+            this.PB_Back.Image = ((System.Drawing.Image)(resources.GetObject("PB_Back.Image")));
             this.PB_Back.Location = new System.Drawing.Point(35, 0);
             this.PB_Back.Margin = new System.Windows.Forms.Padding(0);
             this.PB_Back.Name = "PB_Back";

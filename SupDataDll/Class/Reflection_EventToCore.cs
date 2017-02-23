@@ -21,11 +21,11 @@ namespace SupDataDll
         /// <param name="fromfolder">From</param>
         /// <param name="savefolder">To</param>
         /// <param name="AreCut">Cut or Copy (Cut will delete items in From folder)</param>
-        public void _AddItem(List<AddNewTransferItem> items, string fromfolder, string savefolder, bool AreCut)
+        public void _AddItem(List<ExplorerNode> items, ExplorerNode fromfolder, ExplorerNode savefolder, bool AreCut)
         {
             EventAddItem(items, fromfolder, savefolder, AreCut);
         }
-        public delegate void AddItem(List<AddNewTransferItem> items, string fromfolder, string savefolder, bool AreCut);
+        public delegate void AddItem(List<ExplorerNode> items, ExplorerNode fromfolder, ExplorerNode savefolder, bool AreCut);
         public event AddItem EventAddItem;
         /// <summary>
         /// SetSetting
@@ -84,11 +84,11 @@ namespace SupDataDll
         /// <param name="Email"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public bool _DeleteAccountCloud(string Email, CloudName type)
+        public bool _DeleteAccountCloud(string Email, CloudType type)
         {
             return EventDeleteAccountCloud(Email, type);
         }
-        public delegate bool DeleteAccountCloud(string Email, CloudName type);
+        public delegate bool DeleteAccountCloud(string Email, CloudType type);
         public event DeleteAccountCloud EventDeleteAccountCloud;
         /// <summary>
         /// Get List Cloud Account
@@ -104,24 +104,24 @@ namespace SupDataDll
         /// Oauth for add cloud account
         /// </summary>
         /// <param name="type"></param>
-        public void _ShowFormOauth(CloudName type)
+        public void _ShowFormOauth(CloudType type)
         {
             EventShowFormOauth(type);
         }
-        public delegate void ShowFormOauth(CloudName type);
+        public delegate void ShowFormOauth(CloudType type);
         public event ShowFormOauth EventShowFormOauth;
         /// <summary>
-        /// Explorer
+        /// Explorer, return parent.
         /// </summary>
         /// <param name="path"></param>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ListItemFileFolder _ListIteamRequest(string path, string id)
+        public ExplorerNode _ListIteamRequest(ExplorerNode node)
         {
-            return EventListIteamRequest(path, id);
+            return EventGetChildNode(node);
         }
-        public delegate ListItemFileFolder ListIteamRequest(string path, string id);
-        public event ListIteamRequest EventListIteamRequest;
+        public delegate ExplorerNode GetChildNode(ExplorerNode node);
+        public event GetChildNode EventGetChildNode;
         /// <summary>
         /// Send data login to core
         /// </summary>
@@ -151,11 +151,11 @@ namespace SupDataDll
         /// <param name="type"></param>
         /// <param name="Copy"></param>
         /// <returns></returns>
-        public bool _MoveItem(string path_from, string path_to, string id, string parent_id_from, string parent_id_to, string newname, string Email, CloudName type = CloudName.Folder, bool Copy = false)
+        public bool _MoveItem(ExplorerNode node, ExplorerNode newparent, string newname = null, bool Copy = false)
         {
-            return EventMoveItem(path_from,path_to,id,parent_id_from,parent_id_to,newname,Email,type,Copy);
+            return EventMoveItem(node, newparent, newname, Copy);
         }
-        public delegate bool RenameItem(string path_from, string path_to, string id, string parent_id_from, string parent_id_to, string newname, string Email, CloudName type = CloudName.Folder, bool Copy = false);
+        public delegate bool RenameItem(ExplorerNode node, ExplorerNode newparent, string newname = null, bool Copy = false);
         public event RenameItem EventMoveItem;
         /// <summary>
         /// Delete List items
@@ -168,18 +168,14 @@ namespace SupDataDll
         public delegate void DeletePath(object items);//object DeleteItems
         public event DeletePath EventDeletePath;
         /// <summary>
-        /// Create Folder (if parentid != null then path will dismiss)
+        /// Create folder node
         /// </summary>
-        /// <param name="path"></param>
-        /// <param name="parentid"></param>
-        /// <param name="Email"></param>
-        /// <param name="name"></param>
         /// <returns></returns>
-        public string _CreateFolder(string path, string parentid = null, string Email = null, string name = null)
+        public string _CreateFolder(ExplorerNode node)
         {
-            return EventCreateFolder(path, parentid, Email, name);
+            return EventCreateFolder(node);
         }
-        public delegate string CreateFolder(string path, string parentid = null, string Email = null, string name = null);
+        public delegate string CreateFolder(ExplorerNode node);
         public event CreateFolder EventCreateFolder;
 
         //exit

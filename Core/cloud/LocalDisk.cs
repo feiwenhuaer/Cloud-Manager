@@ -1,5 +1,6 @@
 ﻿using SupDataDll;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -7,31 +8,31 @@ namespace Core.Cloud
 {
     internal static class LocalDisk
     {
-        public static ListItemFileFolder GetListFileFolder(string path)
+        public static ExplorerNode GetListFileFolder(ExplorerNode node)
         {
-            ListItemFileFolder data = new ListItemFileFolder();
+            string path = node.GetFullPathString();
+            node.Child.Clear();
             foreach (string item in Directory.GetDirectories(path))
             {
                 DirectoryInfo info = new DirectoryInfo(item);
                 if (CheckAttribute(info.Attributes, FileAttributes.System) | CheckAttribute(info.Attributes, FileAttributes.Offline)) continue;
-                FileFolder f = new FileFolder();
-                f.Name = info.Name;
-                f.Size = -1;
-                f.Time_mod = info.LastWriteTimeUtc;
-                data.Items.Add(f);
+                ExplorerNode f = new ExplorerNode();
+                f.Info.Name = info.Name;
+                f.Info.Size = -1;
+                f.Info.DateMod = info.LastWriteTimeUtc;
+                node.AddChild(f);
             }
             foreach (string item in Directory.GetFiles(path))
             {
                 FileInfo info = new FileInfo(item);
                 if (CheckAttribute(info.Attributes, FileAttributes.System) | CheckAttribute(info.Attributes, FileAttributes.Offline)) continue;
-                FileFolder f = new FileFolder();
-                f.Name = info.Name;
-                f.Size = info.Length;
-                f.Time_mod = info.LastWriteTimeUtc;
-                data.Items.Add(f);
+                ExplorerNode f = new ExplorerNode();
+                f.Info.Name = info.Name;
+                f.Info.Size = info.Length;
+                f.Info.DateMod = info.LastWriteTimeUtc;
+                node.AddChild(f);
             }
-            data.path_raw = path;
-            return data;
+            return node;
         }
 
         static bool CheckAttribute(FileAttributes Item,FileAttributes compare)
@@ -40,10 +41,12 @@ namespace Core.Cloud
         }
 
 
-        public static Stream GetFileSteam(string path,bool GetfileForUpload,long Startpos)
+        public static Stream GetFileSteam(ExplorerNode node, bool GetfileForUpload,long Startpos)
         {
+            string path = node.GetFullPathString();
             FileInfo info = new FileInfo(path);
             FileStream fs;
+            
             if (GetfileForUpload)
             {
                 if (!info.Exists) throw new FileNotFoundException("File not found",path);
@@ -52,14 +55,13 @@ namespace Core.Cloud
                 fs.Seek(Startpos, SeekOrigin.Begin);
                 return fs;
             }
-            if (!info.Exists)
+            else if (!info.Exists)
             {
-                string[] path_split = path.Split('\\');
-                string path_ = "";
-                for (int i = 0; i < path_split.Length - 1; i++)
+                List<ExplorerNode> nodelist = node.GetFullPath();
+                DirectoryInfo dinfo;
+                for (int i = 1;i < nodelist.Count -1;i++ )
                 {
-                    path_ += path_split[i] + "\\";
-                    DirectoryInfo dinfo = new DirectoryInfo(path_);
+                    dinfo = new DirectoryInfo(nodelist[i].GetFullPathString());
                     if (!dinfo.Exists) dinfo.Create();
                 }
             }
@@ -68,8 +70,9 @@ namespace Core.Cloud
             return fs;
         }
 
-        public static bool Delete(string path,bool PernamentDelete)
+        public static bool Delete(ExplorerNode node, bool PernamentDelete)
         {
+            string path = node.GetFullPathString();
             if (PernamentDelete)//delete
             {
                 FileInfo info = new FileInfo(path);
@@ -95,18 +98,21 @@ namespace Core.Cloud
             }
         }
 
-        public static bool Move(string from,string to)
+        public static bool Move(ExplorerNode node, ExplorerNode newparent,string newname = null)
         {
-            FileInfo info = new FileInfo(from);
-            if (info.Exists) { info.MoveTo(to); return true; }
-            DirectoryInfo dinfo = new DirectoryInfo(from);
-            if (dinfo.Exists) { dinfo.MoveTo(to); return true; }
-            return false;         
+            if (node.GetRoot().RootInfo.Type != CloudType.LocalDisk && newparent.GetRoot().RootInfo.Type != CloudType.LocalDisk) throw new Exception("CloudType is != LocalDisk.");
+            string path_from = node.GetFullPathString();
+            string path_to = newparent.GetFullPathString() + "\\" + newname == null ? node.Info.Name : newname;
+            FileInfo info = new FileInfo(path_from);
+            if (info.Exists) { info.MoveTo(path_to); return true; }
+            DirectoryInfo dinfo = new DirectoryInfo(path_from);
+            if (dinfo.Exists) { dinfo.MoveTo(path_to); return true; }
+            return false;
         }
 
-        public static string CreateFolder(string path)
+        public static string CreateFolder(ExplorerNode node)
         {
-            DirectoryInfo dinfo = new DirectoryInfo(path);
+            DirectoryInfo dinfo = new DirectoryInfo(node.GetFullPathString());
             if (!dinfo.Exists) dinfo.Create();
             return dinfo.FullName;
         }

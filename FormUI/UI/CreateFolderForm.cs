@@ -42,11 +42,11 @@ namespace FormUI.UI
         }
         #endregion
 
-        public string Path;
-        public string Id;
-        public CreateFolderForm()
+        ExplorerNode parentnode;
+        public CreateFolderForm(ExplorerNode parentnode)
         {
             InitializeComponent();
+            this.parentnode = parentnode;
             BT_Create.Enabled = false;
         }
 
@@ -91,9 +91,10 @@ namespace FormUI.UI
         }
         void CreateFolder()
         {
-            AnalyzePath ap = new AnalyzePath(Path);
-            string temp = ap.AddRawChildPath(textBox1.Text);
-            Setting_UI.reflection_eventtocore._CreateFolder(temp, Id, ap.Email, textBox1.Text);
+            ExplorerNode node = new ExplorerNode();
+            node.Info.Name = textBox1.Text;
+            this.parentnode.AddChild(node);
+            Setting_UI.reflection_eventtocore._CreateFolder(node);
             Invoke(new Action(() => this.Close()));
         }
 

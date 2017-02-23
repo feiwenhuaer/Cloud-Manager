@@ -39,11 +39,15 @@ namespace WpfUI.UI.Main.Lv_item
             image_back.Source = Setting_UI.GetImage(SupDataDll.Properties.Resources.back_icon).Source;
             image_next.Source = Setting_UI.GetImage(SupDataDll.Properties.Resources.next_icon).Source;
             image_search.Source = Setting_UI.GetImage(SupDataDll.Properties.Resources.search_64x64, image_search.Width, image_search.Height).Source;
+            managerexplorernodes = new ManagerExplorerNodes();
+            timeformat = Setting_UI.reflection_eventtocore._GetSetting(SettingsKey.DATE_TIME_FORMAT);
+            time_default = new DateTime();
             UILanguage();
             lv_data = new ObservableCollection<LV_data>();
             LV_items.ItemsSource = lv_data;
         }
-
+        string timeformat;
+        DateTime time_default;
         void UILanguage()
         {
             label.Content = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TB_path);
@@ -53,31 +57,28 @@ namespace WpfUI.UI.Main.Lv_item
 
         #region Binding Listview 
         ObservableCollection<LV_data> lv_data { get; set; }
-        public void ShowDataToLV(List<FileFolder> data)
+        public void ShowDataToLV(ExplorerNode parent)
         {
             lv_data.Clear();
-            string timeformat = Setting_UI.reflection_eventtocore._GetSetting(SettingsKey.DATE_TIME_FORMAT);
-            DateTime time_default = new DateTime();
-            foreach (FileFolder item in data)
+            foreach (ExplorerNode item in parent.Child)
             {
                 LV_data dt = new LV_data();
-                dt.Name = item.Name;
-                dt.mimeType = item.mimeType;
-                dt.id = item.id;
-                if(item.Time_mod != time_default) dt.d_mod = item.Time_mod.ToString(timeformat);
-                dt.Size = item.Size;
-                if (item.Size > 0)
+                dt.Node = item;
+                if (item.Info.DateMod != time_default) dt.d_mod = item.Info.DateMod.ToString(timeformat);
+                if (item.Info.Size > 0)
                 {
-                    dt.SizeString = UnitConventer.ConvertSize(item.Size, 2, UnitConventer.unit_size);
-                    dt.Type = Type_FileFolder.File;
-                    string[] splitPath = item.Name.Split(new Char[] { '.' });
-                    string extension = (string)splitPath.GetValue(splitPath.GetUpperBound(0));
-                    dt.ImgSource = Setting_UI.GetImage(IconReader.GetFileIcon("." + extension, IconReader.IconSize.Small, false)).Source;
+                    dt.SizeString = UnitConventer.ConvertSize(item.Info.Size, 2, UnitConventer.unit_size);
+
+                    string extension = item.GetExtension();
+                    dt.ImgSource = Setting_UI.GetImage(
+                                                        item.GetRoot().RootInfo.Type == CloudType.LocalDisk ?
+                                                            IconReader.GetFileIcon(item.GetFullPathString(), IconReader.IconSize.Small, false) ://some large file make slow.
+                                                            IconReader.GetFileIcon("." + extension, IconReader.IconSize.Small, false)
+                        ).Source;
                 }
                 else
                 {
                     dt.SizeString = "-1";
-                    dt.Type = Type_FileFolder.Folder;
                     dt.ImgSource = Setting_UI.GetImage(IconReader.GetFolderIcon(IconReader.IconSize.Small, IconReader.FolderType.Closed)).Source;
                 }
                 lv_data.Add(dt);
@@ -88,78 +89,40 @@ namespace WpfUI.UI.Main.Lv_item
         #region Navigate
         public delegate void ListViewFolderDoubleClickCallBack(ExplorerListItem load);
         public event ListViewFolderDoubleClickCallBack EventListViewFolderDoubleClickCallBack;
-        public List<OldPathLV> HistoryPathID = new List<OldPathLV>();
-        public int HistoryPathID_index = -1;
-        public void Next(bool explandTV = false, bool addToTV = false, TreeViewDataModel DataItem = null, TreeViewItem TV_item = null)
+        public ManagerExplorerNodes managerexplorernodes;
+        public void ExplorerCurrentNode(bool explandTV = false, bool addToTV = false, TreeViewDataModel DataItem = null, TreeViewItem TV_item = null)
         {
-            if (HistoryPathID_index < HistoryPathID.Count - 1)
+            ExplorerListItem load = new ExplorerListItem();
+            load.node = managerexplorernodes.NodeWorking();
+            load.explandTV = explandTV;
+            load.addToTV = addToTV;
+            if (TV_item != null) load.TV_node = TV_item;
+            if (DataItem != null) load.TV_data = DataItem;
+            EventListViewFolderDoubleClickCallBack(load);
+        }
+        void Back()
+        {
+            if (managerexplorernodes.Back() != null)
             {
-                HistoryPathID_index++;
-                ExplorerListItem load = new ExplorerListItem();
-                load.path = HistoryPathID[HistoryPathID_index].Path;
-                load.id = HistoryPathID[HistoryPathID_index].ID;
-                load.explandTV = explandTV;
-                load.addToTV = addToTV;
-                if (DataItem != null) load.TV_data = DataItem;
-                if (TV_item != null) load.TV_node = TV_item;
-                EventListViewFolderDoubleClickCallBack(load);
+                ExplorerCurrentNode();
+            }
+        }
+        void Next()
+        {
+            if (managerexplorernodes.Next() != null)
+            {
+                ExplorerCurrentNode();
             }
         }
 
-        public void Clear()
-        {
-            if (HistoryPathID_index < 0) return;
-            for (int i = HistoryPathID_index + 1; i < HistoryPathID.Count; i++)
-            {
-                HistoryPathID.RemoveAt(i);
-                i--;
-            }
-        }
-
-        public void Back()
-        {
-            if (HistoryPathID_index > 0)
-            {
-                HistoryPathID_index--;
-                ExplorerListItem load = new ExplorerListItem();
-                load.path = HistoryPathID[HistoryPathID_index].Path;
-                load.id = HistoryPathID[HistoryPathID_index].ID;
-                EventListViewFolderDoubleClickCallBack(load);
-            }
-        }
-
-        private void Open()
+        void OpenItemLV()
         {
             if (LV_items.SelectedItems.Count != 1) return;
-            LV_data item = LV_items.SelectedItems[0] as LV_data;
-            if (item.Type == Type_FileFolder.Folder)
+            LV_data data = LV_items.SelectedItem as LV_data;
+            if (data != null)
             {
-                string path = "";
-                if (AnalyzePath.IsUrl(textBox.Text))
-                {
-                    AnalyzePath rp = new AnalyzePath(textBox.Text);
-                    path = rp.ReplaceIDUrl(item.id);
-                }
-                else
-                {
-                    path = textBox.Text + (AnalyzePath.IsCloud(textBox.Text) ? "/" : "\\") + item.Name;
-                }
-                OldPathLV nextpath = new OldPathLV(item.id, path);
-                Clear();
-                HistoryPathID.Add(nextpath);
-                Next();
-            }
-            else
-            {
-                if (AnalyzePath.IsCloud(textBox.Text))
-                {
-                    //download file 
-                    return;
-                }
-                else
-                {
-                    System.Diagnostics.Process.Start(textBox.Text + "\\" + item.Name);
-                }
+                managerexplorernodes.Next(data.Node);
+                ExplorerCurrentNode();
             }
         }
         #endregion
@@ -199,7 +162,6 @@ namespace WpfUI.UI.Main.Lv_item
             menuitemsource.Add(new ContextMenuDataModel(LanguageKey.TSMI_downloadsellected));
             menuitemsource.Add(new ContextMenuDataModel(LanguageKey.TSMI_uploadfolder));
             menuitemsource.Add(new ContextMenuDataModel(LanguageKey.TSMI_uploadfile));
-
             LV_items.ContextMenu.ItemsSource = menuitemsource;
         }
         private void LVitems_ContextMenu_ContextMenuOpening(object sender, ContextMenuEventArgs e)
@@ -208,7 +170,7 @@ namespace WpfUI.UI.Main.Lv_item
             foreach (ContextMenuDataModel data in LV_items.ContextMenu.Items)
             {
                 if (data == null) continue;
-                if (HistoryPathID_index == -1) { data.IsEnabled = false; continue; }
+                if (managerexplorernodes.NodeWorking() == null) { data.IsEnabled = false; continue; }
                 switch (data.Key)
                 {
                     case LanguageKey.TSMI_refresh: data.IsEnabled = true; break;
@@ -218,7 +180,7 @@ namespace WpfUI.UI.Main.Lv_item
                     case LanguageKey.TSMI_paste: if (selected_count > 1 | !ClipBoard_.Clipboard) data.IsEnabled = false; else data.IsEnabled = true; break;
                     case LanguageKey.TSMI_rename: if (selected_count != 1) data.IsEnabled = false; else data.IsEnabled = true; break;
                     case LanguageKey.TSMI_delete: if (selected_count == 0) data.IsEnabled = false; else data.IsEnabled = true; break;
-                    case LanguageKey.TSMI_copyid: if (selected_count != 1) data.IsEnabled = false; else data.IsEnabled = true; break;
+                    case LanguageKey.TSMI_copyid: if (selected_count != 1 || managerexplorernodes.Root.RootInfo.Type == CloudType.LocalDisk) data.IsEnabled = false; else data.IsEnabled = true; break;
                     case LanguageKey.TSMI_downloadsellected: if (selected_count == 0) data.IsEnabled = false; else data.IsEnabled = true; break;
                     default: continue;
                 }
@@ -232,15 +194,15 @@ namespace WpfUI.UI.Main.Lv_item
                 ContextMenuDataModel menu_data_blind = menuitem.DataContext as ContextMenuDataModel;
                 switch (menu_data_blind.Key)
                 {
-                    case LanguageKey.TSMI_refresh: HistoryPathID_index--; Next(); return;
-                    case LanguageKey.TSMI_open: Open(); return;
+                    case LanguageKey.TSMI_refresh: ExplorerCurrentNode(); return;
+                    case LanguageKey.TSMI_open: OpenItemLV(); return;
                     case LanguageKey.TSMI_cut: CutCopy(true); return;
                     case LanguageKey.TSMI_copy: CutCopy(false); return;
                     case LanguageKey.TSMI_paste: Paste(); return;
                     case LanguageKey.TSMI_rename: Rename(); return;
                     case LanguageKey.TSMI_delete: Delete(); return;
                     case LanguageKey.TSMI_createfolder: CreateFolder(); return;
-                    case LanguageKey.TSMI_copyid: System.Windows.Clipboard.SetText((LV_items.SelectedItem as LV_data).id); return;
+                    case LanguageKey.TSMI_copyid: System.Windows.Clipboard.SetText((LV_items.SelectedItem as LV_data).Node.Info.ID); return;
                     case LanguageKey.TSMI_downloadsellected: DownloadSelected(); return;
                     case LanguageKey.TSMI_uploadfolder: uploadfolder(); return;
                     case LanguageKey.TSMI_uploadfile: uploadfile(); return;
@@ -252,51 +214,33 @@ namespace WpfUI.UI.Main.Lv_item
         {
             ClipBoard_.Clear();
             ClipBoard_.AreCut = cut;
-            ClipBoard_.directory = textBox.Text;
-            foreach (LV_data item in LV_items.SelectedItems)
-            {
-                AddNewTransferItem ud_item = new AddNewTransferItem(item.Name, item.id, item.mimeType, item.Type, item.Size);
-                ClipBoard_.Add(ud_item);
-            }
+            ClipBoard_.directory = managerexplorernodes.NodeWorking();
+            foreach (LV_data item in LV_items.SelectedItems) ClipBoard_.Add(item.Node);
             ClipBoard_.Clipboard = true;
         }
         void Paste()
         {
-            if (AnalyzePath.IsUrl(textBox.Text)) return;
-            string savefolder = "";
-            if (LV_items.SelectedItems.Count == 0) savefolder = textBox.Text;
-            else
-            {
-                savefolder = textBox.Text + (AnalyzePath.IsCloud(textBox.Text) ? "/" : "\\") + (LV_items.SelectedItems[0] as LV_data).Name;
-            }
-            Setting_UI.reflection_eventtocore._AddItem(ClipBoard_.Items, ClipBoard_.directory, savefolder, ClipBoard_.AreCut);
+            ExplorerNode roottonode = managerexplorernodes.NodeWorking();
+            Setting_UI.reflection_eventtocore._AddItem(ClipBoard_.Items, ClipBoard_.directory, roottonode, ClipBoard_.AreCut);
         }
         void Rename()
         {
             LV_data data = LV_items.SelectedItem as LV_data;
-            RenameItem rename = new RenameItem(textBox.Text + (AnalyzePath.IsCloud(textBox.Text) ? "/" : "\\") + data.Name, data.id, data.Name);
+            RenameItem rename = new RenameItem(data.Node);
             rename.Show();
         }
-        void Delete()
+        void Delete(bool PernamentDelete = false)
         {
             DeleteItems items = new DeleteItems();
-            string s = AnalyzePath.IsCloud(textBox.Text) ? "/" : "\\";
-            foreach (LV_data data in LV_items.SelectedItems)
-            {
-                items.items.Add(textBox.Text + s + data.Name);
-            }
-            items.PernamentDelete = false;
+            foreach (LV_data data in LV_items.SelectedItems) items.Items.Add(data.Node);
+            items.PernamentDelete = PernamentDelete;
             Thread thr = new Thread(Setting_UI.reflection_eventtocore._DeletePath);
             Setting_UI.ManagerThreads.delete.Add(thr);
             thr.Start(items);
         }
         void CreateFolder()
         {
-            UICreateFolder ui_cf = new UICreateFolder();
-            AnalyzePath ap = new AnalyzePath(HistoryPathID[HistoryPathID_index].Path);
-            ui_cf.Path = HistoryPathID[HistoryPathID_index].Path;
-            if (LV_items.SelectedIndex == 1 && (LV_items.SelectedItem as LV_data).Type == Type_FileFolder.Folder) ui_cf.Path = ap.AddRawChildPath((LV_items.SelectedItem as LV_data).Name);
-            ui_cf.Id = HistoryPathID[HistoryPathID_index].ID;
+            UICreateFolder ui_cf = new UICreateFolder(managerexplorernodes.NodeWorking());
             ui_cf.ShowDialog();
         }
         void DownloadSelected()
@@ -307,12 +251,9 @@ namespace WpfUI.UI.Main.Lv_item
             fbd.ShowNewFolderButton = true;
             DialogResult result = fbd.ShowDialog();
             if (result != DialogResult.OK | result != DialogResult.Yes) return;
-            List<AddNewTransferItem> listitems = new List<AddNewTransferItem>();
-            foreach (LV_data item in LV_items.SelectedItems)
-            {
-                listitems.Add(new AddNewTransferItem(item.Name, item.id, item.mimeType, item.Type, item.Size));
-            }
-            Setting_UI.reflection_eventtocore._AddItem(listitems, HistoryPathID[HistoryPathID_index].Path, fbd.SelectedPath, false);
+            List<ExplorerNode> listitems = new List<ExplorerNode>();
+            foreach (LV_data item in LV_items.SelectedItems) listitems.Add(item.Node);
+            Setting_UI.reflection_eventtocore._AddItem(listitems, managerexplorernodes.NodeWorking(), ExplorerNode.GetNodeFromDiskPath(fbd.SelectedPath), false);
         }
         void uploadfolder()
         {
@@ -321,8 +262,9 @@ namespace WpfUI.UI.Main.Lv_item
             fbd.ShowNewFolderButton = true;
             DialogResult result = fbd.ShowDialog();
             if (result != DialogResult.OK | result != DialogResult.Yes) return;
-            AnalyzePath ap = new AnalyzePath(fbd.SelectedPath);
-            Setting_UI.reflection_eventtocore._AddItem(new List<AddNewTransferItem>() { new AddNewTransferItem(ap.NameLastItem, null, null, Type_FileFolder.Folder) }, ap.Parent, fbd.SelectedPath, false);
+            ExplorerNode node = ExplorerNode.GetNodeFromDiskPath(fbd.SelectedPath);
+
+            Setting_UI.reflection_eventtocore._AddItem(new List<ExplorerNode>() { node }, node.Parent, managerexplorernodes.NodeWorking(), false);
         }
         void uploadfile()
         {
@@ -332,14 +274,19 @@ namespace WpfUI.UI.Main.Lv_item
             ofd.InitialDirectory = PCPath.Mycomputer;
             DialogResult result = ofd.ShowDialog();
             if (result != DialogResult.OK | result != DialogResult.Yes) return;
-            List<AddNewTransferItem> items = new List<AddNewTransferItem>();
-            string root = System.IO.Path.GetDirectoryName(ofd.FileNames[0]);
+            List<ExplorerNode> items = new List<ExplorerNode>();
+            ExplorerNode root = ExplorerNode.GetNodeFromDiskPath(System.IO.Path.GetDirectoryName(ofd.FileNames[0]));
             foreach (string s in ofd.SafeFileNames)
             {
-                FileInfo info = new FileInfo(root + "\\" + s);
-                items.Add(new AddNewTransferItem(s, "", "", Type_FileFolder.File, info.Length));
+                ExplorerNode n = new ExplorerNode();
+                n.Info.Name = s;
+                root.AddChild(n);
+                FileInfo info = new FileInfo(n.GetFullPathString());
+                n.Info.Size = info.Length;
+                n.Info.DateMod = info.LastWriteTime;
+                items.Add(n);
             }
-            Setting_UI.reflection_eventtocore._AddItem(items, root, HistoryPathID[HistoryPathID_index].Path, false);
+            Setting_UI.reflection_eventtocore._AddItem(items, root, managerexplorernodes.NodeWorking(), false);
         }
 
         #endregion
@@ -349,19 +296,20 @@ namespace WpfUI.UI.Main.Lv_item
         {
             LV_data data = LV_items.SelectedItem as LV_data;
             if (data == null) return;
-            bool iscloud = AnalyzePath.IsCloud(HistoryPathID[HistoryPathID_index].Path);
-            if (data.Type == Type_FileFolder.Folder)
+            if (data.Node.Info.Size < 1)//folder
             {
-                Clear();
-                OldPathLV op_lv = new OldPathLV(data.id, HistoryPathID[HistoryPathID_index].Path + (iscloud ? "/" : "\\") + data.Name);
-                HistoryPathID.Add(op_lv);
-                Next();
+                managerexplorernodes.Next(data.Node);
+                ExplorerCurrentNode();
             }
             else
             {
-                if(!iscloud)
+                if (data.Node.GetRoot().RootInfo.Type == CloudType.LocalDisk || string.IsNullOrEmpty(data.Node.GetRoot().RootInfo.Email))
                 {
-                    System.Diagnostics.Process.Start(HistoryPathID[HistoryPathID_index].Path + "\\" + data.Name);
+                    System.Diagnostics.Process.Start(data.Node.GetFullPathString());
+                }
+                else
+                {
+                    //
                 }
             }
         }
@@ -374,13 +322,13 @@ namespace WpfUI.UI.Main.Lv_item
 
         private void textBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if(e.Key == Key.Enter)
-            {
-                OldPathLV nextpath = new OldPathLV("", textBox.Text);
-                Clear();
-                HistoryPathID.Add(nextpath);
-                Next();
-            }
+            //    if(e.Key == Key.Enter)
+            //    {
+            //        OldPathLV nextpath = new OldPathLV("", textBox.Text);
+            //        Clear();
+            //        HistoryPathID.Add(nextpath);
+            //        Next();
+            //    }
         }
     }
 }

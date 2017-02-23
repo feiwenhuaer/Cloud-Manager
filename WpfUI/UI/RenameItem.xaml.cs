@@ -20,19 +20,13 @@ namespace WpfUI.UI
     /// </summary>
     public partial class RenameItem : Window
     {
-        public RenameItem(string raw_path, string id, string oldname)
+        public RenameItem(ExplorerNode node)
         {
             InitializeComponent();
-            TB_oldname.Text = oldname;
-            TB_newname.Text = oldname;
-            this.raw_path = raw_path;
-            this.id = id;
-            this.oldname = oldname;
+            TB_newname.Text = TB_oldname.Text = node.Info.Name;
+            this.node = node;
         }
-
-        private string raw_path;
-        private string id;
-        private string oldname;
+        ExplorerNode node;
 
         private void BT_cancel_Click(object sender, RoutedEventArgs e)
         {
@@ -64,11 +58,7 @@ namespace WpfUI.UI
 
         void Rename()
         {
-            AnalyzePath ap = new AnalyzePath(raw_path);
-            if (ap.TypeCloud == CloudName.GoogleDrive ?
-                        Setting_UI.reflection_eventtocore._MoveItem(null, null, id, null, null, TB_newname.Text, ap.Email, CloudName.GoogleDrive) :
-                        Setting_UI.reflection_eventtocore._MoveItem(ap.AddRawChildPath(oldname), ap.AddRawChildPath(TB_newname.Text), id, null, null, null, null)
-                )
+            if (Setting_UI.reflection_eventtocore._MoveItem(node, node.Parent, TB_newname.Text))
             {
                 Dispatcher.Invoke(new Action(() =>
                 {

@@ -154,9 +154,9 @@ namespace Core.Transfer
 
         #region Add new items from UI
         public List<Thread> LoadGroupThreads = new List<Thread>();
-        public void AddItems(List<AddNewTransferItem> items, string fromfolder_raw, string savefolder_raw, bool AreCut)
+        public void AddItems(List<ExplorerNode> items, ExplorerNode fromfolder, ExplorerNode savefolder, bool AreCut)
         {
-            ItemsTransferManager gr = new ItemsTransferManager(items, fromfolder_raw, savefolder_raw, AreCut);
+            ItemsTransferManager gr = new ItemsTransferManager(items, fromfolder, savefolder, AreCut);
             GroupsWork.Add(gr);
             Thread thr = new Thread(GroupsWork[GroupsWork.IndexOf(gr)].LoadListItems);
             thr.Start();
@@ -223,8 +223,8 @@ namespace Core.Transfer
             {
                 if (GroupsWork[i].GroupData.status == StatusTransfer.Loading) continue;
                 JsonDataSaveGroup json_item = new JsonDataSaveGroup();
-                json_item.fromfolder_raw = GroupsWork[i].fromfolder.Path_Raw;
-                json_item.savefolder_raw = GroupsWork[i].savefolder.Path_Raw;
+                json_item.fromfolder = GroupsWork[i].fromfolder;
+                json_item.savefolder = GroupsWork[i].savefolder;
                 json_item.Group = GroupsWork[i].GroupData;
                 json_item.AreCut = GroupsWork[i].AreCut;
                 json_groups.Add(json_item);

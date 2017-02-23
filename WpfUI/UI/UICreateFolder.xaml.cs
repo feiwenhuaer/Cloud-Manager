@@ -21,12 +21,12 @@ namespace WpfUI.UI
     /// </summary>
     public partial class UICreateFolder : Window
     {
-        public string Path;
-        public string Id;
-        public UICreateFolder()
+        ExplorerNode parent;
+        public UICreateFolder(ExplorerNode parent)
         {
             InitializeComponent();
             BT_create.Visibility = Visibility.Hidden;
+            this.parent = parent;
         }
 
         private void BT_create_Click(object sender, RoutedEventArgs e)
@@ -54,12 +54,11 @@ namespace WpfUI.UI
         }
         void CreateFolder()
         {
-            AnalyzePath ap = new AnalyzePath(Path);
-            string temp = ap.AddRawChildPath(textBox.Text);
-            Setting_UI.reflection_eventtocore._CreateFolder(temp, Id, ap.Email, textBox.Text);
+            ExplorerNode n = new ExplorerNode();
+            n.Info.Name = textBox.Text;
+            parent.AddChild(n);
+            Setting_UI.reflection_eventtocore._CreateFolder(n);
             Dispatcher.Invoke(new Action(() => this.Close()));
         }
-
-        
     }
 }

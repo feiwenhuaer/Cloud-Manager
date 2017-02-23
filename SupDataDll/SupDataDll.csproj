@@ -55,6 +55,7 @@
     <Compile Include="CustomException.cs" />
     <Compile Include="DataClass.cs" />
     <Compile Include="Enum.cs" />
+    <Compile Include="ExplorerNode.cs" />
     <Compile Include="ListBitmapImageResource.cs" />
     <Compile Include="PCPath.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

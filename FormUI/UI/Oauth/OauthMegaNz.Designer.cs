@@ -110,6 +110,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.TB_email);
             this.Name = "OauthMegaNz";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "OauthMegaNz";
             this.ResumeLayout(false);
             this.PerformLayout();

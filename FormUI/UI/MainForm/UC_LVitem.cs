@@ -16,19 +16,13 @@ namespace FormUI.UI.MainForm
         private ImageList _LargeImageList = new ImageList();
         public IconListManager _IconListManager;
         public Thread threxplorer;
-
-        public List<OldPathLV> HistoryPathID = new List<OldPathLV>();
-        public int HistoryPathID_index = -1;
-
+        
         int index_collumn_name;
         int index_collumn_Type;
         int index_collumn_Id;
         int index_cullumn_size;
         int index_cullumn_mimeType;
-
-        public delegate void ListViewFolderDoubleClickCallBack(ExplorerListItem load);
-        public event ListViewFolderDoubleClickCallBack EventListViewFolderDoubleClickCallBack;
-
+        
         public UC_LVitem()
         {
             InitializeComponent();
@@ -49,18 +43,17 @@ namespace FormUI.UI.MainForm
             index_collumn_Id = LV_item.Columns["LV_CH_Id"].Index;
             index_cullumn_size = LV_item.Columns["LV_CH_Size"].Index;
             index_cullumn_mimeType = LV_item.Columns["LV_CH_mimeType"].Index;
-
-            TB_Path.Text = "https://drive.google.com/drive/u/0/folders/0B-yiWN2AF_cIeHZaTWVsU2duSVU";
+            managerexplorernodes = new ManagerExplorerNodes();
+            //TB_Path.Text = "https://drive.google.com/drive/u/0/folders/0B-yiWN2AF_cIeHZaTWVsU2duSVU";
         }
 
         public void AddListViewItem(List<ItemLV> list)
         {
             LV_item.Items.Clear();
+            _IconListManager = new IconListManager(_SmallImageList, _LargeImageList);
             foreach (ItemLV item in list)
             {
-                _IconListManager = new IconListManager(_SmallImageList, _LargeImageList);
-                ListViewItem lv_item = new ListViewItem(item.str, string.IsNullOrEmpty(item.filepath) ? _IconListManager.AddIcon(item.icon) : _IconListManager.AddFileIcon(item.filepath));
-                LV_item.Items.Add(lv_item);
+                LV_item.Items.Add(new ListViewItem(item.str, _IconListManager.AddIcon(item.icon)));
             }
         }
 
@@ -101,32 +94,20 @@ namespace FormUI.UI.MainForm
             if (e.Button == MouseButtons.Left)
             {
                 if (LV_item.SelectedItems.Count != 1) return;
-                Open();
+                OpenItemLV();
             }
         }
         private void LV_item_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Back)
+            switch(e.KeyCode)
             {
-                Back();
+                case Keys.Back:Back(); break;
+                case Keys.Delete:
+                case Keys.Control | Keys.C:
+                case Keys.Control | Keys.X:
+                case Keys.Control | Keys.V:
+                default:return;
             }
-            if (e.KeyCode == Keys.Delete)
-            {
-
-            }
-            if (e.KeyCode == (Keys.Control | Keys.C))
-            {
-
-            }
-            if (e.KeyCode == (Keys.Control | Keys.X))
-            {
-
-            }
-            if (e.KeyCode == (Keys.Control | Keys.V))
-            {
-
-            }
-
         }
         #endregion
 
@@ -146,91 +127,69 @@ namespace FormUI.UI.MainForm
         #endregion
 
         #region Navigate
-        public void Next(bool explandTV = false, bool addToTV = false, TreeNode node = null)
+        public delegate void ListViewFolderDoubleClickCallBack(ExplorerListItem load);
+        public event ListViewFolderDoubleClickCallBack EventListViewFolderDoubleClickCallBack;
+        public ManagerExplorerNodes managerexplorernodes;
+        public void ExplorerCurrentNode(bool explandTV = false, bool addToTV = false, TreeNode Tnode = null)
         {
-
-            if (HistoryPathID_index < HistoryPathID.Count - 1)
+            ExplorerListItem load = new ExplorerListItem();
+            load.node = managerexplorernodes.NodeWorking();
+            load.explandTV = explandTV;
+            load.addToTV = addToTV;
+            if (Tnode != null) load.TV_node = Tnode;
+            EventListViewFolderDoubleClickCallBack(load);
+        }
+        void Back()
+        {
+            if(managerexplorernodes.Back() != null)
             {
-                HistoryPathID_index++;
-                ExplorerListItem load = new ExplorerListItem();
-                load.path = HistoryPathID[HistoryPathID_index].Path;
-                load.id = HistoryPathID[HistoryPathID_index].ID;
-                load.explandTV = explandTV;
-                load.addToTV = addToTV;
-                if (node != null) load.TV_node = node;
-                EventListViewFolderDoubleClickCallBack(load);
+                ExplorerCurrentNode();
+            }
+        }
+        void Next()
+        {
+            if (managerexplorernodes.Next() != null)
+            {
+                ExplorerCurrentNode();
             }
         }
 
-        public void Clear()
-        {
-            if (HistoryPathID_index < 0) return;
-            for (int i = HistoryPathID_index + 1; i < HistoryPathID.Count; i++)
-            {
-                HistoryPathID.RemoveAt(i);
-                i--;
-            }
-        }
-
-        public void Back()
-        {
-            if (HistoryPathID_index > 0)
-            {
-                HistoryPathID_index--;
-                ExplorerListItem load = new ExplorerListItem();
-                load.path = HistoryPathID[HistoryPathID_index].Path;
-                load.id = HistoryPathID[HistoryPathID_index].ID;
-                EventListViewFolderDoubleClickCallBack(load);
-            }
-        }
-
-        private void Open()
+        private void OpenItemLV()
         {
             if (LV_item.SelectedItems.Count != 1) return;
-            if (LV_item.SelectedItems[0].SubItems[index_collumn_Type].Text == "Folder")
+            ExplorerNode find = FindNodeLV(LV_item.SelectedItems[0]);
+            if (find != null)
             {
-                string path = "";
-                string id = LV_item.SelectedItems[0].SubItems[5].Text;
-
-
-                if (!AnalyzePath.IsUrl(TB_Path.Text)) path = TB_Path.Text + (AnalyzePath.IsCloud(TB_Path.Text) ? "/" : "\\") + LV_item.SelectedItems[0].SubItems[0].Text;
-                else
+                if (find.Info.Size > 0)//file
                 {
-                    AnalyzePath rp = new AnalyzePath(TB_Path.Text);
-                    path = rp.ReplaceIDUrl(id);
+                    if (find.GetRoot().RootInfo.Type != CloudType.LocalDisk)//cloud
+                    {
+                        MessageBox.Show("Not support now.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                    }
+                    else//disk
+                    {
+                        System.Diagnostics.Process.Start(find.GetFullPathString());
+                    }
                 }
-
-                Clear();
-                HistoryPathID.Add(new OldPathLV(id, path));
-                Next();
-                return;
-            }
-            if (LV_item.SelectedItems[0].SubItems[index_collumn_Type].Text == "File")
-            {
-                if (AnalyzePath.IsCloud(TB_Path.Text))
+                else//folder
                 {
-                    //download file 
-                    return;
+                    managerexplorernodes.Next(find);
+                    ExplorerCurrentNode();
                 }
-                else
-                {
-                    System.Diagnostics.Process.Start(TB_Path.Text + "\\" + LV_item.SelectedItems[0].SubItems[0].Text);
-                }
-                return;
             }
         }
         #endregion
 
-        private void TB_Path_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter)
-            {
-                AnalyzePath ap = new AnalyzePath(TB_Path.Text);
-                Clear();
-                HistoryPathID.Add(new OldPathLV(string.Empty, TB_Path.Text));
-                Next();
-            }
-        }
+        //private void TB_Path_KeyDown(object sender, KeyEventArgs e)
+        //{
+        //    if (e.KeyCode == Keys.Enter)
+        //    {
+        //        AnalyzePath ap = new AnalyzePath(TB_Path.Text);
+        //        Clear();
+        //        HistoryPathID.Add(new OldPathLV(string.Empty, TB_Path.Text));
+        //        Next();
+        //    }
+        //}
 
         #region Menu R click
         private void CMS_LVitem_Opening(object sender, CancelEventArgs e)
@@ -241,52 +200,50 @@ namespace FormUI.UI.MainForm
             copyIDToClipboardToolStripMenuItem.Enabled = false;
             openToolStripMenuItem.Enabled = false;
             renameToolStripMenuItem.Enabled = false;
+            switch(LV_item.SelectedItems.Count)
+            {
+                case 0:
+                    cutToolStripMenuItem.Enabled = false;
+                    copyToolStripMenuItem.Enabled = false;
+                    dowloadSeletedToolStripMenuItem.Enabled = false;
+                    deleteToolStripMenuItem.Enabled = false;
+                    pasteToolStripMenuItem.Enabled = ClipBoard_.Clipboard;
+                    if (managerexplorernodes.NodeWorking() != null) SetUpload_TSMI(true);
+                    break;
 
-            if (LV_item.SelectedItems.Count == 0) // off all
-            {
-                //createFolderToolStripMenuItem.Enabled = true;
-                cutToolStripMenuItem.Enabled = false;
-                copyToolStripMenuItem.Enabled = false;
-                dowloadSeletedToolStripMenuItem.Enabled = false;
-                deleteToolStripMenuItem.Enabled = false;
-            }
-            else// >0
-            {
-                //createFolderToolStripMenuItem.Enabled = false;
-                cutToolStripMenuItem.Enabled = true;
-                copyToolStripMenuItem.Enabled = true;
-                deleteToolStripMenuItem.Enabled = true;
-                if (AnalyzePath.IsCloud(TB_Path.Text)) dowloadSeletedToolStripMenuItem.Enabled = true;
-                else dowloadSeletedToolStripMenuItem.Enabled = false;
-            }
+                case 1:
+                    openToolStripMenuItem.Enabled = true;
+                    renameToolStripMenuItem.Enabled = true;
+                    copyIDToClipboardToolStripMenuItem.Enabled = true;
+                    pasteToolStripMenuItem.Enabled = ClipBoard_.Clipboard;
+                    if (managerexplorernodes.NodeWorking() != null) SetUpload_TSMI(true);
+                    SetCutCopyDeleteDownload_TSMI();
+                    break;
 
-            //openToolStripMenuItem
-            if (LV_item.SelectedItems.Count == 1)
-            {
-                openToolStripMenuItem.Enabled = true;
-                renameToolStripMenuItem.Enabled = true;
-                copyIDToClipboardToolStripMenuItem.Enabled = true;
+                default: // >1
+                    pasteToolStripMenuItem.Enabled = false;
+                    if (managerexplorernodes.NodeWorking() == null) SetUpload_TSMI(false);
+                    SetCutCopyDeleteDownload_TSMI();
+                    break; 
             }
-
-            //uploadFileToHereToolStripMenuItem
-            if (LV_item.SelectedItems.Count <= 1 & !string.IsNullOrEmpty(TB_Path.Text))
-            {
-                uploadFileToHereToolStripMenuItem.Enabled = true;
-                uploadFolderToHereToolStripMenuItem.Enabled = true;
-            }
-            else
-            {
-                uploadFileToHereToolStripMenuItem.Enabled = false;
-                uploadFolderToHereToolStripMenuItem.Enabled = false;
-            }
-            //pasteToolStripMenuItem
-
-            if (LV_item.SelectedItems.Count > 1) pasteToolStripMenuItem.Enabled = false;
-            else pasteToolStripMenuItem.Enabled = ClipBoard_.Clipboard;
         }
+        void SetUpload_TSMI(bool flag)
+        {
+            uploadFileToHereToolStripMenuItem.Enabled = flag;
+            uploadFolderToHereToolStripMenuItem.Enabled = flag;
+        }
+        void SetCutCopyDeleteDownload_TSMI()
+        {
+            cutToolStripMenuItem.Enabled = true;
+            copyToolStripMenuItem.Enabled = true;
+            deleteToolStripMenuItem.Enabled = true;
+            if (!string.IsNullOrEmpty(managerexplorernodes.Root.RootInfo.Email)) dowloadSeletedToolStripMenuItem.Enabled = true;
+            else dowloadSeletedToolStripMenuItem.Enabled = false;
+        }
+
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Open();
+            OpenItemLV();
         }
         private void cutToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -300,56 +257,56 @@ namespace FormUI.UI.MainForm
         {
             ClipBoard_.Clear();
             ClipBoard_.AreCut = AreCut;
-            ClipBoard_.directory = TB_Path.Text;
-            bool AreCloud = AnalyzePath.IsCloud(TB_Path.Text);
+            ClipBoard_.directory = managerexplorernodes.NodeWorking();
+            bool AreCloud = !string.IsNullOrEmpty(managerexplorernodes.Root.RootInfo.Email);
             foreach (ListViewItem item in LV_item.SelectedItems)
             {
-                Type_FileFolder type = (Type_FileFolder)Enum.Parse(typeof(Type_FileFolder), item.SubItems[index_collumn_Type].Text);
-                ClipBoard_.Add(new AddNewTransferItem(item.SubItems[index_collumn_name].Text,
-                                                  item.SubItems[index_collumn_Id].Text,
-                                                  item.SubItems[index_cullumn_mimeType].Text,
-                                                  type,
-                                                  type == Type_FileFolder.File ? long.Parse(item.SubItems[index_cullumn_size].Text) : -1
-                                                  )
-                                );
+                ExplorerNode node = FindNodeLV(item);
+                if (node != null) ClipBoard_.Add(node);
             }
             ClipBoard_.Clipboard = true;
         }
         private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            AnalyzePath rp = new AnalyzePath(TB_Path.Text);
-            string path = TB_Path.Text;
+            ExplorerNode rootto = managerexplorernodes.NodeWorking();
             if (LV_item.SelectedItems.Count == 1)
             {
-                Type_FileFolder type = (Type_FileFolder)Enum.Parse(typeof(Type_FileFolder), LV_item.SelectedItems[0].SubItems[index_collumn_Type].Text);
-                if (type == Type_FileFolder.Folder)
+                ExplorerNode find = FindNodeLV(LV_item.SelectedItems[0]);
+                if (find != null) rootto = find;
+            }
+            Setting_UI.reflection_eventtocore._AddItem(ClipBoard_.Items, ClipBoard_.directory, rootto, ClipBoard_.AreCut);
+        }
+        ExplorerNode FindNodeLV(ListViewItem item)
+        {
+            foreach (ExplorerNode n in managerexplorernodes.NodeWorking().Child)
+            {
+                if (string.IsNullOrEmpty(n.Info.ID))// disk
                 {
-                    path += rp.PathIsCloud ? "/" : "\\" + LV_item.SelectedItems[0].Text;
+                    if (n.Info.Name == item.SubItems[index_collumn_name].Text) return n;
+                }
+                else
+                {
+                    if(n.Info.ID == item.SubItems[index_collumn_Id].Text) return n;
                 }
             }
-            Setting_UI.reflection_eventtocore._AddItem(ClipBoard_.Items, ClipBoard_.directory, path, ClipBoard_.AreCut);
+            return null;
         }
+        
         private void dowloadSeletedToolStripMenuItem_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog fbd = new FolderBrowserDialog();
             fbd.RootFolder = Environment.SpecialFolder.MyComputer;
             fbd.ShowNewFolderButton = true;
             DialogResult result = fbd.ShowDialog(MainForm);
-            if (result == DialogResult.OK | result == DialogResult.Yes)
+            if (result == DialogResult.OK || result == DialogResult.Yes)
             {
-                List<AddNewTransferItem> list_item_from = new List<AddNewTransferItem>();
+                List<ExplorerNode> list_item_from = new List<ExplorerNode>();
                 foreach (ListViewItem item in LV_item.SelectedItems)
                 {
-                    Type_FileFolder type = (Type_FileFolder)Enum.Parse(typeof(Type_FileFolder), item.SubItems[index_collumn_Type].Text);
-                    AddNewTransferItem dl_item = new AddNewTransferItem(item.SubItems[index_collumn_name].Text,
-                                                                item.SubItems[index_collumn_Id].Text,
-                                                                item.SubItems[index_cullumn_mimeType].Text,
-                                                                type,
-                                                                type == Type_FileFolder.File ? long.Parse(item.SubItems[index_cullumn_size].Text) : -1
-                                                                );
-                    list_item_from.Add(dl_item);
+                    ExplorerNode find = FindNodeLV(item);
+                    if(find != null) list_item_from.Add(find);
                 }
-                Setting_UI.reflection_eventtocore._AddItem(list_item_from, TB_Path.Text, fbd.SelectedPath, false);
+                Setting_UI.reflection_eventtocore._AddItem(list_item_from, managerexplorernodes.NodeWorking(), ExplorerNode.GetNodeFromDiskPath(fbd.SelectedPath), false);
             }
         }
         private void uploadFolderToHereToolStripMenuItem_Click(object sender, EventArgs e)
@@ -360,46 +317,42 @@ namespace FormUI.UI.MainForm
             DialogResult result = fbd.ShowDialog(MainForm);
             if (result == DialogResult.OK | result == DialogResult.Yes)
             {
-                List<AddNewTransferItem> list_item_from = new List<AddNewTransferItem>();
-                string[] pathfrom_arr = fbd.SelectedPath.TrimEnd('\\').Split('\\');
-                string parent_directory_from = "";
-                for (int i = 0; i < pathfrom_arr.Length - 1; i++)
-                {
-                    parent_directory_from += pathfrom_arr[i] + "\\";
-                }
-                if (string.IsNullOrEmpty(parent_directory_from)) parent_directory_from = pathfrom_arr[0];
+                List<ExplorerNode> list_item_from = new List<ExplorerNode>();
+                ExplorerNode node = ExplorerNode.GetNodeFromDiskPath(fbd.SelectedPath.TrimEnd('\\'));
+                list_item_from.Add(node);
 
-                AddNewTransferItem dl_item = new AddNewTransferItem(string.IsNullOrEmpty(parent_directory_from) ? "" : pathfrom_arr[pathfrom_arr.Length - 1],
-                                                            "",
-                                                            "",
-                                                            Type_FileFolder.Folder
-                                                            );
-                list_item_from.Add(dl_item);
-                Setting_UI.reflection_eventtocore._AddItem(list_item_from, parent_directory_from.TrimEnd('\\'),
-                        LV_item.SelectedItems.Count == 0 ? TB_Path.Text : TB_Path.Text + "/" + LV_item.SelectedItems[0].Text, false);
+                ExplorerNode rootto = managerexplorernodes.NodeWorking();
+                if(LV_item.SelectedItems.Count == 1)
+                {
+                    ExplorerNode find = FindNodeLV(LV_item.SelectedItems[0]);
+                    if (find != null && find.Info.Size <= 0) rootto = find;
+                }
+                Setting_UI.reflection_eventtocore._AddItem(list_item_from, node.Parent, rootto, false);
             }
         }
         private void refreshToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            HistoryPathID_index--;
-            Next();
+            ExplorerCurrentNode();
         }
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            AnalyzePath rp = new AnalyzePath(TB_Path.Text);
             string item = "";
-            List<string> item_arr = new List<string>();
+            List<ExplorerNode> item_arr = new List<ExplorerNode>();
             for (int i = 0; i < LV_item.SelectedItems.Count; i++)
             {
-                item += TB_Path.Text + (rp.PathIsCloud ? "/" : "\\") + LV_item.SelectedItems[i].Text + "\r\n";
-                item_arr.Add(TB_Path.Text + (rp.PathIsCloud ? "/" : "\\") + LV_item.SelectedItems[i].Text);
+                ExplorerNode find = FindNodeLV(LV_item.SelectedItems[i]);
+                if (find != null)
+                {
+                    item_arr.Add(find);
+                    item += find.Info.Name + "\r\n";
+                }
             }
             DeleteConfirmForm f = new DeleteConfirmForm();
             f.TB.Text = item;
             f.ShowDialog(this);
             if (f.Delete)
             {
-                DeleteItems items = new DeleteItems() { items = item_arr, PernamentDelete = f.CB_pernament.Checked };
+                DeleteItems items = new DeleteItems() { Items = item_arr, PernamentDelete = f.CB_pernament.Checked };
                 Thread thr = new Thread(Setting_UI.reflection_eventtocore._DeletePath);
                 Setting_UI.ManagerThreads.delete.Add(thr);
                 Setting_UI.ManagerThreads.CleanThr();
@@ -408,9 +361,9 @@ namespace FormUI.UI.MainForm
         }
         private void renameToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            RenameItem rename = new RenameItem(TB_Path.Text + (AnalyzePath.IsCloud(TB_Path.Text) ? "/" : "\\") + LV_item.SelectedItems[0].Text,
-                LV_item.SelectedItems[0].SubItems[index_collumn_Id].Text, LV_item.SelectedItems[0].Text);
-            rename.Show(MainForm);
+            //RenameItem rename = new RenameItem(TB_Path.Text + (AnalyzePath.IsCloud(TB_Path.Text) ? "/" : "\\") + LV_item.SelectedItems[0].Text,
+            //    LV_item.SelectedItems[0].SubItems[index_collumn_Id].Text, LV_item.SelectedItems[0].Text);
+            //rename.Show(MainForm);
         }
         private void copyIDToClipboardToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -419,10 +372,7 @@ namespace FormUI.UI.MainForm
         }
         private void createFolderToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            CreateFolderForm f = new CreateFolderForm();
-            AnalyzePath ap = new AnalyzePath(TB_Path.Text);
-            f.Path = HistoryPathID[HistoryPathID_index].Path;
-            f.Id = HistoryPathID[HistoryPathID_index].ID;
+            CreateFolderForm f = new CreateFolderForm(managerexplorernodes.NodeWorking());
             f.Show(MainForm);
         }
         #endregion
@@ -432,6 +382,5 @@ namespace FormUI.UI.MainForm
     {
         public string[] str;
         public Icon icon;
-        public string filepath = "";
     }
 }

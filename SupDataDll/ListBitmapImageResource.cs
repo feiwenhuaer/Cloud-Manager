@@ -26,24 +26,5 @@ namespace SupDataDll
             SupDataDll.Properties.Resources.cdrom_mount
         };
     }
-    public enum CloudName
-    {
-        LocalDisk = 0,
-        Folder = 1,
-        Dropbox = 2,
-        GoogleDrive = 3,
-        Mega = 4,
-        MediaFire = 5
-    }
-    public enum DiskType
-    {
-        Unknown = 0,
-        NoRootDirectory = 1,
-        Removable = 2,
-        Fixed = 3,
-        Network = 4,
-        CDRom = 5,
-        Ram = 6,
-        Cloud = 7
-    }
+    
 }

@@ -28,14 +28,13 @@ namespace WpfUI.UI.Main
                 return Setting_UI.ReloadUI_Flag;
             }
         }
-        public void AddNewCloudToTV(string email, CloudName type)
+        public void AddNewCloudToTV(string email, CloudType type)
         {
-            //if (Dispatcher.CheckAccess())
-                Dispatcher.Invoke(new Action(() => TreeObservableCollection.Add(new TreeViewDataModel(null) { DisplayData = new TreeviewDataItem(email, type) })));
-            //else TreeObservableCollection.Add(new TreeViewDataModel(null) { DisplayData = new TreeviewDataItem(email, type) });            
+            ExplorerNode n = new ExplorerNode(new RootNode() { Email = email, Type = type });
+            Dispatcher.Invoke(new Action(() => TreeObservableCollection.Add(new TreeViewDataModel(null) { DisplayData = new TreeviewDataItem(n) })));
         }
 
-        public void FileSaveDialog(string InitialDirectory, string FileName, string Filter, AnalyzePath rp, string filename, long filesize)
+        public void FileSaveDialog(string InitialDirectory, string FileName, string Filter, ExplorerNode node)
         {
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.InitialDirectory = InitialDirectory;
@@ -46,9 +45,7 @@ namespace WpfUI.UI.Main
             {
                 if (sfd.ShowDialog().Value)
                 {
-                    AddNewTransferItem uditem = new AddNewTransferItem(filename, rp.ID, "", Type_FileFolder.File, filesize);
-                    AnalyzePath ap = new AnalyzePath(sfd.FileName);
-                    Setting_UI.reflection_eventtocore._AddItem(new List<AddNewTransferItem>() { uditem }, rp.Path_Raw, ap.Parent, false);
+                    Setting_UI.reflection_eventtocore._AddItem(new List<ExplorerNode>() { node }, node.Parent, ExplorerNode.GetNodeFromDiskPath(sfd.FileName).Parent, false);
                 }
             }));
         }
@@ -99,43 +96,25 @@ namespace WpfUI.UI.Main
         private void TV_LoadDisk()
         {
             foreach (var drive in DriveInfo.GetDrives())
-                TreeObservableCollection.Add(new TreeViewDataModel()
-                {
-                    DisplayData = new TreeviewDataItem(drive.RootDirectory.ToString().Replace("\\", null),
-                                                        CloudName.LocalDisk, 
-                                                        (DiskType)(int)drive.DriveType)
-                });
+            {
+                ExplorerNode n = new ExplorerNode(new RootNode() { Type = CloudType.LocalDisk});
+                n.Info.Name = drive.RootDirectory.ToString().TrimEnd('\\');
+                TreeObservableCollection.Add(new TreeViewDataModel() { DisplayData = new TreeviewDataItem(n) });
+            }
             
         }
         private void TV_LoadCloud()
         {
             foreach (CloudEmail_Type cloud in Setting_UI.reflection_eventtocore._GetListAccountCloud())
-                TreeObservableCollection.Add(new TreeViewDataModel() { DisplayData = new TreeviewDataItem(cloud.Email, cloud.Type) });
+            {
+                ExplorerNode n = new ExplorerNode(new RootNode() { Email = cloud.Email, Type = cloud.Type });
+                TreeObservableCollection.Add(new TreeViewDataModel() { DisplayData = new TreeviewDataItem(n) });
+            }
+                
         }
         TreeViewDataModel Get_TVDataMoldel(TreeViewItem item)
         {
             return item.Header as TreeViewDataModel;
-        }
-        public string GetRoot_TV(TreeViewDataModel pr)
-        {
-            string path = pr.DisplayData.Name;
-            do
-            {
-                if (pr.Parent != null)
-                {
-                    pr = pr.Parent;
-                    path = pr.DisplayData.Name + "\\" + path;
-                }
-                else
-                {
-                    switch (pr.DisplayData.Type)
-                    {
-                        case CloudName.Folder: throw new Exception("Root can't be folder.");
-                        case CloudName.LocalDisk: return path;
-                        default: return pr.DisplayData.Type.ToString() + ":" + path.Replace("\\", "/");
-                    }
-                }
-            } while (true);
         }
         TreeViewItem Get_TreeViewItem(StackPanel stackpanel)
         {
@@ -150,10 +129,8 @@ namespace WpfUI.UI.Main
         {
             TreeViewItem item = Get_TreeViewItem(sender as StackPanel);
             TreeViewDataModel tv_datamodel = Get_TVDataMoldel(item);
-            string path = GetRoot_TV(tv_datamodel);
-            ((UC_Lv_item)((TabItem)tabControl.Items[tabControl.SelectedIndex]).Content).Clear();
-            ((UC_Lv_item)((TabItem)tabControl.Items[tabControl.SelectedIndex]).Content).HistoryPathID.Add(new OldPathLV(null, path));
-            ((UC_Lv_item)((TabItem)tabControl.Items[tabControl.SelectedIndex]).Content).Next(e.ClickCount >= 2 ? true : false, true, tv_datamodel, item);
+            ((UC_Lv_item)((TabItem)tabControl.Items[tabControl.SelectedIndex]).Content).managerexplorernodes.Next(tv_datamodel.DisplayData.Node);
+            ((UC_Lv_item)((TabItem)tabControl.Items[tabControl.SelectedIndex]).Content).ExplorerCurrentNode(false, true, tv_datamodel, item);
         }
         private void StackPanel_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -183,7 +160,7 @@ namespace WpfUI.UI.Main
             {
                 item_data_root = item_data_root.Parent;
             }
-            if (item_data_root.DisplayData.Type == CloudName.Folder) throw new Exception("Folder can't be root.");
+            if (item_data_root.DisplayData.Type == CloudType.Folder) throw new Exception("Folder can't be root.");
             bool isroot = item_data_root == item_data;
             foreach (ContextMenuDataModel item in menuitems_source)
             {
@@ -192,9 +169,9 @@ namespace WpfUI.UI.Main
                 {
                     case LanguageKey.TSMI_cut: if (isroot) item.IsEnabled = false; else item.IsEnabled = true; break;
                     case LanguageKey.TSMI_paste: if (ClipBoard_.Clipboard) item.IsEnabled = true; else item.IsEnabled = false; break;
-                    case LanguageKey.TSMI_downloadsellected: if (item_data_root.DisplayData.Type == CloudName.LocalDisk) item.IsEnabled = false; else item.IsEnabled = true; break;
-                    case LanguageKey.TSMI_uploadfile: if (item_data_root.DisplayData.Type == CloudName.LocalDisk) item.IsEnabled = false; else item.IsEnabled = true; break;
-                    case LanguageKey.TSMI_uploadfolder: if (item_data_root.DisplayData.Type == CloudName.LocalDisk) item.IsEnabled = false; else item.IsEnabled = true; break;
+                    case LanguageKey.TSMI_downloadsellected: if (item_data_root.DisplayData.Type == CloudType.LocalDisk) item.IsEnabled = false; else item.IsEnabled = true; break;
+                    case LanguageKey.TSMI_uploadfile: if (item_data_root.DisplayData.Type == CloudType.LocalDisk) item.IsEnabled = false; else item.IsEnabled = true; break;
+                    case LanguageKey.TSMI_uploadfolder: if (item_data_root.DisplayData.Type == CloudType.LocalDisk) item.IsEnabled = false; else item.IsEnabled = true; break;
                     default: continue;
                 }
             }
@@ -224,11 +201,8 @@ namespace WpfUI.UI.Main
             ClipBoard_.Clear();
             ClipBoard_.AreCut = AreCut;
             TreeViewDataModel model = treeView.SelectedItem as TreeViewDataModel;
-            AddNewTransferItem item = new AddNewTransferItem(model.DisplayData.Name, "", "", Type_FileFolder.Folder);
-            string path = GetRoot_TV(model);
-            AnalyzePath ap = new AnalyzePath(path);
-            ClipBoard_.directory = ap.Parent;
-            ClipBoard_.Add(item);
+            ClipBoard_.directory = model.DisplayData.Node.Parent;
+            ClipBoard_.Add(model.DisplayData.Node);
             ClipBoard_.Clipboard = true;
         }
 
@@ -236,27 +210,41 @@ namespace WpfUI.UI.Main
         {
             if (!ClipBoard_.Clipboard) return;
             TreeViewDataModel model = treeView.SelectedItem as TreeViewDataModel;
-            string savefolder = GetRoot_TV(model);
-            Setting_UI.reflection_eventtocore._AddItem(ClipBoard_.Items, ClipBoard_.directory, savefolder, ClipBoard_.AreCut);
+            Setting_UI.reflection_eventtocore._AddItem(ClipBoard_.Items, ClipBoard_.directory, model.DisplayData.Node, ClipBoard_.AreCut);
         }
 
         private void Delete()
         {
             TreeViewDataModel model = treeView.SelectedItem as TreeViewDataModel;
-            switch(model.DisplayData.Type)
+            MessageBoxResult result;
+            switch (model.DisplayData.Type)
             {
-                case CloudName.LocalDisk: return;
-                case CloudName.Folder:
+                case CloudType.LocalDisk: return;
+                case CloudType.Folder:
+                    result = System.Windows.MessageBox.Show(    this,
+                                                                "Are you want to remove " + model.DisplayData.Node.Info.Name,
+                                                                "Confirm",
+                                                                MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    if (result != MessageBoxResult.Yes) return;
                     Thread thr = new Thread(Setting_UI.reflection_eventtocore._DeletePath);
                     Setting_UI.ManagerThreads.delete.Add(thr);
-                    thr.Start(new DeleteItems(GetRoot_TV(model)) { PernamentDelete = false });
+                    thr.Start(new DeleteItems(model.DisplayData.Node) { PernamentDelete = false });
                     break;
+
                 default:
-                    if (Setting_UI.reflection_eventtocore._DeleteAccountCloud(model.DisplayData.Name, model.DisplayData.Type))
+                    result = System.Windows.MessageBox.Show(   this,
+                                                                                "Are you want to remove " + model.DisplayData.Type.ToString() + ":" + model.DisplayData.Node.RootInfo.Email,
+                                                                                "Confirm",
+                                                                                MessageBoxButton.YesNo,MessageBoxImage.Question);
+                    if (result != MessageBoxResult.Yes) return;
+                    if (Setting_UI.reflection_eventtocore._DeleteAccountCloud(model.DisplayData.Node.RootInfo.Email, model.DisplayData.Type))
                     {
                         TreeObservableCollection.Remove(model);
                     }
-                    else MessageBox.Show(this, "Error", "Remove cloud " + model.DisplayData.Type.ToString() + ":" + model.DisplayData.Name + " failed.", MessageBoxButton.OK, MessageBoxImage.Error);
+                    else System.Windows.MessageBox.Show(    this, 
+                                                            "Remove cloud " + model.DisplayData.Type.ToString() + ":" + model.DisplayData.Node.Info.Name + " failed.",
+                                                            "Error"
+                                                            , MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
             }
         }
@@ -304,10 +292,10 @@ namespace WpfUI.UI.Main
         {
             ExplorerListItem o = (ExplorerListItem)obj;
             bool exception = false;
-            ListItemFileFolder list = new ListItemFileFolder();
+            bool flag_arenull = false;
             try
             {
-                list = Setting_UI.reflection_eventtocore._ListIteamRequest(o.path, o.id);
+                if (Setting_UI.reflection_eventtocore._ListIteamRequest(o.node) == null) flag_arenull = true;
             }
             catch (ThreadAbortException)
             {
@@ -333,53 +321,38 @@ namespace WpfUI.UI.Main
             }
             finally
             {
-                string textboxpath = "";
-                Dispatcher.Invoke(new Action(() => textboxpath = ((UC_Lv_item)((TabItem)tabControl.Items[tabControl.SelectedIndex]).Content).textBox.Text));
-                if (list == null | (exception & textboxpath == o.path.TrimEnd(new char[] { '/', '\\' })))
+                if (flag_arenull || exception )
                 {
                     Dispatcher.Invoke(new Action(() =>
                     {
-                        if (((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).HistoryPathID_index <= 0) ((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).textBox.Text = "";
-                        else
-                        {
-                            ((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).HistoryPathID.RemoveAt(((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).HistoryPathID_index);
-                            ((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).HistoryPathID_index--;
-                            ((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).textBox.Text = ((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).HistoryPathID[((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).HistoryPathID_index].Path;
-                        }
+                        ((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).managerexplorernodes.Back();
                     }
                     ));
                 }
                 //Dispatcher.Invoke(new Action(() => CMS_Tabcontrol.Enabled = true));
             }
-            if (!exception & list != null)
+            if (!exception & !flag_arenull)
             {
-                Dispatcher.Invoke(new Action(() => SetData_TV_LV(o, list)));
+                Dispatcher.Invoke(new Action(() => SetData_TV_LV(o)));
             }
         }
-        void SetData_TV_LV(ExplorerListItem load, ListItemFileFolder list)
+        void SetData_TV_LV(ExplorerListItem load)
         {
-            bool iscloud = AnalyzePath.IsCloud(list.path_raw);
             if (load.addToTV && load.TV_data != null && load.TV_node != null)//add folder to tree view
             {
                 ((TreeViewDataModel)load.TV_data).Childrens.Clear();
-                foreach (FileFolder ff in list.Items)
+                foreach (ExplorerNode n in load.node.Child)
                 {
-                    if (ff.Size != -1) continue;
-                    TreeViewDataModel child = new TreeViewDataModel((TreeViewDataModel)load.TV_data) { DisplayData = new TreeviewDataItem(ff.Name, CloudName.Folder) };
+                    if (n.Info.Size < 1) continue;
+                    TreeViewDataModel child = new TreeViewDataModel((TreeViewDataModel)load.TV_data) { DisplayData = new TreeviewDataItem(n) };
                     ((TreeViewDataModel)load.TV_data).Childrens.Add(child);
                 }
                 if (load.explandTV) ((TreeViewItem)load.TV_node).ExpandSubtree();
             }
-            ((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).ShowDataToLV(list.Items);
-
-            string tabname = "";
-            if (!string.IsNullOrEmpty(list.NameFolder)) tabname = list.NameFolder;
-            else if (load.path.IndexOf('/') >= 0) { string[] splitPath = load.path.Split('/'); tabname = (string)splitPath.GetValue(splitPath.GetUpperBound(0)); }
-            else if (load.path.IndexOf('\\') >= 0) { string[] splitPath = load.path.Split('\\'); tabname = (string)splitPath.GetValue(splitPath.GetUpperBound(0)); }
-            else { tabname = load.path; }
-            (tabControl.Items[tabControl.SelectedIndex] as TabItem).Header = tabname;
+            ((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).ShowDataToLV(load.node);
+            (tabControl.Items[tabControl.SelectedIndex] as TabItem).Header = load.node.Info.Name;//tab header
             //(tabControl.Items[tabControl.SelectedIndex] as TabItem_).ToolTip = load.path;
-            ((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).textBox.Text = load.path.TrimEnd(new char[] { '\\', '/' });
+            //((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).textBox.Text = load.path.TrimEnd(new char[] { '\\', '/' });
         }
 
 
@@ -389,8 +362,8 @@ namespace WpfUI.UI.Main
         private void MenuItem_Cloud_Load()
         {
             CloudsAdd = new ObservableCollection<ContextMenuDataModel>();
-            CloudsAdd.Add(new ContextMenuDataModel(CloudName.Dropbox));
-            CloudsAdd.Add(new ContextMenuDataModel(CloudName.GoogleDrive));
+            CloudsAdd.Add(new ContextMenuDataModel(CloudType.Dropbox));
+            CloudsAdd.Add(new ContextMenuDataModel(CloudType.GoogleDrive));
             Cloud_add.ItemsSource = CloudsAdd;
         }
         private void MenuCloud_SubmenuOpened(object sender, RoutedEventArgs e)
@@ -412,18 +385,12 @@ namespace WpfUI.UI.Main
         {
             MenuItem item = sender as MenuItem;
             ContextMenuDataModel data = item.DataContext as ContextMenuDataModel;
-            if (data.Type == CloudName.Folder | data.Type == CloudName.LocalDisk) throw new Exception("Can remove cloud only.");
-            if(Setting_UI.reflection_eventtocore._DeleteAccountCloud(data.Text, data.Type))
-            {
-                foreach(TreeViewDataModel tv_data in TreeObservableCollection)
-                {
-                    if(tv_data.DisplayData.Name == data.Text && tv_data.DisplayData.Type == data.Type)
-                    {
-                        TreeObservableCollection.Remove(tv_data);
-                        return;
-                    }
-                }
-            }
+            MessageBoxResult result = System.Windows.MessageBox.Show(this, "Are you want to remove " + data.Type.ToString() + ":" + data.Text, "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result != MessageBoxResult.Yes) return;
+            if (data.Type == CloudType.Folder || data.Type == CloudType.LocalDisk) throw new Exception("Can remove cloud only.");
+            if (Setting_UI.reflection_eventtocore._DeleteAccountCloud(data.Text, data.Type))
+                foreach (TreeViewDataModel tv_data in TreeObservableCollection)
+                    if (tv_data.DisplayData.Node.Info.Name == data.Text && tv_data.DisplayData.Type == data.Type) { TreeObservableCollection.Remove(tv_data); return; }
         }
 
         ObservableCollection<ContextMenuDataModel> uis;
@@ -436,10 +403,7 @@ namespace WpfUI.UI.Main
             string lang_default = Setting_UI.reflection_eventtocore._GetSetting(SettingsKey.lang);
 
             foreach (string s in GetList_UI_n_lang.GetListUiFile()) uis.Add(new ContextMenuDataModel(s) { IsEnabled = s == ui_default ? false : true });
-            foreach (string s in GetList_UI_n_lang.GetListLangFile())
-            {
-                langs.Add(new ContextMenuDataModel(s) { IsEnabled = s == lang_default ? false : true });
-            }
+            foreach (string s in GetList_UI_n_lang.GetListLangFile()) langs.Add(new ContextMenuDataModel(s) { IsEnabled = s == lang_default ? false : true });
 
             MenuChangeUI.ItemsSource = uis;
             MenuChangeLang.ItemsSource = langs;
@@ -462,7 +426,5 @@ namespace WpfUI.UI.Main
             LoadLanguage();
         }
         #endregion
-
-        
     }
 }

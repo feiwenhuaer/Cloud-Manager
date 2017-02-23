@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml;
 using static Cloud.GoogleDrive.DriveAPIHttprequestv2;
@@ -14,421 +15,167 @@ namespace Core.Cloud
 {
     internal static class GoogleDrive
     {
-        static object sync_GDcache = new object();
-        static List<GD_item> cache_gd;
+        const string Rg_url_idFolder = "(?<=\\/folders\\/)[A-Za-z0-9-_]+",//drive/folders/id_folder or drive.google.com/drive/u/0/folders/id
+        Rg_url_idFolderOpen = "(?<=\\?id\\=)[A-Za-z0-9-_]+",
+        Rg_url_idFile = "(?<=file\\/d\\/)[A-Za-z0-9-_]+";
+        
         static object sync_root = new object();
         static List<RootID> root = new List<RootID>();
         static OrderByEnum[] en = { OrderByEnum.folder, OrderByEnum.title, OrderByEnum.createdDate };
-        static char[] listcannot = new char[] { '/', '\\', ':', '?', '*', '"', '<', '>', '|' };
-        static string[] mimeTypeGoogleRemove = new string[] {mimeType.audio, mimeType.drawing, mimeType.file,mimeType.form,mimeType.fusiontable,
+        internal static List<string> mimeTypeGoogleRemove = new List<string>() {mimeType.audio, mimeType.drawing, mimeType.file,mimeType.form,mimeType.fusiontable,
             mimeType.map,mimeType.presentation,mimeType.script,mimeType.sites,mimeType.unknown,mimeType.video,mimeType.photo};
+
         static DriveAPIHttprequestv2 GetAPIv2(string Email, GD_LimitExceededDelegate LimitExceeded = null)
         {
-            DriveAPIHttprequestv2 gdclient = new DriveAPIHttprequestv2(JsonConvert.DeserializeObject<TokenGoogleDrive>(AppSetting.settings.GetToken(Email, CloudName.GoogleDrive)), LimitExceeded);
+            DriveAPIHttprequestv2 gdclient = new DriveAPIHttprequestv2(JsonConvert.DeserializeObject<TokenGoogleDrive>(AppSetting.settings.GetToken(Email, CloudType.GoogleDrive)), LimitExceeded);
             gdclient.Email = Email;
             gdclient.TokenRenewEvent += Gdclient_TokenRenewEvent;
             return gdclient;
         }
 
-        public static ListItemFileFolder GetListFileFolder(string path,string Email, string id, bool folderonly = false,bool read_only = false)
+        public static ExplorerNode GetListFileFolder(ExplorerNode node, bool folderonly = false,bool read_only = false)
         {
-           // Console.WriteLine("token:" + token);
-            ListItemFileFolder list = new ListItemFileFolder();
-            DriveAPIHttprequestv2 gdclient = GetAPIv2(Email);
-
-            string rootid = GetRootID(Email);
-            string parent_ID = string.IsNullOrEmpty(rootid) ? "root" : rootid;
-            GD_Files_list list_ = new GD_Files_list();
-            if (!string.IsNullOrEmpty(id)) { parent_ID = id; goto mainrequest; }//got id parent
-            if (path == "/" | string.IsNullOrEmpty(path)) { path = ""; goto mainrequest; }//id parrent = root
-
-            parent_ID = GetIdOfPath(path, Email);// if not have parent id
-
-        mainrequest: // list item in parent from parent_ID
-            list_ = Search("'" + parent_ID + "' in parents and trashed=false", Email,parent_ID,read_only);
-            if (parent_ID == "root") AddRoot(Email, list_.id);
-            list = list_.Convert(parent_ID, folderonly, path);
-            list.path_raw = CloudName.GoogleDrive.ToString() + ":" + Email + "/" + path;
-            list.path_raw = list.path_raw.Replace("//", "/");
-            list.id_folder = parent_ID;
-            SaveCache();
-            return list;
-        }
-
-        public static Stream GetFileStream(string id,string Email,long Startpos,long endpos)
-        {
-            DriveAPIHttprequestv2 gdclient = GetAPIv2(Email);
-            return gdclient.Files_get(id,Startpos, endpos);
-        }
-
-        public static GD_Files_list Search(string query, string Email, string parent_id = null, bool read_only = false)
-        {
-            DriveAPIHttprequestv2 gdclient = GetAPIv2(Email);
-            return Check_n_AddToCache(JsonConvert.DeserializeObject<GD_Files_list>(gdclient.Files_list(en, query)),Email, parent_id,read_only);
-        }
-
-        public static ListItemFileFolder GetListFolderRecusive(string path, string id,string Email)
-        {
-            DriveAPIHttprequestv2 gdclient = GetAPIv2(Email);
-            ListItemFileFolder list = GetListFileFolder(path, Email, id, true);
-            for (int i = 0; i < list.Items.Count; i++)
+            bool uri = false;
+            ExplorerNode root = node.GetRoot();
+            string Email = root.RootInfo.Email;
+            string parent_ID = null;
+            string url = null;
+            Regex rg;
+            Match match;
+            if (string.IsNullOrEmpty(Email)) { Email = AppSetting.settings.GetDefaultCloud(CloudType.GoogleDrive); uri = true; }
+            if (uri)//folder
             {
-                ListItemFileFolder list_ = GetListFileFolder(list.Items[i].path_display,Email, list.Items[i].id, true);
-                list.Items.AddRange(list_.Items);
+                if (root.RootInfo.uri != null)
+                {
+                    url = root.RootInfo.uri.ToString();
+                    rg = new Regex(Rg_url_idFolder);
+                    match = rg.Match(url);
+                    if (match.Success) parent_ID = match.Value;
+                    else
+                    {
+                        rg = new Regex(Rg_url_idFolderOpen);
+                        match = rg.Match(url);
+                        if (match.Success) parent_ID = match.Value;
+                    }
+                }
             }
-            return list;
+            else
+            {
+                parent_ID = "root";//root
+                if (!string.IsNullOrEmpty(node.Info.ID)) parent_ID = node.Info.ID;//id root or id node
+            }
+
+            if (!string.IsNullOrEmpty(parent_ID))
+            {
+                GD_Files_list list_ = Search("'" + parent_ID + "' in parents and trashed=false", Email);
+                if (parent_ID == "root") node.Info.ID = list_.id;
+                node.RenewChilds(list_.Convert(node));
+                return node;
+            }
+            else if (string.IsNullOrEmpty(url))
+            {
+                rg = new Regex(Rg_url_idFile);
+                match = rg.Match(url);
+                if(match.Success)
+                {
+                    ExplorerNode n = new ExplorerNode();
+                    n.Info.ID = match.Value;
+                    n.RootInfo.Email = Email;
+                    GD_item item = GoogleDrive.GetMetadataItem(n);
+                    n.Info.Size = item.fileSize;
+                    n.Info.Name = item.title;
+                    n.Info.MimeType = item.mimeType;
+                    AppSetting.UIMain.FileSaveDialog(PCPath.Mycomputer, item.title, PCPath.FilterAllFiles, n);
+                    return null;
+                }
+            }
+            throw new Exception("Can't Analyze Data Input.");
         }
 
-        static object sync_createfolder = new object();
-        public static string CreateFolder(AnalyzePath rp, string parentid = null, string Email = null, string name = null)
+        public static Stream GetFileStream(ExplorerNode node, long Startpos,long endpos)
         {
-            DriveAPIHttprequestv2 gdclient = GetAPIv2(rp.Email);
+            DriveAPIHttprequestv2 gdclient = GetAPIv2(node.GetRoot().RootInfo.Email);
+            return gdclient.Files_get(node.Info.ID, Startpos, endpos);
+        }
+
+        public static GD_Files_list Search(string query, string Email,string pageToken = null)
+        {
+            DriveAPIHttprequestv2 gdclient = GetAPIv2(Email);
+            GD_Files_list list = JsonConvert.DeserializeObject<GD_Files_list>(gdclient.Files_list(en, query, CorpusEnum.DEFAULT, ProjectionEnum.BASIC,pageToken));
+            if(!string.IsNullOrEmpty(list.nextPageToken)) list.items.AddRange(Search(query, Email, list.nextPageToken).items);
+            list.nextPageToken = null;
+            return list;
+        }
+        
+        static object sync_createfolder = new object();
+        public static string CreateFolder(ExplorerNode node)
+        {
+            string Email = node.GetRoot().RootInfo.Email;
+            DriveAPIHttprequestv2 gdclient = GetAPIv2(Email);
             //if (string.IsNullOrEmpty(rp.Parent)) return rp.GetPath();
             string parent_id = "";
             try
             {
+                List<ExplorerNode> listnode = node.GetFullPath();
                 Monitor.Enter(sync_createfolder);
-                if (string.IsNullOrEmpty(parentid))
+                int i;
+                for (i = listnode.Count - 1; i > 0; i--)
                 {
-                    parent_id = GetIdOfPath(rp.GetPath(), rp.Email);
-                    return rp.GetPath();
+                    if (!string.IsNullOrEmpty(listnode[i].Info.ID)) { parent_id = listnode[i].Info.ID; break; }
                 }
-                else
+                i++;
+                bool create = false;
+                for (; i < listnode.Count; i++)
                 {
-                    foreach (var item in Search("'" + parentid + "' in parents and trashed=false", Email).Convert().Items)
+                    if (!create)
                     {
-                        if (item.Name == name) return name;
+                        List<ExplorerNode> listsearchnode = Search("'" + parent_id + "' in parents" +
+                            " and trashed=false" +
+                            " and title='" + listnode[i].Info.Name.Replace("'", "\\'") + "'" +
+                            " and mimeType = 'application/vnd.google-apps.folder'", Email).Convert(node);
+                        if (listsearchnode.Count == 0) create = true;
+                        else parent_id = listsearchnode[0].Info.ID;
                     }
-                    GD_item it = JsonConvert.DeserializeObject<GD_item>(gdclient.CreateFolder(name, parentid));
-                    return it.title;
+
+                    if (create) gdclient.CreateFolder(listnode[i].Info.Name, parent_id);
                 }
-            }
-            catch (GD_PathNotFoundException gd_ex)
-            {
-                string temp = rp.GetPath().Remove(0, gd_ex.FoundPath.Length).TrimStart('/');
-                string[] temp_arr = temp.Split('/');
-                parent_id = gd_ex.IdPath;
-                string data = "";
-                for (int i = 0; i < temp_arr.Length; i++)
-                {
-                    data = gdclient.CreateFolder(temp_arr[i], parent_id);//create folder
-                    GD_item item = JsonConvert.DeserializeObject<GD_item>(data);
-                    parent_id = item.id;
-#if DEBUG
-                    ReadWriteData.WriteLog("Create folder name: " + temp_arr[i] + " at parent_id:" + parent_id);
-#endif
-                }
-                return (gd_ex.FoundPath + "/" + temp).Replace("//", "/");
             }
             finally { Monitor.Exit(sync_createfolder); }
-        }
-
-        public static string GetIdOfPath(string path,string Email)
-        {
-            string root = GetRootID(Email);
-            string parent_ID = string.IsNullOrEmpty(root) ? "root" : root;
-            path = path.TrimEnd('/').TrimStart('/');
-            if (string.IsNullOrEmpty(path)) return parent_ID;
-            string parent_ID_temp = "";
-            GD_Files_list list_;
-            string[] path_arr = path.Split('/');
-            for (int i = 0; i < path_arr.Length; i++)//get id path
-            {
-                parent_ID_temp = "";
-                //find in cache
-                lock (sync_GDcache)
-                {
-                    foreach (GD_item item in cache_gd)
-                    {
-                        if (Email != item.Email) continue;
-                        if (item.title == path_arr[i])
-                        {
-                            foreach (GD_parent parent in item.parents)
-                            {
-                                if (parent.id == parent_ID)
-                                { parent_ID_temp = item.id; break; }//found item id
-                            }
-                        }
-                        if (!string.IsNullOrEmpty(parent_ID_temp)) break;
-                    }
-                }
-                //find in cloud
-                if (string.IsNullOrEmpty(parent_ID_temp))//list recusive in cloud if not found
-                {
-                    list_ = Search("'" + parent_ID + "' in parents and title = '" + path_arr[i].Replace("'", "\\'") + "' and mimeType = 'application/vnd.google-apps.folder' and trashed=false", Email);
-                    foreach (var item in list_.items)
-                    {
-                        if (item.title == path_arr[i])
-                        { parent_ID_temp = item.id; break; }
-                    }
-                }
-                if (string.IsNullOrEmpty(parent_ID_temp))
-                {
-                    string found_path = "";
-                    for (int j = 0; j < i; j++)
-                    {
-                        found_path += "/" + path_arr[j];
-                    }
-                    if (string.IsNullOrEmpty(found_path)) found_path = "/";
-                    throw new GD_PathNotFoundException("[GD_PathNotFoundException] Path not found: " + path){FoundPath = found_path,IdPath = parent_ID};
-                }
-                parent_ID = parent_ID_temp;
-            }
-            return parent_ID;
-        }
-
-        static GD_Files_list Check_n_AddToCache(GD_Files_list list_,string Email,string parent_id = null,bool read_only =false)
-        {
-            for (int i = 0; i < list_.items.Count; i++)
-            {
-                list_.items[i].Email = Email;
-                //if(list_.items[i].userPermission.role != rolePermissions.owner)  //remove item user not have permission writer or owner
-                //{
-                //    list_.items.RemoveAt(i);
-                //    i--;
-                //}
-                if (list_.items[i].mimeType == mimeType.folder) continue;
-                foreach (string item in mimeTypeGoogleRemove)
-                {
-                    if (list_.items[i].mimeType == item)//delete item has mimeType item not support
-                    {
-                        list_.items.RemoveAt(i);
-                        i--;
-                        break;
-                    }
-                }
-            }
-            
-
-            //remove deleted item id on cache
-            if (parent_id != null)
-            {
-                if (parent_id == "root")
-                {
-                    foreach(var id_pr in list_.items[0].parents)
-                    {
-                        if(id_pr.isRoot)
-                        {
-                            parent_id = id_pr.id;
-                            break;
-                        }
-                    }
-                }
-                list_.id = parent_id;
-                List<string> foundid = new List<string>();
-                lock (sync_GDcache) //get list id in this parent on cache
-                {
-                    foreach (GD_item item in cache_gd)
-                    {
-                        if (Email != item.Email) continue;
-                        foreach (GD_parent itemparent in item.parents)
-                        {
-                            if (parent_id == itemparent.id)
-                            {
-                                foundid.Add(item.id);
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (foundid.Count > 0 && foundid.Count > list_.items.Count)//delete/remove parent not found in cache
-                {
-                    foreach (string item in foundid)
-                    {
-                        bool delete = true;
-                        foreach (GD_item gditem in list_.items)
-                        {
-                            if (item == gditem.id)
-                            {
-                                if (gditem.parents.Count == 1)
-                                {
-                                    delete = false;//delete item
-                                    break;
-                                }
-                                else
-                                {
-                                    lock (sync_GDcache)
-                                    {
-                                        foreach (GD_item gditem_cache in cache_gd)
-                                        {
-                                            if (Email != gditem_cache.Email) continue;
-                                            foreach (GD_parent gdparent_cache in gditem_cache.parents)
-                                            {
-                                                if (gdparent_cache.id == parent_id)
-                                                {
-                                                    gditem.parents.Remove(gdparent_cache);//remove parent
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        if (delete) cache_gd.RemoveAt(GetIndexByID(item));
-                    }
-                }
-            }
-
-
-            if (list_.items.Count == 0)//if not found
-            {
-                return list_;
-            }
-
-            #region check wrong path & duplicate & auto rename
-            List<string> ListIDItemCheckDuplicate;
-            foreach (var item in list_.items)
-            {
-                if (!read_only)
-                {
-                    //check wrong path
-                    string temppath = item.title;
-                    foreach (char itemcannot in listcannot)
-                    {
-                        if (item.title.IndexOf(itemcannot) >= 0)
-                        {
-                            temppath = temppath.Replace(itemcannot, '_');
-                        }
-                    }
-                    if (temppath != item.title)//autorename if wrong path
-                    {
-                        ReNameItem(temppath, item.id, Email);
-                        item.title = temppath;
-                    }
-                    //check duplicate item
-                    ListIDItemCheckDuplicate = new List<string>();
-                    foreach (var item_ in list_.items)
-                    {
-                        if (item.title == item_.title && item.id != item_.id)
-                        {
-                            ListIDItemCheckDuplicate.Add(item_.id);
-                        }
-                    }
-                    //rename duplicate item 2nd -> 
-                    for (int j = 0; j < ListIDItemCheckDuplicate.Count; j++)
-                    {
-                        int z = 1;
-                        bool found_duplicate = false;
-                        while (true)
-                        {
-                            foreach (var item_ in list_.items)
-                            {
-                                if (item_.title == (item.title + "(" + z.ToString() + ")")) { found_duplicate = true; break; }
-                                else found_duplicate = false;
-                            }
-                            if (found_duplicate) z++;
-                            else break;
-                        }
-                        ReNameItem(item.title + "(" + z.ToString() + ")", ListIDItemCheckDuplicate[j], Email);
-                        for (int k = 0; k < list_.items.Count; k++)
-                        {
-                            if (list_.items[k].id == ListIDItemCheckDuplicate[j])
-                            {
-                                list_.items[k].title = list_.items[k].title + "(" + z.ToString() + ")";
-                                break;
-                            }
-                        }
-                    }
-                }
-                //add item to cache
-                AddAndEditGDcache(item);
-                
-            }
-            #endregion
-
-            return list_;
-        }
-
-        static string GetTitleByID(string id, string Email = "")
-        {
-            lock (sync_GDcache)
-            {
-                foreach (GD_item item in cache_gd)
-                {
-                    if ((string.IsNullOrEmpty(Email) ? true : Email == item.Email) && item.id == id) return item.title;
-                }
-            }
-            return null;
-        }
-
-        static int GetIndexByID(string id, string Email = "")
-        {
-            int index = 0;
-            lock (sync_GDcache)
-            {
-                foreach (GD_item item in cache_gd)
-                {
-                    if ((string.IsNullOrEmpty(Email) ? true : Email == item.Email) && item.id == id) return index;
-                    index++;
-                }
-            }
-            return -1;
-        }
-
-        static void AddAndEditGDcache(GD_item item_)
-        {
-            if (string.IsNullOrEmpty(item_.Email)) throw new ArgumentNullException(item_.Email);
-            int index = 0;
-            bool addnew = true;
-            lock (sync_GDcache)
-            {
-                foreach (GD_item check in cache_gd)
-                {
-                    if (item_.Email == check.Email && check.id == item_.id && check.title == item_.title)
-                    {
-                        addnew = false;
-                        break;
-                    }
-                    index++;
-                }
-                if (addnew) cache_gd.Add(item_);
-                else cache_gd[index] = item_;
-            }
+            return node.GetFullPathString();
         }
         
-        public static void ReadCache()
+        public static bool ReNameItem(ExplorerNode node,string newname)
         {
-            if (ReadWriteData.Exists(ReadWriteData.Cache_GD))
-                try { cache_gd = JsonConvert.DeserializeObject<List<GD_item>>(ReadWriteData.Read(ReadWriteData.Cache_GD).ReadToEnd()); } catch { cache_gd = new List<GD_item>(); }
-            else cache_gd = new List<GD_item>();
-        }
-
-        public static void SaveCache()
-        {
-            ReadWriteData.Write(ReadWriteData.Cache_GD, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(cache_gd)));
-        }
-
-        public static bool ReNameItem(string newname, string id,string Email)
-        {
-            DriveAPIHttprequestv2 gdclient = GetAPIv2(Email);
+            DriveAPIHttprequestv2 gdclient = GetAPIv2(node.GetRoot().RootInfo.Email);
             string json = "{\"title\": \"" + newname + "\"}";
-            string response = gdclient.EditMetaData(id, json);
+            string response = gdclient.EditMetaData(node.Info.ID, json);
             dynamic json_ = JsonConvert.DeserializeObject(response);
             string name = json_.title;
             if (name == newname) return true;
             else return false;
         }
 
-        public static string MoveItem(string Email, string iditem, string idoldparent, string idnewparent, bool copy = false)
+        public static GD_item MoveItem(ExplorerNode nodemove, ExplorerNode newparent,string newname = null,bool copy = false)
         {
-            DriveAPIHttprequestv2 gdclient = GetAPIv2(Email);
-            GD_item item_metadata = JsonConvert.DeserializeObject<GD_item>(gdclient.EditMetaData(iditem));
-            if (!copy) foreach (GD_parent parent in item_metadata.parents)
-                {
-                    if (parent.id == idoldparent)
-                    {
-                        item_metadata.parents.Remove(parent);
-                        break;
-                    }
-                }
-            bool isroot = false;
-            foreach (RootID r in root)
+            if (nodemove.GetRoot().RootInfo.Email != newparent.GetRoot().RootInfo.Email) throw new Exception("Email not match.");
+            if (nodemove.GetRoot().RootInfo.Type != newparent.GetRoot().RootInfo.Type) throw new Exception("TypeCloud not match.");
+
+            DriveAPIHttprequestv2 gdclient = GetAPIv2(nodemove.GetRoot().RootInfo.Email);
+            GD_item item_metadata = JsonConvert.DeserializeObject<GD_item>(gdclient.EditMetaData(nodemove.Info.ID));
+            if (nodemove.Parent != newparent)
             {
-                if (r.id == idnewparent) isroot = true;
+                if (!copy) foreach (GD_parent parent in item_metadata.parents) if (parent.id == nodemove.Parent.Info.ID)
+                                                                                {
+                                                                                    item_metadata.parents.Remove(parent);
+                                                                                    break;
+                                                                                }
+                    
+                bool isroot = false;
+                foreach (RootID r in root) if (r.id == newparent.Parent.Info.ID) isroot = true;
+                item_metadata.parents.Add(new GD_parent() { id = newparent.Parent.Info.ID, isRoot = isroot });
             }
-            item_metadata.parents.Add(new GD_parent() { id = idnewparent, isRoot = isroot });
-            return gdclient.EditMetaData(JsonConvert.SerializeObject(item_metadata));
+            if (newname != null) item_metadata.title = newname;
+            return JsonConvert.DeserializeObject<GD_item>(gdclient.EditMetaData(nodemove.Info.ID,JsonConvert.SerializeObject(item_metadata)));
         }
 
         static string GetRootID(string email)
@@ -455,35 +202,24 @@ namespace Core.Cloud
             }
         }
 
-        public static string GetMetadataItem(string email,string id)
+        public static GD_item GetMetadataItem(ExplorerNode node)
         {
-            DriveAPIHttprequestv2 client = GetAPIv2(email);
-            return client.EditMetaData(id, null);
+            DriveAPIHttprequestv2 client = GetAPIv2(node.GetRoot().RootInfo.Email);
+            return JsonConvert.DeserializeObject<GD_item>(client.EditMetaData(node.Info.ID, null));
         }
         //trash/delete
-        public static bool File_trash(string path, string id, string token, string Email,bool Permanently)
+        public static bool File_trash(ExplorerNode node, bool Permanently)
         {
-            ListItemFileFolder list = new ListItemFileFolder();
-            TokenGoogleDrive tk = JsonConvert.DeserializeObject<TokenGoogleDrive>(token);
-            DriveAPIHttprequestv2 gdclient = new DriveAPIHttprequestv2(tk);
-            gdclient.Email = Email;
-            gdclient.TokenRenewEvent += Gdclient_TokenRenewEvent;
-
-            if (string.IsNullOrEmpty(id))
-            {
-                if (string.IsNullOrEmpty(path)) throw new ArgumentNullException(path);
-                id = GetIdOfPath(path,Email);
-            }
-
-            if(string.IsNullOrEmpty(id)) throw new ArgumentNullException(id);
+            DriveAPIHttprequestv2 gdclient = GetAPIv2(node.GetRoot().RootInfo.Email);
+            if (node == node.GetRoot()) throw new Exception("Can't delete root.");
             if (Permanently)
             {
-                gdclient.Files_delete(id);
+                gdclient.Files_delete(node.Info.ID);
                 return true;
             }
             else
             {
-                dynamic json = JsonConvert.DeserializeObject(gdclient.ItemTrash(id));
+                dynamic json = JsonConvert.DeserializeObject(gdclient.ItemTrash(node.Info.ID));
                 return true;
             }
         }
@@ -491,53 +227,32 @@ namespace Core.Cloud
         public static void Gdclient_TokenRenewEvent(TokenGoogleDrive token, string Email)
         {
             string json = JsonConvert.SerializeObject(token);
-            XmlNode cloud = AppSetting.settings.GetCloud(Email,CloudName.GoogleDrive);
+            XmlNode cloud = AppSetting.settings.GetCloud(Email,CloudType.GoogleDrive);
             if (cloud != null) AppSetting.settings.ChangeToken(cloud, json);
-            else throw new Exception("Can't save token");
+            else throw new Exception("Can't save token.");
         }
+        
     }
-
     public class GD_Files_list
     {
         public string id;
         public string nextPageToken;
         public List<GD_item> items = new List<GD_item>();
-        public ListItemFileFolder Convert(string parent_ID= null,bool folderonly = false,string path = null)
+        public List<ExplorerNode> Convert(ExplorerNode parent)
         {
-            ListItemFileFolder list = new ListItemFileFolder();
-            foreach(GD_item item in items)
+            List<ExplorerNode> list = new List<ExplorerNode>();
+            foreach (GD_item item in items)
             {
-                if (item.labels.hidden & item.labels.trashed) continue;
-                FileFolder ff = new FileFolder();
-                ff.id = item.id;
-                ff.Name = item.title;
-                ff.Time_mod = DateTime.Parse(item.modifiedDate);
-                ff.mimeType = item.mimeType;
-                if (parent_ID == "root") ff.parentid.Add(id);
-                else foreach (GD_parent item_ in item.parents)
-                    {
-                        ff.parentid.Add(item_.id);
-                    }
-                if (!string.IsNullOrEmpty(path)) ff.path_display = path + "/" + item.title;
-                if (folderonly) { list.Items.Add(ff); continue; }
-                else
-                {
-                    switch (item.mimeType)
-                    {
-                        case mimeType.folder: break;
-                        case mimeType.spreadsheet: continue;
-                        case mimeType.document: continue;
-                        //case mimeType.spreadsheet: ff.Size = 0; ff.Name += "." + AppSetting.settings.GetSettingsAsString(SettingsKey.mimeType_spreadsheet); break;
-                        //case mimeType.document: ff.Size = 0; ff.Name += "." + AppSetting.settings.GetSettingsAsString(SettingsKey.mimeType_document); break;
-                        default: ff.Size = item.fileSize; break;
-                    }
-                    list.Items.Add(ff);
-                }
+                bool add = true;
+                GoogleDrive.mimeTypeGoogleRemove.ForEach(m => { if (item.mimeType == m) add = false; });
+                if (add) list.Add(
+                    new ExplorerNode(
+                        new NodeInfo() { Name = item.title, MimeType = item.mimeType, ID = item.id, Size = item.fileSize, DateMod = DateTime.Parse(item.modifiedDate) }, parent));
+                
             }
             return list;
         }
     }
-
     public class GD_item
     {
         public string title;
@@ -545,7 +260,7 @@ namespace Core.Cloud
         public List<GD_parent> parents = new List<GD_parent>();
         public string mimeType;
         public GD_label labels = new GD_label();
-        public long fileSize = 0;
+        public long fileSize = -1;
         public string id;
         public string fileExtension;
         public string fullFileExtension;

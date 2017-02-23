@@ -9,26 +9,26 @@ namespace SupDataDll
     {
         public static bool Clipboard = false;
         public static bool AreCut = false;
-        public static string directory;
-        public static List<AddNewTransferItem> Items = new List<AddNewTransferItem>();
+        public static ExplorerNode directory;
+        public static List<ExplorerNode> Items = new List<ExplorerNode>();
         public static void Clear()
         {
-            Items = new List<AddNewTransferItem>();
+            Items = new List<ExplorerNode>();
             Clipboard = false;
-            directory = string.Empty;
+            directory = null;
         }
 
-        public static void Add(AddNewTransferItem item)
+        public static void Add(ExplorerNode item)
         {
             Items.Add(item);
         }
 
-        public static void Add(AddNewTransferItem[] item)
+        public static void Add(ExplorerNode[] item)
         {
             Items.AddRange(item);
         }
 
-        public static void Add(List<AddNewTransferItem> item)
+        public static void Add(List<ExplorerNode> item)
         {
             Items.AddRange(item);
         }

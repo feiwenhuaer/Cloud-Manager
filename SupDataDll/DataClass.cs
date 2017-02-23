@@ -10,35 +10,15 @@ using System.Threading;
 
 namespace SupDataDll
 {
-    #region Account
-    public class CloudEmail_Type
-    {
-        public string Email;
-        public CloudName Type;
-    }
-    #endregion
-
     #region ListItem (explorer)
     public class ExplorerListItem
     {
-        public string path;
+        public ExplorerNode node;
         public bool addToTV = false;
         public bool explandTV = false;
         public object TV_data;
         public object TV_node;
-        public string id;
         public int indexLV_tab = -1;
-    }
-
-    public class OldPathLV
-    {
-        public OldPathLV(string ID, string Path)
-        {
-            this.ID = ID;
-            this.Path = Path;
-        }
-        public string ID { get; set; }
-        public string Path { get; set; }
     }
 
     public class ListItemFileFolder
@@ -63,22 +43,22 @@ namespace SupDataDll
     #endregion
 
     #region Transfer
-    public class AddNewTransferItem
-    {
-        public AddNewTransferItem(string name,string id,string mimeType, Type_FileFolder type,long size = -1)
-        {
-            this.name = name;
-            this.id = id;
-            this.mimeType = mimeType;
-            this.type = type;
-            this.size = size;
-        }
-        public string name;
-        public string id;
-        public long size = -1;
-        public string mimeType;
-        public Type_FileFolder type;
-    }
+    //public class AddNewTransferItem
+    //{
+    //    public AddNewTransferItem(string name,string id,string mimeType, Type_FileFolder type,long size = -1)
+    //    {
+    //        this.name = name;
+    //        this.id = id;
+    //        this.mimeType = mimeType;
+    //        this.type = type;
+    //        this.size = size;
+    //    }
+    //    public string name;
+    //    public string id;
+    //    public long size = -1;
+    //    public string mimeType;
+    //    public Type_FileFolder type;
+    //}
     
     public class TransferGroup: Transfer
     {
@@ -126,12 +106,9 @@ namespace SupDataDll
     public class FileTransferInfo
     {
         [JsonIgnore]
-        public AnalyzePath ap;
+        public ExplorerNode node;
         [JsonIgnore]
         public Stream stream;
-        public string Fileid;
-        public string path;
-        public long Size = -1;
     }
 
     public class TransferDataTLVWPF: ITreeModel
@@ -180,16 +157,18 @@ namespace SupDataDll
         {
 
         }
-        public DeleteItems(string item)
+        public DeleteItems(ExplorerNode item)
         {
-            items.Add(item);
+            Items.Add(item);
         }
 
-        public DeleteItems(List<string> items)
+        public DeleteItems(List<ExplorerNode> items)
         {
-            this.items.AddRange(items);
+            Items.AddRange(items);
         }
-        public List<string> items = new List<string>();
+        List<ExplorerNode> items = new List<ExplorerNode>();
+
+        public List<ExplorerNode> Items { get; set; }
         public bool PernamentDelete = false;
     }
 }

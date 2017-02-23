@@ -6,32 +6,37 @@ using System.Text;
 
 namespace SupDataDll
 {
-    public enum TypePath
+    public enum CloudType
     {
-        CloudQuery = 1,
-        CloudID = 2,
-        Cloud = 4,
-        UrlFolder = 8,
-        UrlFile = 16
+        LocalDisk = 0,
+        Folder = 1,
+        Dropbox = 2,
+        GoogleDrive = 3,
+        Mega = 4,
+        MediaFire = 5
+    }
+    public enum DiskType
+    {
+        Unknown = 0,
+        NoRootDirectory = 1,
+        Removable = 2,
+        Fixed = 3,
+        Network = 4,
+        CDRom = 5,
+        Ram = 6,
+        Cloud = 7
     }
     public enum Type_FileFolder
     {
         File, Folder
     }
+
     public enum StatusUpDownApp
     {
         Pause,
         Start,
         StopForClosingApp,
         SavingData
-    }
-    public enum ChangeTLV
-    {
-        ProcessingToDone,
-        Done,
-
-        DoneToProcessing,
-        Processing
     }
     public enum StatusTransfer
     {
@@ -51,6 +56,16 @@ namespace SupDataDll
         //get set
         Stop//stop
     }
+
+    public enum ChangeTLV
+    {
+        ProcessingToDone,
+        Done,
+
+        DoneToProcessing,
+        Processing
+    }
+
     public enum SettingsKey
     {
         Admin_user, Admin_password, AutoLogin,
@@ -65,7 +80,6 @@ namespace SupDataDll
         BufferSize,GD_ChunksSize,Dropbox_ChunksSize,
         AutoStartTransfer,ShutdownWhenDone
     }
-
     public enum LanguageKey
     {
         //button
@@ -97,5 +111,4 @@ namespace SupDataDll
         //DeleteForm
         DeleteForm_text, DeleteForm_CB_autoclose, DeleteForm_updatetext_Deleting, DeleteForm_updatetext_Deleted, DeleteForm_updatetext_Error,
     }
-
 }

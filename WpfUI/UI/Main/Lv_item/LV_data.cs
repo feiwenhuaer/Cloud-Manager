@@ -9,13 +9,9 @@ namespace WpfUI.UI.Main.Lv_item
 {
     public class LV_data
     {
+        public ExplorerNode Node { get; set; }
         public ImageSource ImgSource { get; set; }
-        public string Name { get; set; }
-        public Type_FileFolder Type { get; set; }
-        public long Size { get; set; }
         public string SizeString { get; set; }
-        public string mimeType { get; set; }
-        public string id { get; set; }
         public string d_mod { get; set; }
     }
 }

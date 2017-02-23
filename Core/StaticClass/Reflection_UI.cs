@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using SupDataDll;
 
 namespace Core.StaticClass
 {
@@ -15,7 +16,7 @@ namespace Core.StaticClass
             Type Type_reflection_eventtocore = Type_setting.BaseType.GetField("reflection_eventtocore").FieldType;
             object instance_reflection_eventtocore = Type_setting.BaseType.GetField("reflection_eventtocore").GetValue(null);
             List<object[]> listloadevent = new List<object[]>() {
-            new object[] { Type_reflection_eventtocore, "EventAddItem",AppSetting.TransferManager,"AddItems", instance_reflection_eventtocore }
+            new object[] { Type_reflection_eventtocore, "EventAddItem",AppSetting.TransferManager, "AddItems", instance_reflection_eventtocore }
             ,new object[] { Type_reflection_eventtocore, "EventGetListAccountCloud", AppSetting.settings, "GetListAccountCloud", instance_reflection_eventtocore }
 
             ,new object[] { Type_reflection_eventtocore, "EventSetSetting", AppSetting.settings, "SetSettingAsString", instance_reflection_eventtocore }
@@ -25,7 +26,7 @@ namespace Core.StaticClass
             ,new object[] { Type_reflection_eventtocore, "EventGetTextLanguage", AppSetting.lang, "GetText", instance_reflection_eventtocore }
             ,new object[] { Type_reflection_eventtocore, "EventMoveItem", AppSetting.ManageCloud, "MoveItem", instance_reflection_eventtocore }
             ,new object[] { Type_reflection_eventtocore, "EventDeleteAccountCloud", AppSetting.settings, "RemoveCloud", instance_reflection_eventtocore }
-            ,new object[] { Type_reflection_eventtocore ,"EventListIteamRequest",AppSetting.ManageCloud, "GetItemsList", instance_reflection_eventtocore }
+            ,new object[] { Type_reflection_eventtocore , "EventGetChildNode", AppSetting.ManageCloud, "GetItemsList", instance_reflection_eventtocore }
             ,new object[] { Type_reflection_eventtocore, "EventLogin", AppSetting.login, "Login_EventLoginCallBack", instance_reflection_eventtocore}
             ,new object[] { Type_reflection_eventtocore, "EventExitAppCallBack", AppSetting.TransferManager, "Exit", instance_reflection_eventtocore }
             ,new object[] { Type_reflection_eventtocore, "EventShowFormOauth", AppSetting.ManageCloud, "Oauth", instance_reflection_eventtocore }
