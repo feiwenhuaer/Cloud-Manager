@@ -45,6 +45,13 @@ namespace FormUI.UI.MainForm
             index_cullumn_mimeType = LV_item.Columns["LV_CH_mimeType"].Index;
             managerexplorernodes = new ManagerExplorerNodes();
             //TB_Path.Text = "https://drive.google.com/drive/u/0/folders/0B-yiWN2AF_cIeHZaTWVsU2duSVU";
+            pathUC1.EventNodePathClick += PathUC1_EventNodePathClick;
+        }
+
+        private void PathUC1_EventNodePathClick(ExplorerNode nodeclick)
+        {
+            managerexplorernodes.Next(nodeclick);
+            ExplorerCurrentNode();
         }
 
         public void AddListViewItem(List<ItemLV> list)
@@ -194,8 +201,8 @@ namespace FormUI.UI.MainForm
         #region Menu R click
         private void CMS_LVitem_Opening(object sender, CancelEventArgs e)
         {
-            if (string.IsNullOrEmpty(TB_Path.Text)) refreshToolStripMenuItem.Enabled = false;
-            else refreshToolStripMenuItem.Enabled = true;
+            if(managerexplorernodes.NodeWorking() != null) refreshToolStripMenuItem.Enabled = true;
+            else refreshToolStripMenuItem.Enabled = false;
 
             copyIDToClipboardToolStripMenuItem.Enabled = false;
             openToolStripMenuItem.Enabled = false;

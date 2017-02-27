@@ -4,7 +4,6 @@
     {
         void updatedata(string text);
         void Close_();
-
         void ShowDialog_();
     }
 }

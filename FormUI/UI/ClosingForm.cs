@@ -11,6 +11,8 @@ namespace FormUI.UI
 {
     public partial class ClosingForm : System.Windows.Forms.Form, SupDataDll.UiInheritance.UIClosing
     {
+        bool closeflag = false;
+
         public ClosingForm()
         {
             InitializeComponent();
@@ -24,19 +26,23 @@ namespace FormUI.UI
             }
             else this.label1.Text = text;
         }
-
-        public void Close_()
-        {
-            if (InvokeRequired)
-            {
-                this.Invoke(new Action(() => this.Close()));
-            }
-            else this.Close();
-        }
-
+        
         public void ShowDialog_()
         {
             this.ShowDialog();
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+#if DEBUG
+            Console.WriteLine("ClosingForm: timer1_tick");
+#endif
+            if (closeflag) this.Close();
+        }
+
+        public void Close_()
+        {
+            closeflag = true;
         }
     }
 }

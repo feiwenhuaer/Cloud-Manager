@@ -21,16 +21,23 @@ namespace WpfUI.UI
         public Closing()
         {
             InitializeComponent();
+            System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
+            dispatcherTimer.Tick += DispatcherTimer_Tick;
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 100);
+            dispatcherTimer.Start();
         }
+
+        private void DispatcherTimer_Tick(object sender, EventArgs e)
+        {
+            if (closeflag) this.Close();
+        }
+
+        bool closeflag = false;
 
         #region interface
         public void Close_()
         {
-            if (!Dispatcher.CheckAccess())
-            {
-                Dispatcher.Invoke(new Action(() => this.Close()));
-            }
-            else this.Close();
+            closeflag = true;
         }
 
         public void ShowDialog_()
@@ -56,5 +63,7 @@ namespace WpfUI.UI
         {
             label.Content = text;
         }
+
+        
     }
 }

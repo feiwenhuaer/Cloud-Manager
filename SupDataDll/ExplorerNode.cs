@@ -56,6 +56,8 @@ namespace SupDataDll
         }
 
 
+
+
         #region field
         [JsonIgnore]
         List<ExplorerNode> child;
@@ -85,6 +87,9 @@ namespace SupDataDll
         [JsonProperty]
         public RootNode RootInfo { get { return rootinfo ?? (rootinfo = new RootNode()); } set { rootinfo = value; } }
         #endregion
+
+
+
 
         #region public method
         public void RemoveChild(ExplorerNode child)
@@ -167,6 +172,20 @@ namespace SupDataDll
             string extension = (string)splitPath.GetValue(splitPath.GetUpperBound(0));
             if (string.IsNullOrEmpty(extension)) extension = this.Info.Name;
             return extension;
+        }
+
+        public ExplorerNode FindSameParent(ExplorerNode othernode)
+        {
+            List<ExplorerNode> list_other = othernode.GetFullPath();
+            List<ExplorerNode> list_this = GetFullPath();
+            ExplorerNode node = null;
+            int max = list_other.Count <= list_this.Count ? list_other.Count : list_this.Count;
+            for (int i = 0; i < max; i++)
+            {
+                if (list_other[i] == list_this[i]) node = list_this[i];
+                else break;
+            }
+            return node;
         }
         #endregion
 

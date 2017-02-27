@@ -1,4 +1,6 @@
-﻿namespace FormUI.UI.MainForm
+﻿using FormUI.UI.MainForm.PathNodes;
+
+namespace FormUI.UI.MainForm
 {
     partial class UC_LVitem
     {
@@ -47,7 +49,7 @@
             this.uploadFolderToHereToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.uploadFileToHereToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.TB_Path = new System.Windows.Forms.TextBox();
+            this.pathUC1 = new FormUI.UI.MainForm.PathNodes.PathUC();
             this.PB_Next = new System.Windows.Forms.PictureBox();
             this.PB_Search = new System.Windows.Forms.PictureBox();
             this.PB_Back = new System.Windows.Forms.PictureBox();
@@ -200,7 +202,7 @@
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.TB_Path);
+            this.splitContainer1.Panel1.Controls.Add(this.pathUC1);
             this.splitContainer1.Panel1.Controls.Add(this.PB_Next);
             this.splitContainer1.Panel1.Controls.Add(this.PB_Search);
             this.splitContainer1.Panel1.Controls.Add(this.PB_Back);
@@ -210,27 +212,30 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.LV_item);
-            this.splitContainer1.Size = new System.Drawing.Size(1143, 269);
+            this.splitContainer1.Size = new System.Drawing.Size(839, 269);
             this.splitContainer1.SplitterDistance = 25;
             this.splitContainer1.TabIndex = 0;
             this.splitContainer1.TabStop = false;
             // 
-            // TB_Path
+            // pathUC1
             // 
-            //this.TB_Path.Dock = System.Windows.Forms.DockStyle.Fill;
-            //this.TB_Path.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            //this.TB_Path.Location = new System.Drawing.Point(55, 0);
-            //this.TB_Path.Margin = new System.Windows.Forms.Padding(0);
-            //this.TB_Path.Name = "TB_Path";
-            //this.TB_Path.Size = new System.Drawing.Size(1048, 22);
-            //this.TB_Path.TabIndex = 5;
-            //this.TB_Path.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TB_Path_KeyDown);
+            this.pathUC1.AutoScroll = true;
+            this.pathUC1.AutoSize = true;
+            this.pathUC1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.pathUC1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pathUC1.Location = new System.Drawing.Point(55, 0);
+            this.pathUC1.Margin = new System.Windows.Forms.Padding(0);
+            this.pathUC1.Name = "pathUC1";
+            this.pathUC1.Node = null;
+            this.pathUC1.Padding = new System.Windows.Forms.Padding(3, 4, 3, 0);
+            this.pathUC1.Size = new System.Drawing.Size(744, 25);
+            this.pathUC1.TabIndex = 10;
             // 
             // PB_Next
             // 
             this.PB_Next.Dock = System.Windows.Forms.DockStyle.Right;
             this.PB_Next.Image = ((System.Drawing.Image)(resources.GetObject("PB_Next.Image")));
-            this.PB_Next.Location = new System.Drawing.Point(1103, 0);
+            this.PB_Next.Location = new System.Drawing.Point(799, 0);
             this.PB_Next.Margin = new System.Windows.Forms.Padding(0);
             this.PB_Next.Name = "PB_Next";
             this.PB_Next.Size = new System.Drawing.Size(20, 25);
@@ -243,7 +248,7 @@
             // 
             this.PB_Search.Dock = System.Windows.Forms.DockStyle.Right;
             this.PB_Search.Image = ((System.Drawing.Image)(resources.GetObject("PB_Search.Image")));
-            this.PB_Search.Location = new System.Drawing.Point(1123, 0);
+            this.PB_Search.Location = new System.Drawing.Point(819, 0);
             this.PB_Search.Margin = new System.Windows.Forms.Padding(0);
             this.PB_Search.Name = "PB_Search";
             this.PB_Search.Size = new System.Drawing.Size(20, 25);
@@ -293,7 +298,7 @@
             this.LV_item.Location = new System.Drawing.Point(0, 0);
             this.LV_item.Margin = new System.Windows.Forms.Padding(0);
             this.LV_item.Name = "LV_item";
-            this.LV_item.Size = new System.Drawing.Size(1143, 240);
+            this.LV_item.Size = new System.Drawing.Size(839, 240);
             this.LV_item.TabIndex = 2;
             this.LV_item.UseCompatibleStateImageBehavior = false;
             this.LV_item.View = System.Windows.Forms.View.Details;
@@ -305,7 +310,7 @@
             // 
             this.LV_CH_Name.Name = "LV_CH_Name";
             this.LV_CH_Name.Text = "Name";
-            this.LV_CH_Name.Width = 573;
+            this.LV_CH_Name.Width = 440;
             // 
             // LV_CH_Type
             // 
@@ -317,7 +322,7 @@
             // 
             this.LV_CH_Size.Name = "LV_CH_Size";
             this.LV_CH_Size.Text = "Size";
-            this.LV_CH_Size.Width = 113;
+            this.LV_CH_Size.Width = 82;
             // 
             // LV_CH_DateMod
             // 
@@ -344,7 +349,7 @@
             this.Controls.Add(this.splitContainer1);
             this.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.Name = "UC_LVitem";
-            this.Size = new System.Drawing.Size(1143, 269);
+            this.Size = new System.Drawing.Size(839, 269);
             this.Load += new System.EventHandler(this.UC_LVitem_Load);
             this.CMS_LVitem.ResumeLayout(false);
             this.splitContainer1.Panel1.ResumeLayout(false);
@@ -378,7 +383,6 @@
         private System.Windows.Forms.ToolStripMenuItem createFolderToolStripMenuItem;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.Label label1;
-        public System.Windows.Forms.TextBox TB_Path;
         private System.Windows.Forms.PictureBox PB_Back;
         private System.Windows.Forms.PictureBox PB_Next;
         private System.Windows.Forms.PictureBox PB_Search;
@@ -389,5 +393,6 @@
         private System.Windows.Forms.ColumnHeader LV_CH_DateMod;
         private System.Windows.Forms.ColumnHeader LV_CH_mimeType;
         private System.Windows.Forms.ColumnHeader LV_CH_Id;
+        public PathUC pathUC1;
     }
 }

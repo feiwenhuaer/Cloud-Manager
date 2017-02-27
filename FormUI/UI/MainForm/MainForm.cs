@@ -449,12 +449,15 @@ namespace FormUI.UI.MainForm
                 }
                 list_UCLVitem[load.indexLV_tab].AddListViewItem(ListItem_LV);
             }
+
             //set tab text name
             tabControl1.TabPages[load.indexLV_tab].Text = load.node.Info.Name;
+
             //set tooltip tab
             tabControl1.TabPages[load.indexLV_tab].ToolTipText = load.node.GetFullPathString();
-            //set Path TextBox
-            //list_UCLVitem[loaditemthread.indexLV_tab].TB_Path.Text = loaditemthread.path.TrimEnd(new char[] { '\\', '/' });
+
+            //set PathNode
+            list_UCLVitem[load.indexLV_tab].pathUC1.Node = load.node;
 
             //OldPathLV inpath = new OldPathLV();
             //inpath.ID = list.id_folder;
