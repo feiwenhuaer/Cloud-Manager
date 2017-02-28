@@ -19,7 +19,7 @@ namespace Core.Cloud
         public static ExplorerNode GetListFileFolder(ExplorerNode node)
         {
             DropboxRequestAPIv2 client = GetAPIv2(node.GetRoot().RootInfo.Email);
-            string path = node.GetFullPathString();
+            string path = node.GetFullPathString(false);
             string data = client.ListFolder(path).Replace("\".tag\":", "\"tag\":");
             ListFolder json;
             try
