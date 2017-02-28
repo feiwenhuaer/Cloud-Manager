@@ -13,76 +13,63 @@
             <Setter Property="Padding" Value="0"/>
         </Style>
     </UserControl.Resources>
-    <Grid Background="WhiteSmoke">
-        <Grid Height="24" VerticalAlignment="Top" Grid.ColumnSpan="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Name="col_path" Width="44"/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <Label Name="label" Content="Path:" HorizontalAlignment="Left" Width="35" Margin="0" Padding="2,4,2,0"/>
-            <Image Name="image_back" Grid.Column="1" HorizontalAlignment="Left" Width="32" Margin="3,0,0,0" MouseUp="image_back_MouseUp"/>
-            <TextBox Name="textBox" Grid.Column="1" Margin="40,0,66,0" TextWrapping="Wrap" Text="" Padding="2,4,2,0" KeyDown="textBox_KeyDown"/>
-            <Image Name="image_next" Grid.Column="1" Margin="0,0,31,0" HorizontalAlignment="Right" Width="30" MouseUp="image_next_MouseUp"/>
-            <Image Name="image_search" Grid.Column="1" HorizontalAlignment="Right" Width="26" MouseUp="image_search_MouseUp"/>
-        </Grid>
-        <ListView x:Name="LV_items" Margin="0,24,0,0" ContextMenuOpening="LVitems_ContextMenu_ContextMenuOpening" MouseDoubleClick="LV_items_MouseDoubleClick" SelectionMode="Extended" MouseDown="LV_items_MouseDown">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="Name" Width="250">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <Image Source="{Binding ImgSource}" Height="16" Width="16" Margin="0"/>
-                                    <TextBlock Text="{Binding Name}" Height="24" FontSize="12" Margin="0,0,0,0" Padding="0"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Type" Width="70" DisplayMemberBinding="{Binding Type}"/>
-                    <GridViewColumn Header="Size" Width="100">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock>
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Text" Value="{Binding SizeString}"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding SizeString}" Value="-1">
-                                                    <Setter Property="Text" Value=""/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Date Modified" Width="120" DisplayMemberBinding="{Binding d_mod}"/>
-                    <GridViewColumn Header="mimeType" Width="100" DisplayMemberBinding="{Binding mimeType}"/>
-                    <GridViewColumn Header="id" Width="80" DisplayMemberBinding="{Binding id}"/>
-                </GridView>
-            </ListView.View>
-            <ListView.ContextMenu>
-                <ContextMenu>
-                    <ContextMenu.Resources>
-                        <ControlTemplate x:Key="MenuSeparatorTemplate">
-                            <Separator />
-                        </ControlTemplate>
-                    </ContextMenu.Resources>
-                    <ContextMenu.ItemContainerStyle>
-                        <Style TargetType="{x:Type MenuItem}">
-                            <Setter Property="Header" Value="{Binding Text}" />
-                            <Setter Property="IsEnabled" Value="{Binding IsEnabled}"/>
-                            <EventSetter Event="Click" Handler="MenuItem_Click"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding }" Value="{x:Null}">
-                                    <Setter Property="Template" Value="{StaticResource MenuSeparatorTemplate}" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ContextMenu.ItemContainerStyle>
-                </ContextMenu>
-            </ListView.ContextMenu>
-        </ListView>
-    </Grid>
+    <ListView x:Name="LV_items" Margin="0,0,0,0" ContextMenuOpening="LVitems_ContextMenu_ContextMenuOpening" MouseDoubleClick="LV_items_MouseDoubleClick" SelectionMode="Extended" MouseDown="LV_items_MouseDown">
+        <ListView.View>
+            <GridView>
+                <GridViewColumn Header="Name" Width="250">
+                    <GridViewColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="{Binding ImgSource}" Height="16" Width="16" Margin="0"/>
+                                <TextBlock Text="{Binding Node.Info.Name}" Height="24" FontSize="12" Margin="0,0,0,0" Padding="0"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+                <GridViewColumn Header="Type" Width="70" DisplayMemberBinding="{Binding Type}"/>
+                <GridViewColumn Header="Size" Width="100">
+                    <GridViewColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock>
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="{Binding SizeString}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SizeString}" Value="-1">
+                                                <Setter Property="Text" Value=""/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+                <GridViewColumn Header="Date Modified" Width="120" DisplayMemberBinding="{Binding d_mod}"/>
+                <GridViewColumn Header="mimeType" Width="100" DisplayMemberBinding="{Binding Node.Info.MimeType}"/>
+                <GridViewColumn Header="id" Width="80" DisplayMemberBinding="{Binding Node.Info.ID}"/>
+            </GridView>
+        </ListView.View>
+        <ListView.ContextMenu>
+            <ContextMenu>
+                <ContextMenu.Resources>
+                    <ControlTemplate x:Key="MenuSeparatorTemplate">
+                        <Separator />
+                    </ControlTemplate>
+                </ContextMenu.Resources>
+                <ContextMenu.ItemContainerStyle>
+                    <Style TargetType="{x:Type MenuItem}">
+                        <Setter Property="Header" Value="{Binding Text}" />
+                        <Setter Property="IsEnabled" Value="{Binding IsEnabled}"/>
+                        <EventSetter Event="Click" Handler="MenuItem_Click"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding }" Value="{x:Null}">
+                                <Setter Property="Template" Value="{StaticResource MenuSeparatorTemplate}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ContextMenu.ItemContainerStyle>
+            </ContextMenu>
+        </ListView.ContextMenu>
+    </ListView>
 </UserControl>

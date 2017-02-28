@@ -18,7 +18,6 @@ namespace Core.Cloud
         #region Public Method
         public static ExplorerNode GetListFileFolder(ExplorerNode node)
         {
-            ListItemFileFolder list = new ListItemFileFolder();
             DropboxRequestAPIv2 client = GetAPIv2(node.GetRoot().RootInfo.Email);
             string path = node.GetFullPathString();
             string data = client.ListFolder(path).Replace("\".tag\":", "\"tag\":");

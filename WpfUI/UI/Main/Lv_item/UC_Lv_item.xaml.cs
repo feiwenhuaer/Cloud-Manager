@@ -35,10 +35,7 @@ namespace WpfUI.UI.Main.Lv_item
             this.Width = double.NaN;
             LV_items.Height = double.NaN;
             LV_items.Width = double.NaN;
-
-            image_back.Source = Setting_UI.GetImage(SupDataDll.Properties.Resources.back_icon).Source;
-            image_next.Source = Setting_UI.GetImage(SupDataDll.Properties.Resources.next_icon).Source;
-            image_search.Source = Setting_UI.GetImage(SupDataDll.Properties.Resources.search_64x64, image_search.Width, image_search.Height).Source;
+            
             managerexplorernodes = new ManagerExplorerNodes();
             timeformat = Setting_UI.reflection_eventtocore._GetSetting(SettingsKey.DATE_TIME_FORMAT);
             time_default = new DateTime();
@@ -50,8 +47,6 @@ namespace WpfUI.UI.Main.Lv_item
         DateTime time_default;
         void UILanguage()
         {
-            label.Content = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TB_path);
-            col_path.Width = new GridLength(label.Width + 2);
             LoadContextMenuListview();
         }
 
@@ -64,6 +59,7 @@ namespace WpfUI.UI.Main.Lv_item
             {
                 LV_data dt = new LV_data();
                 dt.Node = item;
+                
                 if (item.Info.DateMod != time_default) dt.d_mod = item.Info.DateMod.ToString(timeformat);
                 if (item.Info.Size > 0)
                 {
@@ -85,6 +81,29 @@ namespace WpfUI.UI.Main.Lv_item
             }
         }
         #endregion
+
+        public void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBoxData data_add = null;
+            ComboBoxData data_remove;
+            if (e.AddedItems.Count >0)
+            {
+                data_add = e.AddedItems[0] as ComboBoxData;
+                if (data_add != null) if (data_add.Node == managerexplorernodes.NodeWorking()) return;
+            }
+            if(e.RemovedItems.Count > 0 && data_add != null)
+            {
+                data_remove = e.RemovedItems[0] as ComboBoxData;
+                if (data_remove != null)
+                {
+                    if(data_remove.Node == managerexplorernodes.NodeWorking())
+                    {
+                        managerexplorernodes.Next(data_add.Node);
+                        ExplorerCurrentNode();
+                    }
+                }
+            }
+        }
 
         #region Navigate
         public delegate void ListViewFolderDoubleClickCallBack(ExplorerListItem load);
@@ -126,22 +145,7 @@ namespace WpfUI.UI.Main.Lv_item
             }
         }
         #endregion
-
-        #region Image Navigate Click
-        private void image_back_MouseUp(object sender, MouseButtonEventArgs e)
-        {
-            Back();
-        }
-        private void image_next_MouseUp(object sender, MouseButtonEventArgs e)
-        {
-            Next();
-        }
-        private void image_search_MouseUp(object sender, MouseButtonEventArgs e)
-        {
-
-        }
-        #endregion
-
+        
         #region ContextMenu Listview
         ObservableCollection<ContextMenuDataModel> menuitemsource;
         public void LoadContextMenuListview()

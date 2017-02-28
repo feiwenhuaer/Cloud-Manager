@@ -20,26 +20,6 @@ namespace SupDataDll
         public object TV_node;
         public int indexLV_tab = -1;
     }
-
-    public class ListItemFileFolder
-    {
-        public List<FileFolder> Items = new List<FileFolder>();
-        public string path_raw;
-        public string id_folder;
-        public string NameFolder = "";
-        public string Error;
-    }
-    
-    public class FileFolder
-    {
-        public string Name;
-        public DateTime Time_mod;
-        public long Size = -1;// =-1 is folder
-        public string mimeType;
-        public List<string> parentid = new List<string>();
-        public string id;
-        public string path_display;
-    }
     #endregion
 
     #region Transfer

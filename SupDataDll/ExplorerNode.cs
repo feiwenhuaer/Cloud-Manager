@@ -251,6 +251,7 @@ namespace SupDataDll
     public class CloudEmail_Type
     {
         public string Email { get; set; }
-        public CloudType Type { get; set; }
+        CloudType type = CloudType.Folder;
+        public CloudType Type { get { return type; } set { type = value; } }
     }
 }

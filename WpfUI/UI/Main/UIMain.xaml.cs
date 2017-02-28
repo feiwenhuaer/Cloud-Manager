@@ -76,6 +76,8 @@ namespace WpfUI.UI.Main
             MenuItem_Cloud_Load();
             LoadLanguage();
             Setting_UI.ReloadUI_Flag = false;
+            tabControl.SelectionChanged += TabControl_SelectionChanged;
+            LoadImage();
         }
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
@@ -129,6 +131,7 @@ namespace WpfUI.UI.Main
         {
             TreeViewItem item = Get_TreeViewItem(sender as StackPanel);
             TreeViewDataModel tv_datamodel = Get_TVDataMoldel(item);
+            ((UC_Lv_item)((TabItem)tabControl.Items[tabControl.SelectedIndex]).Content).managerexplorernodes.Root = tv_datamodel.DisplayData.Node.GetRoot();
             ((UC_Lv_item)((TabItem)tabControl.Items[tabControl.SelectedIndex]).Content).managerexplorernodes.Next(tv_datamodel.DisplayData.Node);
             ((UC_Lv_item)((TabItem)tabControl.Items[tabControl.SelectedIndex]).Content).ExplorerCurrentNode(false, true, tv_datamodel, item);
         }
@@ -256,11 +259,39 @@ namespace WpfUI.UI.Main
         void Newtab()
         {
             TabItem item = new TabItem();
-            item.Header = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.newtab);
+            ComboBoxHeader cbbh = new ComboBoxHeader();
             UC_Lv_item lvitem = new UC_Lv_item();
+
+            cbbh.IsEnabled = false;
+            item.Header = cbbh;
+            cbbh.comboBox.SelectionChanged += lvitem.ComboBox_SelectionChanged;
+
             lvitem.EventListViewFolderDoubleClickCallBack += Lvitem_EventListViewFolderDoubleClickCallBack;
             item.Content = lvitem;
             tabControl.Items.Add(item);
+        }
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            TabItem item;
+            ComboBoxHeader cbb;
+            if (e.AddedItems.Count > 0)
+            {
+                item = e.AddedItems[0] as TabItem;
+                if (item != null)
+                {
+                    cbb = item.Header as ComboBoxHeader;
+                    if (cbb != null) cbb.IsEnabled = true;
+                }
+            }
+            if (e.RemovedItems.Count > 0)
+            {
+                item = e.RemovedItems[0] as TabItem;
+                if (item != null)
+                {
+                    cbb = item.Header as ComboBoxHeader;
+                    if (cbb != null) cbb.IsEnabled = false;
+                }
+            }
         }
         private void ContextMenu_newtab_Click(object sender, RoutedEventArgs e)
         {
@@ -286,6 +317,29 @@ namespace WpfUI.UI.Main
         }
         #endregion
 
+        #region Image Navigate Click
+        void LoadImage()
+        {
+            image_back.Source = Setting_UI.GetImage(SupDataDll.Properties.Resources.back_icon).Source;
+            image_next.Source = Setting_UI.GetImage(SupDataDll.Properties.Resources.next_icon).Source;
+            image_search.Source = Setting_UI.GetImage(SupDataDll.Properties.Resources.search_64x64, image_search.Width, image_search.Height).Source;
+        }
+
+        private void image_back_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            UC_Lv_item lv = ((TabItem)tabControl.Items[tabControl.SelectedIndex]).Content as UC_Lv_item;
+            if(lv!= null) if (lv.managerexplorernodes.Back() != null) lv.ExplorerCurrentNode();
+        }
+        private void image_next_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            UC_Lv_item lv = ((TabItem)tabControl.Items[tabControl.SelectedIndex]).Content as UC_Lv_item;
+            if (lv != null) if (lv.managerexplorernodes.Next() != null) lv.ExplorerCurrentNode();
+        }
+        private void image_search_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            System.Windows.MessageBox.Show(this,"Not support.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        #endregion
 
         //Set explorer data
         void GetData_TV_LV(object obj)
@@ -343,14 +397,14 @@ namespace WpfUI.UI.Main
                 ((TreeViewDataModel)load.TV_data).Childrens.Clear();
                 foreach (ExplorerNode n in load.node.Child)
                 {
-                    if (n.Info.Size < 1) continue;
-                    TreeViewDataModel child = new TreeViewDataModel((TreeViewDataModel)load.TV_data) { DisplayData = new TreeviewDataItem(n) };
+                    if (n.Info.Size > 0) continue;
+                    TreeViewDataModel child = new TreeViewDataModel((TreeViewDataModel)load.TV_data) { DisplayData = new TreeviewDataItem(n)};
                     ((TreeViewDataModel)load.TV_data).Childrens.Add(child);
                 }
                 if (load.explandTV) ((TreeViewItem)load.TV_node).ExpandSubtree();
             }
-            ((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).ShowDataToLV(load.node);
-            (tabControl.Items[tabControl.SelectedIndex] as TabItem).Header = load.node.Info.Name;//tab header
+            ((tabControl.Items[load.indexLV_tab] as TabItem).Content as UC_Lv_item).ShowDataToLV(load.node);
+            ((ComboBoxHeader)(tabControl.Items[load.indexLV_tab] as TabItem).Header).Node = load.node;
             //(tabControl.Items[tabControl.SelectedIndex] as TabItem_).ToolTip = load.path;
             //((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).textBox.Text = load.path.TrimEnd(new char[] { '\\', '/' });
         }
