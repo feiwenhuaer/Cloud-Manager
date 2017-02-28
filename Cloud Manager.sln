@@ -22,8 +22,13 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9F51DBC7-7A62-4349-ACD2-1CDA3EC218F0}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
-		C:\Users\tqk28\Pictures\Untitled.png = C:\Users\tqk28\Pictures\Untitled.png
 		vie.xml = vie.xml
+		C:\Users\tqk28\Pictures\wpf-review.png = C:\Users\tqk28\Pictures\wpf-review.png
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Git", "Git", "{1EBAFF13-BFD3-494B-BE1B-A9FAEA8A2615}"
+	ProjectSection(SolutionItems) = preProject
+		C:\Users\tqk28\Pictures\wpf-review.png = C:\Users\tqk28\Pictures\wpf-review.png
 	EndProjectSection
 EndProject
 Global
@@ -102,5 +107,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1EBAFF13-BFD3-494B-BE1B-A9FAEA8A2615} = {9F51DBC7-7A62-4349-ACD2-1CDA3EC218F0}
 	EndGlobalSection
 EndGlobal
