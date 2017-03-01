@@ -418,6 +418,7 @@ namespace WpfUI.UI.Main
             CloudsAdd = new ObservableCollection<ContextMenuDataModel>();
             CloudsAdd.Add(new ContextMenuDataModel(CloudType.Dropbox));
             CloudsAdd.Add(new ContextMenuDataModel(CloudType.GoogleDrive));
+            CloudsAdd.Add(new ContextMenuDataModel(CloudType.Mega));
             Cloud_add.ItemsSource = CloudsAdd;
         }
         private void MenuCloud_SubmenuOpened(object sender, RoutedEventArgs e)

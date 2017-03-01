@@ -81,6 +81,9 @@
     </Compile>
     <Compile Include="UI\Oauth\OauthDB.cs" />
     <Compile Include="UI\Oauth\OauthGD.cs" />
+    <Compile Include="UI\Oauth\OauthMega.xaml.cs">
+      <DependentUpon>OauthMega.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Oauth\UiOauth.xaml.cs">
       <DependentUpon>UiOauth.xaml</DependentUpon>
     </Compile>
@@ -143,6 +146,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Main\ComboBoxHeader.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Oauth\OauthMega.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -22,12 +22,11 @@ namespace CustomHttpRequest
             if (string.IsNullOrEmpty(RequestMethod)) throw new ArgumentNullException("RequestMethod");
             MakeNewHeader(uri, RequestMethod);
         }
-
-        private string url;
+        
         /// <summary>
         /// Get/Set url
         /// </summary>
-        public string URL { get { return url; } set { url = value; } }
+        public Uri Uri { get { return uri; } set { uri = value; } }
 
         /// <summary>
         /// Get/Set RequestMethod
@@ -67,8 +66,7 @@ namespace CustomHttpRequest
                 tcp.ReceiveTimeout = receive_timeout;
                 tcp.SendTimeout = send_timeout;
                 tcp.Client.NoDelay = true;
-                uri = new Uri(this.url);
-                ssl = url.ToLower().IndexOf("https://") == 0;
+                ssl = uri.ToString().ToLower().IndexOf("https://") == 0;
                 tcp.Connect(uri.Host, ssl ? 443 : 80);
 #if DEBUG
                 debugwrite("TcpClient Connected", "uri.Host: " + uri.Host + ", RemoteEndPoint: " + tcp.Client.RemoteEndPoint.ToString());

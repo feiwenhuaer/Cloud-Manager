@@ -13,7 +13,8 @@ namespace SupDataDll
         Dropbox = 2,
         GoogleDrive = 3,
         Mega = 4,
-        MediaFire = 5
+        MediaFire = 5,
+        OneDrive = 6
     }
     public enum DiskType
     {
