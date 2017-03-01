@@ -47,7 +47,7 @@
             if (Pos_End < Pos_Start) throw new Exception("Pos_End are < Pos_Start.");
             if ((int)(Pos_End - Pos_Start + 1) != contentlength) throw new Exception("contentlength is incorrect.");
 
-            request = new HttpRequest_(uri.ToString(), "POST");
+            request = new HttpRequest_(uri, "POST");
             request.AddHeader("HOST", uri.Host);
             request.AddHeader("Content-Type", "application/octet-stream");
             request.AddHeader("Content-Length", contentlength.ToString());

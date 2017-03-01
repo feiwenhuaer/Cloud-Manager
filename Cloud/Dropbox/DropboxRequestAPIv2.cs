@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using Cloud;
 
 namespace Cloud.Dropbox
 {
@@ -41,7 +42,7 @@ namespace Cloud.Dropbox
             build.AddParameter("client_secret", DropboxAppKey.ApiSecret);
             build.AddParameter("grant_type", "authorization_code");
             if (port != -1) build.AddParameter("redirect_uri", string.Format("http%3A%2F%2Flocalhost%3A{0}", port.ToString()));
-            HttpRequest_ rq = new HttpRequest_(build.Url, TypeRequest.POST.ToString());
+            HttpRequest_ rq = new HttpRequest_(build.uri, TypeRequest.POST.ToString());
             rq.AddHeader("HOST: api.dropboxapi.com");
             rq.AddHeader("Content-Length: 0");
             return rq.GetTextDataResponse(true, true);
@@ -93,7 +94,7 @@ namespace Cloud.Dropbox
         #region path 
         private string RequestUrl2(string url, byte[] reqData)
         {
-            HttpRequest_ rq = new HttpRequest_(url, "POST");
+            HttpRequest_ rq = new HttpRequest_(new Uri(url), "POST");
             rq.AddHeader("HOST", "api.dropboxapi.com");
             rq.AddHeader("Authorization", "Bearer " + access_token);
             rq.AddHeader("Content-Type", "application/json");
@@ -457,7 +458,7 @@ namespace Cloud.Dropbox
         #region up/download
         public Stream Download(string path, long startpos = 0, long endpos = 0, int timeout = 2147483647)// unsupport multi
         {
-            custom_request = new HttpRequest_("https://content.dropboxapi.com/2/files/download", "POST");
+            custom_request = new HttpRequest_("https://content.dropboxapi.com/2/files/download".BuildUri(), "POST");
             custom_request.AddHeader("HOST: content.dropboxapi.com");
             custom_request.AddHeader("Authorization", "Bearer " + access_token);
             custom_request.AddHeader("Dropbox-API-Arg", "{\"path\": \"" + path + "\"}");
@@ -493,7 +494,7 @@ namespace Cloud.Dropbox
         public HttpRequest_ custom_request;
         public Stream upload_session_append(string session_id, long length_chunk, long offset)
         {
-            custom_request = new HttpRequest_("https://content.dropboxapi.com/2/files/upload_session/append", "POST");
+            custom_request = new HttpRequest_("https://content.dropboxapi.com/2/files/upload_session/append".BuildUri(), "POST");
             custom_request.AddHeader("HOST", "content.dropboxapi.com");
             custom_request.AddHeader("Content-Type", "application/octet-stream");
             custom_request.AddHeader("Content-Length", length_chunk.ToString());

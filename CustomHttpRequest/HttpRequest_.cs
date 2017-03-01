@@ -16,12 +16,11 @@ namespace CustomHttpRequest
         public bool debug = false;
         Uri uri;
 
-        public HttpRequest_(string url, string RequestMethod)
+        public HttpRequest_(Uri uri, string RequestMethod)
         {
-            if (string.IsNullOrEmpty(url)) throw new NullReferenceException("url can't be null or empty");
-            this.url = url;
-            this.requestmethod = RequestMethod;
-            MakeNewHeader(url, RequestMethod);
+            if (uri == null) throw new ArgumentNullException("uri");
+            if (string.IsNullOrEmpty(RequestMethod)) throw new ArgumentNullException("RequestMethod");
+            MakeNewHeader(uri, RequestMethod);
         }
 
         private string url;
@@ -71,7 +70,9 @@ namespace CustomHttpRequest
                 uri = new Uri(this.url);
                 ssl = url.ToLower().IndexOf("https://") == 0;
                 tcp.Connect(uri.Host, ssl ? 443 : 80);
+#if DEBUG
                 debugwrite("TcpClient Connected", "uri.Host: " + uri.Host + ", RemoteEndPoint: " + tcp.Client.RemoteEndPoint.ToString());
+#endif
                 if (ssl)
                 {
                     sslStream = new SslStream(tcp.GetStream(), false, new RemoteCertificateValidationCallback(ValidateServerCertificate), null);
@@ -150,13 +151,14 @@ namespace CustomHttpRequest
         /// <summary>
         /// Make new request
         /// </summary>
-        /// <param name="url"></param>
+        /// <param name="uri"></param>
         /// <param name="RequestMethod"></param>
-        public void MakeNewHeader(string url, string RequestMethod)
+        public void MakeNewHeader(Uri uri, string RequestMethod)
         {
             if (tcp.Connected) tcp.Close();
-            uri = new Uri(url);
-            header_send = RequestMethod.ToUpper() + " " + uri.PathAndQuery + " HTTP/1.1\r\n";
+            this.RequestMethod = RequestMethod;
+            this.uri = uri;
+            header_send = RequestMethod.ToUpper() + " " + this.uri.PathAndQuery + " HTTP/1.1\r\n";
         }
         #endregion
 
@@ -361,7 +363,7 @@ namespace CustomHttpRequest
             if (response_code == 301 | response_code == 302) redirect = true; else redirect = false;
             if (AutoDirect & redirect)
             {
-                MakeNewHeader(GetHeaderDataResponse("location")[0], this.requestmethod);
+                MakeNewHeader(new Uri(GetHeaderDataResponse("location")[0]), this.requestmethod);
                 MoveDataHeaderResponeToRequest(HeaderOldRequest);
                 ResetWasSendReceive();
                 goto ReRequest;

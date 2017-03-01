@@ -53,7 +53,7 @@ namespace Cloud.GoogleDrive
         private object Request(string url, TypeRequest typerequest, TypeReturn typereturn = TypeReturn.string_, byte[] bytedata = null, string[] moreheader = null)
         {
             
-            request = new HttpRequest_(url, typerequest.ToString());
+            request = new HttpRequest_(url.BuildUri(), typerequest.ToString());
 #if DEBUG
             request.debug = Debug;
 #endif

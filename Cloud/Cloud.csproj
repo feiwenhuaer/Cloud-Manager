@@ -39,6 +39,7 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Class1.cs" />
     <Compile Include="CloudAppKey.cs" />
     <Compile Include="BuildJson.cs" />
     <Compile Include="BuildURL.cs" />

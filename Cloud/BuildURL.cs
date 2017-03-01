@@ -1,23 +1,27 @@
-﻿namespace Cloud
+﻿using System;
+
+namespace Cloud
 {
     internal class BuildURL
     {
         private string url;
-        public string Url { get { return url; } }
+        public string Url { get { return url; } private set { url = value; uri = new Uri(value); } }
+
+        public Uri uri { get; private set; }
 
         public BuildURL(string url)
         {
-            this.url = url;
+            this.Url = url;
         }
 
         public void AddParameter(string key, string value)
         {
-            if (url.IndexOf("?") > 0)
+            if (Url.IndexOf("?") > 0)
             {
-                url += "&" + key + "=" + value;
+                Url += "&" + key + "=" + value;
                 return;
             }
-            url += "?" + key + "=" + value;
+            Url += "?" + key + "=" + value;
         }
     }
 }
