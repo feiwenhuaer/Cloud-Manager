@@ -40,32 +40,12 @@
         {
             return this.PostRequest(url, dataStream, "application/octet-stream");
         }
-        HttpRequest_ request;
-        public Stream PostRequestRaw(Uri uri, int contentlength, long Pos_Start = 0, long Pos_End = 0)
-        {
-            if (Pos_End < 0 || Pos_Start < 0) throw new Exception("Pos are <0.");
-            if (Pos_End < Pos_Start) throw new Exception("Pos_End are < Pos_Start.");
-            if ((int)(Pos_End - Pos_Start + 1) != contentlength) throw new Exception("contentlength is incorrect.");
 
-            request = new HttpRequest_(uri, "POST");
-            request.AddHeader("HOST", uri.Host);
-            request.AddHeader("Content-Type", "application/octet-stream");
-            request.AddHeader("Content-Length", contentlength.ToString());
-            request.AddHeader("Range", "bytes=" + Pos_Start.ToString() + "-" + Pos_End.ToString());
-            return request.SendHeader_And_GetStream();
-        }
-
-        public string GetDataResponseUpload()
-        {
-            if (request == null) throw new Exception("PostRequestRaw(,,,) is not work.");
-            return request.GetTextDataResponse(true, true);
-        }
-
-        public Stream GetRequestRaw(Uri url)
+        public Stream GetRequestRaw(Uri url, long start_pos = -1, long end_pos = -1)
         {
             HttpWebRequest request = this.CreateRequest(url);
             request.Method = "GET";
-
+            if (start_pos >= 0 && end_pos >= 0 && start_pos <= end_pos) request.AddRange(start_pos, end_pos);
             return request.GetResponse().GetResponseStream();
         }
 

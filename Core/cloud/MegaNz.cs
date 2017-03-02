@@ -7,6 +7,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Core.StaticClass;
 using System.Threading;
+using System.IO;
 
 namespace Core.Cloud
 {
@@ -19,6 +20,34 @@ namespace Core.Cloud
             client.Login(authinfo);
             return client;
         }
+
+        public static ExplorerNode GetListFileFolder(ExplorerNode node)
+        {
+            node.Child.Clear();
+            ExplorerNode root = node.GetRoot();
+            MegaApiClient client = GetClient(root.RootInfo.Email);
+            if (root == node) GetItems(client, GetRoot(root.RootInfo.Email, NodeType.Root), node);
+            else
+            {
+                if (node.Info.Size != -1) throw new Exception("Can't explorer,this item is not folder.");
+                MegaNzNode inode = new MegaNzNode(node.Info.Name, node.Info.ID, node.Parent.Info.ID, -1, NodeType.Directory, node.Info.DateMod);
+                GetItems(client, inode, node);
+            }
+            return node;
+        }
+
+        public static Stream GetStream(ExplorerNode node,long start_pos = 0,long end_pos = 0, bool IsUpload = false)
+        {
+            if (node.Info.Size < 1) throw new Exception("Mega GetStream: Filesize <= 0.");
+            MegaApiClient api = GetClient(node.GetRoot().RootInfo.Email);
+            MegaNzNode meganode = new MegaNzNode(node.Info.ID);
+            if (!IsUpload) return api.Download(meganode, start_pos, end_pos);
+            else return null; 
+        }
+
+
+
+
 
         static INode GetRoot(string Email,NodeType type)
         {
@@ -41,21 +70,6 @@ namespace Core.Cloud
             throw new Exception("Can't find " + type.ToString());
         }
         
-        public static ExplorerNode GetListFileFolder(ExplorerNode node)
-        {
-            node.Child.Clear();
-            ExplorerNode root = node.GetRoot();
-            MegaApiClient client = GetClient(root.RootInfo.Email);
-            if (root == node) GetItems(client, GetRoot(root.RootInfo.Email, NodeType.Root), node);
-            else
-            {
-                if (node.Info.Size != -1) throw new Exception("Can't explorer,this item is not folder.");
-                MegaNzNode inode = new MegaNzNode(node.Info.Name,node.Info.ID,node.Parent.Info.ID,-1,NodeType.Directory,node.Info.DateMod);
-                GetItems(client, inode, node);
-            }
-            return node;
-        }
-
         static void GetItems(MegaApiClient client,INode node, ExplorerNode Enode)
         {
             foreach (INode child in client.GetNodes(node))
@@ -81,6 +95,10 @@ namespace Core.Cloud
 
         class MegaNzNode : INode
         {
+            public MegaNzNode(string ID)
+            {
+                this.id = ID;
+            }
             public MegaNzNode(string Name,string ID,string parentid,long Size, NodeType type, DateTime mod_d)
             {
                 this.name = Name;

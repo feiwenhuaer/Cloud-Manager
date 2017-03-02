@@ -23,7 +23,7 @@ namespace Core.Cloud
         static List<RootID> root = new List<RootID>();
         static OrderByEnum[] en = { OrderByEnum.folder, OrderByEnum.title, OrderByEnum.createdDate };
         internal static List<string> mimeTypeGoogleRemove = new List<string>() {mimeType.audio, mimeType.drawing, mimeType.file,mimeType.form,mimeType.fusiontable,
-            mimeType.map,mimeType.presentation,mimeType.script,mimeType.sites,mimeType.unknown,mimeType.video,mimeType.photo};
+            mimeType.map,mimeType.presentation,mimeType.script,mimeType.sites,mimeType.unknown,mimeType.video,mimeType.photo,mimeType.spreadsheet,mimeType.document};
 
         static DriveAPIHttprequestv2 GetAPIv2(string Email, GD_LimitExceededDelegate LimitExceeded = null)
         {
@@ -246,8 +246,10 @@ namespace Core.Cloud
                 bool add = true;
                 GoogleDrive.mimeTypeGoogleRemove.ForEach(m => { if (item.mimeType == m) add = false; });
                 if (add) list.Add(
-                    new ExplorerNode(
-                        new NodeInfo() { Name = item.title, MimeType = item.mimeType, ID = item.id, Size = item.fileSize, DateMod = DateTime.Parse(item.modifiedDate) }, parent));
+                                    new ExplorerNode(
+                                        new NodeInfo() { Name = item.title, MimeType = item.mimeType, ID = item.id, Size = item.fileSize, DateMod = DateTime.Parse(item.modifiedDate) }, 
+                                        parent)
+                                  );
                 
             }
             return list;

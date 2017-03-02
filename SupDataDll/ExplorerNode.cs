@@ -55,42 +55,38 @@ namespace SupDataDll
             parent.AddChild(this);
         }
 
-
-
-
+        
         #region field
         [JsonIgnore]
         List<ExplorerNode> child;
-
         [JsonIgnore]
-        ExplorerNode parent;
-        [JsonIgnore]
-        NodeInfo info;
-        [JsonIgnore]
-        RootNode rootinfo;
-
-        [JsonIgnore] 
         public List<ExplorerNode> Child
         {
             get { return child ?? (child = new List<ExplorerNode>()); }
             private set { child = value; }
         }
 
-        [JsonProperty]
+        [JsonIgnore]
         public ExplorerNode Parent
         {
             get { return parent; }
             set { parent = value; value.child.Add(this); }
         }
-        [JsonProperty]
+        [JsonIgnore]
         public NodeInfo Info { get { return info ?? (info = new NodeInfo()); } set { info = value; } }
-        [JsonProperty]
+        [JsonIgnore]
         public RootNode RootInfo { get { return rootinfo ?? (rootinfo = new RootNode()); } set { rootinfo = value; } }
+        
+
+        [JsonProperty]
+        ExplorerNode parent;
+        [JsonProperty]
+        NodeInfo info;
+        [JsonProperty]
+        RootNode rootinfo;
         #endregion
 
-
-
-
+        
         #region public method
         public void RemoveChild(ExplorerNode child)
         {
@@ -104,12 +100,20 @@ namespace SupDataDll
             child.parent = this;
         }
 
+        /// <summary>
+        /// Clean all child, and add new Childs
+        /// </summary>
+        /// <param name="childs"></param>
         public void RenewChilds(List<ExplorerNode> childs)
         {
             this.Child.Clear();
             childs.ForEach(c => AddChild(c));
         }
 
+        /// <summary>
+        /// Get List Node from root to this.
+        /// </summary>
+        /// <returns></returns>
         public List<ExplorerNode> GetFullPath()
         {
             List<ExplorerNode> list = new List<ExplorerNode>();
@@ -122,8 +126,14 @@ namespace SupDataDll
             }
             return list;
         }
-        
-        public string GetFullPathString(bool CloudExplorerType = true)
+
+        /// <summary>
+        /// Get string path from Node.
+        /// </summary>
+        /// <param name="CloudExplorerType">Add [CloudType]:[Email] to head path string (Cloud only)</param>
+        /// <param name="RemoveSpecialCharacter">For Dropbox or LocalDisk only</param>
+        /// <returns></returns>
+        public string GetFullPathString(bool CloudExplorerType = true,bool RemoveSpecialCharacter = false)
         {
             List<ExplorerNode> fullpathlist = GetFullPath();
             string path = "";
@@ -131,14 +141,15 @@ namespace SupDataDll
             {
                 case CloudType.LocalDisk:
                     fullpathlist.ForEach(i => path += i.Info.Name + "\\");
-                    path.TrimEnd('\\');
+                    while (path[path.Length - 1] == '\\') path = path.TrimEnd('\\');
+                    if (path.IndexOf('\\') == -1) path += "\\";
                     break;
                 case CloudType.Dropbox:
                 case CloudType.GoogleDrive:
                 case CloudType.Mega:
                     fullpathlist.RemoveAt(0);
                     if (CloudExplorerType) path = GetRoot().RootInfo.Type.ToString() + ":" + GetRoot().RootInfo.Email;
-                    fullpathlist.ForEach(i => path += "/" + RemoveSpecialChar(i.Info.Name));
+                    fullpathlist.ForEach(i => path += "/" + (RemoveSpecialCharacter ? RemoveSpecialChar(i.Info.Name) : i.Info.Name));
                     break;
                 default:throw new Exception("Other cloud not support that type.");
             }
@@ -166,6 +177,10 @@ namespace SupDataDll
             return GetFullPath()[0];
         }
 
+        /// <summary>
+        /// Get File Extension
+        /// </summary>
+        /// <returns></returns>
         public string GetExtension()
         {
             string[] splitPath = this.Info.Name.Split(new Char[] { '.' });
@@ -173,7 +188,7 @@ namespace SupDataDll
             if (string.IsNullOrEmpty(extension)) extension = this.Info.Name;
             return extension;
         }
-
+        
         public ExplorerNode FindSameParent(ExplorerNode othernode)
         {
             List<ExplorerNode> list_other = othernode.GetFullPath();
@@ -192,6 +207,13 @@ namespace SupDataDll
         #region Static
         [JsonIgnore]
         static List<char> listcannot = new List<char>() { '/', '\\', ':', '?', '*', '"', '<', '>', '|' };
+
+        /// <summary>
+        /// Auto Create Node From Path In Disk
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="size"> <1 is folder</param>
+        /// <returns></returns>
         public static ExplorerNode GetNodeFromDiskPath(string path,long size = -1)
         {
             string[] path_split = path.Split('\\');
@@ -209,9 +231,16 @@ namespace SupDataDll
             if (size > 0) parent.Info.Size = size;
             return parent;
         }
-        public static string RemoveSpecialChar(string input)
+
+        /// <summary>
+        /// Replace { '/', '\\', ':', '?', '*', '"', '<', '>', '|' }  to chrReplaceTo
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="chrReplaceTo"></param>
+        /// <returns></returns>
+        public static string RemoveSpecialChar(string input,char chrReplaceTo = '_')
         {
-            listcannot.ForEach(c => input = input.Replace(c, '_'));
+            listcannot.ForEach(c => input = input.Replace(c, chrReplaceTo));
             return input;
         }
         #endregion

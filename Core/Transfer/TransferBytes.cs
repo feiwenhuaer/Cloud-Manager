@@ -69,7 +69,7 @@ namespace Core.Transfer
                     int totalchunkupload = (int)result.AsyncState;
                     totalchunkupload += item.byteread;
                     if (totalchunkupload == item.ChunkUploadSize) totalchunkupload = MakeNextChunkUploadInStreamTo();//make new stream of next chunk and set totalchunkupload=0
-                    int nexbyteread = item.ChunkUploadSize - totalchunkupload >= item.buffer.Length ? item.buffer.Length : item.ChunkUploadSize - totalchunkupload;//1<= nexbyteread = (chunksize - totalupload) <= buffer Length
+                    int nexbyteread = Math.Min(item.ChunkUploadSize - totalchunkupload, item.buffer.Length); //item.ChunkUploadSize - totalchunkupload >= item.buffer.Length ? item.buffer.Length : item.ChunkUploadSize - totalchunkupload;//1<= nexbyteread = (chunksize - totalupload) <= buffer Length
                     item.From.stream.BeginRead(item.buffer, 0, nexbyteread, new AsyncCallback(GetFrom), totalchunkupload);
                 }
                 else//if download
@@ -117,7 +117,7 @@ namespace Core.Transfer
         {
             //create folder if not found
             Dropbox.AutoCreateFolder(item.To.node.Parent);
-            dynamic json_ = JsonConvert.DeserializeObject(((DropboxRequestAPIv2)clientTo).upload_session_finish(null, item.UploadID, item.Transfer, item.To.node.GetFullPathString(false), DropboxUploadMode.add));
+            dynamic json_ = JsonConvert.DeserializeObject(((DropboxRequestAPIv2)clientTo).upload_session_finish(null, item.UploadID, item.Transfer, item.To.node.GetFullPathString(false,true), DropboxUploadMode.add));
             long size = json_.size;
             if (size == item.From.node.Info.Size) return true;
             else

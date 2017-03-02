@@ -128,6 +128,9 @@ namespace Core
                     token = Crypto.DecryptStringAES(node.Attributes["Token"].Value, AppSetting.Pass);
                 }
                 finally { Monitor.Exit(SyncPass); }
+#if DEBUG
+                Console.WriteLine("Token: " + Email + ":" + cloudname.ToString() + " : " + token);
+#endif
                 return token;
             }
         }

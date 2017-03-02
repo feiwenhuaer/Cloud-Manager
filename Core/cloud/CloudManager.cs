@@ -43,32 +43,17 @@ namespace Core.Cloud
             switch (node.GetRoot().RootInfo.Type)
             {
                 case CloudType.Dropbox:
-                    return Dropbox.GetFileStream(node, Startpos, endpos);
+                    return Dropbox.GetFileStream(node, Startpos, endpos);//download only
                 case CloudType.GoogleDrive:
-                    return GoogleDrive.GetFileStream(node, Startpos, endpos);
+                    return GoogleDrive.GetFileStream(node, Startpos, endpos);//download only
                 case CloudType.LocalDisk:
-                    return LocalDisk.GetFileSteam(node, IsUpload, Startpos);
+                    return LocalDisk.GetFileSteam(node, IsUpload, Startpos);//upload/download
+                case CloudType.Mega:
+                    return MegaNz.GetStream(node, Startpos, endpos, IsUpload);//
                 default:
                     throw new UnknowCloudNameException("Error Unknow Cloud Type: " + node.GetRoot().RootInfo.Type.ToString());
             }
         }
-
-        //public ListItemFileFolder GetListRecusive(string path, string id = null)
-        //{
-        //    ListItemFileFolder data = new ListItemFileFolder();
-        //    data.path_raw = path.TrimEnd('/').TrimEnd('\\');
-        //    AnalyzePath rp = new AnalyzePath(path);
-        //    string Real_path = rp.GetPath();
-        //    switch (rp.TypeCloud)
-        //    {
-        //        case CloudType.Dropbox:
-        //            return Dropbox.ListFolderRecusive(Real_path, rp.Email);
-        //        case CloudType.GoogleDrive:
-        //            return GoogleDrive.GetListFolderRecusive(Real_path, id, rp.Email);
-        //        default:
-        //            throw new UnknowCloudNameException("Error Unknow Cloud Type: " + rp.TypeCloud.ToString());
-        //    }
-        //}
 
         public string CreateFolder(ExplorerNode node)
         {
@@ -80,6 +65,7 @@ namespace Core.Cloud
                     return GoogleDrive.CreateFolder(node);
                 case CloudType.LocalDisk:
                     return LocalDisk.CreateFolder(node);
+                case CloudType.Mega:
                 default:
                     throw new UnknowCloudNameException("Error Unknow Cloud Type: " + node.GetRoot().RootInfo.Type.ToString());
             }
@@ -212,6 +198,7 @@ namespace Core.Cloud
                         case CloudType.LocalDisk:
                             if (!LocalDisk.Delete(item, items.PernamentDelete)) Iserror = true;
                             break;
+                        case CloudType.Mega:
                         default: throw new UnknowCloudNameException("Error Unknow Cloud Type: " + item.GetRoot().RootInfo.Type.ToString());
                     }
                     if (!Iserror) deleteform.UpdateText(AppSetting.lang.GetText(LanguageKey.DeleteForm_updatetext_Deleted.ToString()) + "\r\n");

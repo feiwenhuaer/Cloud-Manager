@@ -352,7 +352,7 @@ namespace Core.Transfer
                         if (string.IsNullOrEmpty(GroupData.items[x].UploadID))//create upload id
                         {
                             string parentid = GroupData.items[x].To.node.Parent.Info.ID;
-                            string mimeType = Get_mimeType.Get_mimeType_From_FileExtension(GroupData.items[x].To.node.Info.GetExtensionFile());
+                            string mimeType = Get_mimeType.Get_mimeType_From_FileExtension(GroupData.items[x].To.node.GetExtension());
                             string jsondata = "{\"title\": \"" + GroupData.items[x].From.node.Info.Name + "\", \"mimeType\": \"" + mimeType + "\", \"parents\": [{\"id\": \"" + parentid + "\"}]}";
                             GroupData.items[x].UploadID = gdclient.Files_insert_resumable_getUploadID(jsondata, mimeType, GroupData.items[x].From.node.Info.Size);
                         }

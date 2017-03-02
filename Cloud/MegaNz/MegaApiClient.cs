@@ -469,7 +469,7 @@
         /// <exception cref="ArgumentNullException">node or outputFile is null</exception>
         /// <exception cref="ArgumentException">node is not valid (only <see cref="NodeType.File" /> can be downloaded)</exception>
         /// <exception cref="DownloadException">Checksum is invalid. Downloaded data are corrupted</exception>
-        public Stream Download(INode node)
+        public Stream Download(INode node, long start_pos = -1, long end_pos = -1)
         {
             if (node == null)
             {
@@ -493,7 +493,7 @@
             DownloadUrlRequest downloadRequest = new DownloadUrlRequest(node);
             DownloadUrlResponse downloadResponse = this.Request<DownloadUrlResponse>(downloadRequest);
 
-            Stream dataStream = this.webClient.GetRequestRaw(new Uri(downloadResponse.Url));
+            Stream dataStream = this.webClient.GetRequestRaw(new Uri(downloadResponse.Url), start_pos, end_pos);
             return new MegaAesCtrStreamDecrypter(dataStream, downloadResponse.Size, nodeCrypto.Key, nodeCrypto.Iv, nodeCrypto.MetaMac);
         }
 
@@ -941,17 +941,13 @@
             for (int i = 0; i < chunksPositions.Length; i++)
             {
                 long currentChunkPosition = chunksPositions[i];
-                long nextChunkPosition = i == chunksPositions.Length - 1
-                  ? streamLength
-                  : chunksPositions[i + 1];
+                long nextChunkPosition = i == chunksPositions.Length - 1 ? streamLength : chunksPositions[i + 1];
 
                 // Pack multiple chunks in a single upload
                 while (((int)(nextChunkPosition - currentChunkPosition) < this.ChunksPackSize || this.ChunksPackSize == -1) && i < chunksPositions.Length - 1)
                 {
                     i++;
-                    nextChunkPosition = i == chunksPositions.Length - 1
-                      ? streamLength
-                      : chunksPositions[i + 1];
+                    nextChunkPosition = i == chunksPositions.Length - 1 ? streamLength : chunksPositions[i + 1];
                 }
 
                 yield return (int)(nextChunkPosition - currentChunkPosition);

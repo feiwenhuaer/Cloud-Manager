@@ -5,15 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfUI.UI"
         mc:Ignorable="d" WindowStyle="None" 
-        Title="UILogin" Height="125.974" Width="252.367" WindowStartupLocation="CenterScreen" WindowState="Minimized" Visibility="Visible" ResizeMode="NoResize" Loaded="Grid_Loaded">
+        Title="UILogin" Height="144.503" Width="252.367" WindowStartupLocation="CenterScreen" WindowState="Minimized" Visibility="Visible" ResizeMode="NoResize" Loaded="Grid_Loaded">
     <Grid>
-        <Label x:Name="LB_user" Content="UserName:" Margin="10,10,134,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="TB_user" Height="23" Margin="117,14,10,0" TextWrapping="Wrap" VerticalAlignment="Top" KeyDown="TB_pass_KeyDown"/>
-        <Label x:Name="LB_pass" Content="Password:" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" Width="102"/>
-        <CheckBox x:Name="CB_autologin" Content="Auto login" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="LB_user" Content="UserName:" Margin="10,27,140,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="TB_user" Height="23" Margin="117,31,10,0" TextWrapping="Wrap" VerticalAlignment="Top" KeyDown="TB_pass_KeyDown"/>
+        <Label x:Name="LB_pass" Content="Password:" HorizontalAlignment="Left" Margin="10,58,0,0" VerticalAlignment="Top" Width="102"/>
+        <CheckBox x:Name="CB_autologin" Content="Auto login" HorizontalAlignment="Left" Margin="10,89,0,0" VerticalAlignment="Top"/>
         <Button x:Name="BT_login" Content="Login" Margin="11,0,143,10" Click="BT_login_Click" Height="20" VerticalAlignment="Bottom"/>
         <Button x:Name="BT_cancel" Content="Exit" Margin="144,0,10,10" Click="BT_cancel_Click" Height="20" VerticalAlignment="Bottom"/>
-        <PasswordBox x:Name="PB_pass" Margin="117,43,10,0" KeyDown="TB_pass_KeyDown" Height="22" VerticalAlignment="Top"/>
+        <PasswordBox x:Name="PB_pass" Margin="117,60,10,0" KeyDown="TB_pass_KeyDown" Height="22" VerticalAlignment="Top"/>
+        <Label x:Name="label" Content="Default: admin/admin" HorizontalAlignment="Left" VerticalAlignment="Top" Height="21" FontSize="10" Margin="12,0,0,0"/>
 
     </Grid>
 </Window>

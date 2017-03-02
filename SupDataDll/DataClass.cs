@@ -85,7 +85,6 @@ namespace SupDataDll
     
     public class FileTransferInfo
     {
-        [JsonIgnore]
         public ExplorerNode node;
         [JsonIgnore]
         public Stream stream;
