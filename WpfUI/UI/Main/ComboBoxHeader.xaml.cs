@@ -46,7 +46,8 @@ namespace WpfUI.UI.Main
                 while (Source.Count - 1 >= start_index) Source.RemoveAt(start_index);
             }
             newnode.GetFullPath().ForEach(n => { Source.Add(new ComboBoxData(n)); });
-            if(Source.Count >= 0) this.comboBox.Text = Source[Source.Count - 1].Text;
+            if (Source.Count >= 0)
+                comboBox.SelectedIndex = Source.Count - 1;
         }
     }
 

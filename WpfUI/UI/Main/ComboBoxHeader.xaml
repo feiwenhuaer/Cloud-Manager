@@ -5,6 +5,5 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WpfUI.UI.Main" Background="WhiteSmoke"
              mc:Ignorable="d" Height="auto" Width="auto">
-    <ComboBox x:Name="comboBox" ItemsSource="{Binding Source}" DisplayMemberPath="Text">
-    </ComboBox>
+    <ComboBox x:Name="comboBox" ItemsSource="{Binding Source}" DisplayMemberPath="Text"/>
 </UserControl>
