@@ -61,6 +61,7 @@
     <Compile Include="GoogleDrive\TokenGoogleDrive.cs" />
     <Compile Include="MegaNz\BigInteger.cs" />
     <Compile Include="MegaNz\Crypto.cs" />
+    <Compile Include="MegaNz\DataCryptoMega.cs" />
     <Compile Include="MegaNz\Exceptions.cs" />
     <Compile Include="MegaNz\Extensions.cs" />
     <Compile Include="MegaNz\IAccountInformation.cs" />
@@ -73,6 +74,7 @@
     <Compile Include="MegaNz\Node.cs" />
     <Compile Include="MegaNz\HttpRequestClient.cs" />
     <Compile Include="MegaNz\Oauth\UIinterfaceMegaNz.cs" />
+    <Compile Include="MegaNz\StreamMegaInterface.cs" />
     <Compile Include="OauthUI.cs" />
     <Compile Include="OauthV2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

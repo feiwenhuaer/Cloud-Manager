@@ -51,6 +51,21 @@
             this.expectedMetaMac = expectedMetaMac;
         }
 
+        public MegaAesCtrStreamDecrypter(Stream stream,long fileLength, byte[] fileKey, byte[] iv, byte[] expectedMetaMac,
+            DataCryptoMega dataCrypto) :base(stream,fileLength,Mode.Decrypt,fileKey,iv)
+        {
+            if (expectedMetaMac == null || expectedMetaMac.Length != 8) throw new ArgumentException("Invalid expectedMetaMac");
+            this.expectedMetaMac = expectedMetaMac;
+
+            if (dataCrypto == null) return;
+            this.position = dataCrypto.position;
+            this.metaMac = dataCrypto.metaMac;
+            this.counter = dataCrypto.counter;
+            this.currentCounter = dataCrypto.currentCounter;
+            this.currentChunkMac = dataCrypto.currentChunkMac;
+            this.fileMac = dataCrypto.fileMac;
+        }
+
         protected override void OnStreamRead()
         {
             if (!this.expectedMetaMac.SequenceEqual(this.metaMac))
@@ -60,21 +75,21 @@
         }
     }
 
-    internal abstract class MegaAesCtrStream : Stream
+    internal abstract class MegaAesCtrStream : Stream, StreamMegaInterface
     {
         protected readonly byte[] fileKey;
         protected readonly byte[] iv;
         protected readonly long streamLength;
-        protected long position = 0;
-        protected byte[] metaMac = new byte[8];
+        protected long position = 0;//need save for resume
+        protected byte[] metaMac = new byte[8];//need save for resume
 
         private readonly Stream stream;
         private readonly Mode mode;
-        private readonly long[] chunksPositions;
-        private readonly byte[] counter = new byte[8];
-        private long currentCounter = 0;
-        private byte[] currentChunkMac = new byte[16];
-        private byte[] fileMac = new byte[16];
+        private readonly long[] chunksPositions;//need save for resume\\
+        protected byte[] counter = new byte[8];//need save for resume
+        protected long currentCounter = 0;//need save for resume
+        protected byte[] currentChunkMac = new byte[16];//need save for resume
+        protected byte[] fileMac = new byte[16];//need save for resume
 
         protected MegaAesCtrStream(Stream stream, long streamLength, Mode mode, byte[] fileKey, byte[] iv)
         {
@@ -148,12 +163,12 @@
                 }
             }
         }
-
+        
         public override int Read(byte[] buffer, int offset, int count)
         {
             if (this.position == this.streamLength) return 0;
 
-            for (long pos = this.position; pos < Math.Min(this.position + count, this.streamLength); pos += 16)//16 byte
+            for (long pos = this.position; pos < Math.Min(this.position + count, this.streamLength); pos += 16)//16 byte(128 bit)
             {
                 // We are on a chunk bondary
                 if (this.chunksPositions.Any(chunk => chunk == pos))
@@ -225,6 +240,18 @@
             return (int)len;
         }
 
+        public DataCryptoMega GetSave()
+        {
+            DataCryptoMega dataCrypto = new DataCryptoMega();
+            dataCrypto.position = this.position;
+            dataCrypto.metaMac = this.metaMac;
+            dataCrypto.counter = this.counter;
+            dataCrypto.currentCounter = this.currentCounter;
+            dataCrypto.currentChunkMac = this.currentChunkMac;
+            dataCrypto.fileMac = this.fileMac;
+            return dataCrypto;
+        }
+
         public override void Flush()
         {
             throw new NotSupportedException();
@@ -276,19 +303,17 @@
             chunks.Add(0);
 
             long chunkStartPosition = 0;
-            for (int idx = 1; (idx <= 8) && (chunkStartPosition < (size - (idx * 131072))); idx++)//131072= 2^10 * 2^7
+            for (int idx = 1; (idx <= 8) && (chunkStartPosition < (size - (idx * 131072))); idx++)
             {
                 chunkStartPosition += idx * 131072;
                 chunks.Add(chunkStartPosition);
-            }// last is 2^10 * 2^7 * 2^3 or lastchunk
-            //[0,2^10 * 2^7 * 1, 2^10 * 2^7 * 2,2^10 * 2^7 * 3,2^10 * 2^7 * 4,2^10 * 2^7 * 5,2^10 * 2^7 * 6,2^10 * 2^7 * 7,2^10 * 2^7 * 8 ]
+            }
 
-            while ((chunkStartPosition + 1048576) < size)//1048576 = 1024^2
+            while ((chunkStartPosition + 1048576) < size)//1048576 = 1024^2 = 1Mb
             {
                 chunkStartPosition += 1048576;
                 chunks.Add(chunkStartPosition);
-            }//[0,2^10 * 2^7 * 1, 2^10 * 2^7 * 2,2^10 * 2^7 * 3,2^10 * 2^7 * 4,2^10 * 2^7 * 5,2^10 * 2^7 * 6,2^10 * 2^7 * 7,2^10 * 2^7 * 8,2^10 * 2^7 * 8 *2,2^10 * 2^7 * 8*3,... ]
-
+            }
             return chunks.ToArray();
         }
     }

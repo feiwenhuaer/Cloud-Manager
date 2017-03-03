@@ -38,7 +38,7 @@ namespace Core.Cloud
             }
         }
 
-        public Stream GetFileStream(ExplorerNode node, long Startpos = 0,long endpos =0,bool IsUpload = false)
+        public Stream GetFileStream(ExplorerNode node, long Startpos = -1,long endpos =-1,bool IsUpload = false,object DataEx = null)
         {
             switch (node.GetRoot().RootInfo.Type)
             {
@@ -49,7 +49,7 @@ namespace Core.Cloud
                 case CloudType.LocalDisk:
                     return LocalDisk.GetFileSteam(node, IsUpload, Startpos);//upload/download
                 case CloudType.Mega:
-                    return MegaNz.GetStream(node, Startpos, endpos, IsUpload);//
+                    return MegaNz.GetStream(node, Startpos, endpos, IsUpload, DataEx);//
                 default:
                     throw new UnknowCloudNameException("Error Unknow Cloud Type: " + node.GetRoot().RootInfo.Type.ToString());
             }

@@ -293,21 +293,21 @@ namespace Core.Transfer
 #endif
                 GroupData.items[x].From.stream = AppSetting.ManageCloud.GetFileStream(
                     GroupData.items[x].From.node,
-                    GroupData.items[x].TransferRequest,
+                    GroupData.items[x].SavePosTransfer,
                     GroupData.items[x].From.node.Info.Size - 1,
-                    GroupData.items[x].To.node.GetRoot().RootInfo.Type != CloudType.LocalDisk);
+                    GroupData.items[x].To.node.GetRoot().RootInfo.Type != CloudType.LocalDisk, GroupData.items[x].dataCryptoMega);
                 
                 int buffer_length = 32;//default
                 int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.BufferSize), out buffer_length);//get buffer_length from setting
-                GroupData.items[x].buffer = new byte[buffer_length * 1024];//create buffer
+                GroupData.items[x].buffer = GroupData.items[x].From.node.GetRoot().RootInfo.Type == CloudType.Mega ? new byte[buffer_length * 2048] : new byte[buffer_length * 1024];//create buffer
 
                 ExplorerNode rootnodeto = GroupData.items[x].To.node.GetRoot();
 
                 GroupData.items[x].byteread = 0;
                 string token = "";
                 if (!string.IsNullOrEmpty(rootnodeto.RootInfo.Email)) token = AppSetting.settings.GetToken(rootnodeto.RootInfo.Email, rootnodeto.RootInfo.Type);
-                //this.group.items[x].UploadID = "";//remuse
-                GroupData.items[x].Transfer = GroupData.items[x].OldTransfer = GroupData.items[x].TransferRequest;//remuse
+                //this.group.items[x].UploadID = "";//resume
+                GroupData.items[x].Transfer = GroupData.items[x].OldTransfer = GroupData.items[x].SavePosTransfer;//resume
                 GroupData.items[x].ErrorMsg = "";//clear error
                 GroupData.items[x].Timestamp = CurrentMillis.Millis;
                 if (GroupData.status != StatusTransfer.Running) return;

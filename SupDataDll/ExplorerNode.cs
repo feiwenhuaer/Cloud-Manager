@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
+using Cloud.MegaNz;
+
 namespace SupDataDll
 {
    public class ManagerExplorerNodes
@@ -249,6 +251,7 @@ namespace SupDataDll
 
     public class NodeInfo
     {
+        public MegaKeyCrypto MegaCrypto { get; set; }
         public string Name { get; set; }
         public string ID { get; set; }
         public DateTime DateMod { get; set; }
@@ -264,6 +267,63 @@ namespace SupDataDll
                 return temp_arr[temp_arr.Length - 1];
             }
             else return Name;
+        }
+    }
+
+    public class MegaKeyCrypto : INodeCrypto
+    {
+        public MegaKeyCrypto()
+        {
+
+        }
+        public MegaKeyCrypto(INodeCrypto CryptoKey)
+        {
+            if (CryptoKey == null) return;
+            this.key = CryptoKey.Key;
+            this.sharedkey = CryptoKey.SharedKey;
+            this.iv = CryptoKey.Iv;
+            this.metamac = CryptoKey.MetaMac;
+            this.fullkey = CryptoKey.FullKey;
+        }
+        byte[] key;
+        public byte[] Key
+        {
+            get
+            {
+                return key;
+            }
+        }
+        byte[] sharedkey;
+        public byte[] SharedKey
+        {
+            get
+            {
+                return sharedkey;
+            }
+        }
+        byte[] iv;
+        public byte[] Iv
+        {
+            get
+            {
+                return iv;
+            }
+        }
+        byte[] metamac;
+        public byte[] MetaMac
+        {
+            get
+            {
+                return metamac;
+            }
+        }
+        byte[] fullkey;
+        public byte[] FullKey
+        {
+            get
+            {
+                return fullkey;
+            }
         }
     }
 

@@ -1,4 +1,5 @@
 ﻿using Aga.Controls.Tree;
+using Cloud.MegaNz;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
@@ -23,23 +24,6 @@ namespace SupDataDll
     #endregion
 
     #region Transfer
-    //public class AddNewTransferItem
-    //{
-    //    public AddNewTransferItem(string name,string id,string mimeType, Type_FileFolder type,long size = -1)
-    //    {
-    //        this.name = name;
-    //        this.id = id;
-    //        this.mimeType = mimeType;
-    //        this.type = type;
-    //        this.size = size;
-    //    }
-    //    public string name;
-    //    public string id;
-    //    public long size = -1;
-    //    public string mimeType;
-    //    public Type_FileFolder type;
-    //}
-    
     public class TransferGroup: Transfer
     {
         // MaxItemDownload
@@ -60,17 +44,20 @@ namespace SupDataDll
         public string SizeString = "";
         public FileTransferInfo From = new FileTransferInfo();
         public FileTransferInfo To = new FileTransferInfo();
-        public string UploadID = "";//for remuse upload
+        public DataCryptoMega dataCryptoMega;
+        public string UploadID = "";//for resume upload
         public string ErrorMsg { get { return errormsg; } set { errormsg = value.Replace("\r", "").Replace("\n", ""); } }
         string errormsg = "";
         public long Transfer = 0;//byte[] was transfer
         public int ChunkUploadSize = -1;// = -1 is download, >0 is chunk size upload
-        public long TransferRequest = 0;//Save pos chunk upload success
+        public long SavePosTransfer = 0;//Save size chunk upload/download success 
         [JsonIgnore]
         public int byteread = 0;
         [JsonIgnore]
         public byte[] buffer;//buffer
     }
+
+    
 
     public abstract class Transfer
     {

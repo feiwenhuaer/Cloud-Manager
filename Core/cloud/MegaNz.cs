@@ -26,7 +26,20 @@ namespace Core.Cloud
             node.Child.Clear();
             ExplorerNode root = node.GetRoot();
             MegaApiClient client = GetClient(root.RootInfo.Email);
-            if (root == node) GetItems(client, GetRoot(root.RootInfo.Email, NodeType.Root), node);
+
+            if (root == node)
+            {
+                string ID = AppSetting.settings.GetRootID(root.RootInfo.Email, CloudType.Mega);
+                INode n = null;
+                if (!string.IsNullOrEmpty(ID)) n = new MegaNzNode(ID);
+                if (n == null)
+                {
+                    n = GetRoot(root.RootInfo.Email, NodeType.Root);
+                    AppSetting.settings.SetRootID(root.RootInfo.Email, CloudType.Mega, n.Id);
+                    AppSetting.settings.SaveSettings();
+                }
+                GetItems(client, n, node);
+            }
             else
             {
                 if (node.Info.Size != -1) throw new Exception("Can't explorer,this item is not folder.");
@@ -35,18 +48,22 @@ namespace Core.Cloud
             }
             return node;
         }
-
-        public static Stream GetStream(ExplorerNode node,long start_pos = 0,long end_pos = 0, bool IsUpload = false)
+        
+        public static Stream GetStream(ExplorerNode node,long start_pos = -1,long end_pos = -1,bool IsUpload = false, object DataEx = null)
         {
             if (node.Info.Size < 1) throw new Exception("Mega GetStream: Filesize <= 0.");
             MegaApiClient api = GetClient(node.GetRoot().RootInfo.Email);
-            MegaNzNode meganode = new MegaNzNode(node.Info.ID);
-            if (!IsUpload) return api.Download(meganode, start_pos, end_pos);
-            else return null; 
+            MegaNzNode meganode = new MegaNzNode(node.Info.ID, node.Info.MegaCrypto);
+            if (!IsUpload && start_pos >= 0)//download
+            {
+                long end = end_pos > 0 ? end_pos : node.Info.Size - 1;
+                return api.Download(meganode, start_pos, end, DataEx);
+            }
+            else throw new Exception("Not Support Upload now.");
         }
 
 
-
+        
 
 
         static INode GetRoot(string Email,NodeType type)
@@ -60,8 +77,7 @@ namespace Core.Cloud
                 case NodeType.Root:
                 case NodeType.Trash:
                     MegaApiClient client = GetClient(Email);
-                    IEnumerable<INode> node = client.GetNodes();
-                    foreach (INode n in node)
+                    foreach (INode n in client.GetNodes().Where<INode>(n => n.Type == NodeType.Root))
                     {
                         if (n.Type == NodeType.Root) return n;
                     }
@@ -78,6 +94,7 @@ namespace Core.Cloud
                 c.Info.ID = child.Id;
                 c.Info.Name = child.Name;
                 c.Info.DateMod = child.LastModificationDate;
+                c.Info.MegaCrypto = new MegaKeyCrypto(child as INodeCrypto);
                 switch (child.Type)
                 {
                     case NodeType.File:
@@ -93,13 +110,26 @@ namespace Core.Cloud
             }
         }
 
-        class MegaNzNode : INode
+        class MegaNzNode : MegaKeyCrypto,INode
         {
             public MegaNzNode(string ID)
             {
                 this.id = ID;
             }
-            public MegaNzNode(string Name,string ID,string parentid,long Size, NodeType type, DateTime mod_d)
+            public MegaNzNode(string ID,long Size)
+            {
+                this.id = ID;
+                this.size = Size;
+            }
+            
+            
+            public MegaNzNode(string ID, INodeCrypto keyDeCrypt) : this(null, ID, null, -1, NodeType.File, new DateTime(), keyDeCrypt)
+            {
+            }
+            public MegaNzNode(string Name, string ID, string parentid, long Size, NodeType type, DateTime mod_d) : this(Name, ID, parentid, Size, type, mod_d, null)
+            {
+            }
+            public MegaNzNode(string Name, string ID, string parentid, long Size, NodeType type, DateTime mod_d, INodeCrypto keyDeCrypt) : base(keyDeCrypt)
             {
                 this.name = Name;
                 this.id = ID;
@@ -108,6 +138,9 @@ namespace Core.Cloud
                 this.type = type;
                 this.mod_d = mod_d;
             }
+
+
+            #region INode
             string id;
             public string Id
             {
@@ -156,7 +189,7 @@ namespace Core.Cloud
                     return size;
                 }
             }
-            NodeType type;
+            NodeType type;//default = 0 => File
             public NodeType Type
             {
                 get
@@ -169,6 +202,7 @@ namespace Core.Cloud
             {
                 throw new NotImplementedException();
             }
+            #endregion
         }
     }
 

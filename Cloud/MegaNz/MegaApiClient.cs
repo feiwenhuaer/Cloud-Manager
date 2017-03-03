@@ -469,7 +469,7 @@
         /// <exception cref="ArgumentNullException">node or outputFile is null</exception>
         /// <exception cref="ArgumentException">node is not valid (only <see cref="NodeType.File" /> can be downloaded)</exception>
         /// <exception cref="DownloadException">Checksum is invalid. Downloaded data are corrupted</exception>
-        public Stream Download(INode node, long start_pos = -1, long end_pos = -1)
+        public Stream Download(INode node, long start_pos = -1, long end_pos = -1,object DataEx = null)
         {
             if (node == null)
             {
@@ -492,9 +492,8 @@
             // Retrieve download URL
             DownloadUrlRequest downloadRequest = new DownloadUrlRequest(node);
             DownloadUrlResponse downloadResponse = this.Request<DownloadUrlResponse>(downloadRequest);
-
             Stream dataStream = this.webClient.GetRequestRaw(new Uri(downloadResponse.Url), start_pos, end_pos);
-            return new MegaAesCtrStreamDecrypter(dataStream, downloadResponse.Size, nodeCrypto.Key, nodeCrypto.Iv, nodeCrypto.MetaMac);
+            return new MegaAesCtrStreamDecrypter(dataStream, downloadResponse.Size, nodeCrypto.Key, nodeCrypto.Iv, nodeCrypto.MetaMac,DataEx as DataCryptoMega);
         }
 
         /// <summary>

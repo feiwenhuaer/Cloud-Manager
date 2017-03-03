@@ -34,7 +34,7 @@ namespace Cloud.MegaNz
 
     void DownloadFile(Uri uri, string outputFile);
 
-    Stream Download(INode node,long start_pos = -1, long end_pos = -1);
+    Stream Download(INode node,long start_pos = -1, long end_pos = -1,object DataEx = null);
 
     Stream Download(Uri uri);
 

@@ -85,6 +85,38 @@ namespace Core
             SettingsNode.AppendChild(NewSetting);
         }
 
+        public bool ChangeUserPass(string user, string pass, string newpass)
+        {
+            bool flag = false;
+            if (StringToMD5.CreateMD5(pass) != GetSettingsAsString(SettingsKey.Admin_password)) return flag;
+            else
+            {
+                if (!string.IsNullOrEmpty(user))
+                {
+                    SetSettingAsString(SettingsKey.Admin_user, user);
+                    flag = true;
+                }
+
+                if (!string.IsNullOrEmpty(newpass))
+                {
+                    foreach (XmlNode node in GetCloudDataList())
+                    {
+                        string token = GetToken(node.Attributes["Email"].Value, (CloudType)Enum.Parse(typeof(CloudType), node.Attributes["CloudName"].Value));
+                        if (!string.IsNullOrEmpty(token)) ChangeToken(node, token, newpass);
+                    }
+                    SetSettingAsString(SettingsKey.Admin_password, StringToMD5.CreateMD5(newpass));
+                    SaveSettings();
+                    AppSetting.Pass = newpass;
+                    flag = true;
+                }
+                return flag;
+            }
+
+        }
+
+
+
+        #region Cloud
         public List<CloudEmail_Type> GetListAccountCloud()
         {
             List<CloudEmail_Type> list = new List<CloudEmail_Type>();
@@ -118,59 +150,37 @@ namespace Core
         {
             XmlNode node = GetCloud(Email, cloudname);
             if (node == null) return null;
-            if (node.Attributes["EncryptToken"].Value == "0") return node.Attributes["Token"].Value;
-            else
+            string token;
+            try
             {
-                string token;
-                try
-                {
-                    Monitor.Enter(SyncPass);
-                    token = Crypto.DecryptStringAES(node.Attributes["Token"].Value, AppSetting.Pass);
-                }
-                finally { Monitor.Exit(SyncPass); }
-#if DEBUG
-                Console.WriteLine("Token: " + Email + ":" + cloudname.ToString() + " : " + token);
-#endif
-                return token;
+                Monitor.Enter(SyncPass);
+                token = Crypto.DecryptStringAES(node.Attributes["Token"].Value, AppSetting.Pass);
             }
+            finally { Monitor.Exit(SyncPass); }
+#if DEBUG
+            Console.WriteLine("Token: " + Email + ":" + cloudname.ToString() + " : " + token);
+#endif
+            return token;
+
         }
 
-        public bool AddCloud(string Email, CloudType cloudname, string token, bool AreEncrypt, bool IsDefault = false)
+        internal string GetRootID(string Email, CloudType cloudname)
         {
-            if (GetToken(Email, cloudname) == null)
+            XmlNode node = GetCloud(Email, cloudname);
+            if (node == null) return null;
+#if DEBUG
+            try
             {
-                XmlNode NewSetting = xmlSettings.CreateElement("Cloud");
-                XmlAttribute Attrib = xmlSettings.CreateAttribute("Email");
-                Attrib.Value = Email;
-                NewSetting.Attributes.Append(Attrib);
-
-                Attrib = xmlSettings.CreateAttribute("CloudName");
-                Attrib.Value = cloudname.ToString();
-                NewSetting.Attributes.Append(Attrib);
-
-                Attrib = xmlSettings.CreateAttribute("Token");
-                try
-                {
-                    Monitor.Enter(SyncPass);
-                    if (!AreEncrypt & !string.IsNullOrEmpty(AppSetting.Pass)) Attrib.Value = Crypto.EncryptStringAES(token, AppSetting.Pass);
-                    else Attrib.Value = token;
-                }
-                finally {Monitor.Exit(SyncPass); }
-                NewSetting.Attributes.Append(Attrib);
-
-                Attrib = xmlSettings.CreateAttribute("EncryptToken");
-                Attrib.Value = string.IsNullOrEmpty(AppSetting.Pass) ? "0" : "1";
-                NewSetting.Attributes.Append(Attrib);
-
-                Attrib = xmlSettings.CreateAttribute("Default");
-                Attrib.Value = IsDefault ? "1" : "0";
-                NewSetting.Attributes.Append(Attrib);
-
-                xmlSettings.DocumentElement.SelectSingleNode("UserAccount").AppendChild(NewSetting);
-                SaveSettings();
-                return true;
+                return node.Attributes["RootID"].Value;
             }
-            return false;
+            catch
+            {
+                CreateNewAttribute(node, "RootID", "");
+                return null;
+            }
+#else
+            return node.Attributes["RootID"].Value;
+#endif
         }
 
         public string GetDefaultCloud(CloudType cloudname)
@@ -189,6 +199,37 @@ namespace Core
                 }
             }
             return null;
+        }
+
+
+
+        void CreateNewAttribute(XmlNode Node, string AttributeName, string Value)
+        {
+            XmlAttribute Attrib = xmlSettings.CreateAttribute(AttributeName);
+            Attrib.Value = Value;
+            Node.Attributes.Append(Attrib);
+        }
+
+
+        public bool AddCloud(string Email, CloudType cloudname, string token, bool AreEncrypt, bool IsDefault = false, string root_id = null)
+        {
+            if (string.IsNullOrEmpty(AppSetting.Pass)) throw new Exception("Pass is null.");
+            if (GetToken(Email, cloudname) == null)
+            {
+                XmlNode NewSetting = xmlSettings.CreateElement("Cloud");
+
+                CreateNewAttribute(NewSetting, "Email", Email);
+                CreateNewAttribute(NewSetting, "CloudName", cloudname.ToString());
+                if (!AreEncrypt) token = Crypto.EncryptStringAES(token, AppSetting.Pass);
+                CreateNewAttribute(NewSetting, "Token", token);
+                CreateNewAttribute(NewSetting, "Default", "0");
+                CreateNewAttribute(NewSetting, "RootID", root_id == null ? "" : root_id);
+                xmlSettings.DocumentElement.SelectSingleNode("UserAccount").AppendChild(NewSetting);
+                if (IsDefault) SetDefaultCloud(Email, cloudname);
+                SaveSettings();
+                return true;
+            }
+            return false;
         }
 
         public bool SetDefaultCloud(string Email, CloudType cloudname)
@@ -218,7 +259,7 @@ namespace Core
             return false;
         }
 
-        internal void ChangeToken(XmlNode cloud, string newtoken,string newpass = null)
+        internal void ChangeToken(XmlNode cloud, string newtoken, string newpass = null)
         {
             if (cloud != null)
             {
@@ -226,7 +267,6 @@ namespace Core
                 {
                     Monitor.Enter(AppSetting.settings.SyncPass);
                     cloud.Attributes["Token"].Value = Crypto.EncryptStringAES(newtoken, newpass == null ? AppSetting.Pass : newpass);
-                    cloud.Attributes["EncryptToken"].Value = "1";
                     AppSetting.settings.SaveSettings();
                     return;
                 }
@@ -235,33 +275,24 @@ namespace Core
             throw new Exception("Can't save token");
         }
 
-        public bool ChangeUserPass(string user, string pass, string newpass)
+        internal void SetRootID(string Email, CloudType cloudname, string RootID)
         {
-            bool flag = false;
-            if (StringToMD5.CreateMD5(pass) != GetSettingsAsString(SettingsKey.Admin_password)) return flag;
-            else
+            if (string.IsNullOrEmpty(RootID)) return;
+            XmlNode node = GetCloud(Email, cloudname);
+            if (node == null) throw new Exception("Cloud not found");
+#if DEBUG
+            try
             {
-                if (!string.IsNullOrEmpty(user))
-                {
-                    SetSettingAsString(SettingsKey.Admin_user, user);
-                    flag = true;
-                }
-
-                if (!string.IsNullOrEmpty(newpass))
-                {
-                    foreach (XmlNode node in GetCloudDataList())
-                    {
-                        string token = GetToken(node.Attributes["Email"].Value, (CloudType)Enum.Parse(typeof(CloudType), node.Attributes["CloudName"].Value));
-                        if (!string.IsNullOrEmpty(token)) ChangeToken(node, token, newpass);
-                    }
-                    SetSettingAsString(SettingsKey.Admin_password, StringToMD5.CreateMD5(newpass));
-                    SaveSettings();
-                    AppSetting.Pass = newpass;
-                    flag = true;
-                }
-                return flag;
+                node.Attributes["RootID"].Value = RootID;
             }
-
+            catch
+            {
+                CreateNewAttribute(node, "RootID", RootID);
+            }
+#else
+            node.Attributes["RootID"].Value = RootID;
+#endif
         }
+        #endregion
     }
 }

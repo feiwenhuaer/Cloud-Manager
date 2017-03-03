@@ -1,5 +1,6 @@
 ﻿using Cloud.Dropbox;
 using Cloud.GoogleDrive;
+using Cloud.MegaNz;
 using Core.Cloud;
 using Newtonsoft.Json;
 using SupDataDll;
@@ -41,7 +42,11 @@ namespace Core.Transfer
                 #region transfer done/force stop.
                 if (item.Transfer == item.From.node.Info.Size || item.status != StatusTransfer.Running || GroupManager.GroupData.status != StatusTransfer.Running)//transfer done/force stop.
                 {
-                    if (item.ChunkUploadSize < 0 || item.Transfer == item.From.node.Info.Size) item.TransferRequest = item.Transfer;//save last pos if download or done
+                    if (item.ChunkUploadSize < 0 || item.Transfer == item.From.node.Info.Size)//save last pos if download or done
+                    {
+                        if (this.item.From.node.GetRoot().RootInfo.Type == CloudType.Mega) SaveEncryptDataMega();
+                        item.SavePosTransfer = item.Transfer;
+                    }
                     try { item.From.stream.Close(); } catch { }//close stream if can
                     try { item.To.stream.Close(); } catch { }//close stream if can
 
@@ -74,7 +79,8 @@ namespace Core.Transfer
                 }
                 else//if download
                 {
-                    item.TransferRequest = item.Transfer;
+                    if (this.item.From.node.GetRoot().RootInfo.Type == CloudType.Mega) SaveEncryptDataMega();
+                    item.SavePosTransfer = item.Transfer;
                     item.From.stream.BeginRead(item.buffer, 0, item.buffer.Length, new AsyncCallback(GetFrom), 0);
                 }
                 #endregion
@@ -109,8 +115,14 @@ namespace Core.Transfer
 
                 default: throw new Exception("Not support.");
             }
-            item.TransferRequest = item.Transfer;//
+            item.SavePosTransfer = item.Transfer;//
             return 0;
+        }
+
+        void SaveEncryptDataMega()
+        {
+            StreamMegaInterface stream = this.item.From.stream as StreamMegaInterface;
+            this.item.dataCryptoMega = stream.GetSave();
         }
 
         bool SaveUploadDropbox()
