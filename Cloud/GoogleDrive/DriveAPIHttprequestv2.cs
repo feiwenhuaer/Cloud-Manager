@@ -214,7 +214,7 @@ namespace Cloud.GoogleDrive
 
         public string GetResponse_Files_insert_resumable()
         {
-            string data = request.GetTextDataResponse(false, false);
+            string data = request.GetTextDataResponse(false, true);
 #if DEBUG
             Console.WriteLine("DriveAPIHttprequestv2: " + data);
 #endif

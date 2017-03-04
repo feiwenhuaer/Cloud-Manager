@@ -19,7 +19,7 @@ namespace Core
         public static void Test()
         {
             MegaApiClient client = MegaNz.GetClient(email);
-            FileStream fs = new FileStream(filepath2, FileMode.Open, FileAccess.Read, FileShare.Read);
+            FileStream fs = new FileStream(filepath, FileMode.Open, FileAccess.Read, FileShare.Read);
             MegaNzNode node = new MegaNzNode(AppSetting.settings.GetRootID(email, CloudType.Mega));
             node.Type = NodeType.Root;
             client.Upload(fs, "testfile", node);

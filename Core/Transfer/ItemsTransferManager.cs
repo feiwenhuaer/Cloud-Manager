@@ -63,7 +63,7 @@ namespace Core.Transfer
             //string path = fromfolder.RootInfo.uri == null ? fromfolder.TypeCloud.ToString() + ":" + AppSetting.settings.GetDefaultCloud(fromfolder.TypeCloud) + "?id=" + fromfolder.ID : fromfolder.Path_Raw;
             foreach (ExplorerNode item in items)
             {
-                if (item.Info.Size >0) LoadFile(item);
+                if (item.Info.Size > 0) LoadFile(item);
                 else ListAllItemInFolder(item);
             }
             GroupData.status = StatusTransfer.Waiting;
@@ -82,7 +82,7 @@ namespace Core.Transfer
 
             foreach (ExplorerNode ffitem in list.Child)
             {
-                if (ffitem.Info.Size <=0) ListAllItemInFolder(ffitem);
+                if (ffitem.Info.Size <= 0) ListAllItemInFolder(ffitem);
                 else LoadFile(ffitem);
             }
         }
@@ -266,12 +266,12 @@ namespace Core.Transfer
                 this.GroupData.change = ChangeTLV.DoneToProcessing;
             #endregion
 
-            RefreshGroupDataToShow(count_item_done,count_item_remove);
+            RefreshGroupDataToShow(count_item_done, count_item_remove);
         }
 
-        void RefreshGroupDataToShow(int count_item_done,int count_item_remove = 0)
+        void RefreshGroupDataToShow(int count_item_done, int count_item_remove = 0)
         {
-            if ((count_item_done != -1 && GroupData.col[3].IndexOf("100% (") < 0 && GroupData.items.Count != 0) | count_item_remove !=0)
+            if ((count_item_done != -1 && GroupData.col[3].IndexOf("100% (") < 0 && GroupData.items.Count != 0) | count_item_remove != 0)
                 GroupData.col[3] = Math.Round((double)count_item_done * 100 / GroupData.items.Count, 2).ToString() + "% (" + count_item_done.ToString() + "/" + GroupData.items.Count.ToString() + ")";
             GroupData.col[2] = GroupData.status.ToString();
             for (int i = 0; i < GroupData.items.Count; i++)
@@ -279,7 +279,7 @@ namespace Core.Transfer
                 GroupData.items[i].col[2] = GroupData.items[i].status.ToString();
                 if (GroupData.items[i].col[3].IndexOf("100% (") < 0 & GroupData.items[i].From.node.Info.Size != 0)
                     GroupData.items[i].col[3] = Math.Round((double)GroupData.items[i].SizeWasTransfer * 100 / GroupData.items[i].From.node.Info.Size, 2).ToString() + "% (" + UnitConventer.ConvertSize(GroupData.items[i].SizeWasTransfer, 2, UnitConventer.unit_size) + "/" + GroupData.items[i].SizeString + ")";
-                
+
                 if (GroupData.items[i].ErrorMsg != GroupData.items[i].col[6]) GroupData.items[i].col[6] = GroupData.items[i].ErrorMsg;
             }
         }
@@ -290,14 +290,14 @@ namespace Core.Transfer
             try
             {
 #if DEBUG
-                Console.WriteLine("Transfer items:"+item.From.node.GetFullPathString());
+                Console.WriteLine("Transfer items:" + item.From.node.GetFullPathString());
 #endif
                 item.From.stream = AppSetting.ManageCloud.GetFileStream(
                     item.From.node,
                     item.SaveSizeTransferSuccess,
                     item.From.node.Info.Size - 1,
                     item.To.node.GetRoot().RootInfo.Type != CloudType.LocalDisk, item.dataCryptoMega);
-                
+
                 int buffer_length = 32;//default
                 int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.BufferSize), out buffer_length);//get buffer_length from setting
                 item.buffer = item.From.node.GetRoot().RootInfo.Type == CloudType.Mega ? new byte[buffer_length * 2048] : new byte[buffer_length * 1024];//create buffer
@@ -344,7 +344,7 @@ namespace Core.Transfer
                         int chunksizeGD = 5;//default
                         int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.GD_ChunksSize), out chunksizeGD);
                         item.ChunkUploadSize = chunksizeGD * 1024 * 1024;
-                        
+
                         if (string.IsNullOrEmpty(item.UploadID))//create upload id
                         {
                             string parentid = item.To.node.Parent.Info.ID;
@@ -355,7 +355,9 @@ namespace Core.Transfer
                         ItemsTransferWork.Add(new TransferBytes(item, this, gdclient));
                         return;
                     #endregion
+
                     case CloudType.Mega:
+                        #region Mega
                         MegaApiClient MegaClient = MegaNz.GetClient(rootnodeto.RootInfo.Email);
                         item.buffer = new byte[128 * 1024];
                         if (string.IsNullOrEmpty(item.UploadID))//create upload id
@@ -363,13 +365,14 @@ namespace Core.Transfer
                             MegaNz.AutoCreateFolder(item.To.node.Parent); //auto create folder
                             item.UploadID = MegaClient.RequestUrlUpload(item.From.node.Info.Size);//Make Upload url
                         }
-                        item.From.stream = MegaApiClient.MakeEncryptStreamForUpload(item.From.stream, item.From.node.Info.Size,item.dataCryptoMega);//make encrypt stream from file
+                        item.From.stream = MegaApiClient.MakeEncryptStreamForUpload(item.From.stream, item.From.node.Info.Size, item.dataCryptoMega);//make encrypt stream from file
                         ItemsTransferWork.Add(new TransferBytes(item, this, MegaClient));
                         return;
+                        #endregion
                 }
             }
             catch (Exception ex)
-            { item.ErrorMsg = ex.Message +ex.StackTrace; item.status = StatusTransfer.Error; return; }
+            { item.ErrorMsg = ex.Message + ex.StackTrace; item.status = StatusTransfer.Error; return; }
         }
     }
 }

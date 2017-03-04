@@ -55,7 +55,6 @@ namespace SupDataDll
         public string ErrorMsg { get { return errormsg; } set { errormsg = value.Replace("\r", "").Replace("\n", ""); } }
         [JsonIgnore]
         string errormsg = "";
-        [JsonIgnore]
         public long SizeWasTransfer = 0;//byte[] was transfer
         public int ChunkUploadSize = -1;// = -1 is download, >0 is chunk size upload
         public long SaveSizeTransferSuccess = 0;//Save size chunk upload success

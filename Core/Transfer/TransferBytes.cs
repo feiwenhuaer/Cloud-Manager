@@ -9,6 +9,7 @@ using SupDataDll.Crypt;
 using System;
 using System.IO;
 using System.Linq;
+using static Core.Cloud.MegaNz;
 
 namespace Core.Transfer
 {
@@ -21,7 +22,10 @@ namespace Core.Transfer
         int[] chunksSizesToUploadMega;
         int indexPosMega = 0;
         MegaUpload mega_up;
+        string completionHandle = "-";
 
+        CloudType root_to;
+        CloudType root_from;
         object clientTo;
         public TransferBytes(TransferItem item, ItemsTransferManager GroupManager, object clientTo = null)
         {
@@ -36,6 +40,8 @@ namespace Core.Transfer
             else this.item.To.stream = AppSetting.ManageCloud.GetFileStream(item.To.node, item.SizeWasTransfer);//download to disk
             //begin transfer
             item.status = StatusTransfer.Running;
+            root_to = this.item.To.node.GetRoot().RootInfo.Type;
+            root_from = this.item.From.node.GetRoot().RootInfo.Type;
             item.From.stream.BeginRead(item.buffer, 0, item.buffer.Length, new AsyncCallback(GetFrom), 0);
         }
 
@@ -55,23 +61,25 @@ namespace Core.Transfer
                 {
                     if (item.ChunkUploadSize < 0 || item.SizeWasTransfer == item.From.node.Info.Size)//save last pos if download or done
                     {
-                        if (this.item.From.node.GetRoot().RootInfo.Type == CloudType.Mega) SaveEncryptDataDownloadMega();
+                        if (root_from == CloudType.Mega) SaveEncryptDataDownloadMega();//download done from mega
+                        if (root_to == CloudType.Mega) SaveUploadMega();//upload done to mega
                         item.SaveSizeTransferSuccess = item.SizeWasTransfer;
                     }
+
                     try { item.From.stream.Close(); } catch { }//close stream if can
                     try { item.To.stream.Close(); } catch { }//close stream if can
 
                     switch (GroupManager.GroupData.status)
                     {
-                        case StatusTransfer.Waiting: item.status = StatusTransfer.Waiting;break;
+                        case StatusTransfer.Waiting: item.status = StatusTransfer.Waiting; break;
                         case StatusTransfer.Running: break;
                         default: item.status = StatusTransfer.Stop; break;
                     }
-                    if(item.status == StatusTransfer.Remove) GroupManager.GroupData.items.Remove(item);
+                    if (item.status == StatusTransfer.Remove) GroupManager.GroupData.items.Remove(item);
                     else if (item.status == StatusTransfer.Running && GroupManager.GroupData.status == StatusTransfer.Running)
                     {
                         item.status = StatusTransfer.Done;
-                        if (item.To.node.GetRoot().RootInfo.Type == CloudType.Dropbox) if (!SaveUploadDropbox()) item.status = StatusTransfer.Error;
+                        if (root_to == CloudType.Dropbox) if (!SaveUploadDropbox()) item.status = StatusTransfer.Error;
                     }
                     else item.status = StatusTransfer.Stop;
                     Dispose();
@@ -84,13 +92,18 @@ namespace Core.Transfer
                 {
                     int totalchunkupload = (int)result.AsyncState;
                     totalchunkupload += item.byteread;
-                    if (totalchunkupload == item.ChunkUploadSize) { indexPosMega++; MakeNextChunkUploadInStreamTo(); totalchunkupload = 0; }//make new stream of next chunk and set totalchunkupload=0
+                    if (totalchunkupload == item.ChunkUploadSize)
+                    {
+                        if (root_to == CloudType.Mega) indexPosMega++;
+                        MakeNextChunkUploadInStreamTo();
+                        totalchunkupload = 0;
+                    }//make new stream of next chunk and set totalchunkupload=0
                     int nexbyteread = Math.Min(item.ChunkUploadSize - totalchunkupload, item.buffer.Length); //item.ChunkUploadSize - totalchunkupload >= item.buffer.Length ? item.buffer.Length : item.ChunkUploadSize - totalchunkupload;//1<= nexbyteread = (chunksize - totalupload) <= buffer Length
                     item.From.stream.BeginRead(item.buffer, 0, nexbyteread, new AsyncCallback(GetFrom), totalchunkupload);
                 }
                 else//if download
                 {
-                    if (this.item.From.node.GetRoot().RootInfo.Type == CloudType.Mega) SaveEncryptDataDownloadMega();
+                    if (root_from == CloudType.Mega) SaveEncryptDataDownloadMega();
                     item.SaveSizeTransferSuccess = item.SizeWasTransfer;
                     item.From.stream.BeginRead(item.buffer, 0, item.buffer.Length, new AsyncCallback(GetFrom), 0);
                 }
@@ -123,10 +136,20 @@ namespace Core.Transfer
                     item.To.stream = ((DriveAPIHttprequestv2)clientTo).Files_insert_resumable(item.UploadID, item.SizeWasTransfer, pos_end, item.From.node.Info.Size);
                     break;
                 case CloudType.Mega:
-                    if (!CreateNew) mega_up.ReadDataTextResponse();
+                    if (!CreateNew)
+                    {
+                        completionHandle = mega_up.ReadDataTextResponse();
+                        if (completionHandle.StartsWith("-")) throw new Exception(completionHandle);
+                    }
                     item.ChunkUploadSize = chunksSizesToUploadMega[indexPosMega];
                     Uri uri = new Uri(item.UploadID + "/" + item.SizeWasTransfer.ToString());
                     mega_up = new MegaUpload(uri, item.ChunkUploadSize);
+                    MegaAesCtrStreamCrypter crypt_stream = item.From.stream as MegaAesCtrStreamCrypter;
+
+                    item.dataCryptoMega = crypt_stream.GetSave();//save
+                    item.dataCryptoMega.fileKey = crypt_stream.FileKey;
+                    item.dataCryptoMega.iv = crypt_stream.Iv;
+
                     item.To.stream = mega_up.MakeStreamUpload();
                     break;
 
@@ -152,6 +175,7 @@ namespace Core.Transfer
                     if (indexPosMega >= chunkscount) throw new Exception("Chunks not match.");
                 }
             }
+            item.ChunkUploadSize = chunksSizesToUploadMega[indexPosMega];
         }
 
         void SaveEncryptDataDownloadMega()
@@ -162,11 +186,14 @@ namespace Core.Transfer
 
         bool SaveUploadMega()
         {
+            completionHandle = mega_up.ReadDataTextResponse();
+            if (completionHandle.StartsWith("-")) throw new Exception(completionHandle);
             MegaAesCtrStreamCrypter encryptedStream = item.From.stream as MegaAesCtrStreamCrypter;
             MegaApiClient client = clientTo as MegaApiClient;
-            INode newitem = client.CommitUpload(item.From.node.Info.Name, null, encryptedStream, "");
-
-            return false;
+            MegaNzNode parent = new MegaNzNode(item.To.node.Parent.Info.ID);
+            INode newitem = client.CommitUpload(item.From.node.Info.Name, parent, encryptedStream, completionHandle);
+            if (newitem != null) return true;
+            throw new Exception("Commit Upload Failed.");
         }
 
         bool SaveUploadDropbox()
@@ -189,6 +216,9 @@ namespace Core.Transfer
             GroupManager = null;
             item = null;
             clientTo = null;
+            chunksSizesToUploadMega = null;
+            mega_up = null;
+            completionHandle = null;
         }
     }
 }
