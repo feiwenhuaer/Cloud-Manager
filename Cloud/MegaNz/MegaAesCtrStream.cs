@@ -1,15 +1,29 @@
 ﻿namespace Cloud.MegaNz
 {
+    using SupDataDll.Class.Mega;
+    using SupDataDll.Crypt;
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
 
-    internal class MegaAesCtrStreamCrypter : MegaAesCtrStream
+    public class MegaAesCtrStreamCrypter : MegaAesCtrStream
     {
         public MegaAesCtrStreamCrypter(Stream stream)
           : base(stream, stream.Length, Mode.Crypt, Crypto.CreateAesKey(), Crypto.CreateAesKey().CopySubArray(8))
         {
+        }
+
+        public MegaAesCtrStreamCrypter(Stream stream, long FileLength, DataCryptoMega InfoEncrypt)
+          : base(stream, FileLength, Mode.Crypt, InfoEncrypt == null ? Crypto.CreateAesKey() : InfoEncrypt.fileKey, InfoEncrypt == null ? Crypto.CreateAesKey().CopySubArray(8) : InfoEncrypt.iv)
+        {
+            if (InfoEncrypt == null) return;
+            this.position = InfoEncrypt.position;
+            this.metaMac = InfoEncrypt.metaMac;
+            this.counter = InfoEncrypt.counter;
+            this.currentCounter = InfoEncrypt.currentCounter;
+            this.currentChunkMac = InfoEncrypt.currentChunkMac;
+            this.fileMac = InfoEncrypt.fileMac;
         }
 
         public byte[] FileKey
@@ -75,7 +89,7 @@
         }
     }
 
-    internal abstract class MegaAesCtrStream : Stream, StreamMegaInterface
+    public abstract class MegaAesCtrStream : Stream, StreamMegaInterface
     {
         protected readonly byte[] fileKey;
         protected readonly byte[] iv;
@@ -90,6 +104,20 @@
         protected long currentCounter = 0;//need save for resume
         protected byte[] currentChunkMac = new byte[16];//need save for resume
         protected byte[] fileMac = new byte[16];//need save for resume
+
+        protected MegaAesCtrStream(Stream stream, long FileLength, Mode mode)
+        {
+            if (stream == null)
+            {
+                throw new ArgumentNullException("stream");
+            }
+
+            this.stream = stream;
+            this.streamLength = FileLength;
+            this.mode = mode;
+
+            this.chunksPositions = this.GetChunksPositions(this.streamLength);
+        }
 
         protected MegaAesCtrStream(Stream stream, long streamLength, Mode mode, byte[] fileKey, byte[] iv)
         {

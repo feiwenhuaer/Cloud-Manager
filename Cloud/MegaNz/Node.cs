@@ -1,13 +1,15 @@
 ﻿namespace Cloud.MegaNz
 {
-  using System;
-  using System.Diagnostics;
-  using System.Linq;
-  using System.Runtime.Serialization;
+    using System;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Runtime.Serialization;
 
-  using Newtonsoft.Json;
+    using Newtonsoft.Json;
+    using SupDataDll.Class.Mega;
+    using SupDataDll.Crypt;
 
-  [DebuggerDisplay("Type: {Type} - Name: {Name} - Id: {Id}")]
+    [DebuggerDisplay("Type: {Type} - Name: {Name} - Id: {Id}")]
   internal class Node : NodePublic, INode, INodeCrypto
   {
     private static readonly DateTime OriginalDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);

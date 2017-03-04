@@ -105,7 +105,7 @@ namespace Core.Cloud
         #endregion
 
         #region Private Method
-        private static DropboxRequestAPIv2 GetAPIv2(string Email)
+        internal static DropboxRequestAPIv2 GetAPIv2(string Email)
         {
             return new DropboxRequestAPIv2(AppSetting.settings.GetToken(Email, CloudType.Dropbox));
         }

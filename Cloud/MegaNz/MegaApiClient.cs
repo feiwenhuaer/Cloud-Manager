@@ -13,6 +13,8 @@
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using SupDataDll.Class.Mega;
+    using SupDataDll.Crypt;
 
     public partial class MegaApiClient : IMegaApiClient
     {
@@ -31,7 +33,7 @@
 
         private Node trashNode;
         private string sessionId;
-        private byte[] masterKey;
+        public byte[] masterKey;
         private uint sequenceIndex = (uint)(uint.MaxValue * new Random().NextDouble());
         private int bufferSize;
 
@@ -590,6 +592,44 @@
             }
         }
 
+
+
+        public string RequestUrlUpload(long filelength)
+        {
+            UploadUrlRequest uploadRequest = new UploadUrlRequest(filelength);
+            return this.Request<UploadUrlResponse>(uploadRequest).Url;
+        }
+
+        public static Stream MakeEncryptStreamForUpload(Stream input,long Filesize, DataCryptoMega InfoEncrypt)
+        {
+            return new MegaAesCtrStreamCrypter(input, Filesize, InfoEncrypt);
+        }
+
+        public INode CommitUpload(string Name,INode parent, MegaAesCtrStreamCrypter encryptedStream, string completionHandle)
+        {
+            byte[] cryptedAttributes = Crypto.EncryptAttributes(new Attributes(Name), encryptedStream.FileKey);
+            byte[] fileKey = new byte[32];
+            for (int i = 0; i < 8; i++)
+            {
+                fileKey[i] = (byte)(encryptedStream.FileKey[i] ^ encryptedStream.Iv[i]);
+                fileKey[i + 16] = encryptedStream.Iv[i];
+            }
+            for (int i = 8; i < 16; i++)
+            {
+                fileKey[i] = (byte)(encryptedStream.FileKey[i] ^ encryptedStream.MetaMac[i - 8]);
+                fileKey[i + 16] = encryptedStream.MetaMac[i - 8];
+            }
+            byte[] encryptedKey = Crypto.EncryptKey(fileKey, this.masterKey);
+
+            CreateNodeRequest createNodeRequest = CreateNodeRequest.CreateFileNodeRequest(parent, cryptedAttributes.ToBase64(), encryptedKey.ToBase64(), fileKey, completionHandle);
+            GetNodesResponse createNodeResponse = this.Request<GetNodesResponse>(createNodeRequest, this.masterKey);
+            return createNodeResponse.Nodes[0];
+        }
+
+
+
+
+
         /// <summary>
         /// Upload a stream on Mega.co.nz and attach created node to selected parent
         /// </summary>
@@ -603,36 +643,18 @@
         /// <exception cref="ArgumentException">parent is not valid (all types except <see cref="NodeType.File" /> are supported)</exception>
         public INode Upload(Stream stream, string name, INode parent)
         {
-            if (stream == null)
-            {
-                throw new ArgumentNullException("stream");
-            }
-
-            if (string.IsNullOrEmpty(name))
-            {
-                throw new ArgumentNullException("name");
-            }
-
-            if (parent == null)
-            {
-                throw new ArgumentNullException("parent");
-            }
-
-            if (parent.Type == NodeType.File)
-            {
-                throw new ArgumentException("Invalid parent node");
-            }
-
-            this.EnsureLoggedIn();
+            if (stream == null) throw new ArgumentNullException("stream");
+            if (string.IsNullOrEmpty(name)) throw new ArgumentNullException("name");
+            if (parent == null) throw new ArgumentNullException("parent");
+            if (parent.Type == NodeType.File) throw new ArgumentException("Invalid parent node");
+            this.EnsureLoggedIn();//check are login
 
             string completionHandle = "-";
             int remainingRetry = ApiRequestAttempts;
             while (remainingRetry-- > 0)
             {
-                // Retrieve upload URL
                 UploadUrlRequest uploadRequest = new UploadUrlRequest(stream.Length);
-                UploadUrlResponse uploadResponse = this.Request<UploadUrlResponse>(uploadRequest);
-
+                UploadUrlResponse uploadResponse = this.Request<UploadUrlResponse>(uploadRequest);//Retrieve upload URL
                 using (MegaAesCtrStreamCrypter encryptedStream = new MegaAesCtrStreamCrypter(stream))
                 {
                     var chunkStartPosition = 0;
@@ -642,7 +664,6 @@
                         int chunkSize = chunksSizesToUpload[i];
                         byte[] chunkBuffer = new byte[chunkSize];
                         encryptedStream.Read(chunkBuffer, 0, chunkSize);
-
                         using (MemoryStream chunkStream = new MemoryStream(chunkBuffer))
                         {
                             Uri uri = new Uri(uploadResponse.Url + "/" + chunkStartPosition);
@@ -650,11 +671,7 @@
                             try
                             {
                                 completionHandle = this.webClient.PostRequestRaw(uri, chunkStream);
-
-                                if (completionHandle.StartsWith("-"))
-                                {
-                                    break;
-                                }
+                                if (completionHandle.StartsWith("-")) break;
                             }
                             catch (Exception ex)
                             {
@@ -666,33 +683,26 @@
 
                     if (completionHandle.StartsWith("-"))
                     {
-                        // Restart upload from the beginning
-                        Thread.Sleep(ApiRequestDelay);
-
-                        // Reset steam position
-                        stream.Position = 0;
-
+                        Thread.Sleep(ApiRequestDelay);// Restart upload from the beginning
+                        stream.Position = 0;// Reset steam position
                         continue;
                     }
+                    byte[] cryptedAttributes = Crypto.EncryptAttributes(new Attributes(name), encryptedStream.FileKey);// Encrypt attributes
 
-                    // Encrypt attributes
-                    byte[] cryptedAttributes = Crypto.EncryptAttributes(new Attributes(name), encryptedStream.FileKey);
-
-                    // Compute the file key
+                    #region Compute the file key
                     byte[] fileKey = new byte[32];
                     for (int i = 0; i < 8; i++)
                     {
                         fileKey[i] = (byte)(encryptedStream.FileKey[i] ^ encryptedStream.Iv[i]);
                         fileKey[i + 16] = encryptedStream.Iv[i];
                     }
-
                     for (int i = 8; i < 16; i++)
                     {
                         fileKey[i] = (byte)(encryptedStream.FileKey[i] ^ encryptedStream.MetaMac[i - 8]);
                         fileKey[i + 16] = encryptedStream.MetaMac[i - 8];
                     }
-
                     byte[] encryptedKey = Crypto.EncryptKey(fileKey, this.masterKey);
+                    #endregion
 
                     CreateNodeRequest createNodeRequest = CreateNodeRequest.CreateFileNodeRequest(parent, cryptedAttributes.ToBase64(), encryptedKey.ToBase64(), fileKey, completionHandle);
                     GetNodesResponse createNodeResponse = this.Request<GetNodesResponse>(createNodeRequest, this.masterKey);
@@ -935,7 +945,7 @@
             Crypto.GetPartsFromDecryptedKey(decryptedKey, out iv, out metaMac, out fileKey);
         }
 
-        private IEnumerable<int> ComputeChunksSizesToUpload(long[] chunksPositions, long streamLength)
+        public IEnumerable<int> ComputeChunksSizesToUpload(long[] chunksPositions, long streamLength)
         {
             for (int i = 0; i < chunksPositions.Length; i++)
             {

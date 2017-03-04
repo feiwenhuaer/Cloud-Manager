@@ -3,7 +3,8 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
-// set of attributes. Change these attribute values to modify the information
+// set of 
+// Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Cloud Manager")]
 [assembly: AssemblyDescription("")]

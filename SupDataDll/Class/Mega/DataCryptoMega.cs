@@ -1,4 +1,4 @@
-﻿namespace Cloud.MegaNz
+﻿namespace SupDataDll.Class.Mega
 {
     public class DataCryptoMega
     {
@@ -8,5 +8,8 @@
         public long currentCounter = 0;
         public byte[] currentChunkMac = new byte[16];
         public byte[] fileMac = new byte[16];
+
+        public byte[] fileKey = new byte[16];
+        public byte[] iv = new byte[8];
     }
 }

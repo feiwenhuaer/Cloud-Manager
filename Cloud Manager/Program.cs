@@ -1,4 +1,5 @@
-﻿using Core;
+﻿//#define TESTCLASS
+using Core;
 using Core.StaticClass;
 using SupDataDll;
 using System;
@@ -44,6 +45,10 @@ namespace Cloud_Manager
                 AppSetting.UILogin.ShowDialog_();
                 if (!string.IsNullOrEmpty(AppSetting.Pass))
                 {
+#if DEBUG && TESTCLASS
+                    Core.TestClass.Test();
+
+#endif
                     AppSetting.TransferManager.Start();
                     Reflection_UI.Load_UIMain();
                     showMainForm:
@@ -78,7 +83,7 @@ namespace Cloud_Manager
                 MessageBox.Show("false");
             }
         }
-
+#if DEBUG
         private static void DeleteFile_dev()
         {
             Console.WriteLine("Debug mode");
@@ -93,5 +98,6 @@ namespace Cloud_Manager
             if (dinfo.Exists) { dinfo.Delete(true); }
             dinfo.Create();
         }
+#endif
     }
 }

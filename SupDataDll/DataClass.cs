@@ -1,13 +1,10 @@
 ﻿using Aga.Controls.Tree;
-using Cloud.MegaNz;
 using Newtonsoft.Json;
-using System;
+using SupDataDll.Class.Mega;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
-using System.Threading;
 
 namespace SupDataDll
 {
@@ -24,6 +21,16 @@ namespace SupDataDll
     #endregion
 
     #region Transfer
+    public abstract class Transfer
+    {
+        [JsonIgnore]
+        public long Timestamp = 0;
+        public List<string> col { get; set; }
+        public StatusTransfer status = StatusTransfer.Waiting;
+        [JsonIgnore]
+        public StatusTransfer CheckChangeStatus = StatusTransfer.Waiting;
+        public long OldTransfer = 0;//for caculate speed
+    }
     public class TransferGroup: Transfer
     {
         // MaxItemDownload
@@ -37,37 +44,27 @@ namespace SupDataDll
         //Items
         public List<TransferItem> items = new List<TransferItem>();
     }
-
     public class TransferItem: Transfer
     {
         [JsonIgnore]
         public string SizeString = "";
         public FileTransferInfo From = new FileTransferInfo();
         public FileTransferInfo To = new FileTransferInfo();
-        public DataCryptoMega dataCryptoMega;
+        
         public string UploadID = "";//for resume upload
         public string ErrorMsg { get { return errormsg; } set { errormsg = value.Replace("\r", "").Replace("\n", ""); } }
+        [JsonIgnore]
         string errormsg = "";
-        public long Transfer = 0;//byte[] was transfer
+        [JsonIgnore]
+        public long SizeWasTransfer = 0;//byte[] was transfer
         public int ChunkUploadSize = -1;// = -1 is download, >0 is chunk size upload
-        public long SavePosTransfer = 0;//Save size chunk upload/download success 
+        public long SaveSizeTransferSuccess = 0;//Save size chunk upload success
         [JsonIgnore]
         public int byteread = 0;
         [JsonIgnore]
         public byte[] buffer;//buffer
-    }
 
-    
-
-    public abstract class Transfer
-    {
-        [JsonIgnore]
-        public long Timestamp = 0;
-        public List<string> col { get; set; }
-        public StatusTransfer status = StatusTransfer.Waiting;
-        [JsonIgnore]
-        public StatusTransfer CheckChangeStatus = StatusTransfer.Waiting;
-        public long OldTransfer = 0;//for caculate speed
+        public DataCryptoMega dataCryptoMega;//for mega only
     }
     
     public class FileTransferInfo
@@ -76,6 +73,7 @@ namespace SupDataDll
         [JsonIgnore]
         public Stream stream;
     }
+    
 
     public class TransferDataTLVWPF: ITreeModel
     {
@@ -114,7 +112,6 @@ namespace SupDataDll
             return parent is TransferGroup;
         }
     }
-
     #endregion
 
     public class DeleteItems

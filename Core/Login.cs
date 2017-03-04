@@ -2,9 +2,9 @@
 using System;
 using System.IO;
 using System.Text;
-using Core.EncodeDecode;
 using SupDataDll;
 using Core.StaticClass;
+using SupDataDll.Crypt;
 
 namespace Core
 {
@@ -66,7 +66,7 @@ namespace Core
         public bool CheckAccount(string User, string Pass)
         {
             if (User != AppSetting.settings.GetSettingsAsString(SettingsKey.Admin_user)) return false;
-            if (StringToMD5.CreateMD5(Pass) != AppSetting.settings.GetSettingsAsString(SettingsKey.Admin_password)) return false;
+            if (Md5.CreateMD5String(Pass) != AppSetting.settings.GetSettingsAsString(SettingsKey.Admin_password)) return false;
             return true;
         }
 

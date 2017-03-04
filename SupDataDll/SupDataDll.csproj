@@ -44,14 +44,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BigInteger.cs" />
     <Compile Include="Class\AnalyzePath.cs" />
     <Compile Include="Class\ClipBoard_.cs" />
+    <Compile Include="Class\Extensions.cs" />
     <Compile Include="Class\IconListManager\IconHelper.cs" />
     <Compile Include="Class\IconListManager\IconListManager.cs" />
     <Compile Include="Class\ManagerThread.cs" />
+    <Compile Include="Class\Mega\Attributes.cs" />
+    <Compile Include="Class\Mega\DataCryptoMega.cs" />
+    <Compile Include="Class\Mega\INodeCrypto.cs" />
     <Compile Include="Class\Reflection_EventToCore.cs" />
     <Compile Include="Class\UI_n_lang.cs" />
     <Compile Include="Class\UnitConventer.cs" />
+    <Compile Include="Crypt\Crypto.cs" />
+    <Compile Include="Crypt\Md5.cs" />
     <Compile Include="CustomException.cs" />
     <Compile Include="DataClass.cs" />
     <Compile Include="Enum.cs" />
@@ -75,10 +82,6 @@
     <ProjectReference Include="..\Aga.Controls\Aga.Controls.csproj">
       <Project>{d17cd489-1b14-47eb-8c22-c189d078aec9}</Project>
       <Name>Aga.Controls</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Cloud\Cloud.csproj">
-      <Project>{0B8A1A7D-0267-48A9-BAD6-DCDE5104D660}</Project>
-      <Name>Cloud</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -117,6 +120,7 @@
   <ItemGroup>
     <None Include="Resources\usb.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

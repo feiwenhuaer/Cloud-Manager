@@ -8,6 +8,8 @@ using Newtonsoft.Json;
 using Core.StaticClass;
 using System.Threading;
 using System.IO;
+using CustomHttpRequest;
+using SupDataDll.Class.Mega;
 
 namespace Core.Cloud
 {
@@ -62,7 +64,23 @@ namespace Core.Cloud
             else throw new Exception("Not Support Upload now.");
         }
 
-
+        public static void AutoCreateFolder(ExplorerNode node)
+        {
+            List<ExplorerNode> list = node.GetFullPath();
+            if (list[0].RootInfo.Type != CloudType.Mega) throw new Exception("Mega only.");
+            MegaApiClient client = GetClient(list[0].RootInfo.Email);
+            list.RemoveAt(0);
+            foreach(ExplorerNode child in list)
+            {
+                if(string.IsNullOrEmpty(child.Info.ID))
+                {
+                    MegaNzNode m_p_node = new MegaNzNode(child.Parent.Info.ID);
+                    INode c_node = client.GetNodes(m_p_node).Where(n => n.Name == child.Info.Name).First();//find
+                    if(c_node == null) c_node = client.CreateFolder(child.Info.Name, m_p_node);//if not fount -> create
+                    child.Info.ID = c_node.Id;
+                }
+            }
+        }
         
 
 
@@ -110,7 +128,7 @@ namespace Core.Cloud
             }
         }
 
-        class MegaNzNode : MegaKeyCrypto,INode
+        public class MegaNzNode : MegaKeyCrypto,INode
         {
             public MegaNzNode(string ID)
             {
@@ -196,6 +214,7 @@ namespace Core.Cloud
                 {
                     return type;
                 }
+                set { type = value; }
             }
 
             public bool Equals(INode other)
@@ -206,4 +225,25 @@ namespace Core.Cloud
         }
     }
 
+    public class MegaUpload
+    {
+        HttpRequest_ request;
+        public MegaUpload(Uri uri,int lengthUpload)
+        {
+            request = new HttpRequest_(uri, "POST");
+            request.AddHeader("HOST", uri.Host);
+            request.AddHeader("Content-Type", "application/octet-stream");
+            request.AddHeader("Content-Length", lengthUpload.ToString());
+        }
+
+        public Stream MakeStreamUpload()
+        {
+            return request.SendHeader_And_GetStream();
+        }
+
+        public string ReadDataTextResponse()
+        {
+            return request.GetTextDataResponse(true, true);
+        }
+    }
 }

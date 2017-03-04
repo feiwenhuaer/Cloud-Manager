@@ -1,10 +1,10 @@
 ﻿using System.Text;
 
-namespace Core.EncodeDecode
+namespace SupDataDll.Crypt
 {
-    public static class StringToMD5
+    public static class Md5
     {
-        public static string CreateMD5(string input)
+        public static string CreateMD5String(string input)
         {
             using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
             {

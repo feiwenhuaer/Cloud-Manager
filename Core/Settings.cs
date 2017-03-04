@@ -1,6 +1,6 @@
-﻿using Core.EncodeDecode;
-using Core.StaticClass;
+﻿using Core.StaticClass;
 using SupDataDll;
+using SupDataDll.Crypt;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -88,7 +88,7 @@ namespace Core
         public bool ChangeUserPass(string user, string pass, string newpass)
         {
             bool flag = false;
-            if (StringToMD5.CreateMD5(pass) != GetSettingsAsString(SettingsKey.Admin_password)) return flag;
+            if (Md5.CreateMD5String(pass) != GetSettingsAsString(SettingsKey.Admin_password)) return flag;
             else
             {
                 if (!string.IsNullOrEmpty(user))
@@ -104,7 +104,7 @@ namespace Core
                         string token = GetToken(node.Attributes["Email"].Value, (CloudType)Enum.Parse(typeof(CloudType), node.Attributes["CloudName"].Value));
                         if (!string.IsNullOrEmpty(token)) ChangeToken(node, token, newpass);
                     }
-                    SetSettingAsString(SettingsKey.Admin_password, StringToMD5.CreateMD5(newpass));
+                    SetSettingAsString(SettingsKey.Admin_password,Md5.CreateMD5String(newpass));
                     SaveSettings();
                     AppSetting.Pass = newpass;
                     flag = true;

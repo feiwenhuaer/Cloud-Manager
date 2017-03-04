@@ -1,5 +1,6 @@
 ﻿using Cloud.Dropbox;
 using Cloud.GoogleDrive;
+using Cloud.MegaNz;
 using Core.Cloud;
 using Core.StaticClass;
 using Newtonsoft.Json;
@@ -171,7 +172,7 @@ namespace Core.Transfer
                     long Group_TotalTransfer = 0;
                     for (int i = 0; i < GroupData.items.Count; i++)//start item waiting and Started(force)
                     {
-                        Group_TotalTransfer += GroupData.items[i].Transfer;
+                        Group_TotalTransfer += GroupData.items[i].SizeWasTransfer;
                         #region start item force start
                         if (this.GroupData.items[i].status == StatusTransfer.Started && this.GroupData.status == StatusTransfer.Running)
                         {
@@ -198,19 +199,19 @@ namespace Core.Transfer
                         #region caculate speed & time left item
                         if (this.GroupData.items[i].status == StatusTransfer.Running)
                         {
-                            long size_transfer = GroupData.items[i].Transfer - GroupData.items[i].OldTransfer;
+                            long size_transfer = GroupData.items[i].SizeWasTransfer - GroupData.items[i].OldTransfer;
                             long time_milisec = CurrentMillis.Millis - GroupData.items[i].Timestamp;
                             if (time_milisec != 0 & time_milisec >= GroupsTransferManager.TimeRefresh)
                             {
                                 //speed
                                 GroupData.items[i].Timestamp = CurrentMillis.Millis;
-                                GroupData.items[i].OldTransfer = GroupData.items[i].Transfer;
+                                GroupData.items[i].OldTransfer = GroupData.items[i].SizeWasTransfer;
                                 decimal speed = (decimal)size_transfer * 1000 / time_milisec;
                                 GroupData.items[i].col[4] = UnitConventer.ConvertSize(speed, 2, UnitConventer.unit_speed);
                                 //time 
                                 if (speed != 0)
                                 {
-                                    long length_left = GroupData.items[i].From.node.Info.Size - GroupData.items[i].Transfer;
+                                    long length_left = GroupData.items[i].From.node.Info.Size - GroupData.items[i].SizeWasTransfer;
                                     long secondleft = decimal.ToInt64(((decimal)length_left / speed));
                                     GroupData.items[i].col[5] = CurrentMillis.GetTimeBySecond((int)secondleft);
                                 }
@@ -277,7 +278,7 @@ namespace Core.Transfer
             {
                 GroupData.items[i].col[2] = GroupData.items[i].status.ToString();
                 if (GroupData.items[i].col[3].IndexOf("100% (") < 0 & GroupData.items[i].From.node.Info.Size != 0)
-                    GroupData.items[i].col[3] = Math.Round((double)GroupData.items[i].Transfer * 100 / GroupData.items[i].From.node.Info.Size, 2).ToString() + "% (" + UnitConventer.ConvertSize(GroupData.items[i].Transfer, 2, UnitConventer.unit_size) + "/" + GroupData.items[i].SizeString + ")";
+                    GroupData.items[i].col[3] = Math.Round((double)GroupData.items[i].SizeWasTransfer * 100 / GroupData.items[i].From.node.Info.Size, 2).ToString() + "% (" + UnitConventer.ConvertSize(GroupData.items[i].SizeWasTransfer, 2, UnitConventer.unit_size) + "/" + GroupData.items[i].SizeString + ")";
                 
                 if (GroupData.items[i].ErrorMsg != GroupData.items[i].col[6]) GroupData.items[i].col[6] = GroupData.items[i].ErrorMsg;
             }
@@ -285,37 +286,35 @@ namespace Core.Transfer
 
         void WorkThread(object obj)
         {
-            int x = (int)obj;
+            TransferItem item = GroupData.items[(int)obj];
             try
             {
 #if DEBUG
-                Console.WriteLine("Transfer items:"+GroupData.items[x].From.node.GetFullPathString());
+                Console.WriteLine("Transfer items:"+item.From.node.GetFullPathString());
 #endif
-                GroupData.items[x].From.stream = AppSetting.ManageCloud.GetFileStream(
-                    GroupData.items[x].From.node,
-                    GroupData.items[x].SavePosTransfer,
-                    GroupData.items[x].From.node.Info.Size - 1,
-                    GroupData.items[x].To.node.GetRoot().RootInfo.Type != CloudType.LocalDisk, GroupData.items[x].dataCryptoMega);
+                item.From.stream = AppSetting.ManageCloud.GetFileStream(
+                    item.From.node,
+                    item.SaveSizeTransferSuccess,
+                    item.From.node.Info.Size - 1,
+                    item.To.node.GetRoot().RootInfo.Type != CloudType.LocalDisk, item.dataCryptoMega);
                 
                 int buffer_length = 32;//default
                 int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.BufferSize), out buffer_length);//get buffer_length from setting
-                GroupData.items[x].buffer = GroupData.items[x].From.node.GetRoot().RootInfo.Type == CloudType.Mega ? new byte[buffer_length * 2048] : new byte[buffer_length * 1024];//create buffer
+                item.buffer = item.From.node.GetRoot().RootInfo.Type == CloudType.Mega ? new byte[buffer_length * 2048] : new byte[buffer_length * 1024];//create buffer
 
-                ExplorerNode rootnodeto = GroupData.items[x].To.node.GetRoot();
+                ExplorerNode rootnodeto = item.To.node.GetRoot();
 
-                GroupData.items[x].byteread = 0;
-                string token = "";
-                if (!string.IsNullOrEmpty(rootnodeto.RootInfo.Email)) token = AppSetting.settings.GetToken(rootnodeto.RootInfo.Email, rootnodeto.RootInfo.Type);
+                item.byteread = 0;
                 //this.group.items[x].UploadID = "";//resume
-                GroupData.items[x].Transfer = GroupData.items[x].OldTransfer = GroupData.items[x].SavePosTransfer;//resume
-                GroupData.items[x].ErrorMsg = "";//clear error
-                GroupData.items[x].Timestamp = CurrentMillis.Millis;
+                item.SizeWasTransfer = item.OldTransfer = item.SaveSizeTransferSuccess;//resume
+                item.ErrorMsg = "";//clear error
+                item.Timestamp = CurrentMillis.Millis;
                 if (GroupData.status != StatusTransfer.Running) return;
                 switch (rootnodeto.RootInfo.Type)
                 {
                     case CloudType.LocalDisk:
                         #region LocalDisk
-                        ItemsTransferWork.Add(new TransferBytes(GroupData.items[x], this));
+                        ItemsTransferWork.Add(new TransferBytes(item, this));
                         return;
                     #endregion
 
@@ -323,49 +322,54 @@ namespace Core.Transfer
                         #region Dropbox
                         int chunksizedb = 25;//default 25Mb
                         int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.Dropbox_ChunksSize), out chunksizedb);
-                        GroupData.items[x].ChunkUploadSize = chunksizedb * 1024 * 1024;
+                        item.ChunkUploadSize = chunksizedb * 1024 * 1024;
 
-                        DropboxRequestAPIv2 client = new DropboxRequestAPIv2(token);
+                        DropboxRequestAPIv2 DropboxClient = Dropbox.GetAPIv2(rootnodeto.RootInfo.Email);
 
-                        if (string.IsNullOrEmpty(GroupData.items[x].UploadID))//create upload id
+                        if (string.IsNullOrEmpty(item.UploadID))//create upload id
                         {
-                            GroupData.items[x].byteread = GroupData.items[x].From.stream.Read(GroupData.items[x].buffer, 0, GroupData.items[x].buffer.Length);
-                            dynamic json = JsonConvert.DeserializeObject(client.upload_session_start(GroupData.items[x].buffer, GroupData.items[x].byteread));
-                            GroupData.items[x].UploadID = json.session_id;
-                            GroupData.items[x].Transfer += GroupData.items[x].byteread;
+                            item.byteread = item.From.stream.Read(item.buffer, 0, item.buffer.Length);
+                            dynamic json = JsonConvert.DeserializeObject(DropboxClient.upload_session_start(item.buffer, item.byteread));
+                            item.UploadID = json.session_id;
+                            item.SizeWasTransfer += item.byteread;
                         }
-                        ItemsTransferWork.Add(new TransferBytes(GroupData.items[x], this, client));
+                        ItemsTransferWork.Add(new TransferBytes(item, this, DropboxClient));
                         return;
                     #endregion
 
                     case CloudType.GoogleDrive:
                         #region GoogleDrive
-                        DriveAPIHttprequestv2 gdclient = new DriveAPIHttprequestv2(JsonConvert.DeserializeObject<TokenGoogleDrive>(token));
-                        gdclient.Email = rootnodeto.RootInfo.Email;
-                        gdclient.TokenRenewEvent += GoogleDrive.Gdclient_TokenRenewEvent;
-
-                        GoogleDrive.CreateFolder(GroupData.items[x].To.node.Parent);
+                        DriveAPIHttprequestv2 gdclient = GoogleDrive.GetAPIv2(rootnodeto.RootInfo.Email);
+                        GoogleDrive.CreateFolder(item.To.node.Parent);
                         int chunksizeGD = 5;//default
                         int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.GD_ChunksSize), out chunksizeGD);
-                        GroupData.items[x].ChunkUploadSize = chunksizeGD * 1024 * 1024;
+                        item.ChunkUploadSize = chunksizeGD * 1024 * 1024;
                         
-                        if (string.IsNullOrEmpty(GroupData.items[x].UploadID))//create upload id
+                        if (string.IsNullOrEmpty(item.UploadID))//create upload id
                         {
-                            string parentid = GroupData.items[x].To.node.Parent.Info.ID;
-                            string mimeType = Get_mimeType.Get_mimeType_From_FileExtension(GroupData.items[x].To.node.GetExtension());
-                            string jsondata = "{\"title\": \"" + GroupData.items[x].From.node.Info.Name + "\", \"mimeType\": \"" + mimeType + "\", \"parents\": [{\"id\": \"" + parentid + "\"}]}";
-                            GroupData.items[x].UploadID = gdclient.Files_insert_resumable_getUploadID(jsondata, mimeType, GroupData.items[x].From.node.Info.Size);
+                            string parentid = item.To.node.Parent.Info.ID;
+                            string mimeType = Get_mimeType.Get_mimeType_From_FileExtension(item.To.node.GetExtension());
+                            string jsondata = "{\"title\": \"" + item.From.node.Info.Name + "\", \"mimeType\": \"" + mimeType + "\", \"parents\": [{\"id\": \"" + parentid + "\"}]}";
+                            item.UploadID = gdclient.Files_insert_resumable_getUploadID(jsondata, mimeType, item.From.node.Info.Size);
                         }
-                        ItemsTransferWork.Add(new TransferBytes(GroupData.items[x], this, gdclient));
+                        ItemsTransferWork.Add(new TransferBytes(item, this, gdclient));
                         return;
                     #endregion
                     case CloudType.Mega:
-
+                        MegaApiClient MegaClient = MegaNz.GetClient(rootnodeto.RootInfo.Email);
+                        item.buffer = new byte[128 * 1024];
+                        if (string.IsNullOrEmpty(item.UploadID))//create upload id
+                        {
+                            MegaNz.AutoCreateFolder(item.To.node.Parent); //auto create folder
+                            item.UploadID = MegaClient.RequestUrlUpload(item.From.node.Info.Size);//Make Upload url
+                        }
+                        item.From.stream = MegaApiClient.MakeEncryptStreamForUpload(item.From.stream, item.From.node.Info.Size,item.dataCryptoMega);//make encrypt stream from file
+                        ItemsTransferWork.Add(new TransferBytes(item, this, MegaClient));
                         return;
                 }
             }
             catch (Exception ex)
-            { GroupData.items[x].ErrorMsg = ex.Message +ex.StackTrace; GroupData.items[x].status = StatusTransfer.Error; return; }
+            { item.ErrorMsg = ex.Message +ex.StackTrace; item.status = StatusTransfer.Error; return; }
         }
     }
 }

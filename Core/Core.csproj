@@ -49,9 +49,6 @@
     <Compile Include="Cloud\GoogleDrive.cs" />
     <Compile Include="Cloud\LocalDisk.cs" />
     <Compile Include="Cloud\MegaNz.cs" />
-    <Compile Include="EncodeDecode\Convert_bytearr_class.cs" />
-    <Compile Include="EncodeDecode\Crypto.cs" />
-    <Compile Include="EncodeDecode\StringToMD5.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -66,6 +63,7 @@
     <Compile Include="StaticClass\ReadWriteData.cs" />
     <Compile Include="StaticClass\Reflection_UI.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="TestClass.cs" />
     <Compile Include="Transfer\GroupsTransferManager.cs" />
     <Compile Include="Transfer\ItemsTransferManager.cs" />
     <Compile Include="Transfer\JsonDataSaveGroup.cs" />
@@ -90,6 +88,10 @@
     <ProjectReference Include="..\Cloud\Cloud.csproj">
       <Project>{0B8A1A7D-0267-48A9-BAD6-DCDE5104D660}</Project>
       <Name>Cloud</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CustomHttpRequest\CustomHttpRequest.csproj">
+      <Project>{1D279A6B-CE8D-4184-B9AB-BC24C6F69045}</Project>
+      <Name>CustomHttpRequest</Name>
     </ProjectReference>
     <ProjectReference Include="..\SupDataDll\SupDataDll.csproj">
       <Project>{700eed73-135e-422d-a06e-738d3ad057a1}</Project>
