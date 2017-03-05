@@ -1,5 +1,7 @@
 ﻿using System.Windows.Forms;
 using SupDataDll;
+using SupDataDll.Class;
+
 namespace FormUI.UI.MainForm
 {
     internal class TreeNode_ : TreeNode

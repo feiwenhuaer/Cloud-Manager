@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using System.Threading;
 using SupDataDll;
 using Etier.IconHelper;
+using SupDataDll.Class;
 
 namespace FormUI.UI.MainForm
 {

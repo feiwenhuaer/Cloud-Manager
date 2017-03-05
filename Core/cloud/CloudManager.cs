@@ -12,6 +12,7 @@ using Cloud.Dropbox;
 using Cloud.MegaNz.Oauth;
 using Cloud.MegaNz;
 using System.Text.RegularExpressions;
+using SupDataDll.Class;
 
 namespace Core.Cloud
 {

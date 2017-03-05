@@ -1,5 +1,6 @@
 ﻿using Core.StaticClass;
 using SupDataDll;
+using SupDataDll.Class;
 using SupDataDll.Crypt;
 using System;
 using System.Collections.Generic;

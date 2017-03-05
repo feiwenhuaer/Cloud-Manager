@@ -12,6 +12,7 @@ using System.Collections.ObjectModel;
 using WpfUI.Class;
 using WpfUI.UI.Main.Lv_item;
 using WpfUI.UI.Main.Lv_ud;
+using SupDataDll.Class;
 
 namespace WpfUI.UI.Main
 {

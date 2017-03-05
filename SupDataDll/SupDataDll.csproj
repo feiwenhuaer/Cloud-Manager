@@ -47,6 +47,8 @@
     <Compile Include="BigInteger.cs" />
     <Compile Include="Class\AnalyzePath.cs" />
     <Compile Include="Class\ClipBoard_.cs" />
+    <Compile Include="Class\DeleteItems.cs" />
+    <Compile Include="Class\ExplorerListItem.cs" />
     <Compile Include="Class\Extensions.cs" />
     <Compile Include="Class\IconListManager\IconHelper.cs" />
     <Compile Include="Class\IconListManager\IconListManager.cs" />
@@ -55,14 +57,14 @@
     <Compile Include="Class\Mega\DataCryptoMega.cs" />
     <Compile Include="Class\Mega\INodeCrypto.cs" />
     <Compile Include="Class\Reflection_EventToCore.cs" />
+    <Compile Include="Class\Transfer.cs" />
     <Compile Include="Class\UI_n_lang.cs" />
     <Compile Include="Class\UnitConventer.cs" />
     <Compile Include="Crypt\Crypto.cs" />
     <Compile Include="Crypt\Md5.cs" />
     <Compile Include="CustomException.cs" />
-    <Compile Include="DataClass.cs" />
     <Compile Include="Enum.cs" />
-    <Compile Include="ExplorerNode.cs" />
+    <Compile Include="Class\ExplorerNode.cs" />
     <Compile Include="ListBitmapImageResource.cs" />
     <Compile Include="PCPath.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

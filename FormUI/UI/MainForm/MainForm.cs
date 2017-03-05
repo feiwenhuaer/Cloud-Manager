@@ -10,6 +10,7 @@ using System.Threading;
 using SupDataDll.UiInheritance;
 using FormUI.UI.SettingForm;
 using FormUI.UI.Oauth;
+using SupDataDll.Class;
 
 namespace FormUI.UI.MainForm
 {

@@ -1,4 +1,4 @@
-﻿using System.Windows.Forms;
+﻿using SupDataDll.Class;
 
 namespace SupDataDll.UiInheritance
 {

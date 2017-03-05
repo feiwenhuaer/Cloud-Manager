@@ -5,7 +5,7 @@ using System.Text;
 using Newtonsoft.Json;
 using SupDataDll.Class.Mega;
 
-namespace SupDataDll
+namespace SupDataDll.Class
 {
    public class ManagerExplorerNodes
     {

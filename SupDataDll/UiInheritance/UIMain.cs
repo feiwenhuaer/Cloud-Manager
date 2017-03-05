@@ -1,4 +1,6 @@
-﻿namespace SupDataDll.UiInheritance
+﻿using SupDataDll.Class;
+
+namespace SupDataDll.UiInheritance
 {
     public interface UIMain
     {

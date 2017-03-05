@@ -1,5 +1,4 @@
-﻿using SupDataDll;
-using System.Collections.Generic;
+﻿using SupDataDll.Class;
 
 namespace Core.Transfer
 {

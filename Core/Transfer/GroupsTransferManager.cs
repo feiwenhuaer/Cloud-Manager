@@ -1,6 +1,7 @@
 ﻿using Core.StaticClass;
 using Newtonsoft.Json;
 using SupDataDll;
+using SupDataDll.Class;
 using System;
 using System.Collections.Generic;
 using System.Security.Permissions;

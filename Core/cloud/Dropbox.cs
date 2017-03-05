@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Web;
 using System.Threading;
+using SupDataDll.Class;
 
 namespace Core.Cloud
 {

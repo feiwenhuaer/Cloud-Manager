@@ -55,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class\ContextMenuDataModel.cs" />
+    <Compile Include="Class\TransferDataTLVWPF.cs" />
     <Compile Include="Class\TreeviewDataItem.cs" />
     <Compile Include="Class\TreeViewDataModel.cs" />
     <Compile Include="Class\TreeViewLineConverter.cs" />

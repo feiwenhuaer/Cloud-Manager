@@ -3,13 +3,11 @@ using SupDataDll;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Newtonsoft.Json;
-using Core.StaticClass;
-using System.Threading;
 using System.IO;
 using CustomHttpRequest;
 using SupDataDll.Class.Mega;
+using SupDataDll.Class;
 
 namespace Core.Cloud
 {

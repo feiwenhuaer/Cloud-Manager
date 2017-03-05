@@ -1,7 +1,5 @@
-﻿using System;
+﻿using SupDataDll.Class;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SupDataDll
 {

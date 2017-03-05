@@ -4,6 +4,7 @@ using Cloud.MegaNz;
 using Core.Cloud;
 using Newtonsoft.Json;
 using SupDataDll;
+using SupDataDll.Class;
 using SupDataDll.Class.Mega;
 using SupDataDll.Crypt;
 using System;

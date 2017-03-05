@@ -1,8 +1,4 @@
-﻿using SupDataDll;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using SupDataDll.Class;
 using System.Windows.Media;
 
 namespace WpfUI.UI.Main.Lv_item
