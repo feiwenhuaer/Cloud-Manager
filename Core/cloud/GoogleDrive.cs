@@ -43,7 +43,9 @@ namespace Core.Cloud
             Regex rg;
             Match match;
             if (string.IsNullOrEmpty(Email)) { Email = AppSetting.settings.GetDefaultCloud(CloudType.GoogleDrive); uri = true; }
-            if (uri)//folder
+
+            //Find id folder
+            if (uri)//folder url
             {
                 if (root.RootInfo.uri != null)
                 {
@@ -59,16 +61,29 @@ namespace Core.Cloud
                     }
                 }
             }
-            else
+            else//explorer node
             {
                 parent_ID = "root";//root
                 if (!string.IsNullOrEmpty(node.Info.ID)) parent_ID = node.Info.ID;//id root or id node
             }
 
+            //if found id is folder
             if (!string.IsNullOrEmpty(parent_ID))
             {
                 GD_Files_list list_ = Search("'" + parent_ID + "' in parents and trashed=false", Email);
-                if (parent_ID == "root") node.Info.ID = list_.id;
+                if (parent_ID == "root")//save root id
+                {
+                    foreach(GD_item item in list_.items)
+                    {
+                        foreach(GD_parent parent in item.parents)
+                        {
+                            if (parent.isRoot) { parent_ID = parent.id; break; }
+                        }
+                        if (parent_ID != "root") break;
+                    }
+                    node.Info.ID = parent_ID;
+                    AppSetting.settings.SetRootID(Email, CloudType.GoogleDrive, parent_ID);
+                }
                 node.RenewChilds(list_.Convert(node));
                 return node;
             }

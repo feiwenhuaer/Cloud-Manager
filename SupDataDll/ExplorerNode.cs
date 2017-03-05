@@ -72,12 +72,27 @@ namespace SupDataDll
         public ExplorerNode Parent
         {
             get { return parent; }
-            set { parent = value; value.child.Add(this); }
+            set
+            {
+                if (rootinfo != null) throw new Exception("Root can't be got parent.");
+                else { parent = value; value.child.Add(this); }
+            }
         }
         [JsonIgnore]
         public NodeInfo Info { get { return info ?? (info = new NodeInfo()); } set { info = value; } }
         [JsonIgnore]
-        public RootNode RootInfo { get { return rootinfo ?? (rootinfo = new RootNode()); } set { rootinfo = value; } }
+        public RootNode RootInfo
+        {
+            get
+            {
+                return rootinfo ?? (rootinfo = new RootNode());
+            }
+            set
+            {
+                if (parent != null) throw new Exception("Root can't be got parent.");
+                else rootinfo = value;
+            }
+        }
         
 
         [JsonProperty]
@@ -327,8 +342,11 @@ namespace SupDataDll
         }
     }
 
-    public class RootNode: CloudEmail_Type
+    public class RootNode
     {
+        public string Email { get; set; }
+        CloudType type = CloudType.Folder;
+        public CloudType Type { get { return type; } set { type = value; } }
         public Uri uri { get; set; }
     }
 
@@ -336,11 +354,5 @@ namespace SupDataDll
     {
         Owner = 0,
         Read,Write
-    }
-    public class CloudEmail_Type
-    {
-        public string Email { get; set; }
-        CloudType type = CloudType.Folder;
-        public CloudType Type { get { return type; } set { type = value; } }
     }
 }

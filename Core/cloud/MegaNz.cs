@@ -31,14 +31,13 @@ namespace Core.Cloud
 
             if (root == node)
             {
-                string ID = AppSetting.settings.GetRootID(root.RootInfo.Email, CloudType.Mega);
+                string ID = node.Info.ID;
                 INode n = null;
                 if (!string.IsNullOrEmpty(ID)) n = new MegaNzNode(ID);
-                if (n == null)
+                else
                 {
                     n = GetRoot(root.RootInfo.Email, NodeType.Root);
                     AppSetting.settings.SetRootID(root.RootInfo.Email, CloudType.Mega, n.Id);
-                    AppSetting.settings.SaveSettings();
                 }
                 GetItems(client, n, node);
             }

@@ -31,10 +31,10 @@ namespace FormUI.UI.MainForm
             if (InvokeRequired) Invoke(new Action(() => splitContainer1.Panel2.Controls.Add(LV_Ud_control)));
             else splitContainer1.Panel2.Controls.Add(LV_Ud_control);
         }
-        public void AddNewCloudToTV(string email,CloudType type)
+        public void AddNewCloudToTV(ExplorerNode newnode)
         {
-            if (InvokeRequired) Invoke(new Action(() => AddNewCloudToTV_(email, type)));
-            else AddNewCloudToTV_(email, type);
+            if (InvokeRequired) Invoke(new Action(() => AddNewCloudToTV_(newnode)));
+            else AddNewCloudToTV_(newnode);
         }
         public void ShowDialog_()
         {
@@ -58,9 +58,9 @@ namespace FormUI.UI.MainForm
         }
         #endregion
 
-        void AddNewCloudToTV_(string email, CloudType type)
+        void AddNewCloudToTV_(ExplorerNode newnode)
         {
-            TV_item.Nodes.Add(new TreeNode_(email, (int)type));
+            TV_item.Nodes.Add(new TreeNode_(newnode));
         }
 
         Icon icon_folder;
@@ -82,8 +82,8 @@ namespace FormUI.UI.MainForm
             foreach (var drive in DriveInfo.GetDrives())
                 TV_item.Nodes.Add(new TreeNode_(drive.RootDirectory.ToString().Replace("\\", null), 0));
 
-            foreach (CloudEmail_Type cloud in Setting_UI.reflection_eventtocore._GetListAccountCloud())
-                TV_item.Nodes.Add(new TreeNode_(cloud.Email, (int)cloud.Type));
+            foreach (ExplorerNode cloud in Setting_UI.reflection_eventtocore._GetListAccountCloud())
+                TV_item.Nodes.Add(new TreeNode_(cloud));
             TV_item.EndUpdate();
 
             this.Activate();
@@ -533,9 +533,9 @@ namespace FormUI.UI.MainForm
         private void cloudToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
         {
             removeToolStripMenuItem.DropDownItems.Clear();
-            foreach (CloudEmail_Type cloud in Setting_UI.reflection_eventtocore._GetListAccountCloud())
+            foreach (ExplorerNode cloud in Setting_UI.reflection_eventtocore._GetListAccountCloud())
             {
-                ToolStripMenuItem item = new ToolStripMenuItem(cloud.Type.ToString()+":"+ cloud.Email);
+                ToolStripMenuItem item = new ToolStripMenuItem(cloud.RootInfo.Type.ToString()+":"+ cloud.RootInfo.Email);
                 item.Click += RemoveCloudItem_Click;
                 removeToolStripMenuItem.DropDownItems.Add(item);
             }

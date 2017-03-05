@@ -51,7 +51,7 @@ namespace Core.Cloud
             {
                 if (!info.Exists) throw new FileNotFoundException("File not found",path);
                 if (info.Length == 0) throw new Exception("File size = 0");
-                fs = new FileStream(path, FileMode.Open, FileAccess.Read);
+                fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
                 fs.Seek(Startpos, SeekOrigin.Begin);
                 return fs;
             }

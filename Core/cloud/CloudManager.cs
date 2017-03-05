@@ -141,7 +141,7 @@ namespace Core.Cloud
         }
         private void SaveToken(string email, string token, CloudType type)
         {
-            if(AppSetting.settings.AddCloud(email, type, token, false)) AppSetting.UIMain.AddNewCloudToTV(email, type);
+            if (AppSetting.settings.AddCloud(email, type, token, false)) AppSetting.UIMain.AddNewCloudToTV(new ExplorerNode(new RootNode() { Email = email, Type = type }));
         }
         #endregion
 

@@ -117,16 +117,31 @@ namespace Core
 
 
         #region Cloud
-        public List<CloudEmail_Type> GetListAccountCloud()
+        public List<ExplorerNode> GetListAccountCloud()
         {
-            List<CloudEmail_Type> list = new List<CloudEmail_Type>();
+            List<ExplorerNode> list = new List<ExplorerNode>();
             foreach (XmlNode node in GetCloudDataList())
             {
-                list.Add(new CloudEmail_Type()
+                RootNode root = new RootNode();
+                root.Email = node.Attributes["Email"].Value;
+                root.Type = (CloudType)Enum.Parse(typeof(CloudType), node.Attributes["CloudName"].Value);
+
+                NodeInfo info = new NodeInfo();
+                try
                 {
-                    Email = node.Attributes["Email"].Value,
-                    Type = (CloudType)Enum.Parse(typeof(CloudType), node.Attributes["CloudName"].Value)
-                });
+                    info.ID = node.Attributes["RootID"].Value;
+                }
+                catch
+                {
+#if DEBUG
+                    Console.WriteLine("{Settings} Can't Get RootID [" + root.Type.ToString() + ":" + root.Email + "]");
+#endif
+                }
+                
+                ExplorerNode e_node = new ExplorerNode();
+                e_node.RootInfo = root;
+                e_node.Info = info;
+                list.Add(e_node);
             }
             return list;
         }
@@ -163,26 +178,7 @@ namespace Core
             return token;
 
         }
-
-        internal string GetRootID(string Email, CloudType cloudname)
-        {
-            XmlNode node = GetCloud(Email, cloudname);
-            if (node == null) return null;
-#if DEBUG
-            try
-            {
-                return node.Attributes["RootID"].Value;
-            }
-            catch
-            {
-                CreateNewAttribute(node, "RootID", "");
-                return null;
-            }
-#else
-            return node.Attributes["RootID"].Value;
-#endif
-        }
-
+        
         public string GetDefaultCloud(CloudType cloudname)
         {
             foreach (XmlNode node in GetCloudDataList())
@@ -280,7 +276,6 @@ namespace Core
             if (string.IsNullOrEmpty(RootID)) return;
             XmlNode node = GetCloud(Email, cloudname);
             if (node == null) throw new Exception("Cloud not found");
-#if DEBUG
             try
             {
                 node.Attributes["RootID"].Value = RootID;
@@ -289,9 +284,10 @@ namespace Core
             {
                 CreateNewAttribute(node, "RootID", RootID);
             }
-#else
-            node.Attributes["RootID"].Value = RootID;
+#if DEBUG
+            Console.WriteLine("{Settings} Save RootID [" + cloudname.ToString() + ":" + Email + "] : " + RootID);
 #endif
+            SaveSettings();
         }
         #endregion
     }

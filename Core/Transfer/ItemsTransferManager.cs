@@ -347,6 +347,7 @@ namespace Core.Transfer
 
                         if (string.IsNullOrEmpty(item.UploadID))//create upload id
                         {
+                            if (string.IsNullOrEmpty(item.To.node.Parent.Info.ID)) throw new Exception("Can't get root id.");
                             string parentid = item.To.node.Parent.Info.ID;
                             string mimeType = Get_mimeType.Get_mimeType_From_FileExtension(item.To.node.GetExtension());
                             string jsondata = "{\"title\": \"" + item.From.node.Info.Name + "\", \"mimeType\": \"" + mimeType + "\", \"parents\": [{\"id\": \"" + parentid + "\"}]}";

@@ -28,10 +28,9 @@ namespace WpfUI.UI.Main
                 return Setting_UI.ReloadUI_Flag;
             }
         }
-        public void AddNewCloudToTV(string email, CloudType type)
+        public void AddNewCloudToTV(ExplorerNode newnode)
         {
-            ExplorerNode n = new ExplorerNode(new RootNode() { Email = email, Type = type });
-            Dispatcher.Invoke(new Action(() => TreeObservableCollection.Add(new TreeViewDataModel(null) { DisplayData = new TreeviewDataItem(n) })));
+            Dispatcher.Invoke(new Action(() => TreeObservableCollection.Add(new TreeViewDataModel(null) { DisplayData = new TreeviewDataItem(newnode) })));
         }
 
         public void FileSaveDialog(string InitialDirectory, string FileName, string Filter, ExplorerNode node)
@@ -107,10 +106,9 @@ namespace WpfUI.UI.Main
         }
         private void TV_LoadCloud()
         {
-            foreach (CloudEmail_Type cloud in Setting_UI.reflection_eventtocore._GetListAccountCloud())
+            foreach (ExplorerNode cloud in Setting_UI.reflection_eventtocore._GetListAccountCloud())
             {
-                ExplorerNode n = new ExplorerNode(new RootNode() { Email = cloud.Email, Type = cloud.Type });
-                TreeObservableCollection.Add(new TreeViewDataModel() { DisplayData = new TreeviewDataItem(n) });
+                TreeObservableCollection.Add(new TreeViewDataModel() { DisplayData = new TreeviewDataItem(cloud) });
             }
                 
         }
@@ -424,9 +422,9 @@ namespace WpfUI.UI.Main
         private void MenuCloud_SubmenuOpened(object sender, RoutedEventArgs e)
         {
             CloudsRemove = new ObservableCollection<ContextMenuDataModel>();
-            foreach (CloudEmail_Type cloud in Setting_UI.reflection_eventtocore._GetListAccountCloud())
+            foreach (ExplorerNode cloud in Setting_UI.reflection_eventtocore._GetListAccountCloud())
             {
-                CloudsRemove.Add(new ContextMenuDataModel(cloud.Email, cloud.Type));
+                CloudsRemove.Add(new ContextMenuDataModel(cloud.RootInfo.Email, cloud.RootInfo.Type));
             }
             Cloud_remove.ItemsSource = CloudsRemove;
         }

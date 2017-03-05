@@ -130,7 +130,7 @@ namespace SupDataDll
         }
         List<ExplorerNode> items = new List<ExplorerNode>();
 
-        public List<ExplorerNode> Items { get; set; }
+        public List<ExplorerNode> Items { get { return items; } set { items = value; } }
         public bool PernamentDelete = false;
     }
 }

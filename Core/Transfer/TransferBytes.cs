@@ -198,7 +198,6 @@ namespace Core.Transfer
 
         bool SaveUploadDropbox()
         {
-            //create folder if not found
             Dropbox.AutoCreateFolder(item.To.node.Parent);
             dynamic json_ = JsonConvert.DeserializeObject(((DropboxRequestAPIv2)clientTo).upload_session_finish(null, item.UploadID, item.SizeWasTransfer, item.To.node.GetFullPathString(false,true), DropboxUploadMode.add));
             long size = json_.size;
