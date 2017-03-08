@@ -18,15 +18,6 @@ namespace Core.StaticClass
             return myLibrary.GetExportedTypes();
         }
 
-        public static Type GetTypeClassName(string name)
-        {
-            foreach (Type t in GetExportedTypes())
-            {
-                if (t.Name == name) return t;
-            }
-            return null;
-        }
-
         public static Type GetTypeInterface(Type TypeInterface)
         {
             foreach(Type type in GetExportedTypes())

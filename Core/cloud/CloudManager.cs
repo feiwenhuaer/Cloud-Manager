@@ -13,6 +13,7 @@ using Cloud.MegaNz.Oauth;
 using Cloud.MegaNz;
 using System.Text.RegularExpressions;
 using SupDataDll.Class;
+using System.Collections.Generic;
 
 namespace Core.Cloud
 {
@@ -22,8 +23,17 @@ namespace Core.Cloud
         Rg_url_idFolderOpen = "(?<=\\?id\\=)[A-Za-z0-9-_]+",
         Rg_url_idFile = "(?<=file\\/d\\/)[A-Za-z0-9-_]+";
 
+        const string require_main = "Require main thread for create and show UI.";
+        const string require_child = "This is long task, use main thread will make UI not responding.";
+        public static void CheckThread(bool isMain)
+        {
+            if ((Thread.CurrentThread == AppSetting.MainThread) != isMain) throw new Exception(isMain ? require_main : require_child);
+        }
+
+
         public ExplorerNode GetItemsList(ExplorerNode node)
         {
+            CheckThread(false);
             switch (node.GetRoot().RootInfo.Type)
             {
                 case CloudType.Dropbox:
@@ -39,7 +49,7 @@ namespace Core.Cloud
             }
         }
 
-        public Stream GetFileStream(ExplorerNode node, long Startpos = -1,long endpos =-1,bool IsUpload = false,object DataEx = null)
+        internal Stream GetFileStream(ExplorerNode node, long Startpos = -1,long endpos =-1,bool IsUpload = false,object DataEx = null)
         {
             switch (node.GetRoot().RootInfo.Type)
             {
@@ -56,17 +66,23 @@ namespace Core.Cloud
             }
         }
 
-        public string CreateFolder(ExplorerNode node)
+        public void CreateFolder(ExplorerNode node)
         {
+            CheckThread(false);
             switch (node.GetRoot().RootInfo.Type)
             {
                 case CloudType.Dropbox:
-                    return Dropbox.CreateFolder(node);
+                    Dropbox.CreateFolder(node);
+                    break;
                 case CloudType.GoogleDrive:
-                    return GoogleDrive.CreateFolder(node);
+                    GoogleDrive.CreateFolder(node);
+                    break;
                 case CloudType.LocalDisk:
-                    return LocalDisk.CreateFolder(node);
+                    LocalDisk.CreateFolder(node);
+                    break;
                 case CloudType.Mega:
+                    MegaNz.CreateFolder(node);
+                    break;
                 default:
                     throw new UnknowCloudNameException("Error Unknow Cloud Type: " + node.GetRoot().RootInfo.Type.ToString());
             }
@@ -75,6 +91,7 @@ namespace Core.Cloud
         #region Oauth
         public void Oauth(CloudType type)
         {
+            CheckThread(true);
             Type type_oauthUI;
             switch (type)
             {
@@ -87,6 +104,8 @@ namespace Core.Cloud
 
                     oauth_dropbox.GetCode(AppSetting.UIOauth, AppSetting.UIMain);
                     break;
+
+
                 case CloudType.GoogleDrive:
                     string[] scope = new string[] { Scope.Drive, Scope.DriveFile, Scope.DriveMetadata };
                     GoogleAPIOauth2 oauth_gd = new GoogleAPIOauth2(scope);
@@ -97,6 +116,8 @@ namespace Core.Cloud
 
                     oauth_gd.GetCode(AppSetting.UIOauth, AppSetting.UIMain);
                     break;
+
+
                 case CloudType.Mega:
                     type_oauthUI = LoadDllUI.GetTypeInterface(typeof(UIinterfaceMegaNz));
                     UIinterfaceMegaNz mega = (UIinterfaceMegaNz)Activator.CreateInstance(type_oauthUI);
@@ -112,10 +133,12 @@ namespace Core.Cloud
                         {
                             client.Login(oauthinfo);
                         }
-                        catch (Exception ex) { error = true; goto reoauthMega; }
+                        catch (Exception) { error = true; goto reoauthMega; }
                         SaveToken(mega.Email, JsonConvert.SerializeObject(oauthinfo), CloudType.Mega);
                     }
                     break;
+
+
                 default: throw new Exception("Not support");
             }
         }
@@ -145,9 +168,10 @@ namespace Core.Cloud
             if (AppSetting.settings.AddCloud(email, type, token, false)) AppSetting.UIMain.AddNewCloudToTV(new ExplorerNode(new RootNode() { Email = email, Type = type }));
         }
         #endregion
-
+        
         public bool MoveItem(ExplorerNode node, ExplorerNode newparent, string newname = null, bool Copy = false)
         {
+            CheckThread(false);
             if (node.GetRoot() == newparent.GetRoot())
             {
                 bool flag = false;
@@ -169,82 +193,97 @@ namespace Core.Cloud
             else throw new Exception("Root not match.");
         }
 
-        public void Delete(object items_)
+        //long task (need thread)
+        public void Delete(DeleteItems items)
         {
-            DeleteItems items = items_ as DeleteItems;
+            CheckThread(true);
             Type type_deleteform = LoadDllUI.GetTypeInterface(typeof(SupDataDll.UiInheritance.UIDelete));
-            SupDataDll.UiInheritance.UIDelete deleteform = (SupDataDll.UiInheritance.UIDelete)Activator.CreateInstance(type_deleteform);
-            CancelDelete cd = new CancelDelete();
-            deleteform.EventCancel += cd.Deleteform_EventCancelDelegate;
-            deleteform.EventClosing += cd.Deleteform_EventCloseForm;
-            Thread thr = new Thread(deleteform.ShowDialog_);
-            thr.Start();
-            Thread.Sleep(500);
-            foreach (ExplorerNode item in items.Items)
-            {
-                while (cd.cancel) { Thread.Sleep(100); if (cd.closedform) return; }
-                if (cd.closedform) return;
-                bool Iserror = false;
-                deleteform.UpdateText(AppSetting.lang.GetText(LanguageKey.DeleteForm_updatetext_Deleting.ToString()) + item);
-                try
-                {
-                    switch (item.GetRoot().RootInfo.Type)
-                    {
-                        case CloudType.Dropbox:
-                            if (!Dropbox.Delete(item, items.PernamentDelete)) Iserror = true;
-                            break;
-                        case CloudType.GoogleDrive:
-                            if (!GoogleDrive.File_trash(item, items.PernamentDelete)) Iserror = true;
-                            break;
-                        case CloudType.LocalDisk:
-                            if (!LocalDisk.Delete(item, items.PernamentDelete)) Iserror = true;
-                            break;
-                        case CloudType.Mega:
-                        default: throw new UnknowCloudNameException("Error Unknow Cloud Type: " + item.GetRoot().RootInfo.Type.ToString());
-                    }
-                    if (!Iserror) deleteform.UpdateText(AppSetting.lang.GetText(LanguageKey.DeleteForm_updatetext_Deleted.ToString()) + "\r\n");
-                    else
-                    {
-                        deleteform.UpdateText(AppSetting.lang.GetText(LanguageKey.DeleteForm_updatetext_Error.ToString()) + "\r\n");
-                        if (deleteform.AutoClose)
-                        {
-                            deleteform.SetAutoClose(false);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    deleteform.UpdateText(AppSetting.lang.GetText(LanguageKey.DeleteForm_updatetext_Error.ToString()) + "\r\nMessage:" + ex.Message + "\r\n");
-                    if (deleteform.AutoClose)
-                    {
-                        deleteform.SetAutoClose(false);
-                    }
-                }
-            }
-            if (deleteform.AutoClose) deleteform.Close_();
-            else
-            {
-                deleteform.SetTextButtonCancel(AppSetting.lang.GetText(LanguageKey.BT_close.ToString()));
-                while (!deleteform.AutoClose)
-                {
-                    Thread.Sleep(100);
-                    if (cd.cancel)
-                    {
-                        deleteform.Close_();
-                    }
-                }
-            }
+            DeleteWork dw = new DeleteWork(items.Items, AppSetting.UIMain.CreateUI<SupDataDll.UiInheritance.UIDelete>(type_deleteform), items.PernamentDelete);
+            dw.Start();
         }
 
-        class CancelDelete
+        public class DeleteWork
         {
+            List<ExplorerNode> items;
+            SupDataDll.UiInheritance.UIDelete ui;
+            bool PernamentDelete = false;
+            public DeleteWork(List<ExplorerNode> items, SupDataDll.UiInheritance.UIDelete ui, bool PernamentDelete = false)
+            {
+                if (ui == null) throw new Exception("UI is null.");
+                if (items == null || items.Count == 0) throw new Exception("Need >= 1 item.");
+                this.items = items;
+                this.ui = ui;
+                this.PernamentDelete = PernamentDelete;
+                this.ui.EventCancel += Deleteform_EventCancelDelegate;
+                this.ui.EventClosing += Deleteform_EventCloseForm;
+            }
+
+            public void Start()
+            {
+                Thread thr = new Thread(work);
+                ui.Show_();
+                thr.Start();
+            }
+
+            void work()
+            {
+                Thread.Sleep(500);
+                foreach (ExplorerNode item in items)
+                {
+                    while (cancel) { Thread.Sleep(100); if (closedform) return; }
+                    if (closedform) return;
+                    bool Iserror = false;
+                    ui.UpdateText(AppSetting.lang.GetText(LanguageKey.DeleteForm_updatetext_Deleting.ToString()) + item);
+                    try
+                    {
+                        switch (item.GetRoot().RootInfo.Type)
+                        {
+                            case CloudType.Dropbox:
+                                if (!Dropbox.Delete(item, PernamentDelete)) Iserror = true;
+                                break;
+                            case CloudType.GoogleDrive:
+                                if (!GoogleDrive.File_trash(item, PernamentDelete)) Iserror = true;
+                                break;
+                            case CloudType.LocalDisk:
+                                if (!LocalDisk.Delete(item, PernamentDelete)) Iserror = true;
+                                break;
+                            case CloudType.Mega:
+                            default: throw new UnknowCloudNameException("Error Unknow Cloud Type: " + item.GetRoot().RootInfo.Type.ToString());
+                        }
+                        if (!Iserror) ui.UpdateText(AppSetting.lang.GetText(LanguageKey.DeleteForm_updatetext_Deleted.ToString()) + "\r\n");
+                        else
+                        {
+                            ui.UpdateText(AppSetting.lang.GetText(LanguageKey.DeleteForm_updatetext_Error.ToString()) + "\r\n");
+                            if (ui.AutoClose)
+                            {
+                                ui.SetAutoClose(false);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ui.UpdateText(AppSetting.lang.GetText(LanguageKey.DeleteForm_updatetext_Error.ToString()) + "\r\nMessage:" + ex.Message + "\r\n");
+                        if (ui.AutoClose) ui.SetAutoClose(false);
+                    }
+                }
+                if (ui.AutoClose) ui.Close_();
+                else
+                {
+                    ui.SetTextButtonCancel(AppSetting.lang.GetText(LanguageKey.BT_close.ToString()));
+                    while (!ui.AutoClose)
+                    {
+                        Thread.Sleep(100);
+                        if (cancel) ui.Close_();
+                    }
+                }
+            }
+            
             public bool cancel = false;
             public bool closedform = false;
             public void Deleteform_EventCancelDelegate()
             {
                 cancel = !cancel;
             }
-
             public void Deleteform_EventCloseForm()
             {
                 closedform = !closedform;

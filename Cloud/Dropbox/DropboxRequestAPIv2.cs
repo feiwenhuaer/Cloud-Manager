@@ -510,7 +510,7 @@ namespace Cloud.Dropbox
 
         public string GetResponse_upload_session_append()
         {
-            return custom_request.GetTextDataResponse(false, false);
+            return custom_request.GetTextDataResponse(false, true);
         }
 
         public string upload_session_append(byte[] buffer, string session_id, long offset, int buffer_length = -1, int timeout = 2147483647)// can't multi
@@ -587,15 +587,7 @@ namespace Cloud.Dropbox
 
         public string upload_session_finish(byte[] buffer, string session_id, long offset, string path, DropboxUploadMode mode, int buffer_length = -1, bool autorename = true, bool mute = false, int timeout = 2147483647)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://content.dropboxapi.com/2/files/upload_session/finish");
-            request.Method = "POST";
-            request.Timeout = timeout;
-            request.ContentType = "application/octet-stream";
-            //request.TransferEncoding = "";
-
-            WebHeaderCollection myWebHeaderCollection = request.Headers;
-            myWebHeaderCollection.Add("Authorization", "Bearer " + access_token);
-
+            #region json api
             BuildJson cursor = new BuildJson();
             cursor.AddChildStringNodes("session_id", session_id);
             cursor.AddChildNodes("offset", offset.ToString());
@@ -609,25 +601,47 @@ namespace Cloud.Dropbox
             BuildJson apiarg = new BuildJson();
             apiarg.AddChildNodes("cursor", cursor.GetJson);
             apiarg.AddChildNodes("commit", commit.GetJson);
-
-            myWebHeaderCollection.Add("Dropbox-API-Arg", apiarg.GetJson);
-            request.ContentLength = 0;
-            if (buffer != null)
+            #endregion
+            
+            Uri uri = "https://content.dropboxapi.com/2/files/upload_session/finish".BuildUri();
+            HttpRequest_ request = new HttpRequest_("https://content.dropboxapi.com/2/files/upload_session/finish".BuildUri(), "POST");
+            request.AddHeader("HOST", uri.Host);
+            request.AddHeader("Content-Type", "application/octet-stream");
+            request.AddHeader("Authorization", "Bearer " + access_token);
+            request.AddHeader("Dropbox-API-Arg", apiarg.GetJson);
+            if (buffer == null) request.AddHeader("Content-Length","0");
+            else
             {
-                request.ContentLength = buffer_length == -1 ? buffer.Length : buffer_length;
-                using (Stream dataStream = request.GetRequestStream())
-                {
-                    dataStream.Write(buffer, 0, buffer_length == -1 ? buffer.Length : buffer_length);
-                }
+                int length = buffer_length == -1 ? buffer.Length : buffer_length;
+                request.AddHeader("Content-Length", length.ToString());
+                request.SendHeader_And_GetStream().Write(buffer, 0, length);
             }
+            return request.GetTextDataResponse(true, true);
 
-            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
-            Stream stream = response.GetResponseStream();
-            StreamReader sr = new StreamReader(stream);
-            string result = sr.ReadToEnd();
-            sr.Close();
-            stream.Close();
-            return result;
+            //HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://content.dropboxapi.com/2/files/upload_session/finish");
+            //request.Method = "POST";
+            //request.Timeout = timeout;
+            //request.ContentType = "application/octet-stream";
+            ////request.TransferEncoding = "";
+            //WebHeaderCollection myWebHeaderCollection = request.Headers;
+            //myWebHeaderCollection.Add("Authorization", "Bearer " + access_token);
+            //myWebHeaderCollection.Add("Dropbox-API-Arg", apiarg.GetJson);
+            //request.ContentLength = 0;
+            //if (buffer != null)
+            //{
+            //    request.ContentLength = buffer_length == -1 ? buffer.Length : buffer_length;
+            //    using (Stream dataStream = request.GetRequestStream())
+            //    {
+            //        dataStream.Write(buffer, 0, buffer_length == -1 ? buffer.Length : buffer_length);
+            //    }
+            //}
+            //HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+            //Stream stream = response.GetResponseStream();
+            //StreamReader sr = new StreamReader(stream);
+            //string result = sr.ReadToEnd();
+            //sr.Close();
+            //stream.Close();
+            //return result;
         }
 
         public string upload_session_finish_batch(string[] session_id, long[] offset, string[] path, DropboxUploadMode[] mode, Boolean autorename = true, Boolean mute = false, int timeout = 2147483647)

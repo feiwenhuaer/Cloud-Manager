@@ -40,13 +40,12 @@ namespace Core.Cloud
             return client.Download(node.GetFullPathString(false), Startpos, endpos);
         }
         
-        public static string CreateFolder(ExplorerNode node)
+        public static void CreateFolder(ExplorerNode node)
         {
             if (node == node.GetRoot()) throw new Exception("Node is root.");
             DropboxRequestAPIv2 client = GetAPIv2(node.GetRoot().RootInfo.Email);
-            dynamic json = JsonConvert.DeserializeObject(client.create_folder(node.GetFullPathString(false)));
-            string path_display = json.path_display;
-            return path_display;
+            entrie json = JsonConvert.DeserializeObject<entrie>(client.create_folder(node.GetFullPathString(false)));
+            node.Info.ID = json.id;
         }
 
         public static bool Delete(ExplorerNode node, bool PernamentDelete)
@@ -105,7 +104,7 @@ namespace Core.Cloud
         }
         #endregion
 
-        #region Private Method
+        #region Private
         internal static DropboxRequestAPIv2 GetAPIv2(string Email)
         {
             return new DropboxRequestAPIv2(AppSetting.settings.GetToken(Email, CloudType.Dropbox));

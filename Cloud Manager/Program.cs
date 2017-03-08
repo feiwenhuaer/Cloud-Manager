@@ -20,6 +20,7 @@ namespace Cloud_Manager
         {
             if (mutex.WaitOne(TimeSpan.Zero, true))
             {
+                AppSetting.MainThread = System.Threading.Thread.CurrentThread;
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 #if DEBUG

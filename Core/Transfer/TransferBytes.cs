@@ -60,10 +60,11 @@ namespace Core.Transfer
                 #region transfer done/force stop.
                 if (item.SizeWasTransfer == item.From.node.Info.Size || item.status != StatusTransfer.Running || GroupManager.GroupData.status != StatusTransfer.Running)//transfer done/force stop.
                 {
-                    if (item.ChunkUploadSize < 0 || item.SizeWasTransfer == item.From.node.Info.Size)//save last pos if download or done
+                    if (item.ChunkUploadSize < 0 || item.SizeWasTransfer == item.From.node.Info.Size)//save last pos if download or done (up/down)
                     {
                         if (root_from == CloudType.Mega) SaveEncryptDataDownloadMega();//download done from mega
                         if (root_to == CloudType.Mega) SaveUploadMega();//upload done to mega
+                        if(root_to == CloudType.Dropbox) ((DropboxRequestAPIv2)clientTo).GetResponse_upload_session_append();//get data return from server
                         item.SaveSizeTransferSuccess = item.SizeWasTransfer;
                     }
 

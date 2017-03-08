@@ -41,6 +41,8 @@ namespace FormUI.UI.MainForm
         {
             this.ShowDialog();
         }
+
+
         public void FileSaveDialog(string InitialDirectory, string FileName, string Filter, ExplorerNode node)
         {
             SaveFileDialog sfd = new SaveFileDialog();
@@ -56,6 +58,26 @@ namespace FormUI.UI.MainForm
                     Setting_UI.reflection_eventtocore._AddItem(new List<ExplorerNode>() { node }, node.Parent, filesave.Parent, false);
                 }
             }));
+        }
+        public void ShowChildUI(object UI, bool ShowDialog,bool Owner)
+        {
+            Invoke(new Action(() =>
+            {
+                if (ShowDialog)
+                {
+                    if (Owner) ((System.Windows.Forms.Form)UI).ShowDialog(this);
+                    else ((System.Windows.Forms.Form)UI).ShowDialog();
+                }
+                else
+                {
+                    if (Owner) ((System.Windows.Forms.Form)UI).Show(this);
+                    else ((System.Windows.Forms.Form)UI).Show();
+                }
+            }));
+        }
+        public T CreateUI<T>(Type type)
+        {
+            return (T)Activator.CreateInstance(type);
         }
         #endregion
 
@@ -273,11 +295,7 @@ namespace FormUI.UI.MainForm
                     {
                         DeleteItems deleteitems = new DeleteItems() { PernamentDelete = d.CB_pernament.Checked };
                         deleteitems.Items.Add(((TreeNode_)TV_item.SelectedNode).explorernode);
-
-                        Thread thr = new Thread(Setting_UI.reflection_eventtocore._DeletePath);
-                        Setting_UI.ManagerThreads.delete.Add(thr);
-                        thr.Start(deleteitems);
-                        Setting_UI.ManagerThreads.CleanThr();
+                        Setting_UI.reflection_eventtocore._DeletePath(deleteitems);
                     }
                     break;
                 default://cloud

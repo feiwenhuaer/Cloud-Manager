@@ -33,6 +33,18 @@ namespace WpfUI.UI.Main
         {
             Dispatcher.Invoke(new Action(() => TreeObservableCollection.Add(new TreeViewDataModel(null) { DisplayData = new TreeviewDataItem(newnode) })));
         }
+        public void ShowDialog_()
+        {
+            this.ShowDialog();
+        }
+        public void load_uC_Lv_ud(SupDataDll.UiInheritance.UIUC_TLV_ud control)
+        {
+            UC_TLV_ud ct = (UC_TLV_ud)control;
+            Grid_Lv_ud.Children.Add(ct);
+            ct.Height = Double.NaN;
+            ct.Width = Double.NaN;
+        }
+
 
         public void FileSaveDialog(string InitialDirectory, string FileName, string Filter, ExplorerNode node)
         {
@@ -49,20 +61,19 @@ namespace WpfUI.UI.Main
                 }
             }));
         }
-
-        public void ShowDialog_()
+        public void ShowChildUI(object UI, bool ShowDialog, bool Owner)
         {
-            this.ShowDialog();
+            this.Dispatcher.Invoke(new Action(() =>
+            {
+                if (Owner) ((System.Windows.Window)UI).Owner = this;
+                if (ShowDialog) ((System.Windows.Window)UI).ShowDialog();
+                else ((System.Windows.Window)UI).Show();
+            }));            
         }
-
-        public void load_uC_Lv_ud(SupDataDll.UiInheritance.UIUC_TLV_ud control)
+        public T CreateUI<T>(Type type)
         {
-            UC_TLV_ud ct = (UC_TLV_ud)control;
-            Grid_Lv_ud.Children.Add(ct);
-            ct.Height = Double.NaN;
-            ct.Width = Double.NaN;
+            return (T)Activator.CreateInstance(type);
         }
-
         #endregion
 
         public UIMain()
@@ -228,9 +239,7 @@ namespace WpfUI.UI.Main
                                                                 "Confirm",
                                                                 MessageBoxButton.YesNo, MessageBoxImage.Question);
                     if (result != MessageBoxResult.Yes) return;
-                    Thread thr = new Thread(Setting_UI.reflection_eventtocore._DeletePath);
-                    Setting_UI.ManagerThreads.delete.Add(thr);
-                    thr.Start(new DeleteItems(model.DisplayData.Node) { PernamentDelete = false });
+                    Setting_UI.reflection_eventtocore._DeletePath(new DeleteItems(model.DisplayData.Node) { PernamentDelete = false });
                     break;
 
                 default:
@@ -404,8 +413,6 @@ namespace WpfUI.UI.Main
             }
             ((tabControl.Items[load.indexLV_tab] as TabItem).Content as UC_Lv_item).ShowDataToLV(load.node);
             ((ComboBoxHeader)(tabControl.Items[load.indexLV_tab] as TabItem).Header).Node = load.node;
-            //(tabControl.Items[tabControl.SelectedIndex] as TabItem_).ToolTip = load.path;
-            //((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).textBox.Text = load.path.TrimEnd(new char[] { '\\', '/' });
         }
 
 

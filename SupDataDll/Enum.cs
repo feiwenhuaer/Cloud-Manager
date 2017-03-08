@@ -27,10 +27,6 @@ namespace SupDataDll
         Ram = 6,
         Cloud = 7
     }
-    public enum Type_FileFolder
-    {
-        File, Folder
-    }
 
     public enum StatusUpDownApp
     {
@@ -39,6 +35,7 @@ namespace SupDataDll
         StopForClosingApp,
         SavingData
     }
+
     public enum StatusTransfer
     {
         Loading,//AddItem -> loading info (before Started)
@@ -55,7 +52,14 @@ namespace SupDataDll
         //Removing,
 
         //get set
-        Stop//stop
+        Stop,//stop
+
+        Move,
+        Moving,
+        Moved,
+
+        Adding,
+        Added
     }
 
     public enum ChangeTLV

@@ -61,6 +61,14 @@ namespace Core.Cloud
             else throw new Exception("Not Support Upload now.");
         }
 
+        public static void CreateFolder(ExplorerNode node)
+        {
+            MegaNzNode parent_meganode = new MegaNzNode(node.Parent.Info.ID);
+            MegaApiClient client = GetClient(node.GetRoot().RootInfo.Email);
+            INode folder_meganode = client.CreateFolder(node.Info.Name, parent_meganode);
+            node.Info.ID = folder_meganode.Id;
+        }
+
         public static void AutoCreateFolder(ExplorerNode node)
         {
             List<ExplorerNode> list = node.GetFullPath();
@@ -73,7 +81,7 @@ namespace Core.Cloud
                 {
                     MegaNzNode m_p_node = new MegaNzNode(child.Parent.Info.ID);
                     INode c_node = client.GetNodes(m_p_node).Where(n => n.Name == child.Info.Name).First();//find
-                    if(c_node == null) c_node = client.CreateFolder(child.Info.Name, m_p_node);//if not fount -> create
+                    if(c_node == null) c_node = client.CreateFolder(child.Info.Name, m_p_node);//if not found -> create
                     child.Info.ID = c_node.Id;
                 }
             }

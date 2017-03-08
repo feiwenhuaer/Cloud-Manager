@@ -24,7 +24,7 @@ namespace Cloud.GoogleDrive
         public int ReceiveTimeout { set { ReceiveTimeout_ = value; } get { return ReceiveTimeout; } }
         int ReceiveTimeout_ = 20000;
         
-        public string Email { private get; set; }
+        public string Email { get; set; }
 
         public bool acknowledgeAbuse { get { return acknowledgeAbuse_; } set { acknowledgeAbuse_ = value; } }
         bool acknowledgeAbuse_ = true;

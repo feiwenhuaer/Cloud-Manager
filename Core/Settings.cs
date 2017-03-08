@@ -13,42 +13,31 @@ namespace Core
 {
     public class Settings
     {
+        object SyncPass = new object();
         private XmlDocument xmlSettings;
-        private object SyncSetting = new object();
-        public object SyncPass = new object();
         public void ReadSettings()
         {
             xmlSettings = new XmlDocument();
-            if (ReadWriteData.Exists(ReadWriteData.File_Settings))
-            {
-                lock (SyncSetting)
-                {
-                    xmlSettings.Load(ReadWriteData.Read(ReadWriteData.File_Settings));
-                }
-            }
+            if (ReadWriteData.Exists(ReadWriteData.File_Settings)) xmlSettings.Load(ReadWriteData.Read(ReadWriteData.File_Settings));
             else
             {
                 xmlSettings.LoadXml(global::Core.Properties.Resources.SettingDefault);
                 SaveSettings();
             }
         }
-
         public void SaveSettings()
         {
-            lock (SyncSetting)
-            {
-                MemoryStream Stream = new MemoryStream();
-                TextWriter TxtWriter = new StreamWriter(Stream, Encoding.UTF8);
-                xmlSettings.Save(TxtWriter);
-                ReadWriteData.Write(ReadWriteData.File_Settings, Stream.GetBuffer());
-            }
+            MemoryStream Stream = new MemoryStream();
+            TextWriter TxtWriter = new StreamWriter(Stream, Encoding.UTF8);
+            xmlSettings.Save(TxtWriter);
+            ReadWriteData.Write(ReadWriteData.File_Settings, Stream.GetBuffer());
         }
 
+        #region Setting
         public string GetSettingsAsString(SettingsKey Key)
         {
             return GetSettingsAsString_FromString(Key.ToString());
         }
-
         public string GetSettingsAsString_FromString(string Key)
         {
             XmlNodeList SettingsList = xmlSettings.DocumentElement.SelectSingleNode("SETTINGS").ChildNodes;
@@ -61,12 +50,10 @@ namespace Core
             }
             return returnValue;
         }
-
         public void SetSettingAsString(SettingsKey Key, string Data)
         {
             SetSettingAsString_FromString(Key.ToString(), Data);
         }
-
         public void SetSettingAsString_FromString(string Key, string Data)
         {
             XmlNode SettingsNode = xmlSettings.DocumentElement.SelectSingleNode("SETTINGS");
@@ -85,7 +72,7 @@ namespace Core
             NewSetting.Attributes.Append(Attrib);
             SettingsNode.AppendChild(NewSetting);
         }
-
+        //Reflection
         public bool ChangeUserPass(string user, string pass, string newpass)
         {
             bool flag = false;
@@ -112,11 +99,9 @@ namespace Core
                 }
                 return flag;
             }
-
         }
-
-
-
+        #endregion
+        
         #region Cloud
         public List<ExplorerNode> GetListAccountCloud()
         {
@@ -147,11 +132,43 @@ namespace Core
             return list;
         }
 
+        public ExplorerNode GetCloudRootNode(string Email, CloudType cloudname)
+        {
+            foreach (XmlNode node in GetCloudDataList())
+            {
+                RootNode root = new RootNode();
+                root.Email = node.Attributes["Email"].Value;
+                root.Type = (CloudType)Enum.Parse(typeof(CloudType), node.Attributes["CloudName"].Value);
+                if (root.Email == Email && root.Type == cloudname)
+                {
+
+
+                    NodeInfo info = new NodeInfo();
+                    try
+                    {
+                        info.ID = node.Attributes["RootID"].Value;
+                    }
+                    catch
+                    {
+#if DEBUG
+                        Console.WriteLine("{Settings} Can't Get RootID [" + root.Type.ToString() + ":" + root.Email + "]");
+#endif
+                    }
+
+                    ExplorerNode e_node = new ExplorerNode();
+                    e_node.RootInfo = root;
+                    e_node.Info = info;
+                    return e_node;
+                }
+            }
+            return null;
+        }
+
         public XmlNodeList GetCloudDataList()
         {
             return xmlSettings.DocumentElement.SelectSingleNode("UserAccount").ChildNodes;
         }
-
+        
         internal XmlNode GetCloud(string Email, CloudType cloudname)
         {
             foreach (XmlNode node in GetCloudDataList())
@@ -162,7 +179,7 @@ namespace Core
             return null;
         }
 
-        internal string GetToken(string Email, CloudType cloudname)
+        internal string GetToken(string Email, CloudType cloudname)//SyncPass
         {
             XmlNode node = GetCloud(Email, cloudname);
             if (node == null) return null;
@@ -198,16 +215,13 @@ namespace Core
             return null;
         }
 
-
-
         void CreateNewAttribute(XmlNode Node, string AttributeName, string Value)
         {
             XmlAttribute Attrib = xmlSettings.CreateAttribute(AttributeName);
             Attrib.Value = Value;
             Node.Attributes.Append(Attrib);
         }
-
-
+        
         public bool AddCloud(string Email, CloudType cloudname, string token, bool AreEncrypt, bool IsDefault = false, string root_id = null)
         {
             if (string.IsNullOrEmpty(AppSetting.Pass)) throw new Exception("Pass is null.");

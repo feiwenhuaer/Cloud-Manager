@@ -50,7 +50,7 @@ namespace WpfUI.UI
 
         void Rename()
         {
-            if (Setting_UI.reflection_eventtocore._MoveItem(node, node.Parent, TB_newname.Text))
+            if (Setting_UI.reflection_eventtocore._RenameItem(node,TB_newname.Text))
             {
                 Dispatcher.Invoke(new Action(() =>
                 {

@@ -20,8 +20,6 @@ namespace Core.Cloud
         Rg_url_idFolderOpen = "(?<=\\?id\\=)[A-Za-z0-9-_]+",
         Rg_url_idFile = "(?<=file\\/d\\/)[A-Za-z0-9-_]+";
         
-        static object sync_root = new object();
-        static List<RootID> root = new List<RootID>();
         static OrderByEnum[] en = { OrderByEnum.folder, OrderByEnum.title, OrderByEnum.createdDate };
         internal static List<string> mimeTypeGoogleRemove = new List<string>() {mimeType.audio, mimeType.drawing, mimeType.file,mimeType.form,mimeType.fusiontable,
             mimeType.map,mimeType.presentation,mimeType.script,mimeType.sites,mimeType.unknown,mimeType.video,mimeType.photo,mimeType.spreadsheet,mimeType.document};
@@ -122,13 +120,12 @@ namespace Core.Cloud
             list.nextPageToken = null;
             return list;
         }
-        
+
         static object sync_createfolder = new object();
-        public static string CreateFolder(ExplorerNode node)
+        public static void CreateFolder(ExplorerNode node)
         {
             string Email = node.GetRoot().RootInfo.Email;
             DriveAPIHttprequestv2 gdclient = GetAPIv2(Email);
-            //if (string.IsNullOrEmpty(rp.Parent)) return rp.GetPath();
             string parent_id = "";
             try
             {
@@ -157,9 +154,8 @@ namespace Core.Cloud
                 }
             }
             finally { Monitor.Exit(sync_createfolder); }
-            return node.GetFullPathString();
         }
-        
+
         public static bool ReNameItem(ExplorerNode node,string newname)
         {
             DriveAPIHttprequestv2 gdclient = GetAPIv2(node.GetRoot().RootInfo.Email);
@@ -173,6 +169,7 @@ namespace Core.Cloud
 
         public static GD_item MoveItem(ExplorerNode nodemove, ExplorerNode newparent,string newname = null,bool copy = false)
         {
+            //Same account
             if (nodemove.GetRoot().RootInfo.Email != newparent.GetRoot().RootInfo.Email) throw new Exception("Email not match.");
             if (nodemove.GetRoot().RootInfo.Type != newparent.GetRoot().RootInfo.Type) throw new Exception("TypeCloud not match.");
 
@@ -185,37 +182,12 @@ namespace Core.Cloud
                                                                                     item_metadata.parents.Remove(parent);
                                                                                     break;
                                                                                 }
-                    
                 bool isroot = false;
-                foreach (RootID r in root) if (r.id == newparent.Parent.Info.ID) isroot = true;
+                if (AppSetting.settings.GetCloudRootNode(gdclient.Email, CloudType.GoogleDrive).Info.ID == newparent.Parent.Info.ID) isroot = true;
                 item_metadata.parents.Add(new GD_parent() { id = newparent.Parent.Info.ID, isRoot = isroot });
             }
             if (newname != null) item_metadata.title = newname;
             return JsonConvert.DeserializeObject<GD_item>(gdclient.EditMetaData(nodemove.Info.ID,JsonConvert.SerializeObject(item_metadata)));
-        }
-
-        static string GetRootID(string email)
-        {
-            lock (sync_root)
-            {
-                foreach (RootID item in root)
-                {
-                    if (item.email == email) return item.id;
-                }
-            }
-            return null;
-        }
-
-        static void AddRoot(string email, string id)
-        {
-            lock (sync_root)
-            {
-                foreach (RootID item in root)
-                {
-                    if (item.email == email && item.id == id) return;
-                }
-                root.Add(new RootID() { email = email, id = id });
-            }
         }
 
         public static GD_item GetMetadataItem(ExplorerNode node)

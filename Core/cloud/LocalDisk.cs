@@ -111,11 +111,10 @@ namespace Core.Cloud
             return false;
         }
 
-        public static string CreateFolder(ExplorerNode node)
+        public static void CreateFolder(ExplorerNode node)
         {
             DirectoryInfo dinfo = new DirectoryInfo(node.GetFullPathString());
             if (!dinfo.Exists) dinfo.Create();
-            return dinfo.FullName;
         }
     }
 

@@ -5,11 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfUI.UI"
         mc:Ignorable="d" WindowStyle="None"  Background="DarkGray"
-        Title="Deleting..." Height="256.546" Width="393.593" ResizeMode="NoResize" Closing="Window_Closing">
+        Title="Deleting..." Height="256.546" Width="393.593" ResizeMode="NoResize" Closing="Window_Closing" WindowStartupLocation="CenterScreen">
     <Grid>
         <TextBox x:Name="textBox" Margin="10,10,10,33" TextWrapping="Wrap"/>
-        <CheckBox x:Name="checkBox" Content="Auto close" HorizontalAlignment="Left" Margin="10,0,0,10" Height="15" VerticalAlignment="Bottom" Width="auto" Checked="checkBox_Checked" Unchecked="checkBox_Unchecked"/>
+        <CheckBox x:Name="checkBox" Content="Auto close" HorizontalAlignment="Left" Margin="10,0,0,10" Height="15" VerticalAlignment="Bottom" Width="auto" IsChecked="True"/>
         <Button x:Name="button" Content="Cancel" Margin="0,0,10,8" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75" Click="button_Click"/>
-
     </Grid>
 </Window>

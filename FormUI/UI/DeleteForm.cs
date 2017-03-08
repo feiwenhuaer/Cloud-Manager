@@ -26,13 +26,10 @@ namespace FormUI.UI
             }
         }
 
-        public void ShowDialog_()
+        public void Show_(object owner)
         {
-            if (InvokeRequired)
-            {
-                this.Invoke(new Action(() => this.ShowDialog()));
-            }
-            else this.ShowDialog();
+            this.Owner = (Form)owner;
+            this.Show();
         }
 
         public void SetTextButtonCancel(string text)

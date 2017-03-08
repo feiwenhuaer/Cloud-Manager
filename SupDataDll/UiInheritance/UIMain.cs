@@ -1,4 +1,5 @@
 ﻿using SupDataDll.Class;
+using System;
 
 namespace SupDataDll.UiInheritance
 {
@@ -10,5 +11,7 @@ namespace SupDataDll.UiInheritance
         void AddNewCloudToTV(ExplorerNode newcloud);
 
         void FileSaveDialog(string InitialDirectory,string FileName,string Filter, ExplorerNode node);
+        void ShowChildUI(object UI, bool ShowDialog, bool Owner);
+        T CreateUI<T>(Type type);
     }
 }

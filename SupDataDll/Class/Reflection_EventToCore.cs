@@ -99,7 +99,7 @@ namespace SupDataDll
         public delegate List<ExplorerNode> GetListAccountCloud();
         public event GetListAccountCloud EventGetListAccountCloud;
         /// <summary>
-        /// Oauth for add cloud account
+        /// 
         /// </summary>
         /// <param name="type"></param>
         public void _ShowFormOauth(CloudType type)
@@ -135,23 +135,16 @@ namespace SupDataDll
         public event Login EventLogin;
 
         /// <summary>
-        /// Move/Rename Disk/Dropbox : path_from,path_to |
-        /// Move GoogleDrive: { path_from,path_to,id} or { Email,id,type,parent_id_from,parent_id_to} |
-        /// Rename GoogleDrive: Email,id,type,newname
+        /// 
         /// </summary>
-        /// <param name="path_from"></param>
-        /// <param name="path_to"></param>
-        /// <param name="id"></param>
-        /// <param name="parent_id_from"></param>
-        /// <param name="parent_id_to"></param>
+        /// <param name="node"></param>
+        /// <param name="newparent"></param>
         /// <param name="newname"></param>
-        /// <param name="Email"></param>
-        /// <param name="type"></param>
         /// <param name="Copy"></param>
         /// <returns></returns>
-        public bool _MoveItem(ExplorerNode node, ExplorerNode newparent, string newname = null, bool Copy = false)
+        public bool _RenameItem(ExplorerNode node,string newname)
         {
-            return EventMoveItem(node, newparent, newname, Copy);
+            return EventMoveItem(node, null, newname, false);
         }
         public delegate bool RenameItem(ExplorerNode node, ExplorerNode newparent, string newname = null, bool Copy = false);
         public event RenameItem EventMoveItem;
@@ -159,21 +152,21 @@ namespace SupDataDll
         /// Delete List items
         /// </summary>
         /// <param name="items">Class SupDataDll.DeleteItems</param>
-        public void _DeletePath(object items)
+        public void _DeletePath(DeleteItems items)
         {
             EventDeletePath(items);
-        }//object DeleteItems
-        public delegate void DeletePath(object items);//object DeleteItems
+        }
+        public delegate void DeletePath(DeleteItems items);
         public event DeletePath EventDeletePath;
         /// <summary>
         /// Create folder node
         /// </summary>
         /// <returns></returns>
-        public string _CreateFolder(ExplorerNode node)
+        public void _CreateFolder(ExplorerNode node)
         {
-            return EventCreateFolder(node);
+            EventCreateFolder(node);
         }
-        public delegate string CreateFolder(ExplorerNode node);
+        public delegate void CreateFolder(ExplorerNode node);
         public event CreateFolder EventCreateFolder;
 
         //exit

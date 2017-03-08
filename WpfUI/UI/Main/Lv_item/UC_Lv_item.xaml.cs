@@ -239,9 +239,7 @@ namespace WpfUI.UI.Main.Lv_item
             DeleteItems items = new DeleteItems();
             foreach (LV_data data in LV_items.SelectedItems) items.Items.Add(data.Node);
             items.PernamentDelete = PernamentDelete;
-            Thread thr = new Thread(Setting_UI.reflection_eventtocore._DeletePath);
-            Setting_UI.ManagerThreads.delete.Add(thr);
-            thr.Start(items);
+            Setting_UI.reflection_eventtocore._DeletePath(items);
         }
         void CreateFolder()
         {

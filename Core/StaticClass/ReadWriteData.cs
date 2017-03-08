@@ -10,12 +10,11 @@ namespace Core.StaticClass
         /// <summary>
         /// Default path: %appdata%\CloudManager
         /// </summary>
-        public static string Path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\CloudManager";
-
+        public static readonly string Path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\CloudManager";
+        
         public const string File_Login = "Login.dat";
         public const string File_Settings = "Settings.dat";
         public const string File_DataUploadDownload = "DataUploadDownload.dat";
-        public const string Cache_GD = "CacheDriver.dat";
 
         public static TextReader Read(string filename)
         {

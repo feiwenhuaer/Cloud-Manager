@@ -46,13 +46,13 @@ namespace CustomHttpRequest
         /// Get/Set ReceiveTimeout of tcpclient (default 10000ms)
         /// </summary>
         public int ReceiveTimeout { get { return receive_timeout; } set { receive_timeout = value; } }
-        int receive_timeout = 10000;
+        int receive_timeout = 30000;
 
         /// <summary>
         /// Get/Set SendTimeout of tcpclient (default 10000ms)
         /// </summary>
         public int SendTimeout { get { return send_timeout; } set { send_timeout = value; } }
-        int send_timeout = 10000;
+        int send_timeout = 30000;
 
         public TcpClient tcp = new TcpClient();
         SslStream sslStream;
@@ -357,7 +357,7 @@ namespace CustomHttpRequest
             
             ReadDataResponseText(CheckMethodTransfer());
             int response_code = GetCodeResponse();
-            if (response_code == 200) return textdataresponse;
+            if (response_code >= 200 && response_code < 300) return textdataresponse;
             if (response_code == 301 | response_code == 302) redirect = true; else redirect = false;
             if (AutoDirect & redirect)
             {

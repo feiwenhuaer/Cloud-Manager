@@ -11,7 +11,7 @@
 
         void SetAutoClose(bool c);
 
-        void ShowDialog_();
+        void Show_(object owner = null);
 
         void SetTextButtonCancel(string text);
 

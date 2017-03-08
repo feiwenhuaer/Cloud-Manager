@@ -361,10 +361,7 @@ namespace FormUI.UI.MainForm
             if (f.Delete)
             {
                 DeleteItems items = new DeleteItems() { Items = item_arr, PernamentDelete = f.CB_pernament.Checked };
-                Thread thr = new Thread(Setting_UI.reflection_eventtocore._DeletePath);
-                Setting_UI.ManagerThreads.delete.Add(thr);
-                Setting_UI.ManagerThreads.CleanThr();
-                thr.Start(items);
+                Setting_UI.reflection_eventtocore._DeletePath(items);
             }
         }
         private void renameToolStripMenuItem_Click(object sender, EventArgs e)

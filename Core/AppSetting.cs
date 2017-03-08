@@ -1,15 +1,15 @@
 ﻿using System.IO;
 using Core.Cloud;
-using Core.StaticClass;
-using SupDataDll;
 using SupDataDll.UiInheritance;
 using Core.Transfer;
 using Cloud;
+using System.Threading;
 
 namespace Core
 {
     public static class AppSetting
     {
+        public static Thread MainThread;
         //can't static class (because event)
         public static Settings settings;//setting
         public static Login login;//login

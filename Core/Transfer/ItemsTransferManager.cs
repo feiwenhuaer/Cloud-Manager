@@ -288,93 +288,147 @@ namespace Core.Transfer
         void WorkThread(object obj)
         {
             TransferItem item = GroupData.items[(int)obj];
+            ExplorerNode root_from = fromfolder.GetRoot();
+            ExplorerNode root_to = savefolder.GetRoot();
             try
             {
-#if DEBUG
-                Console.WriteLine("Transfer items:" + item.From.node.GetFullPathString());
-#endif
-                item.From.stream = AppSetting.ManageCloud.GetFileStream(
-                    item.From.node,
-                    item.SaveSizeTransferSuccess,
-                    item.From.node.Info.Size - 1,
-                    item.To.node.GetRoot().RootInfo.Type != CloudType.LocalDisk, item.dataCryptoMega);
-
-                int buffer_length = 32;//default
-                int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.BufferSize), out buffer_length);//get buffer_length from setting
-                item.buffer = item.From.node.GetRoot().RootInfo.Type == CloudType.Mega ? new byte[buffer_length * 2048] : new byte[buffer_length * 1024];//create buffer
-
-                ExplorerNode rootnodeto = item.To.node.GetRoot();
-
-                item.byteread = 0;
-                //this.group.items[x].UploadID = "";//resume
-                item.SizeWasTransfer = item.OldTransfer = item.SaveSizeTransferSuccess;//resume
-                item.ErrorMsg = "";//clear error
-                item.Timestamp = CurrentMillis.Millis;
-                if (GroupData.status != StatusTransfer.Running) return;
-                switch (rootnodeto.RootInfo.Type)
+                if (root_from.RootInfo.Type == root_to.RootInfo.Type)
                 {
-                    case CloudType.LocalDisk:
-                        #region LocalDisk
-                        ItemsTransferWork.Add(new TransferBytes(item, this));
-                        return;
-                    #endregion
-
-                    case CloudType.Dropbox:
-                        #region Dropbox
-                        int chunksizedb = 25;//default 25Mb
-                        int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.Dropbox_ChunksSize), out chunksizedb);
-                        item.ChunkUploadSize = chunksizedb * 1024 * 1024;
-
-                        DropboxRequestAPIv2 DropboxClient = Dropbox.GetAPIv2(rootnodeto.RootInfo.Email);
-
-                        if (string.IsNullOrEmpty(item.UploadID))//create upload id
+                    if (root_from.RootInfo.Type == CloudType.LocalDisk)
+                    {
+                        if (root_from.Info.Name == root_to.Info.Name & !AreCut)//same disk & not cut
                         {
-                            item.byteread = item.From.stream.Read(item.buffer, 0, item.buffer.Length);
-                            dynamic json = JsonConvert.DeserializeObject(DropboxClient.upload_session_start(item.buffer, item.byteread));
-                            item.UploadID = json.session_id;
-                            item.SizeWasTransfer += item.byteread;
+                            ChangePathFileDisk();
                         }
-                        ItemsTransferWork.Add(new TransferBytes(item, this, DropboxClient));
-                        return;
-                    #endregion
-
-                    case CloudType.GoogleDrive:
-                        #region GoogleDrive
-                        DriveAPIHttprequestv2 gdclient = GoogleDrive.GetAPIv2(rootnodeto.RootInfo.Email);
-                        GoogleDrive.CreateFolder(item.To.node.Parent);
-                        int chunksizeGD = 5;//default
-                        int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.GD_ChunksSize), out chunksizeGD);
-                        item.ChunkUploadSize = chunksizeGD * 1024 * 1024;
-
-                        if (string.IsNullOrEmpty(item.UploadID))//create upload id
+                        else//window cut/copy
                         {
-                            if (string.IsNullOrEmpty(item.To.node.Parent.Info.ID)) throw new Exception("Can't get root id.");
-                            string parentid = item.To.node.Parent.Info.ID;
-                            string mimeType = Get_mimeType.Get_mimeType_From_FileExtension(item.To.node.GetExtension());
-                            string jsondata = "{\"title\": \"" + item.From.node.Info.Name + "\", \"mimeType\": \"" + mimeType + "\", \"parents\": [{\"id\": \"" + parentid + "\"}]}";
-                            item.UploadID = gdclient.Files_insert_resumable_getUploadID(jsondata, mimeType, item.From.node.Info.Size);
+                            WindowCutCopyDisk();
                         }
-                        ItemsTransferWork.Add(new TransferBytes(item, this, gdclient));
-                        return;
-                    #endregion
-
-                    case CloudType.Mega:
-                        #region Mega
-                        MegaApiClient MegaClient = MegaNz.GetClient(rootnodeto.RootInfo.Email);
-                        item.buffer = new byte[128 * 1024];
-                        if (string.IsNullOrEmpty(item.UploadID))//create upload id
+                    }
+                    else//cloud
+                    {
+                        if (root_from.RootInfo.Email == root_to.RootInfo.Email)//same account
                         {
-                            MegaNz.AutoCreateFolder(item.To.node.Parent); //auto create folder
-                            item.UploadID = MegaClient.RequestUrlUpload(item.From.node.Info.Size);//Make Upload url
+                            SameAccountCloud();
                         }
-                        item.From.stream = MegaApiClient.MakeEncryptStreamForUpload(item.From.stream, item.From.node.Info.Size, item.dataCryptoMega);//make encrypt stream from file
-                        ItemsTransferWork.Add(new TransferBytes(item, this, MegaClient));
-                        return;
-                        #endregion
+                        else//different account
+                        {
+                            DifferentAccountCloud();
+                        }
+                    }
                 }
+                else Transfer(item);//not same cloud
             }
-            catch (Exception ex)
-            { item.ErrorMsg = ex.Message + ex.StackTrace; item.status = StatusTransfer.Error; return; }
+            catch (Exception ex){ item.ErrorMsg = ex.Message + ex.StackTrace; item.status = StatusTransfer.Error; return; }
+        }
+
+        
+        // Cut Same Disk
+        void ChangePathFileDisk()
+        {
+
+        }
+
+        void WindowCutCopyDisk()
+        {
+
+        }
+
+        void SameAccountCloud()
+        {
+
+        }
+
+        void DifferentAccountCloud()
+        {
+
+        }
+
+        void Transfer(TransferItem item)
+        {
+
+#if DEBUG
+            Console.WriteLine("Transfer items:" + item.From.node.GetFullPathString());
+#endif
+            item.From.stream = AppSetting.ManageCloud.GetFileStream(
+                item.From.node,
+                item.SaveSizeTransferSuccess,
+                item.From.node.Info.Size - 1,
+                item.To.node.GetRoot().RootInfo.Type != CloudType.LocalDisk, item.dataCryptoMega);
+
+            int buffer_length = 32;//default
+            int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.BufferSize), out buffer_length);//get buffer_length from setting
+            item.buffer = item.From.node.GetRoot().RootInfo.Type == CloudType.Mega ? new byte[buffer_length * 2048] : new byte[buffer_length * 1024];//create buffer
+
+            ExplorerNode rootnodeto = item.To.node.GetRoot();
+
+            item.byteread = 0;
+            //this.group.items[x].UploadID = "";//resume
+            item.SizeWasTransfer = item.OldTransfer = item.SaveSizeTransferSuccess;//resume
+            item.ErrorMsg = "";//clear error
+            item.Timestamp = CurrentMillis.Millis;
+            if (GroupData.status != StatusTransfer.Running) return;
+            switch (rootnodeto.RootInfo.Type)
+            {
+                case CloudType.LocalDisk:
+                    #region LocalDisk
+                    ItemsTransferWork.Add(new TransferBytes(item, this));
+                    return;
+                #endregion
+
+                case CloudType.Dropbox:
+                    #region Dropbox
+                    int chunksizedb = 25;//default 25Mb
+                    int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.Dropbox_ChunksSize), out chunksizedb);
+                    item.ChunkUploadSize = chunksizedb * 1024 * 1024;
+
+                    DropboxRequestAPIv2 DropboxClient = Dropbox.GetAPIv2(rootnodeto.RootInfo.Email);
+
+                    if (string.IsNullOrEmpty(item.UploadID))//create upload id
+                    {
+                        item.byteread = item.From.stream.Read(item.buffer, 0, item.buffer.Length);
+                        dynamic json = JsonConvert.DeserializeObject(DropboxClient.upload_session_start(item.buffer, item.byteread));
+                        item.UploadID = json.session_id;
+                        item.SizeWasTransfer += item.byteread;
+                    }
+                    ItemsTransferWork.Add(new TransferBytes(item, this, DropboxClient));
+                    return;
+                #endregion
+
+                case CloudType.GoogleDrive:
+                    #region GoogleDrive
+                    DriveAPIHttprequestv2 gdclient = GoogleDrive.GetAPIv2(rootnodeto.RootInfo.Email);
+                    GoogleDrive.CreateFolder(item.To.node.Parent);
+                    int chunksizeGD = 5;//default
+                    int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.GD_ChunksSize), out chunksizeGD);
+                    item.ChunkUploadSize = chunksizeGD * 1024 * 1024;
+
+                    if (string.IsNullOrEmpty(item.UploadID))//create upload id
+                    {
+                        if (string.IsNullOrEmpty(item.To.node.Parent.Info.ID)) throw new Exception("Can't get root id.");
+                        string parentid = item.To.node.Parent.Info.ID;
+                        string mimeType = Get_mimeType.Get_mimeType_From_FileExtension(item.To.node.GetExtension());
+                        string jsondata = "{\"title\": \"" + item.From.node.Info.Name + "\", \"mimeType\": \"" + mimeType + "\", \"parents\": [{\"id\": \"" + parentid + "\"}]}";
+                        item.UploadID = gdclient.Files_insert_resumable_getUploadID(jsondata, mimeType, item.From.node.Info.Size);
+                    }
+                    ItemsTransferWork.Add(new TransferBytes(item, this, gdclient));
+                    return;
+                #endregion
+
+                case CloudType.Mega:
+                    #region Mega
+                    MegaApiClient MegaClient = MegaNz.GetClient(rootnodeto.RootInfo.Email);
+                    item.buffer = new byte[128 * 1024];
+                    if (string.IsNullOrEmpty(item.UploadID))//create upload id
+                    {
+                        MegaNz.AutoCreateFolder(item.To.node.Parent); //auto create folder
+                        item.UploadID = MegaClient.RequestUrlUpload(item.From.node.Info.Size);//Make Upload url
+                    }
+                    item.From.stream = MegaApiClient.MakeEncryptStreamForUpload(item.From.stream, item.From.node.Info.Size, item.dataCryptoMega);//make encrypt stream from file
+                    ItemsTransferWork.Add(new TransferBytes(item, this, MegaClient));
+                    return;
+                    #endregion
+            }
         }
     }
 }

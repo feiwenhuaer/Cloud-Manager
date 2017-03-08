@@ -22,14 +22,24 @@ namespace WpfUI.UI
         public UIDelete()
         {
             InitializeComponent();
+            checkBox.Checked += CheckBox_Checked;
+            checkBox.Unchecked += CheckBox_Unchecked;
         }
 
-        bool autoclose = false;
+        private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            autoclose = false;
+        }
+
+        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            autoclose = true;
+        }
 
         #region interface
         public event CancelDelegate EventCancel;
         public event ClosingDelegate EventClosing;
-
+        bool autoclose = true;
         public bool AutoClose
         {
             get
@@ -52,15 +62,10 @@ namespace WpfUI.UI
             {
                 Dispatcher.Invoke(new Action(() =>
                 {
-                    autoclose = c;
                     checkBox.IsChecked = c;
                 }));
             }
-            else
-            {
-                autoclose = c;
-                checkBox.IsChecked = c;
-            }
+            else checkBox.IsChecked = c;
         }
 
         public void SetTextButtonCancel(string text)
@@ -72,9 +77,10 @@ namespace WpfUI.UI
             else button.Content = text;
         }
 
-        public void ShowDialog_()
+        public void Show_(object owner = null)
         {
-            this.ShowDialog();
+            if (owner != null) this.Owner = (Window)owner;
+            this.Show();
         }
 
         public void UpdateText(string text)
@@ -87,16 +93,7 @@ namespace WpfUI.UI
         }
         #endregion
 
-        #region event 
-        private void checkBox_Checked(object sender, RoutedEventArgs e)
-        {
-            autoclose = true;
-        }
-
-        private void checkBox_Unchecked(object sender, RoutedEventArgs e)
-        {
-            autoclose = false;
-        }
+        #region event
 
         private void button_Click(object sender, RoutedEventArgs e)
         {
@@ -105,7 +102,7 @@ namespace WpfUI.UI
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            autoclose = true;
+            checkBox.IsChecked = true;
             EventClosing();
         }
         #endregion

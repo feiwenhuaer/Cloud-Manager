@@ -44,7 +44,7 @@ namespace Core
         public string GetText(string Key)
         {
             if (Key == LanguageKey.ReloadLang.ToString()) return Reload();
-            string returnValue = "Err";
+            string returnValue = "Error";
             foreach (XmlNode lang in langlist)
             {
                 if (lang.NodeType == XmlNodeType.Comment || lang.Attributes["NAME"].Value != Key) continue;
