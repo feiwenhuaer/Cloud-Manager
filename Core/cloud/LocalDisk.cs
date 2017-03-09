@@ -116,6 +116,17 @@ namespace Core.Cloud
             DirectoryInfo dinfo = new DirectoryInfo(node.GetFullPathString());
             if (!dinfo.Exists) dinfo.Create();
         }
+
+        public static void AutoCreateFolder(ExplorerNode node_folder_target)
+        {
+            List<ExplorerNode> nodelist = node_folder_target.GetFullPath();
+            DirectoryInfo dinfo;
+            for (int i = 1; i < nodelist.Count; i++)
+            {
+                dinfo = new DirectoryInfo(nodelist[i].GetFullPathString());
+                if (!dinfo.Exists) dinfo.Create();
+            }
+        }
     }
 
     public class FileOperationAPIWrapper

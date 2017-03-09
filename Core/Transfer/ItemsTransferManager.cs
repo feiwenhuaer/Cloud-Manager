@@ -292,54 +292,32 @@ namespace Core.Transfer
             ExplorerNode root_to = savefolder.GetRoot();
             try
             {
-                if (root_from.RootInfo.Type == root_to.RootInfo.Type)
+                if (root_from.RootInfo.Type == root_to.RootInfo.Type)//Same type
                 {
-                    if (root_from.RootInfo.Type == CloudType.LocalDisk)
-                    {
-                        if (root_from.Info.Name == root_to.Info.Name & !AreCut)//same disk & not cut
-                        {
-                            ChangePathFileDisk();
-                        }
-                        else//window cut/copy
-                        {
-                            WindowCutCopyDisk();
-                        }
-                    }
+                    if (root_from.RootInfo.Type == CloudType.LocalDisk) WindowCutCopyDisk(item);
                     else//cloud
                     {
-                        if (root_from.RootInfo.Email == root_to.RootInfo.Email)//same account
-                        {
-                            SameAccountCloud();
-                        }
-                        else//different account
-                        {
-                            DifferentAccountCloud();
-                        }
+                        if (root_from.RootInfo.Email == root_to.RootInfo.Email) SameAccountCloud(item);//same account
+                        else DifferentAccountCloud(item);//different account
                     }
                 }
-                else Transfer(item);//not same cloud
+                else Transfer(item);//not same type
             }
             catch (Exception ex){ item.ErrorMsg = ex.Message + ex.StackTrace; item.status = StatusTransfer.Error; return; }
         }
 
-        
-        // Cut Same Disk
-        void ChangePathFileDisk()
+       
+        void WindowCutCopyDisk(TransferItem item)
         {
 
         }
 
-        void WindowCutCopyDisk()
+        void SameAccountCloud(TransferItem item)
         {
 
         }
 
-        void SameAccountCloud()
-        {
-
-        }
-
-        void DifferentAccountCloud()
+        void DifferentAccountCloud(TransferItem item)
         {
 
         }
