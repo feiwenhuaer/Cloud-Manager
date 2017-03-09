@@ -38,6 +38,13 @@ namespace Core
         {
             return GetSettingsAsString_FromString(Key.ToString());
         }
+        public bool GetSettingsAsBool(SettingsKey Key)
+        {
+            string temp = GetSettingsAsString(Key);
+            if (temp == "1") return true;
+            else if (temp == "0") return false;
+            else throw new Exception("Value can't convert to bool.");
+        }
         public string GetSettingsAsString_FromString(string Key)
         {
             XmlNodeList SettingsList = xmlSettings.DocumentElement.SelectSingleNode("SETTINGS").ChildNodes;

@@ -88,13 +88,17 @@ namespace Core.Transfer
 
                             GroupsWork[i].ManagerItemsAndRefreshData();
                         }
-
-                        if (!flag_shutdown && count_group_running > 0 && AppSetting.settings.GetSettingsAsString(SettingsKey.ShutdownWhenDone) == "1") flag_shutdown = true;
-                        if (flag_shutdown && AppSetting.settings.GetSettingsAsString(SettingsKey.ShutdownWhenDone) == "0") flag_shutdown = false;
-                        if (flag_shutdown && AppSetting.settings.GetSettingsAsString(SettingsKey.ShutdownWhenDone) == "1" && (count_group_running + count) == 0)
+                        bool ShutdownWhenDone = AppSetting.settings.GetSettingsAsBool(SettingsKey.ShutdownWhenDone);
+                        if (!flag_shutdown && count_group_running > 0 && ShutdownWhenDone) flag_shutdown = true;
+                        if (flag_shutdown && !ShutdownWhenDone) flag_shutdown = false;
+                        if (flag_shutdown && ShutdownWhenDone && (count_group_running + count) == 0)
                         {
                             SaveData();
+#if DEBUG
                             Console.WriteLine("shutdown");
+#else
+
+#endif
                             return;
                         }
 

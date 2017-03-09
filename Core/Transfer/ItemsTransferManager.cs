@@ -150,6 +150,8 @@ namespace Core.Transfer
                 else switch (GroupData.items[i].status)
                     {
                         case StatusTransfer.Running: count_item_running++; break;
+                        case StatusTransfer.Moved:
+                        case StatusTransfer.Added:
                         case StatusTransfer.Done: count_item_done++; break;
                         case StatusTransfer.Error: count_item_error++; break;
                         case StatusTransfer.Stop: count_item_stop++; break;
