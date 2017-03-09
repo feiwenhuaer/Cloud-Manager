@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Xml;
 
-namespace Core
+namespace Core.Class
 {
     public class Settings
     {

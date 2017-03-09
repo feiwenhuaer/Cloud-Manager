@@ -1,5 +1,4 @@
 ﻿//#define TESTCLASS
-using Core;
 using Core.StaticClass;
 using SupDataDll;
 using System;
@@ -9,6 +8,7 @@ using System.Windows.Forms;
 using SupDataDll.UiInheritance;
 using Core.Cloud;
 using Core.Transfer;
+using Core.Class;
 
 namespace Cloud_Manager
 {

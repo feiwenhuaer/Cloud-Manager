@@ -4,8 +4,9 @@ using SupDataDll.UiInheritance;
 using Core.Transfer;
 using Cloud;
 using System.Threading;
+using Core.Class;
 
-namespace Core
+namespace Core.StaticClass
 {
     public static class AppSetting
     {

@@ -8,6 +8,7 @@ using System.IO;
 using CustomHttpRequest;
 using SupDataDll.Class.Mega;
 using SupDataDll.Class;
+using Core.StaticClass;
 
 namespace Core.Cloud
 {

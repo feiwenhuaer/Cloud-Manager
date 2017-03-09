@@ -6,7 +6,7 @@ using SupDataDll;
 using Core.StaticClass;
 using SupDataDll.Crypt;
 
-namespace Core
+namespace Core.Class
 {
     public class LoginData
     {

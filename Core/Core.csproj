@@ -43,12 +43,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppSetting.cs" />
+    <Compile Include="StaticClass\AppSetting.cs" />
     <Compile Include="Cloud\CloudManager.cs" />
     <Compile Include="Cloud\Dropbox.cs" />
     <Compile Include="Cloud\GoogleDrive.cs" />
     <Compile Include="Cloud\LocalDisk.cs" />
     <Compile Include="Cloud\MegaNz.cs" />
+    <Compile Include="Class\ManagerCoreThreads.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -56,15 +57,16 @@
     </Compile>
     <Compile Include="StaticClass\CurrentMillis.cs" />
     <Compile Include="StaticClass\Get_mimeType.cs" />
-    <Compile Include="Languages.cs" />
+    <Compile Include="Class\Languages.cs" />
     <Compile Include="StaticClass\LoadDllUI.cs" />
-    <Compile Include="Login.cs" />
+    <Compile Include="Class\Login.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StaticClass\ReadWriteData.cs" />
     <Compile Include="StaticClass\Reflection_UI.cs" />
-    <Compile Include="Settings.cs" />
+    <Compile Include="Class\Settings.cs" />
     <Compile Include="TestClass.cs" />
     <Compile Include="Transfer\GroupsTransferManager.cs" />
+    <Compile Include="Class\HostStreamingFileViaHttp.cs" />
     <Compile Include="Transfer\ItemsTransferManager.cs" />
     <Compile Include="Transfer\JsonDataSaveGroup.cs" />
     <Compile Include="Transfer\TransferBytes.cs" />

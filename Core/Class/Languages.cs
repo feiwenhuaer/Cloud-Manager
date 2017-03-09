@@ -1,9 +1,9 @@
-﻿using SupDataDll;
-using System;
+﻿using Core.StaticClass;
+using SupDataDll;
 using System.IO;
 using System.Xml;
 
-namespace Core
+namespace Core.Class
 {
     public class Languages
     {
