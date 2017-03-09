@@ -53,12 +53,9 @@ namespace SupDataDll
 
         //get set
         Stop,//stop
-
-        Move,
-        Moving,
+        
         Moved,
-
-        Adding,
+        
         Added
     }
 

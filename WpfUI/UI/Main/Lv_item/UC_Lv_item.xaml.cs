@@ -62,7 +62,7 @@ namespace WpfUI.UI.Main.Lv_item
                 dt.Node = item;
                 
                 if (item.Info.DateMod != time_default) dt.d_mod = item.Info.DateMod.ToString(timeformat);
-                if (item.Info.Size > 0)
+                if (item.Info.Size >= 0)
                 {
                     dt.SizeString = UnitConventer.ConvertSize(item.Info.Size, 2, UnitConventer.unit_size);
 

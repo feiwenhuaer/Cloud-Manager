@@ -294,30 +294,16 @@ namespace Core.Transfer
             {
                 if (root_from.RootInfo.Type == root_to.RootInfo.Type)//Same type
                 {
-                    if (root_from.RootInfo.Type == CloudType.LocalDisk) WindowCutCopyDisk(item);
-                    else//cloud
-                    {
-                        if (root_from.RootInfo.Email == root_to.RootInfo.Email) SameAccountCloud(item);//same account
-                        else DifferentAccountCloud(item);//different account
-                    }
+                    if (root_from.RootInfo.Type == CloudType.LocalDisk) Transfer(item);
+                    else AccountCloud(item);//cloud
                 }
                 else Transfer(item);//not same type
             }
             catch (Exception ex){ item.ErrorMsg = ex.Message + ex.StackTrace; item.status = StatusTransfer.Error; return; }
         }
 
-       
-        void WindowCutCopyDisk(TransferItem item)
-        {
-
-        }
-
-        void SameAccountCloud(TransferItem item)
-        {
-
-        }
-
-        void DifferentAccountCloud(TransferItem item)
+      
+        void AccountCloud(TransferItem item)
         {
 
         }
@@ -328,12 +314,6 @@ namespace Core.Transfer
 #if DEBUG
             Console.WriteLine("Transfer items:" + item.From.node.GetFullPathString());
 #endif
-            item.From.stream = AppSetting.ManageCloud.GetFileStream(
-                item.From.node,
-                item.SaveSizeTransferSuccess,
-                item.From.node.Info.Size - 1,
-                item.To.node.GetRoot().RootInfo.Type != CloudType.LocalDisk, item.dataCryptoMega);
-
             int buffer_length = 32;//default
             int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.BufferSize), out buffer_length);//get buffer_length from setting
             item.buffer = item.From.node.GetRoot().RootInfo.Type == CloudType.Mega ? new byte[buffer_length * 2048] : new byte[buffer_length * 1024];//create buffer

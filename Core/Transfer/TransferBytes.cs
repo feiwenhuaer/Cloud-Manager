@@ -25,25 +25,42 @@ namespace Core.Transfer
         MegaUpload mega_up;
         string completionHandle = "-";
 
-        CloudType root_to;
-        CloudType root_from;
+        CloudType Type_root_to;
+        CloudType Type_root_from;
         object clientTo;
         public TransferBytes(TransferItem item, ItemsTransferManager GroupManager, object clientTo = null)
         {
             if (item.From.node.Info.Size == 0) { item.ErrorMsg = "File size zero."; Dispose(); }
             this.item = item;
             this.GroupManager = GroupManager;
-            if (item.buffer == null) item.buffer = new byte[128 * 1024];
-            if (clientTo != null) this.clientTo = clientTo;
-            if (item.To.node.GetRoot().RootInfo.Type == CloudType.Mega) InitUploadMega();//InitUploadMega
-            //Make Stream To
-            if (item.ChunkUploadSize > 0) MakeNextChunkUploadInStreamTo(true);
-            else this.item.To.stream = AppSetting.ManageCloud.GetFileStream(item.To.node, item.SizeWasTransfer);//download to disk
-            //begin transfer
-            item.status = StatusTransfer.Running;
-            root_to = this.item.To.node.GetRoot().RootInfo.Type;
-            root_from = this.item.From.node.GetRoot().RootInfo.Type;
-            item.From.stream.BeginRead(item.buffer, 0, item.buffer.Length, new AsyncCallback(GetFrom), 0);
+            Type_root_to = this.item.To.node.GetRoot().RootInfo.Type;
+            Type_root_from = this.item.From.node.GetRoot().RootInfo.Type;
+
+            if (GroupManager.AreCut && (Type_root_to | CloudType.LocalDisk) == Type_root_from &&
+                item.To.node.GetRoot().Info.Name == item.From.node.GetRoot().Info.Name)
+            {
+                LocalDisk.AutoCreateFolder(this.item.To.node.Parent);
+                File.Move(item.From.node.GetFullPathString(), item.To.node.GetFullPathString());
+                item.status = StatusTransfer.Moved;
+                Dispose();
+            }
+            else
+            {
+                
+                if (item.buffer == null) item.buffer = new byte[128 * 1024];
+                if (clientTo != null) this.clientTo = clientTo;
+                if (item.To.node.GetRoot().RootInfo.Type == CloudType.Mega) InitUploadMega();//InitUploadMega
+
+                //Make Stream From
+                item.From.stream = AppSetting.ManageCloud.GetFileStream(item.From.node, item.SaveSizeTransferSuccess,
+                    item.From.node.Info.Size - 1, item.To.node.GetRoot().RootInfo.Type != CloudType.LocalDisk, item.dataCryptoMega);
+                //Make Stream To
+                if (item.ChunkUploadSize > 0) MakeNextChunkUploadInStreamTo(true);//upload to cloud
+                else this.item.To.stream = AppSetting.ManageCloud.GetFileStream(item.To.node, item.SizeWasTransfer);//download to disk
+
+                item.status = StatusTransfer.Running;
+                item.From.stream.BeginRead(item.buffer, 0, item.buffer.Length, new AsyncCallback(GetFrom), 0);
+            }
         }
 
         void GetFrom(IAsyncResult result)
@@ -62,9 +79,9 @@ namespace Core.Transfer
                 {
                     if (item.ChunkUploadSize < 0 || item.SizeWasTransfer == item.From.node.Info.Size)//save last pos if download or done (up/down)
                     {
-                        if (root_from == CloudType.Mega) SaveEncryptDataDownloadMega();//download done from mega
-                        if (root_to == CloudType.Mega) SaveUploadMega();//upload done to mega
-                        if(root_to == CloudType.Dropbox) ((DropboxRequestAPIv2)clientTo).GetResponse_upload_session_append();//get data return from server
+                        if (Type_root_from == CloudType.Mega) SaveEncryptDataDownloadMega();//download done from mega
+                        if (Type_root_to == CloudType.Mega) SaveUploadMega();//upload done to mega
+                        if(Type_root_to == CloudType.Dropbox) ((DropboxRequestAPIv2)clientTo).GetResponse_upload_session_append();//get data return from server
                         item.SaveSizeTransferSuccess = item.SizeWasTransfer;
                     }
 
@@ -81,7 +98,7 @@ namespace Core.Transfer
                     else if (item.status == StatusTransfer.Running && GroupManager.GroupData.status == StatusTransfer.Running)
                     {
                         item.status = StatusTransfer.Done;
-                        if (root_to == CloudType.Dropbox) if (!SaveUploadDropbox()) item.status = StatusTransfer.Error;
+                        if (Type_root_to == CloudType.Dropbox) if (!SaveUploadDropbox()) item.status = StatusTransfer.Error;
                     }
                     else item.status = StatusTransfer.Stop;
                     Dispose();
@@ -96,7 +113,7 @@ namespace Core.Transfer
                     totalchunkupload += item.byteread;
                     if (totalchunkupload == item.ChunkUploadSize)
                     {
-                        if (root_to == CloudType.Mega) indexPosMega++;
+                        if (Type_root_to == CloudType.Mega) indexPosMega++;
                         MakeNextChunkUploadInStreamTo();
                         totalchunkupload = 0;
                     }//make new stream of next chunk and set totalchunkupload=0
@@ -105,7 +122,7 @@ namespace Core.Transfer
                 }
                 else//if download
                 {
-                    if (root_from == CloudType.Mega) SaveEncryptDataDownloadMega();
+                    if (Type_root_from == CloudType.Mega) SaveEncryptDataDownloadMega();
                     item.SaveSizeTransferSuccess = item.SizeWasTransfer;
                     item.From.stream.BeginRead(item.buffer, 0, item.buffer.Length, new AsyncCallback(GetFrom), 0);
                 }
