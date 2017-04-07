@@ -12,7 +12,7 @@ using System.Threading;
 using System.Xml;
 using static Cloud.GoogleDrive.DriveAPIHttprequestv2;
 
-namespace Core.Cloud
+namespace Core.CloudSubClass
 {
     internal static class GoogleDrive
     {
@@ -106,7 +106,7 @@ namespace Core.Cloud
             throw new Exception("Can't Analyze Data Input.");
         }
 
-        public static Stream GetFileStream(ExplorerNode node, long Startpos,long endpos)
+        public static Stream GetFileStream(ExplorerNode node, long Startpos = -1,long endpos = -1)
         {
             DriveAPIHttprequestv2 gdclient = GetAPIv2(node.GetRoot().RootInfo.Email);
             return gdclient.Files_get(node.Info.ID, Startpos, endpos);

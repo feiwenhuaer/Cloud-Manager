@@ -74,5 +74,16 @@ namespace SupDataDll.Class
                 outputStream.Write(buffer, 0, read);
             }
         }
+
+        public static string EncodeUnicode(this string input)
+        {
+            string str = "";
+            foreach (char chr in input)
+            {
+                if (((ushort)chr) < 127) str += chr;
+                else str += "\\u" + ((ushort)chr).ToString("X");
+            }
+            return str;
+        }
     }
 }

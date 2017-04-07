@@ -1,4 +1,4 @@
-﻿//#define TESTCLASS
+﻿#define TESTCLASS
 using Core.StaticClass;
 using SupDataDll;
 using System;
@@ -6,7 +6,7 @@ using System.IO;
 using System.Threading;
 using System.Windows.Forms;
 using SupDataDll.UiInheritance;
-using Core.Cloud;
+using Core.CloudSubClass;
 using Core.Transfer;
 using Core.Class;
 

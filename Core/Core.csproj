@@ -43,12 +43,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CloudSubClass\LocalDisk_FileOperationAPIWrapper.cs" />
     <Compile Include="StaticClass\AppSetting.cs" />
-    <Compile Include="Cloud\CloudManager.cs" />
-    <Compile Include="Cloud\Dropbox.cs" />
-    <Compile Include="Cloud\GoogleDrive.cs" />
-    <Compile Include="Cloud\LocalDisk.cs" />
-    <Compile Include="Cloud\MegaNz.cs" />
+    <Compile Include="CloudSubClass\CloudManager.cs" />
+    <Compile Include="CloudSubClass\Dropbox.cs" />
+    <Compile Include="CloudSubClass\GoogleDrive.cs" />
+    <Compile Include="CloudSubClass\LocalDisk.cs" />
+    <Compile Include="CloudSubClass\MegaNz.cs" />
     <Compile Include="Class\ManagerCoreThreads.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

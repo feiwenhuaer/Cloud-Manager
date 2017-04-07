@@ -77,7 +77,7 @@ namespace Cloud.GoogleDrive
                 switch(typereturn)
                 {
                     case TypeReturn.header_response: string temp = request.GetTextDataResponse(false, true); return request.HeaderReceive;
-                    case TypeReturn.streamresponse_: return request.ReadHeaderResponse_and_GetStreamResponse(true, true);//get stream response
+                    case TypeReturn.streamresponse_: return request.ReadHeaderResponse_and_GetStreamResponse(true);//get stream response
                     case TypeReturn.streamupload_: return request.SendHeader_And_GetStream();//get stream upload
                     case TypeReturn.string_:request.SendHeader_And_GetStream(); return request.GetTextDataResponse(true, true);//text data response
                     default:throw new Exception("Error typereturn.");
@@ -174,11 +174,11 @@ namespace Cloud.GoogleDrive
             return (string)Request(url, TypeRequest.GET);
         }
 
-        public Stream Files_get(string fileId, long PosStart = 0, long endpos = 0)
+        public Stream Files_get(string fileId, long PosStart = -1, long endpos = -1)
         {
             string url = string.Format(uriFileGet, fileId);
             string[] moreheader = { "Range: bytes=" + PosStart.ToString() + "-" + endpos.ToString() };
-            return (Stream)Request(url, TypeRequest.GET, TypeReturn.streamresponse_, null, (endpos != 0) ? moreheader : null);
+            return (Stream)Request(url, TypeRequest.GET, TypeReturn.streamresponse_, null, (endpos < 0) ? moreheader : null);
         }
 
         public string Files_insert_resumable_getUploadID(string jsondata, string typefileupload, long filesize)

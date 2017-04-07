@@ -1,7 +1,7 @@
 ﻿using Cloud.Dropbox;
 using Cloud.GoogleDrive;
 using Cloud.MegaNz;
-using Core.Cloud;
+using Core.CloudSubClass;
 using Core.StaticClass;
 using Newtonsoft.Json;
 using SupDataDll;
@@ -274,7 +274,7 @@ namespace Core.Transfer
 
         void RefreshGroupDataToShow(int count_item_done, int count_item_remove = 0)
         {
-            if ((count_item_done != -1 && GroupData.col[3].IndexOf("100% (") < 0 && GroupData.items.Count != 0) | count_item_remove != 0)
+            if ((count_item_done != -1 && GroupData.col != null && GroupData.col[3].IndexOf("100% (") < 0 && GroupData.items.Count != 0) | count_item_remove != 0)
                 GroupData.col[3] = Math.Round((double)count_item_done * 100 / GroupData.items.Count, 2).ToString() + "% (" + count_item_done.ToString() + "/" + GroupData.items.Count.ToString() + ")";
             GroupData.col[2] = GroupData.status.ToString();
             for (int i = 0; i < GroupData.items.Count; i++)
@@ -294,11 +294,7 @@ namespace Core.Transfer
             ExplorerNode root_to = savefolder.GetRoot();
             try
             {
-                if (root_from.RootInfo.Type == root_to.RootInfo.Type)//Same type
-                {
-                    if (root_from.RootInfo.Type == CloudType.LocalDisk) Transfer(item);
-                    else AccountCloud(item);//cloud
-                }
+                if (root_from.RootInfo.Type == root_to.RootInfo.Type && root_from.RootInfo.Type != CloudType.LocalDisk) AccountCloud(item);//cloud, inport file from other cloud
                 else Transfer(item);//not same type
             }
             catch (Exception ex){ item.ErrorMsg = ex.Message + ex.StackTrace; item.status = StatusTransfer.Error; return; }
@@ -347,8 +343,8 @@ namespace Core.Transfer
                     if (string.IsNullOrEmpty(item.UploadID))//create upload id
                     {
                         item.byteread = item.From.stream.Read(item.buffer, 0, item.buffer.Length);
-                        dynamic json = JsonConvert.DeserializeObject(DropboxClient.upload_session_start(item.buffer, item.byteread));
-                        item.UploadID = json.session_id;
+                        IDropbox_Request_UploadSessionAppend session = DropboxClient.upload_session_start(item.buffer, item.byteread);
+                        item.UploadID = session.session_id;
                         item.SizeWasTransfer += item.byteread;
                     }
                     ItemsTransferWork.Add(new TransferBytes(item, this, DropboxClient));

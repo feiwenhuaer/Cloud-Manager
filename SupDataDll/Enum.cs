@@ -73,6 +73,7 @@ namespace SupDataDll
         Admin_user, Admin_password, AutoLogin,
         UI_dll_file, lang,
         DATE_TIME_FORMAT,
+        HOST_STREAM, HOST_STREAM_PORT,
 
         mimeType_audio, mimeType_document, mimeType_drawing, mimeType_form,
         mimeType_fusiontable, mimeType_map, mimeType_photo, mimeType_presentation,

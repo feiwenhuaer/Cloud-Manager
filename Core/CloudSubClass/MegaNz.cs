@@ -10,7 +10,7 @@ using SupDataDll.Class.Mega;
 using SupDataDll.Class;
 using Core.StaticClass;
 
-namespace Core.Cloud
+namespace Core.CloudSubClass
 {
     internal static class MegaNz
     {
@@ -59,7 +59,7 @@ namespace Core.Cloud
                 long end = end_pos > 0 ? end_pos : node.Info.Size - 1;
                 return api.Download(meganode, start_pos, end, DataEx);
             }
-            else throw new Exception("Not Support Upload now.");
+            else throw new Exception("Not Support Upload.");
         }
 
         public static void CreateFolder(ExplorerNode node)
@@ -228,6 +228,14 @@ namespace Core.Cloud
                 throw new NotImplementedException();
             }
             #endregion
+        }
+
+        public static ExplorerNode GetItem(ExplorerNode node)
+        {
+            MegaApiClient client = GetClient(node.GetRoot().RootInfo.Email);
+            MegaNzNode inode = new MegaNzNode(node.Info.ID);
+            GetItems(client, inode, node);
+            return node;
         }
     }
 

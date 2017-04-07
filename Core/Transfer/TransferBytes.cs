@@ -1,7 +1,7 @@
 ﻿using Cloud.Dropbox;
 using Cloud.GoogleDrive;
 using Cloud.MegaNz;
-using Core.Cloud;
+using Core.CloudSubClass;
 using Core.StaticClass;
 using Newtonsoft.Json;
 using SupDataDll;
@@ -9,7 +9,7 @@ using SupDataDll.Class;
 using System;
 using System.IO;
 using System.Linq;
-using static Core.Cloud.MegaNz;
+using static Core.CloudSubClass.MegaNz;
 
 namespace Core.Transfer
 {
@@ -45,7 +45,6 @@ namespace Core.Transfer
             }
             else
             {
-                
                 if (item.buffer == null) item.buffer = new byte[128 * 1024];
                 if (clientTo != null) this.clientTo = clientTo;
                 if (item.To.node.GetRoot().RootInfo.Type == CloudType.Mega) InitUploadMega();//InitUploadMega
@@ -146,7 +145,9 @@ namespace Core.Transfer
             {
                 case CloudType.Dropbox:
                     if (!CreateNew) ((DropboxRequestAPIv2)clientTo).GetResponse_upload_session_append();//get data return from server
-                    item.To.stream = ((DropboxRequestAPIv2)clientTo).upload_session_append(item.UploadID, pos_end - item.SizeWasTransfer + 1, item.SizeWasTransfer);
+                    item.To.stream = ((DropboxRequestAPIv2)clientTo).upload_session_append(
+                        new Dropbox_Request_UploadSessionAppend(item.UploadID, item.SizeWasTransfer), 
+                        pos_end - item.SizeWasTransfer + 1);
                     break;
 
                 case CloudType.GoogleDrive:
@@ -217,7 +218,11 @@ namespace Core.Transfer
         bool SaveUploadDropbox()
         {
             Dropbox.AutoCreateFolder(item.To.node.Parent);
-            dynamic json_ = JsonConvert.DeserializeObject(((DropboxRequestAPIv2)clientTo).upload_session_finish(null, item.UploadID, item.SizeWasTransfer, item.To.node.GetFullPathString(false,true), DropboxUploadMode.add));
+            Dropbox_Request_UploadSessionFinish session_finish = new Dropbox_Request_UploadSessionFinish(
+                new Dropbox_upload(item.To.node.GetFullPathString(false)),
+                new Dropbox_Request_UploadSessionAppend(item.UploadID, item.SizeWasTransfer)
+                );
+            IDropbox_Response_MetaData json_ = ((DropboxRequestAPIv2)clientTo).upload_session_finish(session_finish);
             long size = json_.size;
             if (size == item.From.node.Info.Size) return true;
             else
@@ -236,6 +241,47 @@ namespace Core.Transfer
             chunksSizesToUploadMega = null;
             mega_up = null;
             completionHandle = null;
+        }
+
+
+        class Dropbox_Request_UploadSessionFinish : Cloud.Dropbox.IDropbox_Request_UploadSessionFinish
+        {
+            public Dropbox_Request_UploadSessionFinish(Cloud.Dropbox.IDropbox_upload commit, Cloud.Dropbox.IDropbox_Request_UploadSessionAppend cursor)
+            {
+                this.commit = commit;
+                this.cursor = cursor;
+            }
+
+            public IDropbox_upload commit { get; set; }
+            public IDropbox_Request_UploadSessionAppend cursor { get; set; }
+        }
+
+        class Dropbox_upload : Cloud.Dropbox.IDropbox_upload
+        {
+            public Dropbox_upload(string path, Dropbox_WriteMode mode = Dropbox_WriteMode.add,bool autorename =false,bool mute =false)
+            {
+                this.path = path;
+                this.mode = mode;
+                this.autorename = autorename;
+                this.mute = mute;
+            }
+
+            public bool autorename { get; set; }
+            public Dropbox_WriteMode mode { get; set; }
+            public bool mute { get; set; }
+            public string path { get; set; }
+        }
+
+        class Dropbox_Request_UploadSessionAppend : Cloud.Dropbox.IDropbox_Request_UploadSessionAppend
+        {
+            public Dropbox_Request_UploadSessionAppend(string session_id,long offset)
+            {
+                this.offset = offset;
+                this.session_id = session_id;
+            }
+
+            public long offset { get; set; }
+            public string session_id { get; set; }
         }
     }
 }

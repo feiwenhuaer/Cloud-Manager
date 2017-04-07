@@ -245,7 +245,12 @@ namespace SupDataDll.Class
                 parent.AddChild(node);
                 parent = node;
             }
-            if (size > 0) parent.Info.Size = size;
+            if (size >= 0) parent.Info.Size = size;
+            else
+            {
+                System.IO.FileInfo info = new System.IO.FileInfo(path);
+                if (info.Exists) parent.Info.Size = info.Length;
+            }
             return parent;
         }
 

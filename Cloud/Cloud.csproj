@@ -45,9 +45,10 @@
     <Compile Include="BuildURL.cs" />
     <Compile Include="Dropbox\DropboxEnum.cs" />
     <Compile Include="Dropbox\DropboxErrorCode.cs" />
+    <Compile Include="Dropbox\DropboxJsonResponseException.cs" />
+    <Compile Include="Dropbox\JsonSerialization.cs" />
     <Compile Include="Dropbox\Oauth\DropboxOauthv2.cs" />
     <Compile Include="Dropbox\DropboxRequestAPIv2.cs" />
-    <Compile Include="Dropbox\DropboxSharingMember.cs" />
     <Compile Include="Dropbox\Oauth\UIinterfaceDB.cs" />
     <Compile Include="GoogleDrive\DriveAPIHttprequestv2.cs" />
     <Compile Include="GoogleDrive\GoogleDriveEnum.cs" />

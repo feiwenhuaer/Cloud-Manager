@@ -15,7 +15,7 @@ using System.Text.RegularExpressions;
 using SupDataDll.Class;
 using System.Collections.Generic;
 
-namespace Core.Cloud
+namespace Core.CloudSubClass
 {
     public class CloudManager
     {
@@ -49,7 +49,7 @@ namespace Core.Cloud
             }
         }
 
-        internal Stream GetFileStream(ExplorerNode node, long Startpos = -1,long endpos =-1,bool IsUpload = false,object DataEx = null)
+        public Stream GetFileStream(ExplorerNode node, long Startpos = -1,long endpos =-1,bool IsUpload = false,object DataEx = null)
         {
             switch (node.GetRoot().RootInfo.Type)
             {
@@ -146,9 +146,8 @@ namespace Core.Cloud
         {
             Console.WriteLine("dropbox token call back");
             DropboxRequestAPIv2 client = new DropboxRequestAPIv2(token);
-            dynamic json = JsonConvert.DeserializeObject(client.GetCurrentAccount());
-            string email = json.email;
-            SaveToken(email, token, CloudType.Dropbox);
+            IDropbox_Response_GetCurrentAccount account = client.GetCurrentAccount();
+            SaveToken(account.email, token, CloudType.Dropbox);
         }
         private void Oauth_gd_TokenCallBack(string token_)
         {
@@ -287,6 +286,28 @@ namespace Core.Cloud
             public void Deleteform_EventCloseForm()
             {
                 closedform = !closedform;
+            }
+        }
+
+
+        public ExplorerNode GetFileInfo(ExplorerNode node)
+        {
+            switch (node.GetRoot().RootInfo.Type)
+            {
+                case CloudType.Dropbox:
+                    return Dropbox.GetMetaData(node);
+                case CloudType.GoogleDrive:
+                    GD_item item = GoogleDrive.GetMetadataItem(node);
+                    node.Info.Size = item.fileSize;
+                    node.Info.Name = item.title;
+                    node.Info.DateMod = DateTime.Parse(item.modifiedDate);
+                    return node;
+                case CloudType.LocalDisk:
+                    return LocalDisk.GetFileInfo(node);
+                case CloudType.Mega:
+                    return MegaNz.GetItem(node);
+                default:
+                    throw new UnknowCloudNameException("Error Unknow Cloud Type: " + node.GetRoot().RootInfo.Type.ToString());
             }
         }
     }

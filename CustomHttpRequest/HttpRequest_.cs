@@ -13,7 +13,9 @@ namespace CustomHttpRequest
 {
     public class HttpRequest_
     {
+#if DEBUG
         public bool debug = false;
+#endif
         Uri uri;
 
         public HttpRequest_(Uri uri, string RequestMethod)
@@ -43,13 +45,13 @@ namespace CustomHttpRequest
 
         #region Connection & SSL
         /// <summary>
-        /// Get/Set ReceiveTimeout of tcpclient (default 10000ms)
+        /// Get/Set ReceiveTimeout of tcpclient (default 30000ms)
         /// </summary>
         public int ReceiveTimeout { get { return receive_timeout; } set { receive_timeout = value; } }
         int receive_timeout = 30000;
 
         /// <summary>
-        /// Get/Set SendTimeout of tcpclient (default 10000ms)
+        /// Get/Set SendTimeout of tcpclient (default 30000ms)
         /// </summary>
         public int SendTimeout { get { return send_timeout; } set { send_timeout = value; } }
         int send_timeout = 30000;
@@ -138,12 +140,19 @@ namespace CustomHttpRequest
         {
             header_send += Header + "\r\n";
         }
-        public void AddHeader(string[] Header)
+        public void AddHeader(string[] Headers)
         {
-            foreach (string h in Header)
-            {
-                header_send += h + "\r\n";
-            }
+            if (Headers != null) foreach (string h in Headers)
+                {
+                    header_send += h + "\r\n";
+                }
+        }
+        public void AddHeader(List<string> Headers)
+        {
+            if (Headers != null) foreach (string h in Headers)
+                {
+                    header_send += h + "\r\n";
+                }
         }
 
         /// <summary>
@@ -233,10 +242,12 @@ namespace CustomHttpRequest
         private void SendHeader(Stream stream)
         {
             if (WasSendHeader) return;
-            byte[] req = Encoding.UTF8.GetBytes(header_send + "\r\n");
+            byte[] req = Encoding.ASCII.GetBytes(header_send + "\r\n");
             stream.Write(req, 0, req.Length);
             WasSendHeader = true;
+#if DEBUG
             debugwrite("send header", header_send);
+#endif
         }
         /// <summary>
         /// Send header and Get Stream Upload.
@@ -246,7 +257,9 @@ namespace CustomHttpRequest
         {
             Stream stream = GetStream();
             SendHeader(stream);
+#if DEBUG
             debugwrite("Stream response status: read:", stream.CanRead.ToString() + ", write:" + stream.CanWrite.ToString());
+#endif
             return stream;
         }
         #endregion
@@ -261,7 +274,7 @@ namespace CustomHttpRequest
         /// <param name="SendDataHeader"></param>
         /// <param name="CheckStatusCode">HttpException, Ignore 200 and 206</param>
         /// <returns>Data Stream Download</returns>
-        public Stream ReadHeaderResponse_and_GetStreamResponse(bool SendDataHeader = true, bool CheckStatusCode = false)
+        public Stream ReadHeaderResponse_and_GetStreamResponse(bool CheckStatusCode = false)
         {
             Stream st;
             st = GetStream();
@@ -269,7 +282,7 @@ namespace CustomHttpRequest
             byte_send = 0;
             byte_header_receive = 0;
             byte_header_send = 0;
-            if (SendDataHeader) SendHeader(st);
+            SendHeader(st);
             if (!WasReceiveHeader)
             {
                 int byteread = 0;
@@ -278,6 +291,8 @@ namespace CustomHttpRequest
                     do //Receive header
                     {
                         byteread = st.Read(buffer, 0, buffer.Length);
+                        if (byteread == 0)
+                            continue;
                         Array.Copy(buffer, 0, buffer_header, byte_receive, byteread);
                         byte_receive += byteread;
                         byte_header_receive += byteread;
@@ -289,7 +304,9 @@ namespace CustomHttpRequest
                 catch (Exception ex)
                 { throw ex; }
                 header_receive = Encoding.UTF8.GetString(buffer_header, 0, (int)byte_header_receive).TrimStart(' ');
+#if DEBUG
                 debugwrite("header response.", header_receive);
+#endif
                 WasReceiveHeader = true;
             }
 
@@ -401,7 +418,9 @@ namespace CustomHttpRequest
                         //stream.Read(chunk_buffer, 1, 4);
                         textdataresponse = Encoding.UTF8.GetString(buffer, 0, receive);
                         tcp.Close();
+#if DEBUG
                         debugwrite("TCP closed, Data text response:", textdataresponse);
+#endif
                         return textdataresponse;
                     }
                     int offset = 1;
@@ -438,16 +457,18 @@ namespace CustomHttpRequest
                         } while (receive != GetContentLengthResponse());
                     }
                     textdataresponse = Encoding.UTF8.GetString(buffer);
+#if DEBUG
                     debugwrite("TCP closed, Data text response", textdataresponse);
+#endif
                     tcp.Close();
                     return textdataresponse;
                 }
                 else return "";
             }catch(Exception ex) { throw ex; }
         }//read data text receive
-        #endregion
+#endregion
         
-        #region SubMethod check,data processing,...
+#region SubMethod check,data processing,...
         private List<string> RemoveOldDataHeader(List<string> headerlist)
         {
             for (int i = 0; i < headerlist.Count; i++)
@@ -496,8 +517,8 @@ namespace CustomHttpRequest
         };
 
         public List<string> ListHeaderRemove = new List<string>() { "host" };
-        #endregion
-        
+#endregion
+#if DEBUG
         private void debugwrite(string title,string data)
         {
             if(debug)
@@ -505,5 +526,6 @@ namespace CustomHttpRequest
                 Console.WriteLine(">> " + title + "\r\n" + data);
             }
         }
+#endif
     }
 }
