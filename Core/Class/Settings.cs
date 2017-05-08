@@ -1,7 +1,7 @@
 ﻿using Core.StaticClass;
-using SupDataDll;
-using SupDataDll.Class;
-using SupDataDll.Crypt;
+using CloudManagerGeneralLib;
+using CloudManagerGeneralLib.Class;
+using CloudManagerGeneralLib.Crypt;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -112,6 +112,9 @@ namespace Core.Class
         #region Cloud
         public List<ExplorerNode> GetListAccountCloud()
         {
+#if DEBUG
+            //Console.WriteLine("Check event handle multi?");
+#endif
             List<ExplorerNode> list = new List<ExplorerNode>();
             foreach (XmlNode node in GetCloudDataList())
             {

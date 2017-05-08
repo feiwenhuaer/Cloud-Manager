@@ -3,10 +3,10 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json;
-using SupDataDll.Class;
-using SupDataDll.Class.Mega;
+using CloudManagerGeneralLib.Class;
+using CloudManagerGeneralLib.Class.Mega;
 
-namespace SupDataDll.Crypt
+namespace CloudManagerGeneralLib.Crypt
 {
     public static class Crypto
     {

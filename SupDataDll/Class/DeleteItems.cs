@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SupDataDll.Class
+namespace CloudManagerGeneralLib.Class
 {
     public class DeleteItems
     {

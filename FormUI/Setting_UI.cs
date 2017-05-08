@@ -2,7 +2,7 @@
 
 namespace FormUI
 {
-    public class Setting_UI:SupDataDll.UiInheritance.SettingUI
+    public class Setting_UI:CloudManagerGeneralLib.UiInheritance.SettingUI
     {
         public static Color Background = SystemColors.ControlDark;
     }

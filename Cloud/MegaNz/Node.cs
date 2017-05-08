@@ -6,8 +6,8 @@
     using System.Runtime.Serialization;
 
     using Newtonsoft.Json;
-    using SupDataDll.Class.Mega;
-    using SupDataDll.Crypt;
+    using CloudManagerGeneralLib.Class.Mega;
+    using CloudManagerGeneralLib.Crypt;
 
     [DebuggerDisplay("Type: {Type} - Name: {Name} - Id: {Id}")]
   internal class Node : NodePublic, INode, INodeCrypto

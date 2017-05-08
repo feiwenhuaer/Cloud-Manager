@@ -1,9 +1,9 @@
-﻿using SupDataDll.Class;
+﻿using CloudManagerGeneralLib.Class;
 using System.Collections.Generic;
 
-namespace SupDataDll
+namespace CloudManagerGeneralLib
 {
-    public static class ClipBoard_
+    public static class AppClipboard
     {
         public static bool Clipboard = false;
         public static bool AreCut = false;

@@ -1,12 +1,12 @@
 ﻿using Cloud.Dropbox;
 using Newtonsoft.Json;
-using SupDataDll;
+using CloudManagerGeneralLib;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Web;
 using System.Threading;
-using SupDataDll.Class;
+using CloudManagerGeneralLib.Class;
 using Core.StaticClass;
 
 namespace Core.CloudSubClass

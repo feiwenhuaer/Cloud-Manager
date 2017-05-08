@@ -1,7 +1,7 @@
 ﻿namespace Cloud.MegaNz
 {
-    using SupDataDll.Class.Mega;
-    using SupDataDll.Crypt;
+    using CloudManagerGeneralLib.Class.Mega;
+    using CloudManagerGeneralLib.Crypt;
     using System;
     using System.Collections.Generic;
     using System.IO;

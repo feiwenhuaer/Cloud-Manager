@@ -4,8 +4,8 @@ using Cloud.MegaNz;
 using Core.CloudSubClass;
 using Core.StaticClass;
 using Newtonsoft.Json;
-using SupDataDll;
-using SupDataDll.Class;
+using CloudManagerGeneralLib;
+using CloudManagerGeneralLib.Class;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -33,7 +33,7 @@ namespace Core.Transfer
             this.savefolder = group_json.savefolder;
 
             this.GroupData.status = (group_json.Group.status == StatusTransfer.Done | group_json.Group.status == StatusTransfer.Error) ? group_json.Group.status : StatusTransfer.Stop;
-            foreach (TransferItem item in this.GroupData.items)
+            foreach (CloudManagerGeneralLib.Class.TransferItem item in this.GroupData.items)
             {
                 if (item.status == StatusTransfer.Running) item.status = StatusTransfer.Stop;
                 item.col[3] = item.status.ToString();
@@ -91,7 +91,7 @@ namespace Core.Transfer
         //Path_Parent : GD:default@gmail.com?id=id/folder/folder or GD:a@gmail.com/folder/folder
         void LoadFile(ExplorerNode node)//Path_raw path parent folder of file
         {
-            TransferItem ud_item = new TransferItem();
+            CloudManagerGeneralLib.Class.TransferItem ud_item = new CloudManagerGeneralLib.Class.TransferItem();
             //From
             ud_item.From.node = node;
             //group & UI
@@ -289,7 +289,7 @@ namespace Core.Transfer
 
         void WorkThread(object obj)
         {
-            TransferItem item = GroupData.items[(int)obj];
+            CloudManagerGeneralLib.Class.TransferItem item = GroupData.items[(int)obj];
             ExplorerNode root_from = fromfolder.GetRoot();
             ExplorerNode root_to = savefolder.GetRoot();
             try
@@ -301,12 +301,12 @@ namespace Core.Transfer
         }
 
       
-        void AccountCloud(TransferItem item)
+        void AccountCloud(CloudManagerGeneralLib.Class.TransferItem item)
         {
 
         }
 
-        void Transfer(TransferItem item)
+        void Transfer(CloudManagerGeneralLib.Class.TransferItem item)
         {
 
 #if DEBUG

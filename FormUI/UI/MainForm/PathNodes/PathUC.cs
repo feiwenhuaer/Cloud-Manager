@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using SupDataDll.Class;
+using CloudManagerGeneralLib.Class;
 
 namespace FormUI.UI.MainForm.PathNodes
 {

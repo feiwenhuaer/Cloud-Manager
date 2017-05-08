@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SupDataDll.UiInheritance
+namespace CloudManagerGeneralLib.UiInheritance
 {
     public class SettingUI
     {

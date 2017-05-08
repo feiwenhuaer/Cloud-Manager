@@ -1,7 +1,7 @@
 ﻿using Core.CloudSubClass;
 using Core.StaticClass;
-using SupDataDll;
-using SupDataDll.Class;
+using CloudManagerGeneralLib;
+using CloudManagerGeneralLib.Class;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,10 +16,10 @@ namespace Core.Class
         HttpListener listener;
         public void Start()
         {
-            if(AppSetting.settings.GetSettingsAsBool(SupDataDll.SettingsKey.HOST_STREAM))
+            if(AppSetting.settings.GetSettingsAsBool(CloudManagerGeneralLib.SettingsKey.HOST_STREAM))
             {
                 int port = 34567;
-                int.TryParse(AppSetting.settings.GetSettingsAsString(SupDataDll.SettingsKey.HOST_STREAM_PORT), out port);
+                int.TryParse(AppSetting.settings.GetSettingsAsString(CloudManagerGeneralLib.SettingsKey.HOST_STREAM_PORT), out port);
                 listener = new HttpListener();
                 listener.Prefixes.Add("http://localhost:" + port);
                 listener.Start();

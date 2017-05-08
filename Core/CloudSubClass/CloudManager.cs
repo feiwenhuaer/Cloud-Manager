@@ -1,4 +1,4 @@
-﻿using SupDataDll;
+﻿using CloudManagerGeneralLib;
 using System.IO;
 using Newtonsoft.Json;
 using System;
@@ -12,7 +12,7 @@ using Cloud.Dropbox;
 using Cloud.MegaNz.Oauth;
 using Cloud.MegaNz;
 using System.Text.RegularExpressions;
-using SupDataDll.Class;
+using CloudManagerGeneralLib.Class;
 using System.Collections.Generic;
 
 namespace Core.CloudSubClass
@@ -196,17 +196,17 @@ namespace Core.CloudSubClass
         public void Delete(DeleteItems items)
         {
             CheckThread(true);
-            Type type_deleteform = LoadDllUI.GetTypeInterface(typeof(SupDataDll.UiInheritance.UIDelete));
-            DeleteWork dw = new DeleteWork(items.Items, AppSetting.UIMain.CreateUI<SupDataDll.UiInheritance.UIDelete>(type_deleteform), items.PernamentDelete);
+            Type type_deleteform = LoadDllUI.GetTypeInterface(typeof(CloudManagerGeneralLib.UiInheritance.UIDelete));
+            DeleteWork dw = new DeleteWork(items.Items, AppSetting.UIMain.CreateUI<CloudManagerGeneralLib.UiInheritance.UIDelete>(type_deleteform), items.PernamentDelete);
             dw.Start();
         }
 
         public class DeleteWork
         {
             List<ExplorerNode> items;
-            SupDataDll.UiInheritance.UIDelete ui;
+            CloudManagerGeneralLib.UiInheritance.UIDelete ui;
             bool PernamentDelete = false;
-            public DeleteWork(List<ExplorerNode> items, SupDataDll.UiInheritance.UIDelete ui, bool PernamentDelete = false)
+            public DeleteWork(List<ExplorerNode> items, CloudManagerGeneralLib.UiInheritance.UIDelete ui, bool PernamentDelete = false)
             {
                 if (ui == null) throw new Exception("UI is null.");
                 if (items == null || items.Count == 0) throw new Exception("Need >= 1 item.");

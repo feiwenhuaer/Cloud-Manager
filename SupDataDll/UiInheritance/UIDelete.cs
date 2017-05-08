@@ -1,4 +1,4 @@
-﻿namespace SupDataDll.UiInheritance
+﻿namespace CloudManagerGeneralLib.UiInheritance
 {
     public delegate void CancelDelegate();
     public delegate void ClosingDelegate();

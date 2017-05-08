@@ -1,6 +1,6 @@
-﻿using SupDataDll.Class;
+﻿using CloudManagerGeneralLib.Class;
 
-namespace SupDataDll.UiInheritance
+namespace CloudManagerGeneralLib.UiInheritance
 {
     public interface UIUC_TLV_ud
     {

@@ -16,7 +16,7 @@ namespace WpfUI.UI
     /// <summary>
     /// Interaction logic for Closing.xaml
     /// </summary>
-    public partial class Closing : Window, SupDataDll.UiInheritance.UIClosing
+    public partial class Closing : Window, CloudManagerGeneralLib.UiInheritance.UIClosing
     {
         public Closing()
         {

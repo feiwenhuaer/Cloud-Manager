@@ -1,5 +1,5 @@
-﻿using SupDataDll;
-using SupDataDll.Class;
+﻿using CloudManagerGeneralLib;
+using CloudManagerGeneralLib.Class;
 using System.Windows.Media;
 
 namespace WpfUI.Class

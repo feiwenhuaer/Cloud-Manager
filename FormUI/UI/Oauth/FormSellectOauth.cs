@@ -51,17 +51,17 @@ namespace FormUI.UI.Oauth
 
         private void PB_Dropbox_Click(object sender, EventArgs e)
         {
-            Setting_UI.reflection_eventtocore._ShowFormOauth(SupDataDll.CloudType.Dropbox);
+            Setting_UI.reflection_eventtocore.ShowFormOauth(CloudManagerGeneralLib.CloudType.Dropbox);
             this.Close();
         }
         private void PB_GoogleDrive_Click(object sender, EventArgs e)
         {
-            Setting_UI.reflection_eventtocore._ShowFormOauth(SupDataDll.CloudType.GoogleDrive);
+            Setting_UI.reflection_eventtocore.ShowFormOauth(CloudManagerGeneralLib.CloudType.GoogleDrive);
             this.Close();
         }
         private void PB_Mega_Click(object sender, EventArgs e)
         {
-            Setting_UI.reflection_eventtocore._ShowFormOauth(SupDataDll.CloudType.Mega);
+            Setting_UI.reflection_eventtocore.ShowFormOauth(CloudManagerGeneralLib.CloudType.Mega);
             this.Close();
         }
     }

@@ -1,4 +1,4 @@
-﻿using SupDataDll.Class.Mega;
+﻿using CloudManagerGeneralLib.Class.Mega;
 
 namespace Cloud.MegaNz
 {

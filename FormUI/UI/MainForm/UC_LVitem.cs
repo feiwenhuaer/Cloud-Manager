@@ -4,9 +4,9 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Threading;
-using SupDataDll;
+using CloudManagerGeneralLib;
 using Etier.IconHelper;
-using SupDataDll.Class;
+using CloudManagerGeneralLib.Class;
 
 namespace FormUI.UI.MainForm
 {
@@ -67,25 +67,25 @@ namespace FormUI.UI.MainForm
 
         public void LoadLanguage()
         {
-            label1.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TB_path);
+            label1.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TB_path);
 
             for (int i = 0; i < LV_item.Columns.Count; i++)
             {
-                LV_item.Columns[i].Text = Setting_UI.reflection_eventtocore._GetTextLanguage("LVitem_Columns_" + i.ToString());
+                LV_item.Columns[i].Text = Setting_UI.reflection_eventtocore.GetTextLanguage("LVitem_Columns_" + i.ToString());
             }
 
-            refreshToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_refresh);
-            openToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_open);
-            cutToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_cut);
-            copyToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_copy);
-            pasteToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_paste);
-            renameToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_rename);
-            deleteToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_delete);
-            createFolderToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_createfolder);
-            copyIDToClipboardToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_copyid);
-            dowloadSeletedToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_downloadsellected);
-            uploadFileToHereToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_uploadfile);
-            uploadFolderToHereToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_uploadfolder);
+            refreshToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_refresh);
+            openToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_open);
+            cutToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_cut);
+            copyToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_copy);
+            pasteToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_paste);
+            renameToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_rename);
+            deleteToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_delete);
+            createFolderToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_createfolder);
+            copyIDToClipboardToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_copyid);
+            dowloadSeletedToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_downloadsellected);
+            uploadFileToHereToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_uploadfile);
+            uploadFolderToHereToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_uploadfolder);
         }
 
         #region ListView Event
@@ -215,7 +215,7 @@ namespace FormUI.UI.MainForm
                     copyToolStripMenuItem.Enabled = false;
                     dowloadSeletedToolStripMenuItem.Enabled = false;
                     deleteToolStripMenuItem.Enabled = false;
-                    pasteToolStripMenuItem.Enabled = ClipBoard_.Clipboard;
+                    pasteToolStripMenuItem.Enabled = AppClipboard.Clipboard;
                     if (managerexplorernodes.NodeWorking() != null) SetUpload_TSMI(true);
                     break;
 
@@ -223,7 +223,7 @@ namespace FormUI.UI.MainForm
                     openToolStripMenuItem.Enabled = true;
                     renameToolStripMenuItem.Enabled = true;
                     copyIDToClipboardToolStripMenuItem.Enabled = true;
-                    pasteToolStripMenuItem.Enabled = ClipBoard_.Clipboard;
+                    pasteToolStripMenuItem.Enabled = AppClipboard.Clipboard;
                     if (managerexplorernodes.NodeWorking() != null) SetUpload_TSMI(true);
                     SetCutCopyDeleteDownload_TSMI();
                     break;
@@ -263,16 +263,16 @@ namespace FormUI.UI.MainForm
         }
         void AddClipboard_(bool AreCut)
         {
-            ClipBoard_.Clear();
-            ClipBoard_.AreCut = AreCut;
-            ClipBoard_.directory = managerexplorernodes.NodeWorking();
+            AppClipboard.Clear();
+            AppClipboard.AreCut = AreCut;
+            AppClipboard.directory = managerexplorernodes.NodeWorking();
             bool AreCloud = !string.IsNullOrEmpty(managerexplorernodes.Root.RootInfo.Email);
             foreach (ListViewItem item in LV_item.SelectedItems)
             {
                 ExplorerNode node = FindNodeLV(item);
-                if (node != null) ClipBoard_.Add(node);
+                if (node != null) AppClipboard.Add(node);
             }
-            ClipBoard_.Clipboard = true;
+            AppClipboard.Clipboard = true;
         }
         private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -282,7 +282,7 @@ namespace FormUI.UI.MainForm
                 ExplorerNode find = FindNodeLV(LV_item.SelectedItems[0]);
                 if (find != null) rootto = find;
             }
-            Setting_UI.reflection_eventtocore._AddItem(ClipBoard_.Items, ClipBoard_.directory, rootto, ClipBoard_.AreCut);
+            Setting_UI.reflection_eventtocore.TransferItems(AppClipboard.Items, AppClipboard.directory, rootto, AppClipboard.AreCut);
         }
         ExplorerNode FindNodeLV(ListViewItem item)
         {
@@ -314,7 +314,7 @@ namespace FormUI.UI.MainForm
                     ExplorerNode find = FindNodeLV(item);
                     if(find != null) list_item_from.Add(find);
                 }
-                Setting_UI.reflection_eventtocore._AddItem(list_item_from, managerexplorernodes.NodeWorking(), ExplorerNode.GetNodeFromDiskPath(fbd.SelectedPath), false);
+                Setting_UI.reflection_eventtocore.TransferItems(list_item_from, managerexplorernodes.NodeWorking(), ExplorerNode.GetNodeFromDiskPath(fbd.SelectedPath), false);
             }
         }
         private void uploadFolderToHereToolStripMenuItem_Click(object sender, EventArgs e)
@@ -335,7 +335,7 @@ namespace FormUI.UI.MainForm
                     ExplorerNode find = FindNodeLV(LV_item.SelectedItems[0]);
                     if (find != null && find.Info.Size <= 0) rootto = find;
                 }
-                Setting_UI.reflection_eventtocore._AddItem(list_item_from, node.Parent, rootto, false);
+                Setting_UI.reflection_eventtocore.TransferItems(list_item_from, node.Parent, rootto, false);
             }
         }
         private void refreshToolStripMenuItem_Click(object sender, EventArgs e)
@@ -361,7 +361,7 @@ namespace FormUI.UI.MainForm
             if (f.Delete)
             {
                 DeleteItems items = new DeleteItems() { Items = item_arr, PernamentDelete = f.CB_pernament.Checked };
-                Setting_UI.reflection_eventtocore._DeletePath(items);
+                Setting_UI.reflection_eventtocore.DeletePath(items);
             }
         }
         private void renameToolStripMenuItem_Click(object sender, EventArgs e)

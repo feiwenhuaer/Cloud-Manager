@@ -1,4 +1,4 @@
-﻿namespace SupDataDll.Class.Mega
+﻿namespace CloudManagerGeneralLib.Class.Mega
 {
     public class DataCryptoMega
     {

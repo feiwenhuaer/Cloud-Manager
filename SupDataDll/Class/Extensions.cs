@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-namespace SupDataDll.Class
+namespace CloudManagerGeneralLib.Class
 {
     public static class Extensions
     {

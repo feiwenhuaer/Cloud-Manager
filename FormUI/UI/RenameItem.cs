@@ -1,4 +1,4 @@
-﻿using SupDataDll.Class;
+﻿using CloudManagerGeneralLib.Class;
 using System;
 using System.Drawing;
 using System.Threading;

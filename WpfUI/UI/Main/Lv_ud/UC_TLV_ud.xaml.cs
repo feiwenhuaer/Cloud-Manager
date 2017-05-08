@@ -1,5 +1,5 @@
-﻿using SupDataDll;
-using SupDataDll.Class;
+﻿using CloudManagerGeneralLib;
+using CloudManagerGeneralLib.Class;
 using System;
 using System.Collections.Generic;
 using System.Windows.Controls;
@@ -9,7 +9,7 @@ namespace WpfUI.UI.Main.Lv_ud
     /// <summary>
     /// Interaction logic for UCLV_ud.xaml
     /// </summary>
-    public partial class UC_TLV_ud : UserControl, SupDataDll.UiInheritance.UIUC_TLV_ud
+    public partial class UC_TLV_ud : UserControl, CloudManagerGeneralLib.UiInheritance.UIUC_TLV_ud
     {
         object uimain;
         #region interface
@@ -43,8 +43,8 @@ namespace WpfUI.UI.Main.Lv_ud
 
         public void LoadLanguage()
         {
-            TI_process.Header = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TP_processing);
-            TI_complete.Header = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TP_done);
+            TI_process.Header = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TP_processing);
+            TI_complete.Header = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TP_done);
         }
 
         public void RefreshAll()

@@ -8,8 +8,8 @@
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
-    using SupDataDll.Crypt;
-    using SupDataDll.Class.Mega;
+    using CloudManagerGeneralLib.Crypt;
+    using CloudManagerGeneralLib.Class.Mega;
 
     #region Base
 

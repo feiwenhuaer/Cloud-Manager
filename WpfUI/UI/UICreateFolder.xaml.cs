@@ -1,4 +1,4 @@
-﻿using SupDataDll.Class;
+﻿using CloudManagerGeneralLib.Class;
 using System;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -48,7 +48,7 @@ namespace WpfUI.UI
             ExplorerNode n = new ExplorerNode();
             n.Info.Name = textBox.Text;
             parent.AddChild(n);
-            Setting_UI.reflection_eventtocore._CreateFolder(n);
+            Setting_UI.reflection_eventtocore.CreateFolder(n);
             Dispatcher.Invoke(new Action(() => this.Close()));
         }
     }

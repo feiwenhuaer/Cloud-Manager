@@ -1,8 +1,8 @@
 ﻿using Cloud.GoogleDrive;
 using Core.StaticClass;
 using Newtonsoft.Json;
-using SupDataDll;
-using SupDataDll.Class;
+using CloudManagerGeneralLib;
+using CloudManagerGeneralLib.Class;
 using System;
 using System.Collections.Generic;
 using System.IO;

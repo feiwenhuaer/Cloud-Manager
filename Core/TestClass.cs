@@ -1,4 +1,4 @@
-﻿using SupDataDll;
+﻿using CloudManagerGeneralLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +19,7 @@ namespace Core
         const string filepath2 = @"E:\Music\music\XviD4PSP_5.10.346.0_(2015-04-07)_rc34.2.exe";
         public static void Test()
         {
-            testWindowCutCopy();
+            //testWindowCutCopy();
             //Mega();
             //FileInfo info = new FileInfo(filepath);
             //info.MoveTo(@"E:\test_folder\mp3tagv270setup.exe");

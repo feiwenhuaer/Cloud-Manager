@@ -1,11 +1,11 @@
 ﻿#define TESTCLASS
 using Core.StaticClass;
-using SupDataDll;
+using CloudManagerGeneralLib;
 using System;
 using System.IO;
 using System.Threading;
 using System.Windows.Forms;
-using SupDataDll.UiInheritance;
+using CloudManagerGeneralLib.UiInheritance;
 using Core.CloudSubClass;
 using Core.Transfer;
 using Core.Class;
@@ -31,14 +31,14 @@ namespace Cloud_Manager
                 Get_mimeType.Load();//mimeType (google drive upload)
                 AppSetting.ManageCloud = new CloudManager();//explorer
                 AppSetting.TransferManager = new GroupsTransferManager();//transfer file
-                AppSetting.login = new Login();//load login
+                AppSetting.login = new Core.Class.Login();//load login
 
                 //load core
                 AppSetting.settings = new Settings();//load settings
                 AppSetting.settings.ReadSettings();
                 AppSetting.lang = new Languages(AppSetting.settings.GetSettingsAsString(SettingsKey.lang));//load language
 
-                LoadDllUI.Load();//load dll UI
+                if(!LoadDllUI.Load()) return;//load dll UI
                 Reflection_UI.CreateInstanceLogin();//Create Login UI
                 Reflection_UI.Load_Setting_UI();//Load Setting_UI and event
 
@@ -63,7 +63,7 @@ namespace Cloud_Manager
                         AppSetting.UIMain = null;
                         AppSetting.uc_lv_ud_instance = null;
                         //reload dll ui
-                        LoadDllUI.Load();//reload dll
+                        if (!LoadDllUI.Load()) return;//reload dll
                         //Reflection_UI.Load_Setting_UI();//Load Setting_UI and event
                         Reflection_UI.Load_UIMain();//create instance main and LV_ud
                         AppSetting.settings.SaveSettings();

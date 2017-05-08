@@ -1,24 +1,15 @@
 ﻿using Etier.IconHelper;
-using SupDataDll;
-using SupDataDll.Class;
+using CloudManagerGeneralLib;
+using CloudManagerGeneralLib.Class;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Forms;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using WpfUI;
 using WpfUI.Class;
 
 namespace WpfUI.UI.Main.Lv_item
@@ -38,7 +29,7 @@ namespace WpfUI.UI.Main.Lv_item
             LV_items.Width = double.NaN;
             
             managerexplorernodes = new ManagerExplorerNodes();
-            timeformat = Setting_UI.reflection_eventtocore._GetSetting(SettingsKey.DATE_TIME_FORMAT);
+            timeformat = Setting_UI.reflection_eventtocore.GetSetting(SettingsKey.DATE_TIME_FORMAT);
             time_default = new DateTime();
             UILanguage();
             lv_data = new ObservableCollection<LV_data>();
@@ -68,9 +59,9 @@ namespace WpfUI.UI.Main.Lv_item
 
                     string extension = item.GetExtension();
                     dt.ImgSource = Setting_UI.GetImage(
-                                                        item.GetRoot().RootInfo.Type == CloudType.LocalDisk ?
-                                                            IconReader.GetFileIcon(item.GetFullPathString(), IconReader.IconSize.Small, false) ://some large file make slow.
-                                                            IconReader.GetFileIcon("." + extension, IconReader.IconSize.Small, false)
+                        item.GetRoot().RootInfo.Type == CloudType.LocalDisk ?
+                            IconReader.GetFileIcon(item.GetFullPathString(), IconReader.IconSize.Small, false) ://some large file make slow.
+                            IconReader.GetFileIcon("." + extension, IconReader.IconSize.Small, false)
                         ).Source;
                 }
                 else
@@ -182,7 +173,7 @@ namespace WpfUI.UI.Main.Lv_item
                     case LanguageKey.TSMI_open: if (selected_count != 1) data.IsEnabled = false; else data.IsEnabled = true; break;
                     case LanguageKey.TSMI_cut: if (selected_count == 0) data.IsEnabled = false; else data.IsEnabled = true; break;
                     case LanguageKey.TSMI_copy: if (selected_count == 0) data.IsEnabled = false; else data.IsEnabled = true; break;
-                    case LanguageKey.TSMI_paste: if (selected_count > 1 | !ClipBoard_.Clipboard) data.IsEnabled = false; else data.IsEnabled = true; break;
+                    case LanguageKey.TSMI_paste: if (selected_count > 1 | !AppClipboard.Clipboard) data.IsEnabled = false; else data.IsEnabled = true; break;
                     case LanguageKey.TSMI_rename: if (selected_count != 1) data.IsEnabled = false; else data.IsEnabled = true; break;
                     case LanguageKey.TSMI_delete: if (selected_count == 0) data.IsEnabled = false; else data.IsEnabled = true; break;
                     case LanguageKey.TSMI_copyid: if (selected_count != 1 || managerexplorernodes.Root.RootInfo.Type == CloudType.LocalDisk) data.IsEnabled = false; else data.IsEnabled = true; break;
@@ -217,16 +208,16 @@ namespace WpfUI.UI.Main.Lv_item
         }
         void CutCopy(bool cut)
         {
-            ClipBoard_.Clear();
-            ClipBoard_.AreCut = cut;
-            ClipBoard_.directory = managerexplorernodes.NodeWorking();
-            foreach (LV_data item in LV_items.SelectedItems) ClipBoard_.Add(item.Node);
-            ClipBoard_.Clipboard = true;
+            AppClipboard.Clear();
+            AppClipboard.AreCut = cut;
+            AppClipboard.directory = managerexplorernodes.NodeWorking();
+            foreach (LV_data item in LV_items.SelectedItems) AppClipboard.Add(item.Node);
+            AppClipboard.Clipboard = true;
         }
         void Paste()
         {
             ExplorerNode roottonode = managerexplorernodes.NodeWorking();
-            Setting_UI.reflection_eventtocore._AddItem(ClipBoard_.Items, ClipBoard_.directory, roottonode, ClipBoard_.AreCut);
+            Setting_UI.reflection_eventtocore.TransferItems(AppClipboard.Items, AppClipboard.directory, roottonode, AppClipboard.AreCut);
         }
         void Rename()
         {
@@ -234,12 +225,14 @@ namespace WpfUI.UI.Main.Lv_item
             RenameItem rename = new RenameItem(data.Node);
             rename.Show();
         }
-        void Delete(bool PernamentDelete = false)
+        void Delete()
         {
+            MessageBoxResult result = System.Windows.MessageBox.Show("Delete selected items\r\nAre you sure?\r\n\r\nYes: Send To Recycle Bin\r\nNo: Permanently Delete", "Confirm Delete", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Cancel) return;
             DeleteItems items = new DeleteItems();
             foreach (LV_data data in LV_items.SelectedItems) items.Items.Add(data.Node);
-            items.PernamentDelete = PernamentDelete;
-            Setting_UI.reflection_eventtocore._DeletePath(items);
+            items.PernamentDelete = result == MessageBoxResult.No;
+            Setting_UI.reflection_eventtocore.DeletePath(items);
         }
         void CreateFolder()
         {
@@ -256,7 +249,7 @@ namespace WpfUI.UI.Main.Lv_item
             if (result != DialogResult.OK | result != DialogResult.Yes) return;
             List<ExplorerNode> listitems = new List<ExplorerNode>();
             foreach (LV_data item in LV_items.SelectedItems) listitems.Add(item.Node);
-            Setting_UI.reflection_eventtocore._AddItem(listitems, managerexplorernodes.NodeWorking(), ExplorerNode.GetNodeFromDiskPath(fbd.SelectedPath), false);
+            Setting_UI.reflection_eventtocore.TransferItems(listitems, managerexplorernodes.NodeWorking(), ExplorerNode.GetNodeFromDiskPath(fbd.SelectedPath), false);
         }
         void uploadfolder()
         {
@@ -267,7 +260,7 @@ namespace WpfUI.UI.Main.Lv_item
             if (result != DialogResult.OK | result != DialogResult.Yes) return;
             ExplorerNode node = ExplorerNode.GetNodeFromDiskPath(fbd.SelectedPath);
 
-            Setting_UI.reflection_eventtocore._AddItem(new List<ExplorerNode>() { node }, node.Parent, managerexplorernodes.NodeWorking(), false);
+            Setting_UI.reflection_eventtocore.TransferItems(new List<ExplorerNode>() { node }, node.Parent, managerexplorernodes.NodeWorking(), false);
         }
         void uploadfile()
         {
@@ -289,7 +282,7 @@ namespace WpfUI.UI.Main.Lv_item
                 n.Info.DateMod = info.LastWriteTime;
                 items.Add(n);
             }
-            Setting_UI.reflection_eventtocore._AddItem(items, root, managerexplorernodes.NodeWorking(), false);
+            Setting_UI.reflection_eventtocore.TransferItems(items, root, managerexplorernodes.NodeWorking(), false);
         }
 
         #endregion
@@ -322,16 +315,5 @@ namespace WpfUI.UI.Main.Lv_item
             LV_items.SelectedItems.Clear();
         }
         #endregion
-
-        private void textBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            //    if(e.Key == Key.Enter)
-            //    {
-            //        OldPathLV nextpath = new OldPathLV("", textBox.Text);
-            //        Clear();
-            //        HistoryPathID.Add(nextpath);
-            //        Next();
-            //    }
-        }
     }
 }

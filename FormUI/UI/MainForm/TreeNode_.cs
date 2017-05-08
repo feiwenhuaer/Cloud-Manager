@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
-using SupDataDll;
-using SupDataDll.Class;
+using CloudManagerGeneralLib;
+using CloudManagerGeneralLib.Class;
 
 namespace FormUI.UI.MainForm
 {

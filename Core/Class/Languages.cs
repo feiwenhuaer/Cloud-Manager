@@ -1,5 +1,5 @@
 ﻿using Core.StaticClass;
-using SupDataDll;
+using CloudManagerGeneralLib;
 using System.IO;
 using System.Xml;
 

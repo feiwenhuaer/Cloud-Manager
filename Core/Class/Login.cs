@@ -2,9 +2,9 @@
 using System;
 using System.IO;
 using System.Text;
-using SupDataDll;
+using CloudManagerGeneralLib;
 using Core.StaticClass;
-using SupDataDll.Crypt;
+using CloudManagerGeneralLib.Crypt;
 
 namespace Core.Class
 {
@@ -55,7 +55,7 @@ namespace Core.Class
                     AppSetting.settings.SaveSettings();
                 }
                 //create mainform
-                if (AppSetting.UILogin.WindowState_ != SupDataDll.UiInheritance.WindowState.Minimized) AppSetting.UILogin.WindowState_ = SupDataDll.UiInheritance.WindowState.Minimized;
+                if (AppSetting.UILogin.WindowState_ != CloudManagerGeneralLib.UiInheritance.WindowState.Minimized) AppSetting.UILogin.WindowState_ = CloudManagerGeneralLib.UiInheritance.WindowState.Minimized;
                 if (AppSetting.UILogin.ShowInTaskbar_ == true) AppSetting.UILogin.ShowInTaskbar_ = false;
                 AppSetting.Pass = Pass;
                 return true;

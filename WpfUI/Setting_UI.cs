@@ -1,4 +1,4 @@
-﻿using SupDataDll;
+﻿using CloudManagerGeneralLib;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -9,7 +9,7 @@ using System.Windows.Media.Imaging;
 
 namespace WpfUI
 {
-    public class Setting_UI : SupDataDll.UiInheritance.SettingUI
+    public class Setting_UI : CloudManagerGeneralLib.UiInheritance.SettingUI
     {
         public static System.Windows.Controls.Image GetImage(Bitmap bmp,double Width=16,double Height=16)
         {

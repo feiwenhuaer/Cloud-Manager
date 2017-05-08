@@ -1,4 +1,4 @@
-﻿using SupDataDll;
+﻿using CloudManagerGeneralLib;
 using System.Windows;
 using System.Windows.Input;
 namespace WpfUI.UI
@@ -6,7 +6,7 @@ namespace WpfUI.UI
     /// <summary>
     /// Interaction logic for UILogin.xaml
     /// </summary>
-    public partial class UILogin : Window, SupDataDll.UiInheritance.UILogin
+    public partial class UILogin : Window, CloudManagerGeneralLib.UiInheritance.UILogin
     {
         public string user = "";
         public string pass = "";
@@ -30,11 +30,11 @@ namespace WpfUI.UI
             }
         }
 
-        public SupDataDll.UiInheritance.WindowState WindowState_
+        public CloudManagerGeneralLib.UiInheritance.WindowState WindowState_
         {
             get
             {
-                return (SupDataDll.UiInheritance.WindowState)(int)this.WindowState;
+                return (CloudManagerGeneralLib.UiInheritance.WindowState)(int)this.WindowState;
             }
 
             set
@@ -58,7 +58,7 @@ namespace WpfUI.UI
 
         public void Check(string user, string pass, bool autologin)
         {
-            if (!Setting_UI.reflection_eventtocore._Login(user, pass, autologin))
+            if (!Setting_UI.reflection_eventtocore.Login(user, pass, autologin))
             {
                 MessageBox.Show("Login failed", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 if (this.WindowState == System.Windows.WindowState.Minimized) this.WindowState = System.Windows.WindowState.Normal;
@@ -68,12 +68,12 @@ namespace WpfUI.UI
         }
         public void LoadLanguage()
         {
-            this.Title = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.Form_Text);
-            LB_user.Content = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.LB_User);
-            LB_pass.Content = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.LB_pass);
-            BT_login.Content = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.BT_Login);
-            BT_cancel.Content = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.BT_cancel);
-            CB_autologin.Content = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.CB_autologin);
+            this.Title = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.Form_Text);
+            LB_user.Content = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.LB_User);
+            LB_pass.Content = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.LB_pass);
+            BT_login.Content = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.BT_Login);
+            BT_cancel.Content = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.BT_cancel);
+            CB_autologin.Content = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.CB_autologin);
         }
 
         #region Event UI

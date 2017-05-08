@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomHttpRequest", "CustomHttpRequest\CustomHttpRequest.csproj", "{1D279A6B-CE8D-4184-B9AB-BC24C6F69045}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SupDataDll", "SupDataDll\SupDataDll.csproj", "{700EED73-135E-422D-A06E-738D3AD057A1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudManagerGeneralLib", "SupDataDll\CloudManagerGeneralLib.csproj", "{700EED73-135E-422D-A06E-738D3AD057A1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormUI", "FormUI\FormUI.csproj", "{8EA03A73-86CC-4CDF-B5B8-68094F2DF352}"
 EndProject

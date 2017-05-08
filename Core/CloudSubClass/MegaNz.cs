@@ -1,13 +1,13 @@
 ﻿using Cloud.MegaNz;
-using SupDataDll;
+using CloudManagerGeneralLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using System.IO;
 using CustomHttpRequest;
-using SupDataDll.Class.Mega;
-using SupDataDll.Class;
+using CloudManagerGeneralLib.Class.Mega;
+using CloudManagerGeneralLib.Class;
 using Core.StaticClass;
 
 namespace Core.CloudSubClass

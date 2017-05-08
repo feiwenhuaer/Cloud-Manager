@@ -1,6 +1,6 @@
 ﻿using Aga.Controls.Tree;
-using SupDataDll;
-using SupDataDll.Class;
+using CloudManagerGeneralLib;
+using CloudManagerGeneralLib.Class;
 using System.Collections;
 using System.Collections.ObjectModel;
 
@@ -31,7 +31,7 @@ namespace WpfUI.Class
             }
             else if (pr != null)
             {
-                foreach (TransferItem item in pr.items)
+                foreach (CloudManagerGeneralLib.Class.TransferItem item in pr.items)
                 {
                     yield return item;
                 }

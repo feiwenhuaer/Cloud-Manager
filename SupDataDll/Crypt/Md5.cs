@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace SupDataDll.Crypt
+namespace CloudManagerGeneralLib.Crypt
 {
     public static class Md5
     {

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Windows.Forms;
-using SupDataDll.UiInheritance;
-using SupDataDll;
+using CloudManagerGeneralLib.UiInheritance;
+using CloudManagerGeneralLib;
 
 namespace FormUI.UI
 {
-    public partial class LoginForm : System.Windows.Forms.Form, SupDataDll.UiInheritance.UILogin
+    public partial class LoginForm : System.Windows.Forms.Form, CloudManagerGeneralLib.UiInheritance.UILogin
     {
         public string user = "";
         public string pass = "";
@@ -104,7 +104,7 @@ namespace FormUI.UI
 
         public void Check(string user, string pass, bool autologin)
         {
-            if (!Setting_UI.reflection_eventtocore._Login(user, pass, autologin))
+            if (!Setting_UI.reflection_eventtocore.Login(user, pass, autologin))
             {
                 MessageBox.Show("Login failed", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 if (this.WindowState == FormWindowState.Minimized) this.WindowState = FormWindowState.Normal;
@@ -114,12 +114,12 @@ namespace FormUI.UI
         }
         public void LoadLanguage()
         {
-            this.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.Form_Text);
-            LB_User.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.LB_User);
-            LB_Pass.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.LB_pass);
-            BT_Login.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.BT_Login);
-            BT_cancel.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.BT_cancel);
-            CB_autologin.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.CB_autologin);
+            this.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.Form_Text);
+            LB_User.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.LB_User);
+            LB_Pass.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.LB_pass);
+            BT_Login.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.BT_Login);
+            BT_cancel.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.BT_cancel);
+            CB_autologin.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.CB_autologin);
         }
     }
 }

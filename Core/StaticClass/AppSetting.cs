@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using Core.CloudSubClass;
-using SupDataDll.UiInheritance;
+using CloudManagerGeneralLib.UiInheritance;
 using Core.Transfer;
 using Cloud;
 using System.Threading;

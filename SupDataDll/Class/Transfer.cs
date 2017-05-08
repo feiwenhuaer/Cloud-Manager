@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
-using SupDataDll.Class.Mega;
+using CloudManagerGeneralLib.Class.Mega;
 using System.Collections.Generic;
 using System.IO;
 
-namespace SupDataDll.Class
+namespace CloudManagerGeneralLib.Class
 {
     public abstract class Transfer
     {

@@ -1,6 +1,6 @@
 ﻿using Aga.Controls.Tree;
-using SupDataDll;
-using SupDataDll.Class;
+using CloudManagerGeneralLib;
+using CloudManagerGeneralLib.Class;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
@@ -65,7 +65,7 @@ namespace WpfUI.UI.Main.Lv_ud
         }
         
         List<TransferGroup> groups;
-        List<TransferItem> items;
+        List<CloudManagerGeneralLib.Class.TransferItem> items;
         private void treeList_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
             start.IsEnabled = false;
@@ -80,17 +80,17 @@ namespace WpfUI.UI.Main.Lv_ud
             {
                 if (seleecteditems.Count > 0) remove.IsEnabled = true;
                 groups = new List<TransferGroup>();
-                items = new List<TransferItem>();
+                items = new List<CloudManagerGeneralLib.Class.TransferItem>();
                 foreach (var item in seleecteditems)
                 {
                     TreeNode node = item as TreeNode;
                     TransferGroup tg = node.Tag as TransferGroup;
-                    TransferItem ti = node.Tag as TransferItem;
+                    CloudManagerGeneralLib.Class.TransferItem ti = node.Tag as CloudManagerGeneralLib.Class.TransferItem;
                     if (tg != null)//group
                     {
                         groups.Add(tg);
                         SetIsEnableMenuTLV(tg as Transfer);
-                        foreach (TransferItem child in tg.items) SetIsEnableMenuTLV(child as Transfer);
+                        foreach (CloudManagerGeneralLib.Class.TransferItem child in tg.items) SetIsEnableMenuTLV(child as Transfer);
                     }//item
                     else
                     {
@@ -150,7 +150,7 @@ namespace WpfUI.UI.Main.Lv_ud
 
         void ChangeStatus(StatusTransfer val)
         {
-            foreach (TransferItem it in items)
+            foreach (CloudManagerGeneralLib.Class.TransferItem it in items)
             {
                 if (val == StatusTransfer.Started && (it.status == StatusTransfer.Stop | it.status == StatusTransfer.Waiting | it.status == StatusTransfer.Error))
                 {
@@ -194,11 +194,11 @@ namespace WpfUI.UI.Main.Lv_ud
             }
         }
 
-        TransferGroup GetParentItem(TransferItem item)
+        TransferGroup GetParentItem(CloudManagerGeneralLib.Class.TransferItem item)
         {
             foreach (TreeNode node in treeList.Nodes)
             {
-                foreach (TransferItem it in (node.Tag as TransferGroup).items) if (it == item) return node.Tag as TransferGroup;
+                foreach (CloudManagerGeneralLib.Class.TransferItem it in (node.Tag as TransferGroup).items) if (it == item) return node.Tag as TransferGroup;
             }
             return null;
         }

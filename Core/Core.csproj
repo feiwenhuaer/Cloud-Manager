@@ -96,9 +96,9 @@
       <Project>{1D279A6B-CE8D-4184-B9AB-BC24C6F69045}</Project>
       <Name>CustomHttpRequest</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SupDataDll\SupDataDll.csproj">
+    <ProjectReference Include="..\SupDataDll\CloudManagerGeneralLib.csproj">
       <Project>{700eed73-135e-422d-a06e-738d3ad057a1}</Project>
-      <Name>SupDataDll</Name>
+      <Name>CloudManagerGeneralLib</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

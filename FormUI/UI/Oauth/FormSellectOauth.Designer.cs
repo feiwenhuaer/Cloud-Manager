@@ -39,7 +39,7 @@
             // 
             // PB_GoogleDrive
             // 
-            this.PB_GoogleDrive.Image = SupDataDll.Properties.Resources.Google_Drive_Icon256x256;
+            this.PB_GoogleDrive.Image = CloudManagerGeneralLib.Properties.Resources.Google_Drive_Icon256x256;
             this.PB_GoogleDrive.Location = new System.Drawing.Point(12, 12);
             this.PB_GoogleDrive.Name = "PB_GoogleDrive";
             this.PB_GoogleDrive.Size = new System.Drawing.Size(128, 128);
@@ -50,7 +50,7 @@
             // 
             // PB_Mega
             // 
-            this.PB_Mega.Image = SupDataDll.Properties.Resources.MegaSync;
+            this.PB_Mega.Image = CloudManagerGeneralLib.Properties.Resources.MegaSync;
             this.PB_Mega.Location = new System.Drawing.Point(146, 12);
             this.PB_Mega.Name = "PB_Mega";
             this.PB_Mega.Size = new System.Drawing.Size(128, 128);
@@ -61,7 +61,7 @@
             // 
             // PB_Dropbox
             // 
-            this.PB_Dropbox.Image = SupDataDll.Properties.Resources.Dropbox256x256;
+            this.PB_Dropbox.Image = CloudManagerGeneralLib.Properties.Resources.Dropbox256x256;
             this.PB_Dropbox.Location = new System.Drawing.Point(280, 12);
             this.PB_Dropbox.Name = "PB_Dropbox";
             this.PB_Dropbox.Size = new System.Drawing.Size(128, 128);

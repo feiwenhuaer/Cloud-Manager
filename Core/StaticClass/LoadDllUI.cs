@@ -1,4 +1,4 @@
-﻿using SupDataDll;
+﻿using CloudManagerGeneralLib;
 using System;
 using System.IO;
 using System.Reflection;
@@ -8,9 +8,17 @@ namespace Core.StaticClass
     public static class LoadDllUI
     {
         private static Assembly myLibrary;
-        public static void Load()
+        public static bool Load()
         {
-            myLibrary = Assembly.LoadFile(Directory.GetCurrentDirectory() + "\\" + AppSetting.settings.GetSettingsAsString(SettingsKey.UI_dll_file));
+            try
+            {
+                myLibrary = Assembly.LoadFile(Directory.GetCurrentDirectory() + "\\" + AppSetting.settings.GetSettingsAsString(SettingsKey.UI_dll_file));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
         public static Type[] GetExportedTypes()

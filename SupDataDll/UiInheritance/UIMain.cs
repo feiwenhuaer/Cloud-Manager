@@ -1,7 +1,7 @@
-﻿using SupDataDll.Class;
+﻿using CloudManagerGeneralLib.Class;
 using System;
 
-namespace SupDataDll.UiInheritance
+namespace CloudManagerGeneralLib.UiInheritance
 {
     public interface UIMain
     {

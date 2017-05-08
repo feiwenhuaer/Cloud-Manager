@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace SupDataDll
+namespace CloudManagerGeneralLib
 {
     public static class GetList_UI_n_lang
     {

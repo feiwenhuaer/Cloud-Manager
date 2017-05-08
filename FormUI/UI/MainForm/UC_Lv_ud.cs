@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using SupDataDll;
+using CloudManagerGeneralLib;
 using System.ComponentModel;
 using BrightIdeasSoftware;
-using SupDataDll.Class;
+using CloudManagerGeneralLib.Class;
 
 namespace FormUI.UI.MainForm
 {
-    public partial class UC_Lv_ud : UserControl, SupDataDll.UiInheritance.UIUC_TLV_ud
+    public partial class UC_Lv_ud : UserControl, CloudManagerGeneralLib.UiInheritance.UIUC_TLV_ud
     {
 
         #region Reflection
@@ -86,18 +86,18 @@ namespace FormUI.UI.MainForm
 
         public void LoadLanguage()
         {
-            TP_processing.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TP_processing);
-            TP_done.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TP_done);
+            TP_processing.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TP_processing);
+            TP_done.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TP_done);
 
-            changeStatusToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_ChangeStatus);
-            numberOfParallelDownloadsToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_numberOfParallelDownloads);
-            removeToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_remove);
-            startToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_start);
-            stopToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_stop);
-            waitingToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_waiting);
-            errorToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_error);
-            forceStartToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_forcestart);
-            forceWaitingToolStripMenuItem.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.TSMI_forcewaiting);
+            changeStatusToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_ChangeStatus);
+            numberOfParallelDownloadsToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_numberOfParallelDownloads);
+            removeToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_remove);
+            startToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_start);
+            stopToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_stop);
+            waitingToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_waiting);
+            errorToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_error);
+            forceStartToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_forcestart);
+            forceWaitingToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_forcewaiting);
 
             Set_TLV_lang(TLV_ud);
             Set_TLV_lang(TLV_done);
@@ -106,7 +106,7 @@ namespace FormUI.UI.MainForm
         {
             for (int i = 0; i < lv.Columns.Count; i++)//0-7
             {
-                lv.Columns[i].Text = Setting_UI.reflection_eventtocore._GetTextLanguage("TLV_UD_Columns_" + i.ToString());
+                lv.Columns[i].Text = Setting_UI.reflection_eventtocore.GetTextLanguage("TLV_UD_Columns_" + i.ToString());
             }
         }
         #endregion
@@ -165,9 +165,9 @@ namespace FormUI.UI.MainForm
                 int i = val - 1;
                 array_header[val].AspectGetter = delegate (object x)
                 {
-                    if (x is TransferItem)//item in group
+                    if (x is CloudManagerGeneralLib.Class.TransferItem)//item in group
                     {
-                        return ((TransferItem)x).col[i];
+                        return ((CloudManagerGeneralLib.Class.TransferItem)x).col[i];
                     }
                     if (x is TransferGroup)//group
                     {
@@ -179,7 +179,7 @@ namespace FormUI.UI.MainForm
         }
 
         List<TransferGroup> parents;
-        List<TransferItem> childs;
+        List<CloudManagerGeneralLib.Class.TransferItem> childs;
 
         private List<HeaderTLV> Create_Headeritem_TLV_ud()
         {
@@ -221,11 +221,11 @@ namespace FormUI.UI.MainForm
         private void TLV_SelectedIndexChanged(object sender, EventArgs e)
         {
             parents = new List<TransferGroup>();
-            childs = new List<TransferItem>();
+            childs = new List<CloudManagerGeneralLib.Class.TransferItem>();
             olv = sender as TreeListView;
             for (int i = 0; i < olv.SelectedObjects.Count; i++)
             {
-                if (olv.SelectedObjects[i].GetType() == typeof(TransferItem)) childs.Add(olv.SelectedObjects[i] as TransferItem);
+                if (olv.SelectedObjects[i].GetType() == typeof(CloudManagerGeneralLib.Class.TransferItem)) childs.Add(olv.SelectedObjects[i] as CloudManagerGeneralLib.Class.TransferItem);
                 else parents.Add(olv.SelectedObjects[i] as TransferGroup);
             }
         }

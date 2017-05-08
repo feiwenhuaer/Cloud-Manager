@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace FormUI.UI
 {
-    public partial class ClosingForm : System.Windows.Forms.Form, SupDataDll.UiInheritance.UIClosing
+    public partial class ClosingForm : System.Windows.Forms.Form, CloudManagerGeneralLib.UiInheritance.UIClosing
     {
         bool closeflag = false;
 

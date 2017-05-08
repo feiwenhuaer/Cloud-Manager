@@ -4,8 +4,8 @@ using Cloud.MegaNz;
 using Core.CloudSubClass;
 using Core.StaticClass;
 using Newtonsoft.Json;
-using SupDataDll;
-using SupDataDll.Class;
+using CloudManagerGeneralLib;
+using CloudManagerGeneralLib.Class;
 using System;
 using System.IO;
 using System.Linq;
@@ -78,7 +78,7 @@ namespace Core.Transfer
                     if (item.ChunkUploadSize < 0 || item.SizeWasTransfer == item.From.node.Info.Size)//save last pos if download or done (up/down)
                     {
                         if (Type_root_from == CloudType.Mega) SaveEncryptDataDownloadMega();//download done from mega
-                        if (Type_root_to == CloudType.Mega) SaveUploadMega();//upload done to mega
+                        if (Type_root_to == CloudType.Mega) CommitUploadMega();//upload done to mega
                         if(Type_root_to == CloudType.Dropbox) ((DropboxRequestAPIv2)clientTo).GetResponse_upload_session_append();//get data return from server
                         item.SaveSizeTransferSuccess = item.SizeWasTransfer;
                     }
@@ -199,11 +199,10 @@ namespace Core.Transfer
 
         void SaveEncryptDataDownloadMega()
         {
-            StreamMegaInterface stream = this.item.From.stream as StreamMegaInterface;
-            this.item.dataCryptoMega = stream.GetSave();//if null -> error transfer
+            this.item.dataCryptoMega = (this.item.From.stream as StreamMegaInterface).GetSave();//if null -> error transfer
         }
 
-        bool SaveUploadMega()
+        bool CommitUploadMega()
         {
             completionHandle = mega_up.ReadDataTextResponse();
             if (completionHandle.StartsWith("-")) throw new Exception(completionHandle);

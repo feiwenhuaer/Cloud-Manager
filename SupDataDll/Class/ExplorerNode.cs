@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
-using SupDataDll.Class.Mega;
+using CloudManagerGeneralLib.Class.Mega;
 
-namespace SupDataDll.Class
+namespace CloudManagerGeneralLib.Class
 {
    public class ManagerExplorerNodes
     {

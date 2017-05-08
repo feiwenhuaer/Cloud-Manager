@@ -1,4 +1,4 @@
-﻿namespace SupDataDll.Class
+﻿namespace CloudManagerGeneralLib.Class
 {
     public class ExplorerListItem
     {

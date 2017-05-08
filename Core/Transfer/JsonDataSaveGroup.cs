@@ -1,4 +1,4 @@
-﻿using SupDataDll.Class;
+﻿using CloudManagerGeneralLib.Class;
 
 namespace Core.Transfer
 {

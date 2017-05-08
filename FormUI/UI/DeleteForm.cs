@@ -1,4 +1,4 @@
-﻿using SupDataDll;
+﻿using CloudManagerGeneralLib;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -7,11 +7,11 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using SupDataDll.UiInheritance;
+using CloudManagerGeneralLib.UiInheritance;
 
 namespace FormUI.UI
 {
-    public partial class DeleteForm : System.Windows.Forms.Form, SupDataDll.UiInheritance.UIDelete
+    public partial class DeleteForm : System.Windows.Forms.Form, CloudManagerGeneralLib.UiInheritance.UIDelete
     {
         #region interface
         bool autoclose = true;
@@ -73,9 +73,9 @@ namespace FormUI.UI
         public DeleteForm()
         {
             InitializeComponent();
-            CB_autoclose.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.DeleteForm_CB_autoclose);
-            BT_cancel.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.BT_cancel);
-            this.Text = Setting_UI.reflection_eventtocore._GetTextLanguage(LanguageKey.DeleteForm_text);
+            CB_autoclose.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.DeleteForm_CB_autoclose);
+            BT_cancel.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.BT_cancel);
+            this.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.DeleteForm_text);
         }
 
         #region Event Form

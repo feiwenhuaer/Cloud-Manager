@@ -1,4 +1,4 @@
-﻿using SupDataDll;
+﻿using CloudManagerGeneralLib;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,7 +17,7 @@ namespace WpfUI.Class
         }
         public ContextMenuDataModel(LanguageKey Key)
         {
-            Text = Setting_UI.reflection_eventtocore._GetTextLanguage(Key);
+            Text = Setting_UI.reflection_eventtocore.GetTextLanguage(Key);
             this.Key = Key;
             IsEnabled = true;
         }

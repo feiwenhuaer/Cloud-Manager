@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 
-namespace SupDataDll
+namespace CloudManagerGeneralLib
 {
 
     public class ManagerThread

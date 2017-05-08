@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System;
 
-namespace SupDataDll.UiInheritance
+namespace CloudManagerGeneralLib.UiInheritance
 {
     public interface UILogin
     {

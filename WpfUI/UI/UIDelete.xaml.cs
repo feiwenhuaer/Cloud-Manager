@@ -10,14 +10,14 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using SupDataDll.UiInheritance;
+using CloudManagerGeneralLib.UiInheritance;
 
 namespace WpfUI.UI
 {
     /// <summary>
     /// Interaction logic for Delete.xaml
     /// </summary>
-    public partial class UIDelete : Window, SupDataDll.UiInheritance.UIDelete
+    public partial class UIDelete : Window, CloudManagerGeneralLib.UiInheritance.UIDelete
     {
         public UIDelete()
         {

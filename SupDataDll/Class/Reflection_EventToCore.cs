@@ -1,17 +1,41 @@
-﻿using SupDataDll.Class;
+﻿using CloudManagerGeneralLib.Class;
 using System.Collections.Generic;
 
-namespace SupDataDll
+namespace CloudManagerGeneralLib
 {
+    public delegate bool ChangeUserPass(string user, string pass, string newpass);
+    public delegate void TransferItems(List<ExplorerNode> items, ExplorerNode fromfolder, ExplorerNode savefolder, bool AreCut);
+    public delegate void SaveSetting();
+    public delegate string GetSetting(SettingsKey Key);
+    public delegate string GetTextLanguage(string Key);
+    public delegate bool DeleteAccountCloud(string Email, CloudType type);
+    public delegate List<ExplorerNode> GetListAccountCloud();
+    public delegate void ShowFormOauth(CloudType type);
+    public delegate ExplorerNode GetChildNode(ExplorerNode node);
+    public delegate bool LoginApp(string User, string Pass, bool AutoLogin);
+    public delegate bool RenameItem(ExplorerNode node, ExplorerNode newparent, string newname = null, bool Copy = false);
+    public delegate void DeletePath(DeleteItems items);
+    public delegate void CreateFolder(ExplorerNode node);
+    public delegate void ExitAppCallBack();
+    public delegate void SetSetting(SettingsKey Key, string Data);
     public class Reflection_EventToCore
     {
-        public bool _ChangeUserPass(string user, string pass, string newpass)
+        public string test()
+        {
+            return EventChangeUserPass.GetType().Name;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="pass"></param>
+        /// <param name="newpass"></param>
+        /// <returns></returns>
+        public bool ChangeUserPass(string user, string pass, string newpass)
         {
             return EventChangeUserPass(user, pass, newpass);
         }
-        public delegate bool ChangeUserPass(string user, string pass, string newpass);
         public event ChangeUserPass EventChangeUserPass;
-
         /// <summary>
         /// Add list item for download upload
         /// </summary>
@@ -19,49 +43,45 @@ namespace SupDataDll
         /// <param name="fromfolder">From</param>
         /// <param name="savefolder">To</param>
         /// <param name="AreCut">Cut or Copy (Cut will delete items in From folder)</param>
-        public void _AddItem(List<ExplorerNode> items, ExplorerNode fromfolder, ExplorerNode savefolder, bool AreCut)
+        public void TransferItems(List<ExplorerNode> items, ExplorerNode fromfolder, ExplorerNode savefolder, bool AreCut)
         {
-            EventAddItem(items, fromfolder, savefolder, AreCut);
+            EventTransferItems(items, fromfolder, savefolder, AreCut);
         }
-        public delegate void AddItem(List<ExplorerNode> items, ExplorerNode fromfolder, ExplorerNode savefolder, bool AreCut);
-        public event AddItem EventAddItem;
+        public event TransferItems EventTransferItems;
         /// <summary>
         /// SetSetting
         /// </summary>
         /// <param name="Key">Key name</param>
         /// <param name="Data">Value to set</param>
-        public void _SetSetting(SettingsKey Key, string Data)
+        public void SetSetting(SettingsKey Key, string Data)
         {
             EventSetSetting(Key, Data);
         }
-        public delegate void SetSetting(SettingsKey Key, string Data);
         public event SetSetting EventSetSetting;
         /// <summary>
         /// Save Setting
         /// </summary>
-        public void _SaveSetting()
+        public void SaveSetting()
         {
             EventSaveSetting();
         }
-        public delegate void SaveSetting();
         public event SaveSetting EventSaveSetting;
         /// <summary>
         /// Read Setting
         /// </summary>
         /// <param name="Key"></param>
         /// <returns></returns>
-        public string _GetSetting(SettingsKey Key)
+        public string GetSetting(SettingsKey Key)
         {
             return EventGetSetting(Key);
         }
-        public delegate string GetSetting(SettingsKey Key);
         public event GetSetting EventGetSetting;
         /// <summary>
         /// Read language
         /// </summary>
         /// <param name="Key"></param>
         /// <returns></returns>
-        public string _GetTextLanguage(string Key)
+        public string GetTextLanguage(string Key)
         {
             return EventGetTextLanguage(Key);
         }
@@ -70,11 +90,10 @@ namespace SupDataDll
         /// </summary>
         /// <param name="Key"></param>
         /// <returns></returns>
-        public string _GetTextLanguage(LanguageKey Key)
+        public string GetTextLanguage(LanguageKey Key)
         {
             return EventGetTextLanguage(Key.ToString());
         }
-        public delegate string GetTextLanguage(string Key);
         public event GetTextLanguage EventGetTextLanguage;
         /// <summary>
         /// Delete Cloud Account
@@ -82,31 +101,28 @@ namespace SupDataDll
         /// <param name="Email"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public bool _DeleteAccountCloud(string Email, CloudType type)
+        public bool DeleteAccountCloud(string Email, CloudType type)
         {
             return EventDeleteAccountCloud(Email, type);
         }
-        public delegate bool DeleteAccountCloud(string Email, CloudType type);
         public event DeleteAccountCloud EventDeleteAccountCloud;
         /// <summary>
         /// Get List Cloud Account
         /// </summary>
         /// <returns></returns>
-        public List<ExplorerNode> _GetListAccountCloud()
+        public List<ExplorerNode> GetListAccountCloud()
         {
             return EventGetListAccountCloud();
         }
-        public delegate List<ExplorerNode> GetListAccountCloud();
         public event GetListAccountCloud EventGetListAccountCloud;
         /// <summary>
         /// 
         /// </summary>
         /// <param name="type"></param>
-        public void _ShowFormOauth(CloudType type)
+        public void ShowFormOauth(CloudType type)
         {
             EventShowFormOauth(type);
         }
-        public delegate void ShowFormOauth(CloudType type);
         public event ShowFormOauth EventShowFormOauth;
         /// <summary>
         /// Explorer, return parent.
@@ -114,11 +130,10 @@ namespace SupDataDll
         /// <param name="path"></param>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ExplorerNode _ListIteamRequest(ExplorerNode node)
+        public ExplorerNode ListIteamRequest(ExplorerNode node)
         {
             return EventGetChildNode(node);
         }
-        public delegate ExplorerNode GetChildNode(ExplorerNode node);
         public event GetChildNode EventGetChildNode;
         /// <summary>
         /// Send data login to core
@@ -127,12 +142,11 @@ namespace SupDataDll
         /// <param name="Pass"></param>
         /// <param name="AutoLogin"></param>
         /// <returns></returns>
-        public bool _Login(string User, string Pass, bool AutoLogin)
+        public bool Login(string User, string Pass, bool AutoLogin)
         {
             return EventLogin(User, Pass, AutoLogin);
         }
-        public delegate bool Login(string User, string Pass, bool AutoLogin);
-        public event Login EventLogin;
+        public event LoginApp EventLogin;
 
         /// <summary>
         /// 
@@ -142,31 +156,28 @@ namespace SupDataDll
         /// <param name="newname"></param>
         /// <param name="Copy"></param>
         /// <returns></returns>
-        public bool _RenameItem(ExplorerNode node,string newname)
+        public bool RenameItem(ExplorerNode node,string newname)
         {
             return EventMoveItem(node, null, newname, false);
         }
-        public delegate bool RenameItem(ExplorerNode node, ExplorerNode newparent, string newname = null, bool Copy = false);
         public event RenameItem EventMoveItem;
         /// <summary>
         /// Delete List items
         /// </summary>
-        /// <param name="items">Class SupDataDll.DeleteItems</param>
-        public void _DeletePath(DeleteItems items)
+        /// <param name="items">Class CloudManagerGeneralLib.DeleteItems</param>
+        public void DeletePath(DeleteItems items)
         {
             EventDeletePath(items);
         }
-        public delegate void DeletePath(DeleteItems items);
         public event DeletePath EventDeletePath;
         /// <summary>
         /// Create folder node
         /// </summary>
         /// <returns></returns>
-        public void _CreateFolder(ExplorerNode node)
+        public void CreateFolder(ExplorerNode node)
         {
             EventCreateFolder(node);
         }
-        public delegate void CreateFolder(ExplorerNode node);
         public event CreateFolder EventCreateFolder;
 
         //exit
@@ -174,7 +185,7 @@ namespace SupDataDll
         /// <summary>
         /// Close App
         /// </summary>
-        public void _ExitApp()
+        public void ExitApp()
         {
             if (!Exitting)
             {
@@ -182,7 +193,6 @@ namespace SupDataDll
                 Exitting = true;
             }
         }
-        public delegate void ExitAppCallBack();
         public event ExitAppCallBack EventExitAppCallBack;
     }
 
