@@ -7,7 +7,7 @@ namespace CloudManagerGeneralLib.UiInheritance
 {
     public class SettingUI
     {
-        public static Reflection_EventToCore reflection_eventtocore = new Reflection_EventToCore();
+        public static RequestToCore reflection_eventtocore = new RequestToCore();
         public static ManagerThread ManagerThreads = new ManagerThread();
         public static bool ReloadUI_Flag = false;
         public static bool ExitAPP_Flag = false;

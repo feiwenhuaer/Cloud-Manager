@@ -216,7 +216,7 @@ namespace Core.Transfer
                                 {
                                     long length_left = GroupData.items[i].From.node.Info.Size - GroupData.items[i].SizeWasTransfer;
                                     long secondleft = decimal.ToInt64(((decimal)length_left / speed));
-                                    GroupData.items[i].col[5] = CurrentMillis.GetTimeBySecond((int)secondleft);
+                                    GroupData.items[i].col[5] = CurrentMillis.GetTimeBySecond(secondleft);
                                 }
                             }
                         }
@@ -236,7 +236,7 @@ namespace Core.Transfer
                         {
                             long length_left_group = GroupData.TotalFileLength - Group_TotalTransfer;
                             long secondleft_group = length_left_group / decimal.ToInt64(speed_group);
-                            GroupData.col[5] = CurrentMillis.GetTimeBySecond((int)secondleft_group);
+                            GroupData.col[5] = CurrentMillis.GetTimeBySecond(secondleft_group);
                         }
                     }
                     #endregion
@@ -289,24 +289,24 @@ namespace Core.Transfer
 
         void WorkThread(object obj)
         {
-            CloudManagerGeneralLib.Class.TransferItem item = GroupData.items[(int)obj];
+            TransferItem item = GroupData.items[(int)obj];
             ExplorerNode root_from = fromfolder.GetRoot();
             ExplorerNode root_to = savefolder.GetRoot();
             try
             {
-                if (root_from.RootInfo.Type == root_to.RootInfo.Type && root_from.RootInfo.Type != CloudType.LocalDisk) AccountCloud(item);//cloud, inport file from other cloud
+                if (root_from.RootInfo.Type == root_to.RootInfo.Type && root_from.RootInfo.Type != CloudType.LocalDisk) AccountCloud(item);//cloud, inport file from other account same cloud
                 else Transfer(item);//not same type
             }
             catch (Exception ex){ item.ErrorMsg = ex.Message + ex.StackTrace; item.status = StatusTransfer.Error; return; }
         }
 
       
-        void AccountCloud(CloudManagerGeneralLib.Class.TransferItem item)
+        void AccountCloud(TransferItem item)
         {
 
         }
 
-        void Transfer(CloudManagerGeneralLib.Class.TransferItem item)
+        void Transfer(TransferItem item)
         {
 
 #if DEBUG

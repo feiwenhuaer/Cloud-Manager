@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace Core.StaticClass
 {
-    public static class Reflection_UI
+    public static class AddEventHandleUI
     {
         public static void Load_Setting_UI()
         {
@@ -14,7 +14,7 @@ namespace Core.StaticClass
             #region AddEventHandler reflection_eventtocore
             Type Type_setting = LoadDllUI.GetTypeInterface(typeof(SettingUI));
             Type Type_reflection_eventtocore = Type_setting.BaseType.GetField("reflection_eventtocore").FieldType;
-            Reflection_EventToCore instance = Type_setting.BaseType.GetField("reflection_eventtocore").GetValue(null) as Reflection_EventToCore;
+            RequestToCore instance = Type_setting.BaseType.GetField("reflection_eventtocore").GetValue(null) as RequestToCore;
 
             instance.EventGetListAccountCloud += AppSetting.settings.GetListAccountCloud;
             instance.EventSetSetting += AppSetting.settings.SetSettingAsString;

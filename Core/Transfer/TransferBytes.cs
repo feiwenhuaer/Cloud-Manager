@@ -157,7 +157,7 @@ namespace Core.Transfer
                 case CloudType.Mega:
                     if (!CreateNew)
                     {
-                        completionHandle = mega_up.ReadDataTextResponse();
+                        completionHandle = mega_up.ReadDataTextResponse();//get data return from server
                         if (completionHandle.StartsWith("-")) throw new Exception(completionHandle);
                     }
                     item.ChunkUploadSize = chunksSizesToUploadMega[indexPosMega];

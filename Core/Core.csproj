@@ -63,7 +63,7 @@
     <Compile Include="Class\Login.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StaticClass\ReadWriteData.cs" />
-    <Compile Include="StaticClass\Reflection_UI.cs" />
+    <Compile Include="StaticClass\AddEventHandleUI.cs" />
     <Compile Include="Class\Settings.cs" />
     <Compile Include="TestClass.cs" />
     <Compile Include="Transfer\GroupsTransferManager.cs" />

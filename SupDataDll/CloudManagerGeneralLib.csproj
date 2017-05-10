@@ -55,7 +55,7 @@
     <Compile Include="Class\Mega\Attributes.cs" />
     <Compile Include="Class\Mega\DataCryptoMega.cs" />
     <Compile Include="Class\Mega\INodeCrypto.cs" />
-    <Compile Include="Class\Reflection_EventToCore.cs" />
+    <Compile Include="Class\RequestToCore.cs" />
     <Compile Include="Class\Transfer.cs" />
     <Compile Include="Class\UI_n_lang.cs" />
     <Compile Include="Class\UnitConventer.cs" />

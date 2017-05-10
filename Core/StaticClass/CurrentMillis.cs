@@ -11,19 +11,16 @@ namespace Core.StaticClass
         /// <summary>Get extra long current timestamp</summary>
         public static long Millis { get { return (long)((DateTime.UtcNow - Jan1St1970).TotalMilliseconds); } }
 
-        public static string GetTimeBySecond(int second)
+        public static string GetTimeBySecond(long second)
         {
-            int sec = second % 60;
-            int minute = (second - sec) / 60;
-            int min = minute % 60;
-            int hour = (minute - min) / 60;
-            int hr = hour % 24;
-            int days = (hour - hr) / 24;
+            long sec = second % (long)60;
+            long minute = (second - sec) / 60;
+            long min = minute % 60;
+            long hour = (minute - min) / 60;
+            long hr = hour % 24;
+            long days = (hour - hr) / 24;
             string text = "";
-            if (days != 0)
-            {
-                text += days.ToString() + " days ";
-            }
+            if (days != 0) text += days.ToString() + " days ";
             text += hr.ToString() + ":" + min.ToString() + ":" + sec.ToString();
             return text;
         }

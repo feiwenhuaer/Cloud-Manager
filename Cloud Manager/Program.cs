@@ -39,8 +39,8 @@ namespace Cloud_Manager
                 AppSetting.lang = new Languages(AppSetting.settings.GetSettingsAsString(SettingsKey.lang));//load language
 
                 if(!LoadDllUI.Load()) return;//load dll UI
-                Reflection_UI.CreateInstanceLogin();//Create Login UI
-                Reflection_UI.Load_Setting_UI();//Load Setting_UI and event
+                AddEventHandleUI.CreateInstanceLogin();//Create Login UI
+                AddEventHandleUI.Load_Setting_UI();//Load Setting_UI and event
 
                 AppSetting.login.Load(arg);// load login form
                 AppSetting.UILogin.ShowDialog_();
@@ -51,7 +51,7 @@ namespace Cloud_Manager
 
 #endif
                     AppSetting.TransferManager.Start();
-                    Reflection_UI.Load_UIMain();
+                    AddEventHandleUI.Load_UIMain();
                     showMainForm:
                     AppSetting.TransferManager.status = StatusUpDownApp.Start;
                     AppSetting.UIMain.ShowDialog_();
@@ -65,7 +65,7 @@ namespace Cloud_Manager
                         //reload dll ui
                         if (!LoadDllUI.Load()) return;//reload dll
                         //Reflection_UI.Load_Setting_UI();//Load Setting_UI and event
-                        Reflection_UI.Load_UIMain();//create instance main and LV_ud
+                        AddEventHandleUI.Load_UIMain();//create instance main and LV_ud
                         AppSetting.settings.SaveSettings();
                         GC.Collect();
                         goto showMainForm;

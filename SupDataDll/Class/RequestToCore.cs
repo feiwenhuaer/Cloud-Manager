@@ -18,12 +18,8 @@ namespace CloudManagerGeneralLib
     public delegate void CreateFolder(ExplorerNode node);
     public delegate void ExitAppCallBack();
     public delegate void SetSetting(SettingsKey Key, string Data);
-    public class Reflection_EventToCore
+    public class RequestToCore
     {
-        public string test()
-        {
-            return EventChangeUserPass.GetType().Name;
-        }
         /// <summary>
         /// 
         /// </summary>
@@ -36,6 +32,7 @@ namespace CloudManagerGeneralLib
             return EventChangeUserPass(user, pass, newpass);
         }
         public event ChangeUserPass EventChangeUserPass;
+
         /// <summary>
         /// Add list item for download upload
         /// </summary>
@@ -48,6 +45,7 @@ namespace CloudManagerGeneralLib
             EventTransferItems(items, fromfolder, savefolder, AreCut);
         }
         public event TransferItems EventTransferItems;
+
         /// <summary>
         /// SetSetting
         /// </summary>
@@ -58,6 +56,7 @@ namespace CloudManagerGeneralLib
             EventSetSetting(Key, Data);
         }
         public event SetSetting EventSetSetting;
+
         /// <summary>
         /// Save Setting
         /// </summary>
@@ -66,6 +65,7 @@ namespace CloudManagerGeneralLib
             EventSaveSetting();
         }
         public event SaveSetting EventSaveSetting;
+
         /// <summary>
         /// Read Setting
         /// </summary>
@@ -76,6 +76,7 @@ namespace CloudManagerGeneralLib
             return EventGetSetting(Key);
         }
         public event GetSetting EventGetSetting;
+
         /// <summary>
         /// Read language
         /// </summary>
@@ -85,6 +86,7 @@ namespace CloudManagerGeneralLib
         {
             return EventGetTextLanguage(Key);
         }
+
         /// <summary>
         /// Read language
         /// </summary>
@@ -95,6 +97,7 @@ namespace CloudManagerGeneralLib
             return EventGetTextLanguage(Key.ToString());
         }
         public event GetTextLanguage EventGetTextLanguage;
+
         /// <summary>
         /// Delete Cloud Account
         /// </summary>
@@ -106,6 +109,7 @@ namespace CloudManagerGeneralLib
             return EventDeleteAccountCloud(Email, type);
         }
         public event DeleteAccountCloud EventDeleteAccountCloud;
+
         /// <summary>
         /// Get List Cloud Account
         /// </summary>
@@ -115,6 +119,7 @@ namespace CloudManagerGeneralLib
             return EventGetListAccountCloud();
         }
         public event GetListAccountCloud EventGetListAccountCloud;
+
         /// <summary>
         /// 
         /// </summary>
@@ -124,6 +129,7 @@ namespace CloudManagerGeneralLib
             EventShowFormOauth(type);
         }
         public event ShowFormOauth EventShowFormOauth;
+
         /// <summary>
         /// Explorer, return parent.
         /// </summary>
@@ -135,6 +141,7 @@ namespace CloudManagerGeneralLib
             return EventGetChildNode(node);
         }
         public event GetChildNode EventGetChildNode;
+
         /// <summary>
         /// Send data login to core
         /// </summary>
@@ -161,6 +168,7 @@ namespace CloudManagerGeneralLib
             return EventMoveItem(node, null, newname, false);
         }
         public event RenameItem EventMoveItem;
+
         /// <summary>
         /// Delete List items
         /// </summary>
@@ -170,6 +178,7 @@ namespace CloudManagerGeneralLib
             EventDeletePath(items);
         }
         public event DeletePath EventDeletePath;
+
         /// <summary>
         /// Create folder node
         /// </summary>
