@@ -51,6 +51,7 @@
     <Compile Include="Dropbox\DropboxRequestAPIv2.cs" />
     <Compile Include="Dropbox\Oauth\UIinterfaceDB.cs" />
     <Compile Include="GoogleDrive\DriveAPIHttprequestv2.cs" />
+    <Compile Include="GoogleDrive\DriveFiles.cs" />
     <Compile Include="GoogleDrive\GoogleDriveEnum.cs" />
     <Compile Include="GoogleDrive\GoogleDriveErrorMessage.cs" />
     <Compile Include="GoogleDrive\JsonClass\File_list.cs" />

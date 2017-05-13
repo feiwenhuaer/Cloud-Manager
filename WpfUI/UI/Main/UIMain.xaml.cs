@@ -269,7 +269,7 @@ namespace WpfUI.UI.Main
             TabItem item = new TabItem();
             ComboBoxHeader cbbh = new ComboBoxHeader();
             UC_Lv_item lvitem = new UC_Lv_item();
-
+            lvitem.main_window = this;
             cbbh.IsEnabled = false;
             item.Header = cbbh;
             cbbh.comboBox.SelectionChanged += lvitem.ComboBox_SelectionChanged;

@@ -365,7 +365,7 @@ namespace Core.Transfer
                         string parentid = item.To.node.Parent.Info.ID;
                         string mimeType = Get_mimeType.Get_mimeType_From_FileExtension(item.To.node.GetExtension());
                         string jsondata = "{\"title\": \"" + item.From.node.Info.Name + "\", \"mimeType\": \"" + mimeType + "\", \"parents\": [{\"id\": \"" + parentid + "\"}]}";
-                        item.UploadID = gdclient.Files_insert_resumable_getUploadID(jsondata, mimeType, item.From.node.Info.Size);
+                        item.UploadID = gdclient.Files.Insert_ResumableGetUploadID(jsondata, mimeType, item.From.node.Info.Size);
                     }
                     ItemsTransferWork.Add(new TransferBytes(item, this, gdclient));
                     return;

@@ -2,6 +2,7 @@
 {
     public class TokenGoogleDrive
     {
+        public string Email;
         public bool IsError = false;
         public string Code;
         public string access_token;

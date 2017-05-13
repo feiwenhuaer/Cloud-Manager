@@ -107,8 +107,7 @@ namespace Core.CloudSubClass
 
 
                 case CloudType.GoogleDrive:
-                    string[] scope = new string[] { Scope.Drive, Scope.DriveFile, Scope.DriveMetadata };
-                    GoogleAPIOauth2 oauth_gd = new GoogleAPIOauth2(scope);
+                    GoogleAPIOauth2 oauth_gd = new GoogleAPIOauth2();
                     oauth_gd.TokenCallBack += Oauth_gd_TokenCallBack;
 
                     type_oauthUI = LoadDllUI.GetTypeInterface(typeof(UIinterfaceGD));
@@ -157,7 +156,7 @@ namespace Core.CloudSubClass
                 if (token.IsError) throw new Exception("Accesstoken:" + token.access_token + ",RefreshToken:" + token.refresh_token);
                 string token_text = JsonConvert.SerializeObject(token);
                 DriveAPIHttprequestv2 client = new DriveAPIHttprequestv2(token);
-                dynamic about = JsonConvert.DeserializeObject(client.About());
+                dynamic about = JsonConvert.DeserializeObject(client.About.Get());
                 string email = about.user.emailAddress;
                 SaveToken(email, token_text, CloudType.GoogleDrive);
             }else throw new Exception("Oauth token GD failed.");

@@ -41,12 +41,12 @@ namespace WpfUI.UI
             Thread thr = new Thread(CreateFolder);
             Setting_UI.ManagerThreads.CleanThr();
             Setting_UI.ManagerThreads.createfolder.Add(thr);
-            thr.Start();
+            thr.Start(textBox.Text);
         }
-        void CreateFolder()
+        void CreateFolder(object obj)
         {
             ExplorerNode n = new ExplorerNode();
-            n.Info.Name = textBox.Text;
+            n.Info.Name = (string)obj;
             parent.AddChild(n);
             Setting_UI.reflection_eventtocore.CreateFolder(n);
             Dispatcher.Invoke(new Action(() => this.Close()));

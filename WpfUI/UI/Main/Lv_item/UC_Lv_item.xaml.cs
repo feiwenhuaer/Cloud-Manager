@@ -19,6 +19,7 @@ namespace WpfUI.UI.Main.Lv_item
     /// </summary>
     public partial class UC_Lv_item : System.Windows.Controls.UserControl
     {
+        public Window main_window;
         public Thread thr;
         public UC_Lv_item()
         {
@@ -237,6 +238,7 @@ namespace WpfUI.UI.Main.Lv_item
         void CreateFolder()
         {
             UICreateFolder ui_cf = new UICreateFolder(managerexplorernodes.NodeWorking());
+            ui_cf.Owner = this.main_window;
             ui_cf.ShowDialog();
         }
         void DownloadSelected()
@@ -259,7 +261,6 @@ namespace WpfUI.UI.Main.Lv_item
             DialogResult result = fbd.ShowDialog();
             if (result != DialogResult.OK | result != DialogResult.Yes) return;
             ExplorerNode node = ExplorerNode.GetNodeFromDiskPath(fbd.SelectedPath);
-
             Setting_UI.reflection_eventtocore.TransferItems(new List<ExplorerNode>() { node }, node.Parent, managerexplorernodes.NodeWorking(), false);
         }
         void uploadfile()

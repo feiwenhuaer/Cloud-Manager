@@ -27,7 +27,7 @@ namespace Core.CloudSubClass
         internal static DriveAPIHttprequestv2 GetAPIv2(string Email, GD_LimitExceededDelegate LimitExceeded = null)
         {
             DriveAPIHttprequestv2 gdclient = new DriveAPIHttprequestv2(JsonConvert.DeserializeObject<TokenGoogleDrive>(AppSetting.settings.GetToken(Email, CloudType.GoogleDrive)), LimitExceeded);
-            gdclient.Email = Email;
+            if(string.IsNullOrEmpty(gdclient.Token.Email) || gdclient.Token.Email != Email) gdclient.Token.Email = Email;
             gdclient.TokenRenewEvent += Gdclient_TokenRenewEvent;
             return gdclient;
         }
@@ -109,13 +109,13 @@ namespace Core.CloudSubClass
         public static Stream GetFileStream(ExplorerNode node, long Startpos = -1,long endpos = -1)
         {
             DriveAPIHttprequestv2 gdclient = GetAPIv2(node.GetRoot().RootInfo.Email);
-            return gdclient.Files_get(node.Info.ID, Startpos, endpos);
+            return gdclient.Files.Get(node.Info.ID, Startpos, endpos);
         }
 
         public static GD_Files_list Search(string query, string Email,string pageToken = null)
         {
             DriveAPIHttprequestv2 gdclient = GetAPIv2(Email);
-            GD_Files_list list = JsonConvert.DeserializeObject<GD_Files_list>(gdclient.Files_list(en, query, CorpusEnum.DEFAULT, ProjectionEnum.BASIC,pageToken));
+            GD_Files_list list = JsonConvert.DeserializeObject<GD_Files_list>(gdclient.Files.List(en, query, CorpusEnum.DEFAULT, ProjectionEnum.BASIC,pageToken));
             if(!string.IsNullOrEmpty(list.nextPageToken)) list.items.AddRange(Search(query, Email, list.nextPageToken).items);
             list.nextPageToken = null;
             return list;
@@ -150,7 +150,7 @@ namespace Core.CloudSubClass
                         else parent_id = listsearchnode[0].Info.ID;
                     }
 
-                    if (create) gdclient.CreateFolder(listnode[i].Info.Name, parent_id);
+                    if (create) gdclient.Extend.CreateFolder(listnode[i].Info.Name, parent_id);
                 }
             }
             finally { Monitor.Exit(sync_createfolder); }
@@ -160,7 +160,7 @@ namespace Core.CloudSubClass
         {
             DriveAPIHttprequestv2 gdclient = GetAPIv2(node.GetRoot().RootInfo.Email);
             string json = "{\"title\": \"" + newname + "\"}";
-            string response = gdclient.EditMetaData(node.Info.ID, json);
+            string response = gdclient.Files.Patch(node.Info.ID, json);
             dynamic json_ = JsonConvert.DeserializeObject(response);
             string name = json_.title;
             if (name == newname) return true;
@@ -174,7 +174,7 @@ namespace Core.CloudSubClass
             if (nodemove.GetRoot().RootInfo.Type != newparent.GetRoot().RootInfo.Type) throw new Exception("TypeCloud not match.");
 
             DriveAPIHttprequestv2 gdclient = GetAPIv2(nodemove.GetRoot().RootInfo.Email);
-            GD_item item_metadata = JsonConvert.DeserializeObject<GD_item>(gdclient.EditMetaData(nodemove.Info.ID));
+            GD_item item_metadata = JsonConvert.DeserializeObject<GD_item>(gdclient.Files.Patch(nodemove.Info.ID));
             if (nodemove.Parent != newparent)
             {
                 if (!copy) foreach (GD_parent parent in item_metadata.parents) if (parent.id == nodemove.Parent.Info.ID)
@@ -183,17 +183,17 @@ namespace Core.CloudSubClass
                                                                                     break;
                                                                                 }
                 bool isroot = false;
-                if (AppSetting.settings.GetCloudRootNode(gdclient.Email, CloudType.GoogleDrive).Info.ID == newparent.Parent.Info.ID) isroot = true;
+                if (AppSetting.settings.GetCloudRootNode(gdclient.Token.Email, CloudType.GoogleDrive).Info.ID == newparent.Parent.Info.ID) isroot = true;
                 item_metadata.parents.Add(new GD_parent() { id = newparent.Parent.Info.ID, isRoot = isroot });
             }
             if (newname != null) item_metadata.title = newname;
-            return JsonConvert.DeserializeObject<GD_item>(gdclient.EditMetaData(nodemove.Info.ID,JsonConvert.SerializeObject(item_metadata)));
+            return JsonConvert.DeserializeObject<GD_item>(gdclient.Files.Patch(nodemove.Info.ID,JsonConvert.SerializeObject(item_metadata)));
         }
 
         public static GD_item GetMetadataItem(ExplorerNode node)
         {
             DriveAPIHttprequestv2 client = GetAPIv2(node.GetRoot().RootInfo.Email);
-            return JsonConvert.DeserializeObject<GD_item>(client.EditMetaData(node.Info.ID, null));
+            return JsonConvert.DeserializeObject<GD_item>(client.Files.Patch(node.Info.ID, null));
         }
         //trash/delete
         public static bool File_trash(ExplorerNode node, bool Permanently)
@@ -202,21 +202,20 @@ namespace Core.CloudSubClass
             if (node == node.GetRoot()) throw new Exception("Can't delete root.");
             if (Permanently)
             {
-                gdclient.Files_delete(node.Info.ID);
+                gdclient.Files.Delete(node.Info.ID);
                 return true;
             }
             else
             {
-                dynamic json = JsonConvert.DeserializeObject(gdclient.ItemTrash(node.Info.ID));
+                dynamic json = JsonConvert.DeserializeObject(gdclient.Files.Trash(node.Info.ID));
                 return true;
             }
         }
         
-        public static void Gdclient_TokenRenewEvent(TokenGoogleDrive token, string Email)
+        public static void Gdclient_TokenRenewEvent(TokenGoogleDrive token)
         {
-            string json = JsonConvert.SerializeObject(token);
-            XmlNode cloud = AppSetting.settings.GetCloud(Email,CloudType.GoogleDrive);
-            if (cloud != null) AppSetting.settings.ChangeToken(cloud, json);
+            XmlNode cloud = AppSetting.settings.GetCloud(token.Email,CloudType.GoogleDrive);
+            if (cloud != null) AppSetting.settings.ChangeToken(cloud, JsonConvert.SerializeObject(token));
             else throw new Exception("Can't save token.");
         }
         
