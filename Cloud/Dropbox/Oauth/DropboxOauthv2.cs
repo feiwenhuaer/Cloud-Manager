@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Web;
 
 namespace Cloud.Dropbox.Oauth
 {
@@ -16,16 +17,15 @@ namespace Cloud.Dropbox.Oauth
             port = GetFirstAvailableRandomPort(MinPortRange, MaxPortRange);
             redirectURI = string.Format(LoopbackCallback, port) + "/";
             authorizationRequest = string.Format("https://www.dropbox.com/1/oauth2/authorize?client_id={0}&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A{1}", DropboxAppKey.ApiKey, port.ToString());
-
-            GetCode_(ui, owner, new HttpListenerContextRecieve(Rev));
+            ui.EventUriResponse += Ui_EventUriResponse;
+            GetCode_(ui, owner);
         }
 
-        void Rev(HttpListenerContext ls)
+        private void Ui_EventUriResponse(Uri uri)
         {
-            string code = ls.Request.QueryString.Get("code");
-            if (code == null)
+            string code = HttpUtility.ParseQueryString(uri.Query).Get("code");
+            if(code == null)
             {
-                try { listener.Close(); } catch { }
                 ReturnToken(null);
                 return;
             }
@@ -33,7 +33,7 @@ namespace Cloud.Dropbox.Oauth
             client.GetAccessToken(code, port);
             ReturnToken(client.AccessToken);
         }
-
+        
         int GetFirstAvailableRandomPort(int startPort, int stopPort)
         {
             Random r = new Random();

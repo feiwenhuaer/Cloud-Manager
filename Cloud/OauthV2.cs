@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -10,7 +11,6 @@ using System.Text;
 namespace Cloud
 {
     public delegate void DelegateToken(string token);
-    internal delegate void HttpListenerContextRecieve(HttpListenerContext ls);
 
     public abstract class OauthV2
     {
@@ -29,38 +29,25 @@ namespace Cloud
     </script>
   </body>
 </html>";
-        internal HttpListener listener;
         internal string redirectURI;
         internal string authorizationRequest;
         
         public event DelegateToken TokenCallBack;
-        
-        internal void GetCode_(OauthUI ui, object owner, HttpListenerContextRecieve rev)
+        byte[] buffer = new byte[1024];
+        Process Cloud_Oauth;
+        internal void GetCode_(OauthUI ui, object owner)//, HttpListenerContextRecieve rev)
         {
             if (string.IsNullOrEmpty(authorizationRequest) | string.IsNullOrEmpty(redirectURI)) throw new Exception("Oauth:authorizationRequest or redirectURI is null.");
-            listener = new HttpListener();
-            listener.Prefixes.Add(redirectURI);
-            try
-            {
-                listener.Start();
-                ui.Url = authorizationRequest;
-                ui.CheckUrl = redirectURI;
-                ui.ShowUI(owner);
-                listener.BeginGetContext(new AsyncCallback(RecieveCode), rev);
-            }
-            catch { TokenCallBack.Invoke(null); }
+            Cloud_Oauth = Process.Start(Directory.GetCurrentDirectory() + "\\Cloud_Oauth.exe", redirectURI);
+            Cloud_Oauth.OutputDataReceived += Cloud_Oauth_OutputDataReceived;
+            ui.Url = authorizationRequest;
+            ui.CheckUrl = redirectURI;
+            ui.ShowUI(owner);
         }
 
-        void RecieveCode(IAsyncResult rs)
+        private void Cloud_Oauth_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
-            HttpListenerContext ls = listener.EndGetContext(rs);
-            using (var writer = new StreamWriter(ls.Response.OutputStream))
-            {
-                writer.WriteLine(ClosePageResponse);
-                writer.Flush();
-            }
-            ls.Response.OutputStream.Close();
-            ((HttpListenerContextRecieve)rs.AsyncState)(ls);
+            throw new Exception(e.Data);
         }
 
         internal void ReturnToken(string token)

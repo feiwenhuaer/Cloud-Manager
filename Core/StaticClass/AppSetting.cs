@@ -21,7 +21,6 @@ namespace Core.StaticClass
         public static SettingUI UISetting;
         public static UILogin UILogin;
         public static UIMain UIMain;
-        public static UIUC_TLV_ud uc_lv_ud_instance;
         public static UIClosing UIclose;
         public static OauthUI UIOauth;
         //pass

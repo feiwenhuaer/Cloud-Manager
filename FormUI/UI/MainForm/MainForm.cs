@@ -17,7 +17,6 @@ namespace FormUI.UI.MainForm
     public partial class MainForm : System.Windows.Forms.Form, CloudManagerGeneralLib.UiInheritance.UIMain
     {
         #region interface
-        UserControl LV_Ud_control;
         public bool AreReloadUI
         {
             get
@@ -25,13 +24,7 @@ namespace FormUI.UI.MainForm
                 return Setting_UI.ReloadUI_Flag;
             }
         }
-        public void load_uC_Lv_ud(UIUC_TLV_ud control)
-        {
-            LV_Ud_control = (UserControl)control;
-            LV_Ud_control.Dock = DockStyle.Fill;
-            if (InvokeRequired) Invoke(new Action(() => splitContainer1.Panel2.Controls.Add(LV_Ud_control)));
-            else splitContainer1.Panel2.Controls.Add(LV_Ud_control);
-        }
+
         public void AddNewCloudToTV(ExplorerNode newnode)
         {
             if (InvokeRequired) Invoke(new Action(() => AddNewCloudToTV_(newnode)));
@@ -42,6 +35,15 @@ namespace FormUI.UI.MainForm
             this.ShowDialog();
         }
 
+        public void UpdateGroup(TransferGroup Group, UpdateTransfer_TLVUD type)
+        {
+            switch (type)
+            {
+                case UpdateTransfer_TLVUD.Add: uC_Lv_ud1.AddNewGroup(Group); break;
+                case UpdateTransfer_TLVUD.Remove: uC_Lv_ud1.RemoveGroup(Group); break;
+                case UpdateTransfer_TLVUD.Refresh: uC_Lv_ud1.RefreshAll(); break;
+            }
+        }
 
         public void FileSaveDialog(string InitialDirectory, string FileName, string Filter, ExplorerNode node)
         {
@@ -199,9 +201,9 @@ namespace FormUI.UI.MainForm
             addNewTabToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.addtab);
             closeThisTabToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.removetab);
 
-            ((CloudManagerGeneralLib.UiInheritance.UIUC_TLV_ud)LV_Ud_control).LoadLanguage();
+            uC_Lv_ud1.LoadLanguage();
 
-            for(int i = 0; i < tabControl1.Controls.Count;i++)
+            for (int i = 0; i < tabControl1.Controls.Count;i++)
             {
                 ((UC_LVitem)((TabPage)tabControl1.Controls[i]).Controls[0]).LoadLanguage();
             }

@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
+using System.Web;
 
 namespace Cloud.GoogleDrive.Oauth
 {
@@ -53,29 +54,22 @@ namespace Cloud.GoogleDrive.Oauth
             redirectURI = string.Format("http://{0}:{1}/", IPAddress.Loopback, GetRandomUnusedPort());
             authorizationRequest = string.Format("{0}?response_type=code&scope={1}&redirect_uri={2}&client_id={3}&state={4}&code_challenge={5}&code_challenge_method={6}",
                 authorizationEndpoint, scopepara, Uri.EscapeDataString(redirectURI), GoogleDriveAppKey.ClientID, state, code_challenge, code_challenge_method);
-            
-            GetCode_(ui,owner,new HttpListenerContextRecieve(Rev));
+
+            ui.EventUriResponse += Ui_EventUriResponse;
+            GetCode_(ui, owner);//,new HttpListenerContextRecieve(Rev));
         }
 
-        void Rev(HttpListenerContext ls)
+        private void Ui_EventUriResponse(Uri uri)
         {
-            if (ls.Request.QueryString.Get("error") != null | ls.Request.QueryString.Get("code") == null | ls.Request.QueryString.Get("state") == null)
+            var querys = HttpUtility.ParseQueryString(uri.Query);
+            if(querys.Get("error") != null || querys.Get("code") == null || querys.Get("state") == null || querys.Get("state") != state)
             {
                 this.token.IsError = true;
-                try { listener.Close(); } catch { }
-                throw new Exception(ls.Request.RawUrl);
+                throw new Exception(uri.ToString());
             }
-            token.Code = ls.Request.QueryString.Get("code");
-            var incoming_state = ls.Request.QueryString.Get("state");
-            if (incoming_state != state)
-            {
-                this.token.IsError = true;
-                try { listener.Close(); } catch { }
-                throw new Exception(ls.Request.RawUrl);
-            }
-
+            token.Code = querys.Get("code");
             string tokenRequestBody = string.Format("code={0}&redirect_uri={1}&client_id={2}&code_verifier={3}&client_secret={4}&scope=&grant_type=authorization_code",
-                this.token.Code, System.Uri.EscapeDataString(redirectURI), GoogleDriveAppKey.ClientID, code_verifier, GoogleDriveAppKey.Clientsecret);
+               this.token.Code, System.Uri.EscapeDataString(redirectURI), GoogleDriveAppKey.ClientID, code_verifier, GoogleDriveAppKey.Clientsecret);
 
             HttpWebRequest tokenRequest = (HttpWebRequest)WebRequest.Create(tokenEndpoint);
             tokenRequest.Method = "POST";
@@ -101,7 +95,7 @@ namespace Cloud.GoogleDrive.Oauth
                 ReturnToken(responseText);
             }
         }
-
+        
         public TokenGoogleDrive RefreshToken()
         {
             if (string.IsNullOrEmpty(token.refresh_token)) throw new Exception("refresh_token can't be null");

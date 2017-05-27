@@ -60,7 +60,7 @@ namespace Core.Transfer
         {
             this.GroupData.status = StatusTransfer.Loading;
             this.GroupData.col = new List<string> { fromfolder.GetFullPathString(), savefolder.GetFullPathString(), this.GroupData.status.ToString(), "0/0", "", "", "" };
-            AppSetting.uc_lv_ud_instance.AddNewGroup(GroupData);
+            AppSetting.UIMain.UpdateGroup(GroupData, UpdateTransfer_TLVUD.Add);
             //string path = fromfolder.RootInfo.uri == null ? fromfolder.TypeCloud.ToString() + ":" + AppSetting.settings.GetDefaultCloud(fromfolder.TypeCloud) + "?id=" + fromfolder.ID : fromfolder.Path_Raw;
             foreach (ExplorerNode item in items)
             {

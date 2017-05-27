@@ -13,6 +13,9 @@ namespace WpfUI.UI.Oauth
         bool isclosed = false;
         string url;
         string url_check;
+
+        public event UriResponse EventUriResponse;
+
         public UiOauth()
         {
             InitializeComponent();
@@ -39,7 +42,7 @@ namespace WpfUI.UI.Oauth
                 url = value;
             }
         }
-
+        
         public void ShowUI(object owner)
         {
             this.Show();
@@ -56,6 +59,7 @@ namespace WpfUI.UI.Oauth
             if (e.Uri.ToString().IndexOf(url_check) == 0)
             {
                 this.Close();
+                EventUriResponse(e.Uri);
             }
         }
 

@@ -77,7 +77,6 @@
     <Compile Include="UiInheritance\UIDelete.cs" />
     <Compile Include="UiInheritance\UILogin.cs" />
     <Compile Include="UiInheritance\UIMain.cs" />
-    <Compile Include="UiInheritance\UIUC_TLV_ud.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Aga.Controls\Aga.Controls.csproj">

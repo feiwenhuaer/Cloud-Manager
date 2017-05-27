@@ -9,10 +9,10 @@ namespace WpfUI.UI.Main.Lv_ud
     /// <summary>
     /// Interaction logic for UCLV_ud.xaml
     /// </summary>
-    public partial class UC_TLV_ud : UserControl, CloudManagerGeneralLib.UiInheritance.UIUC_TLV_ud
+    public partial class UC_TLV_ud : UserControl
     {
         object uimain;
-        #region interface
+
         public object UIMain
         {
             set
@@ -83,8 +83,7 @@ namespace WpfUI.UI.Main.Lv_ud
             if (Group.change == ChangeTLV.Processing) TLV_process.data.Remove(Group);
             else TLV_done.data.Remove(Group);
         }
-
-        #endregion
+        
 
         public UC_TLV_ud()
         {

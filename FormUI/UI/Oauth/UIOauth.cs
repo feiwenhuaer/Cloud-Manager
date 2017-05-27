@@ -15,7 +15,9 @@ namespace FormUI.UI.Oauth
         bool isclosed = false;
         string url;
         string url_check;
-        
+
+        public event UriResponse EventUriResponse;
+
         private void UIOauth_FormClosed(object sender, FormClosedEventArgs e)
         {
             isclosed = true;
@@ -65,6 +67,7 @@ namespace FormUI.UI.Oauth
             if (e.Url.ToString().IndexOf(url_check) == 0)
             {
                 this.Close();
+                EventUriResponse(e.Url);
             }
         }
     }

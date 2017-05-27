@@ -60,8 +60,10 @@
             this.settingsToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.uiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.languageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.uC_Lv_ud1 = new FormUI.UI.MainForm.UC_Lv_ud();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
+            this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
             this.splitContainer2.Panel1.SuspendLayout();
@@ -84,6 +86,10 @@
             // splitContainer1.Panel1
             // 
             this.splitContainer1.Panel1.Controls.Add(this.splitContainer2);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.Controls.Add(this.uC_Lv_ud1);
             this.splitContainer1.Size = new System.Drawing.Size(1008, 414);
             this.splitContainer1.SplitterDistance = 264;
             this.splitContainer1.TabIndex = 2;
@@ -330,6 +336,14 @@
             this.languageToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this.languageToolStripMenuItem.Text = "Change Language";
             // 
+            // uC_Lv_ud1
+            // 
+            this.uC_Lv_ud1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.uC_Lv_ud1.Location = new System.Drawing.Point(0, 0);
+            this.uC_Lv_ud1.Name = "uC_Lv_ud1";
+            this.uC_Lv_ud1.Size = new System.Drawing.Size(1008, 146);
+            this.uC_Lv_ud1.TabIndex = 0;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -344,6 +358,7 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             this.splitContainer2.Panel1.ResumeLayout(false);
@@ -393,5 +408,6 @@
         private System.Windows.Forms.ContextMenuStrip CMS_Tabcontrol;
         private System.Windows.Forms.ToolStripMenuItem addNewTabToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem closeThisTabToolStripMenuItem;
+        private UC_Lv_ud uC_Lv_ud1;
     }
 }

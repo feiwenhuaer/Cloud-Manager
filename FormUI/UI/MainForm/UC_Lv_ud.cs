@@ -8,10 +8,9 @@ using CloudManagerGeneralLib.Class;
 
 namespace FormUI.UI.MainForm
 {
-    public partial class UC_Lv_ud : UserControl, CloudManagerGeneralLib.UiInheritance.UIUC_TLV_ud
+    public partial class UC_Lv_ud : UserControl
     {
-
-        #region Reflection
+        
         System.Windows.Forms.Form mainform;
         public object UIMain { set { mainform = (System.Windows.Forms.Form)value; } }
 
@@ -109,7 +108,6 @@ namespace FormUI.UI.MainForm
                 lv.Columns[i].Text = Setting_UI.reflection_eventtocore.GetTextLanguage("TLV_UD_Columns_" + i.ToString());
             }
         }
-        #endregion
 
 
         List<TransferGroup> Groups = new List<TransferGroup>();

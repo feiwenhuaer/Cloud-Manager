@@ -114,4 +114,11 @@ namespace CloudManagerGeneralLib
         //DeleteForm
         DeleteForm_text, DeleteForm_CB_autoclose, DeleteForm_updatetext_Deleting, DeleteForm_updatetext_Deleted, DeleteForm_updatetext_Error,
     }
+
+    public enum UpdateTransfer_TLVUD
+    {
+        Add,
+        Remove,
+        Refresh
+    }
 }

@@ -61,7 +61,6 @@ namespace Cloud_Manager
                         AppSetting.TransferManager.status = StatusUpDownApp.Pause;
                         //clean memory
                         AppSetting.UIMain = null;
-                        AppSetting.uc_lv_ud_instance = null;
                         //reload dll ui
                         if (!LoadDllUI.Load()) return;//reload dll
                         //Reflection_UI.Load_Setting_UI();//Load Setting_UI and event

@@ -37,14 +37,16 @@ namespace WpfUI.UI.Main
         {
             this.ShowDialog();
         }
-        public void load_uC_Lv_ud(CloudManagerGeneralLib.UiInheritance.UIUC_TLV_ud control)
-        {
-            UC_TLV_ud ct = (UC_TLV_ud)control;
-            Grid_Lv_ud.Children.Add(ct);
-            ct.Height = Double.NaN;
-            ct.Width = Double.NaN;
-        }
 
+        public void UpdateGroup(TransferGroup Group, UpdateTransfer_TLVUD type)
+        {
+            switch (type)
+            {
+                case UpdateTransfer_TLVUD.Add: TLV_UD.AddNewGroup(Group); break;
+                case UpdateTransfer_TLVUD.Remove: TLV_UD.RemoveGroup(Group); break;
+                case UpdateTransfer_TLVUD.Refresh: TLV_UD.RefreshAll(); break;
+            }
+        }
 
         public void FileSaveDialog(string InitialDirectory, string FileName, string Filter, ExplorerNode node)
         {

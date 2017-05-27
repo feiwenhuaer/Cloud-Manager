@@ -142,25 +142,22 @@ namespace WpfUI.UI.Main.Lv_ud
         {
             ChangeNumberItemsTransfer u = new ChangeNumberItemsTransfer(groups[0].MaxItemsDownload);
             u.ShowDialog();
-            if(u.Flags)
-            {
-                groups[0].MaxItemsDownload = u.Number;
-            }
+            if(u.Flags) groups[0].MaxItemsDownload = u.Number;
         }
 
         void ChangeStatus(StatusTransfer val)
         {
             foreach (CloudManagerGeneralLib.Class.TransferItem it in items)
             {
-                if (val == StatusTransfer.Started && (it.status == StatusTransfer.Stop | it.status == StatusTransfer.Waiting | it.status == StatusTransfer.Error))
+                if (val == StatusTransfer.Started && (it.status == StatusTransfer.Stop || it.status == StatusTransfer.Waiting || it.status == StatusTransfer.Error))
                 {
                     it.status = val;
                     TransferGroup pr = GetParentItem(it);
-                    if (pr != null && (pr.status != StatusTransfer.Running | pr.status != StatusTransfer.Loading | pr.status != StatusTransfer.Remove)) pr.status = val;
+                    if (pr != null && (pr.status != StatusTransfer.Running || pr.status != StatusTransfer.Loading || pr.status != StatusTransfer.Remove)) pr.status = val;
                 }
                 else
                     //set Stop child
-                    if (val == StatusTransfer.Stop && (it.status != StatusTransfer.Done | it.status != StatusTransfer.Error | it.status != StatusTransfer.Stop)) it.status = val;
+                    if (val == StatusTransfer.Stop && (it.status != StatusTransfer.Done || it.status != StatusTransfer.Error || it.status != StatusTransfer.Stop)) it.status = val;
                 else
                     //set Waiting child
                     if (val == StatusTransfer.Waiting && it.status != StatusTransfer.Done) it.status = val;
@@ -172,9 +169,9 @@ namespace WpfUI.UI.Main.Lv_ud
             {
                 if (val == StatusTransfer.Started && (gr.status != StatusTransfer.Running)) gr.status = val;
                 else
-                   if (val == StatusTransfer.Stop && (gr.status != StatusTransfer.Done | gr.status != StatusTransfer.Loading | gr.status != StatusTransfer.Stop)) gr.status = val;
+                   if (val == StatusTransfer.Stop && (gr.status != StatusTransfer.Done || gr.status != StatusTransfer.Loading || gr.status != StatusTransfer.Stop)) gr.status = val;
                 else
-                   if (val == StatusTransfer.Waiting && (gr.status != StatusTransfer.Done | gr.status != StatusTransfer.Remove)) gr.status = val;
+                   if (val == StatusTransfer.Waiting && (gr.status != StatusTransfer.Done || gr.status != StatusTransfer.Remove)) gr.status = val;
                 else
                    if (val == StatusTransfer.Remove) gr.status = val;
             }
@@ -182,16 +179,7 @@ namespace WpfUI.UI.Main.Lv_ud
 
         void ErrorSetForce(StatusTransfer val)
         {
-            foreach (var gr in groups)
-            {
-                foreach (var it in gr.items)
-                {
-                    if (it.status == StatusTransfer.Error)
-                    {
-                        it.status = val;
-                    }
-                }
-            }
+            foreach (var gr in groups) foreach (var it in gr.items) if (it.status == StatusTransfer.Error) it.status = val;
         }
 
         TransferGroup GetParentItem(CloudManagerGeneralLib.Class.TransferItem item)

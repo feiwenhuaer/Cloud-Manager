@@ -79,7 +79,7 @@ namespace Core.Transfer
                             if (GroupsWork[i].GroupData.status == StatusTransfer.Remove & GroupsWork[i].ThreadsItemLoadWork.Count == 0 &
                                 GroupsWork[i].ItemsTransferWork.Count == 0)
                             {
-                                AppSetting.uc_lv_ud_instance.RemoveGroup(this.GroupsWork[i].GroupData);
+                                AppSetting.UIMain.UpdateGroup(this.GroupsWork[i].GroupData, UpdateTransfer_TLVUD.Remove);
                                 GroupsWork[i].GroupData.items.Clear();
                                 this.GroupsWork.RemoveAt(i);
                                 i--;
@@ -105,7 +105,7 @@ namespace Core.Transfer
                         if (CurrentMillis.Millis - timestamp > TimeRefresh)
                         {
                             timestamp = CurrentMillis.Millis;
-                            AppSetting.uc_lv_ud_instance.RefreshAll();
+                            AppSetting.UIMain.UpdateGroup(null, UpdateTransfer_TLVUD.Refresh);
                             SaveData();
                         }
                         #endregion
@@ -174,7 +174,7 @@ namespace Core.Transfer
         {
             foreach (ItemsTransferManager gr in GroupsWork)
             {
-                AppSetting.uc_lv_ud_instance.AddNewGroup(gr.GroupData);
+                AppSetting.UIMain.UpdateGroup(gr.GroupData, UpdateTransfer_TLVUD.Add);
             }
         }
         #endregion

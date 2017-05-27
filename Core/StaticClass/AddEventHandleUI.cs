@@ -48,11 +48,6 @@ namespace Core.StaticClass
         {
             Type Main = LoadDllUI.GetTypeInterface(typeof(UIMain));
             AppSetting.UIMain = (UIMain)Activator.CreateInstance(Main);
-
-            Type uc_lv_ud = LoadDllUI.GetTypeInterface(typeof(UIUC_TLV_ud));
-            AppSetting.uc_lv_ud_instance = (UIUC_TLV_ud)Activator.CreateInstance(uc_lv_ud);
-
-            AppSetting.UIMain.load_uC_Lv_ud(AppSetting.uc_lv_ud_instance);
             AppSetting.TransferManager.LoadGroupToListView();
         }
     }
