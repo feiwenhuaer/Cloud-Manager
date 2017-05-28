@@ -29,22 +29,20 @@ namespace Cloud.Dropbox
         #endregion
         
         #region authorsize
-        public string GetAccessToken(string key_authorize, int port = -1)
+        public string GetAccessToken(string key_authorize, int port)
         {
             dynamic json = JsonConvert.DeserializeObject(GetAccessToken_(key_authorize, port));
             this.access_token = json.access_token;
             return this.access_token;
         }
 
-        private string GetAccessToken_(string key_authorize, int port = -1)
+        private string GetAccessToken_(string key_authorize, int port)
         {
-            BuildURL build = new BuildURL("https://api.dropboxapi.com/1/oauth2/token");
-            build.AddParameter("code", key_authorize);
-            build.AddParameter("client_id", DropboxAppKey.ApiKey);
-            build.AddParameter("client_secret", DropboxAppKey.ApiSecret);
-            build.AddParameter("grant_type", "authorization_code");
-            if (port != -1) build.AddParameter("redirect_uri", string.Format("http%3A%2F%2Flocalhost%3A{0}", port.ToString()));
-            HttpRequest_ rq = new HttpRequest_(build.uri, TypeRequest.POST.ToString());
+            Uri uri = new Uri("https://api.dropboxapi.com/1/oauth2/token" + 
+                string.Format("?code={0}&client_id={1}&client_secret={2}&grant_type={3}&redirect_uri=http%3A%2F%2Flocalhost%3A{4}"
+                , key_authorize, DropboxAppKey.ApiKey, DropboxAppKey.ApiSecret, "authorization_code", port.ToString()));
+
+            HttpRequest_ rq = new HttpRequest_(uri, TypeRequest.POST.ToString());
             rq.AddHeader("HOST: api.dropboxapi.com");
             rq.AddHeader("Content-Length: 0");
             return rq.GetTextDataResponse(true, true);

@@ -56,7 +56,7 @@ namespace Cloud.GoogleDrive
         private RequestReturn Request<T>(string url, TypeRequest typerequest, byte[] bytedata = null, string[] moreheader = null)
         {
             RequestReturn result = new RequestReturn();
-            http_request = new HttpRequest_(url.BuildUri(), typerequest.ToString());
+            http_request = new HttpRequest_(new Uri(url), typerequest.ToString());
 #if DEBUG
             http_request.debug = Debug;
 #endif

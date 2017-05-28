@@ -39,10 +39,7 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
     <Compile Include="CloudAppKey.cs" />
-    <Compile Include="BuildJson.cs" />
-    <Compile Include="BuildURL.cs" />
     <Compile Include="Dropbox\DropboxEnum.cs" />
     <Compile Include="Dropbox\DropboxErrorCode.cs" />
     <Compile Include="Dropbox\DropboxJsonResponseException.cs" />
