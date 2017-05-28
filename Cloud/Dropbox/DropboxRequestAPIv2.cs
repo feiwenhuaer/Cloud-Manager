@@ -105,11 +105,11 @@ namespace Cloud.Dropbox
         
         public IDropbox_Response_GetCurrentAccount GetCurrentAccount()
         {
-            return POST_Request<IDropbox_Response_GetCurrentAccount>("https://api.dropboxapi.com/2/users/get_current_account");
+            return POST_Request<Dropbox_Response_GetCurrentAccount>("https://api.dropboxapi.com/2/users/get_current_account");
         }
         public IDropbox_Response_GetSpaceUsage GetSpaceUsage()
         {
-            return POST_Request<IDropbox_Response_GetSpaceUsage>("https://api.dropboxapi.com/2/users/get_space_usage");
+            return POST_Request<Dropbox_Response_GetSpaceUsage>("https://api.dropboxapi.com/2/users/get_space_usage");
         }        
         public IDropbox_Response_MetaData GetMetadata(IDropbox_Request_Metadata data_request)
         {

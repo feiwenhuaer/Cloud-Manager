@@ -38,8 +38,8 @@ namespace Cloud
         internal void GetCode_(OauthUI ui, object owner)//, HttpListenerContextRecieve rev)
         {
             if (string.IsNullOrEmpty(authorizationRequest) | string.IsNullOrEmpty(redirectURI)) throw new Exception("Oauth:authorizationRequest or redirectURI is null.");
-            Cloud_Oauth = Process.Start(Directory.GetCurrentDirectory() + "\\Cloud_Oauth.exe", redirectURI);
-            Cloud_Oauth.OutputDataReceived += Cloud_Oauth_OutputDataReceived;
+            //Cloud_Oauth = Process.Start(Directory.GetCurrentDirectory() + "\\Cloud_Oauth.exe", redirectURI);
+            //Cloud_Oauth.OutputDataReceived += Cloud_Oauth_OutputDataReceived;
             ui.Url = authorizationRequest;
             ui.CheckUrl = redirectURI;
             ui.ShowUI(owner);

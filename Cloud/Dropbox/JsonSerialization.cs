@@ -11,44 +11,44 @@ namespace Cloud.Dropbox
     #region interface Response
     public interface IDropbox_Response_GetCurrentAccount
     {
-        string account_id { get; set; }
-        IDropbox_Response_GetCurrentAccount_name name { get; set; }
-        string email { get; set; }
-        bool email_verified { get; set; }
-        bool disabled { get; set; }
-        string locale { get; set; }
-        string referral_link { get; set; }
-        bool is_paired { get; set; }
-        IDropbox_tag_string account_type { get; set; }
-        string country { get; set; }
-        IDropbox_Response_GetCurrentAccount_team team { get; set; }
-        string team_member_id { get; set; }
-        string profile_photo_url { get; set; }
+        string account_id { get; }
+        IDropbox_Response_GetCurrentAccount_name name { get; }
+        string email { get;}
+        bool email_verified { get;}
+        bool disabled { get;}
+        string locale { get; }
+        string referral_link { get; }
+        bool is_paired { get; }
+        IDropbox_tag_string account_type { get; }
+        string country { get;  }
+        IDropbox_Response_GetCurrentAccount_team team { get;}
+        string team_member_id { get; }
+        string profile_photo_url { get; }
     }
     public interface IDropbox_Response_GetCurrentAccount_name
     {
-        string given_name { get; set; }
-        string surname { get; set; }
-        string familiar_name { get; set; }
-        string display_name { get; set; }
-        string abbreviated_name { get; set; }
+        string given_name { get; }
+        string surname { get; }
+        string familiar_name { get; }
+        string display_name { get; }
+        string abbreviated_name { get; }
     }
     public interface IDropbox_Response_GetCurrentAccount_team
     {
-        string id { get; set; }
-        string name { get; set; }
-        IDropbox_Response_GetCurrentAccount_Team_SharingPolicies sharing_policies { get; set; }
+        string id { get; }
+        string name { get; }
+        IDropbox_Response_GetCurrentAccount_Team_SharingPolicies sharing_policies { get; }
     }
     public interface IDropbox_Response_GetCurrentAccount_Team_SharingPolicies
     {
-        IDropbox_tag_string Dropbox_tag_string { get; set; }
-        IDropbox_tag_string shared_folder_join_policy { get; set; }
-        IDropbox_tag_string shared_link_create_policy { get; set; }
+        IDropbox_tag_string Dropbox_tag_string { get; }
+        IDropbox_tag_string shared_folder_join_policy { get; }
+        IDropbox_tag_string shared_link_create_policy { get; }
     }
     public interface IDropbox_Response_GetSpaceUsage
     {
-        long used { get; set; }
-        IDropbox_Response_GetSpaceUsage_Allocation allocation { get; set; }
+        long used { get; }
+        IDropbox_Response_GetSpaceUsage_Allocation allocation { get; }
     }
     public interface IDropbox_Response_GetSpaceUsage_Allocation: IDropbox_tag_string
     {
@@ -171,6 +171,101 @@ namespace Cloud.Dropbox
 
 
     #region Class
+    internal class Dropbox_Response_GetCurrentAccount : IDropbox_Response_GetCurrentAccount
+    {
+        public string account_id { get; set; }
+
+        [JsonProperty("account_type")]
+        Dropbox_tag_string account_type_;
+        [JsonIgnore]
+        public IDropbox_tag_string account_type { get { return account_type_; } }
+
+        public string country { get; set; }
+
+        public bool disabled { get; set; }
+
+        public string email { get; set; }
+
+        public bool email_verified { get; set; }
+
+        public bool is_paired { get; set; }
+
+        public string locale { get; set; }
+
+        [JsonProperty("name")]
+        Dropbox_Response_GetCurrentAccount_name name_;
+        [JsonIgnore]
+        public IDropbox_Response_GetCurrentAccount_name name { get { return name_; } }
+
+        public string profile_photo_url { get; set; }
+
+        public string referral_link { get; set; }
+
+        [JsonProperty("team")]
+        Dropbox_Response_GetCurrentAccount_team team_;
+        [JsonIgnore]
+        public IDropbox_Response_GetCurrentAccount_team team { get; set; }
+
+        public string team_member_id { get; set; }
+    }
+    internal class Dropbox_Response_GetCurrentAccount_name : IDropbox_Response_GetCurrentAccount_name
+    {
+        public string abbreviated_name { get; set; }
+        public string display_name { get; set; }
+
+        public string familiar_name { get; set; }
+
+        public string given_name { get; set; }
+
+        public string surname { get; set; }
+    }
+    internal class Dropbox_Response_GetCurrentAccount_team : IDropbox_Response_GetCurrentAccount_team
+    {
+        public string id { get; set; }
+
+        public string name { get; set; }
+
+        [JsonProperty("sharing_policies")]
+        Dropbox_Response_GetCurrentAccount_Team_SharingPolicies sharing_policies_;
+        [JsonIgnore]
+        public IDropbox_Response_GetCurrentAccount_Team_SharingPolicies sharing_policies { get { return sharing_policies_; } }
+    }
+    internal class Dropbox_Response_GetCurrentAccount_Team_SharingPolicies : IDropbox_Response_GetCurrentAccount_Team_SharingPolicies
+    {
+        [JsonProperty("Dropbox_tag_string")]
+        Dropbox_tag_string Dropbox_tag_string_;
+        [JsonIgnore]
+        public IDropbox_tag_string Dropbox_tag_string { get { return Dropbox_tag_string_; } }
+
+        [JsonProperty("shared_folder_join_policy")]
+        Dropbox_tag_string shared_folder_join_policy_;
+        [JsonIgnore]
+        public IDropbox_tag_string shared_folder_join_policy { get { return shared_folder_join_policy_; } }
+
+        [JsonProperty("shared_link_create_policy")]
+        Dropbox_tag_string shared_link_create_policy_;
+        [JsonIgnore]
+        public IDropbox_tag_string shared_link_create_policy { get { return shared_link_create_policy_; } }
+    }
+
+    internal class Dropbox_Response_GetSpaceUsage : IDropbox_Response_GetSpaceUsage
+    {
+        [JsonProperty("allocation")]
+        Dropbox_Response_GetSpaceUsage_Allocation allocation_;
+        [JsonIgnore]
+        public IDropbox_Response_GetSpaceUsage_Allocation allocation { get { return allocation_; } }
+
+        public long used { get; set; }
+    }
+    internal class Dropbox_Response_GetSpaceUsage_Allocation : IDropbox_Response_GetSpaceUsage_Allocation
+    {
+        public long allocated { get; set; }
+
+        public string tag { get; set; }
+    }
+
+
+
     internal class Dropbox_Response_ListFolder : IDropbox_Response_ListFolder
     {
         [JsonProperty("entries")]

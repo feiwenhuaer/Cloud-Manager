@@ -176,7 +176,6 @@ namespace Cloud.GoogleDrive
                 this.client = client;
             }
             
-
             public Stream Get(string fileId, long PosStart = -1, long endpos = -1)
             {
                 string url = string.Format(uriFileGet, fileId);
