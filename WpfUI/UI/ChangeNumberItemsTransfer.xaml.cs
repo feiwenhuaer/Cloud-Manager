@@ -22,7 +22,7 @@ namespace WpfUI.UI
         {
             InitializeComponent();
             int max = 32;
-            int.TryParse(Setting_UI.reflection_eventtocore.GetSetting(CloudManagerGeneralLib.SettingsKey.MaxItemsInGroupDownload),out max);
+            int.TryParse(Setting_UI.reflection_eventtocore.SettingAndLanguage.GetSetting(CloudManagerGeneralLib.SettingsKey.MaxItemsInGroupDownload),out max);
             n_ud.MaxValue = max;
             n_ud.MinValue = 1;
             Flags = false;

@@ -16,25 +16,25 @@ namespace Core.StaticClass
             Type Type_reflection_eventtocore = Type_setting.BaseType.GetField("reflection_eventtocore").FieldType;
             RequestToCore instance = Type_setting.BaseType.GetField("reflection_eventtocore").GetValue(null) as RequestToCore;
 
-            instance.EventGetListAccountCloud += AppSetting.settings.GetListAccountCloud;
-            instance.EventSetSetting += AppSetting.settings.SetSettingAsString;
-            instance.EventSaveSetting += AppSetting.settings.SaveSettings;
-            instance.EventGetSetting += AppSetting.settings.GetSettingsAsString;
-            instance.EventDeleteAccountCloud += AppSetting.settings.RemoveCloud;
-            instance.EventChangeUserPass += AppSetting.settings.ChangeUserPass;
+            instance.AccountsAndCloud.EventGetListAccountCloud += AppSetting.settings.GetListAccountCloud;
+            instance.SettingAndLanguage.EventSetSetting += AppSetting.settings.SetSettingAsString;
+            instance.SettingAndLanguage.EventSaveSetting += AppSetting.settings.SaveSettings;
+            instance.SettingAndLanguage.EventGetSetting += AppSetting.settings.GetSettingsAsString;
+            instance.AccountsAndCloud.EventDeleteAccountCloud += AppSetting.settings.RemoveCloud;
+            instance.AccountsAndCloud.EventChangeUserPass += AppSetting.settings.ChangeUserPass;
 
-            instance.EventShowFormOauth += AppSetting.ManageCloud.Oauth;
-            instance.EventDeletePath += AppSetting.ManageCloud.Delete;
-            instance.EventCreateFolder += AppSetting.ManageCloud.CreateFolder;
-            instance.EventMoveItem += AppSetting.ManageCloud.MoveItem;
-            instance.EventGetChildNode += AppSetting.ManageCloud.GetItemsList;
+            instance.AccountsAndCloud.EventShowFormOauth += AppSetting.ManageCloud.Oauth;
+            instance.ExplorerAndManagerFile.EventDeletePath += AppSetting.ManageCloud.Delete;
+            instance.ExplorerAndManagerFile.EventCreateFolder += AppSetting.ManageCloud.CreateFolder;
+            instance.ExplorerAndManagerFile.EventMoveItem += AppSetting.ManageCloud.MoveItem;
+            instance.ExplorerAndManagerFile.EventGetChildNode += AppSetting.ManageCloud.GetItemsList;
 
-            instance.EventTransferItems += AppSetting.TransferManager.AddItems;
+            instance.ExplorerAndManagerFile.EventTransferItems += AppSetting.TransferManager.AddItems;
             instance.EventExitAppCallBack += AppSetting.TransferManager.Exit;
 
-            instance.EventGetTextLanguage += AppSetting.lang.GetText;
+            instance.SettingAndLanguage.EventGetTextLanguage += AppSetting.lang.GetText;
 
-            instance.EventLogin += AppSetting.login.Login_EventLoginCallBack;
+            instance.AccountsAndCloud.EventLogin += AppSetting.login.Login_EventLoginCallBack;
             #endregion
         }
 

@@ -48,7 +48,7 @@ namespace WpfUI.UI
             ExplorerNode n = new ExplorerNode();
             n.Info.Name = (string)obj;
             parent.AddChild(n);
-            Setting_UI.reflection_eventtocore.CreateFolder(n);
+            Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.CreateFolder(n);
             Dispatcher.Invoke(new Action(() => this.Close()));
         }
     }

@@ -15,11 +15,11 @@ namespace FormUI.UI
         public DeleteConfirmForm()
         {
             InitializeComponent();
-            label1.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.DeleteConfirmForm_waning);
-            CB_pernament.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.CB_pernament);
-            BT_cancel.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.BT_cancel);
-            BT_yes.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.BT_yes);
-            this.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.DeleteConfirmForm_text);
+            label1.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.DeleteConfirmForm_waning);
+            CB_pernament.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.CB_pernament);
+            BT_cancel.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.BT_cancel);
+            BT_yes.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.BT_yes);
+            this.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.DeleteConfirmForm_text);
         }
         public bool Delete = false;
 

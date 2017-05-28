@@ -59,7 +59,7 @@ namespace WpfUI.UI.Main
             {
                 if (sfd.ShowDialog().Value)
                 {
-                    Setting_UI.reflection_eventtocore.TransferItems(new List<ExplorerNode>() { node }, node.Parent, ExplorerNode.GetNodeFromDiskPath(sfd.FileName).Parent, false);
+                    Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(new List<ExplorerNode>() { node }, node.Parent, ExplorerNode.GetNodeFromDiskPath(sfd.FileName).Parent, false);
                 }
             }));
         }
@@ -120,7 +120,7 @@ namespace WpfUI.UI.Main
         }
         private void TV_LoadCloud()
         {
-            foreach (ExplorerNode cloud in Setting_UI.reflection_eventtocore.GetListAccountCloud())
+            foreach (ExplorerNode cloud in Setting_UI.reflection_eventtocore.AccountsAndCloud.GetListAccountCloud())
             {
                 TreeObservableCollection.Add(new TreeViewDataModel() { DisplayData = new TreeviewDataItem(cloud) });
             }
@@ -225,7 +225,7 @@ namespace WpfUI.UI.Main
         {
             if (!AppClipboard.Clipboard) return;
             TreeViewDataModel model = treeView.SelectedItem as TreeViewDataModel;
-            Setting_UI.reflection_eventtocore.TransferItems(AppClipboard.Items, AppClipboard.directory, model.DisplayData.Node, AppClipboard.AreCut);
+            Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(AppClipboard.Items, AppClipboard.directory, model.DisplayData.Node, AppClipboard.AreCut);
         }
 
         private void Delete()
@@ -241,7 +241,7 @@ namespace WpfUI.UI.Main
                                                                 "Confirm",
                                                                 MessageBoxButton.YesNo, MessageBoxImage.Question);
                     if (result != MessageBoxResult.Yes) return;
-                    Setting_UI.reflection_eventtocore.DeletePath(new DeleteItems(model.DisplayData.Node) { PernamentDelete = false });
+                    Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.DeletePath(new DeleteItems(model.DisplayData.Node) { PernamentDelete = false });
                     break;
 
                 default:
@@ -250,7 +250,7 @@ namespace WpfUI.UI.Main
                                                                                 "Confirm",
                                                                                 MessageBoxButton.YesNo,MessageBoxImage.Question);
                     if (result != MessageBoxResult.Yes) return;
-                    if (Setting_UI.reflection_eventtocore.DeleteAccountCloud(model.DisplayData.Node.RootInfo.Email, model.DisplayData.Type))
+                    if (Setting_UI.reflection_eventtocore.AccountsAndCloud.DeleteAccountCloud(model.DisplayData.Node.RootInfo.Email, model.DisplayData.Type))
                     {
                         TreeObservableCollection.Remove(model);
                     }
@@ -359,7 +359,7 @@ namespace WpfUI.UI.Main
             bool flag_arenull = false;
             try
             {
-                if (Setting_UI.reflection_eventtocore.ListIteamRequest(o.node) == null) flag_arenull = true;
+                if (Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.ListIteamRequest(o.node) == null) flag_arenull = true;
             }
             catch (ThreadAbortException)
             {
@@ -432,7 +432,7 @@ namespace WpfUI.UI.Main
         private void MenuCloud_SubmenuOpened(object sender, RoutedEventArgs e)
         {
             CloudsRemove = new ObservableCollection<ContextMenuDataModel>();
-            foreach (ExplorerNode cloud in Setting_UI.reflection_eventtocore.GetListAccountCloud())
+            foreach (ExplorerNode cloud in Setting_UI.reflection_eventtocore.AccountsAndCloud.GetListAccountCloud())
             {
                 CloudsRemove.Add(new ContextMenuDataModel(cloud.RootInfo.Email, cloud.RootInfo.Type));
             }
@@ -442,7 +442,7 @@ namespace WpfUI.UI.Main
         {
             MenuItem item = sender as MenuItem;
             ContextMenuDataModel data = item.DataContext as ContextMenuDataModel;
-            Setting_UI.reflection_eventtocore.ShowFormOauth(data.Type);
+            Setting_UI.reflection_eventtocore.AccountsAndCloud.ShowFormOauth(data.Type);
         }
         private void Cloud_remove_click(object sender, RoutedEventArgs e)
         {
@@ -451,7 +451,7 @@ namespace WpfUI.UI.Main
             MessageBoxResult result = System.Windows.MessageBox.Show(this, "Are you want to remove " + data.Type.ToString() + ":" + data.Text, "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result != MessageBoxResult.Yes) return;
             if (data.Type == CloudType.Folder || data.Type == CloudType.LocalDisk) throw new Exception("Can remove cloud only.");
-            if (Setting_UI.reflection_eventtocore.DeleteAccountCloud(data.Text, data.Type))
+            if (Setting_UI.reflection_eventtocore.AccountsAndCloud.DeleteAccountCloud(data.Text, data.Type))
                 foreach (TreeViewDataModel tv_data in TreeObservableCollection)
                     if (tv_data.DisplayData.Node.Info.Name == data.Text && tv_data.DisplayData.Type == data.Type) { TreeObservableCollection.Remove(tv_data); return; }
         }
@@ -462,8 +462,8 @@ namespace WpfUI.UI.Main
         {
             uis = new ObservableCollection<ContextMenuDataModel>();
             langs = new ObservableCollection<ContextMenuDataModel>();
-            string ui_default = Setting_UI.reflection_eventtocore.GetSetting(SettingsKey.UI_dll_file);
-            string lang_default = Setting_UI.reflection_eventtocore.GetSetting(SettingsKey.lang);
+            string ui_default = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetSetting(SettingsKey.UI_dll_file);
+            string lang_default = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetSetting(SettingsKey.lang);
 
             foreach (string s in GetList_UI_n_lang.GetListUiFile()) uis.Add(new ContextMenuDataModel(s) { IsEnabled = s == ui_default ? false : true });
             foreach (string s in GetList_UI_n_lang.GetListLangFile()) langs.Add(new ContextMenuDataModel(s) { IsEnabled = s == lang_default ? false : true });
@@ -475,8 +475,8 @@ namespace WpfUI.UI.Main
         {
             MenuItem item = sender as MenuItem;
             ContextMenuDataModel data = item.DataContext as ContextMenuDataModel;
-            Setting_UI.reflection_eventtocore.SetSetting(SettingsKey.UI_dll_file, data.Text);
-            Setting_UI.reflection_eventtocore.SaveSetting();
+            Setting_UI.reflection_eventtocore.SettingAndLanguage.SetSetting(SettingsKey.UI_dll_file, data.Text);
+            Setting_UI.reflection_eventtocore.SettingAndLanguage.SaveSetting();
             Setting_UI.ReloadUI_Flag = true;
             this.Close();
         }
@@ -484,8 +484,8 @@ namespace WpfUI.UI.Main
         {
             MenuItem item = sender as MenuItem;
             ContextMenuDataModel data = item.DataContext as ContextMenuDataModel;
-            Setting_UI.reflection_eventtocore.SetSetting(SettingsKey.lang, data.Text);
-            Setting_UI.reflection_eventtocore.SaveSetting();
+            Setting_UI.reflection_eventtocore.SettingAndLanguage.SetSetting(SettingsKey.lang, data.Text);
+            Setting_UI.reflection_eventtocore.SettingAndLanguage.SaveSetting();
             LoadLanguage();
         }
         #endregion

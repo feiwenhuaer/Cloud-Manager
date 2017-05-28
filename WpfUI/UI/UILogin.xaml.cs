@@ -58,7 +58,7 @@ namespace WpfUI.UI
 
         public void Check(string user, string pass, bool autologin)
         {
-            if (!Setting_UI.reflection_eventtocore.Login(user, pass, autologin))
+            if (!Setting_UI.reflection_eventtocore.AccountsAndCloud.Login(user, pass, autologin))
             {
                 MessageBox.Show("Login failed", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 if (this.WindowState == System.Windows.WindowState.Minimized) this.WindowState = System.Windows.WindowState.Normal;
@@ -68,12 +68,12 @@ namespace WpfUI.UI
         }
         public void LoadLanguage()
         {
-            this.Title = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.Form_Text);
-            LB_user.Content = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.LB_User);
-            LB_pass.Content = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.LB_pass);
-            BT_login.Content = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.BT_Login);
-            BT_cancel.Content = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.BT_cancel);
-            CB_autologin.Content = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.CB_autologin);
+            this.Title = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.Form_Text);
+            LB_user.Content = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.LB_User);
+            LB_pass.Content = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.LB_pass);
+            BT_login.Content = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.BT_Login);
+            BT_cancel.Content = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.BT_cancel);
+            CB_autologin.Content = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.CB_autologin);
         }
 
         #region Event UI

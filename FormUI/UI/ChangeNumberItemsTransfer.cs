@@ -16,9 +16,9 @@ namespace FormUI.UI
         {
             InitializeComponent();
             this.numberitems = numberitems;
-            label1.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.ChangeNumberItemDownload);
-            BT_Save.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.BT_save);
-            BT_Cancel.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.BT_cancel);
+            label1.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.ChangeNumberItemDownload);
+            BT_Save.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.BT_save);
+            BT_Cancel.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.BT_cancel);
             numericUpDown1.Value = numberitems;
         }
         private int numberitems = 2;

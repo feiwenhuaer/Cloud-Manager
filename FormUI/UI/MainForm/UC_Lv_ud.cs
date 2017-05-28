@@ -85,18 +85,18 @@ namespace FormUI.UI.MainForm
 
         public void LoadLanguage()
         {
-            TP_processing.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TP_processing);
-            TP_done.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TP_done);
+            TP_processing.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.TP_processing);
+            TP_done.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.TP_done);
 
-            changeStatusToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_ChangeStatus);
-            numberOfParallelDownloadsToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_numberOfParallelDownloads);
-            removeToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_remove);
-            startToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_start);
-            stopToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_stop);
-            waitingToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_waiting);
-            errorToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_error);
-            forceStartToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_forcestart);
-            forceWaitingToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_forcewaiting);
+            changeStatusToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.TSMI_ChangeStatus);
+            numberOfParallelDownloadsToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.TSMI_numberOfParallelDownloads);
+            removeToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.TSMI_remove);
+            startToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.TSMI_start);
+            stopToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.TSMI_stop);
+            waitingToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.TSMI_waiting);
+            errorToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.TSMI_error);
+            forceStartToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.TSMI_forcestart);
+            forceWaitingToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.TSMI_forcewaiting);
 
             Set_TLV_lang(TLV_ud);
             Set_TLV_lang(TLV_done);
@@ -105,7 +105,7 @@ namespace FormUI.UI.MainForm
         {
             for (int i = 0; i < lv.Columns.Count; i++)//0-7
             {
-                lv.Columns[i].Text = Setting_UI.reflection_eventtocore.GetTextLanguage("TLV_UD_Columns_" + i.ToString());
+                lv.Columns[i].Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage("TLV_UD_Columns_" + i.ToString());
             }
         }
 

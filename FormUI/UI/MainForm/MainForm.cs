@@ -57,7 +57,7 @@ namespace FormUI.UI.MainForm
                 if (rs == DialogResult.OK || rs == DialogResult.Yes)
                 {
                     ExplorerNode filesave = ExplorerNode.GetNodeFromDiskPath(sfd.FileName, node.Info.Size);
-                    Setting_UI.reflection_eventtocore.TransferItems(new List<ExplorerNode>() { node }, node.Parent, filesave.Parent, false);
+                    Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(new List<ExplorerNode>() { node }, node.Parent, filesave.Parent, false);
                 }
             }));
         }
@@ -100,14 +100,14 @@ namespace FormUI.UI.MainForm
         {
             Setting_UI.ReloadUI_Flag = false;
             icon_folder = IconReader.GetFolderIcon(IconReader.IconSize.Small, IconReader.FolderType.Closed);
-            TimeFormat = Setting_UI.reflection_eventtocore.GetSetting(SettingsKey.DATE_TIME_FORMAT);
+            TimeFormat = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetSetting(SettingsKey.DATE_TIME_FORMAT);
             LoadLanguage();
             AddNewTabControl();
             TV_item.BeginUpdate();
             foreach (var drive in DriveInfo.GetDrives())
                 TV_item.Nodes.Add(new TreeNode_(drive.RootDirectory.ToString().Replace("\\", null), 0));
 
-            foreach (ExplorerNode cloud in Setting_UI.reflection_eventtocore.GetListAccountCloud())
+            foreach (ExplorerNode cloud in Setting_UI.reflection_eventtocore.AccountsAndCloud.GetListAccountCloud())
                 TV_item.Nodes.Add(new TreeNode_(cloud));
             TV_item.EndUpdate();
 
@@ -141,7 +141,7 @@ namespace FormUI.UI.MainForm
             tabpage.Padding = new System.Windows.Forms.Padding(3);
             tabpage.Size = new System.Drawing.Size(672, 296);
             tabpage.TabIndex = tabControl1.Controls.Count;
-            string newtab = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.newtab);
+            string newtab = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.newtab);
             tabpage.Text = newtab;
             tabpage.ToolTipText = newtab;
             tabpage.UseVisualStyleBackColor = true;
@@ -181,25 +181,25 @@ namespace FormUI.UI.MainForm
         //language
         private void LoadLanguage()
         {
-            Setting_UI.reflection_eventtocore.SaveSetting();
-            Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.ReloadLang);
+            Setting_UI.reflection_eventtocore.SettingAndLanguage.SaveSetting();
+            Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.ReloadLang);
             //Menu ToolStrip
-            cloudToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.ToolStrip_cloud);
-            settingsToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.ToolStrip_settings);
-            settingsToolStripMenuItem1.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.ToolStrip_settings_setting);
-            addToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.ToolStrip_cloud_add);
-            removeToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.ToolStrip_cloud_remove);
+            cloudToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.ToolStrip_cloud);
+            settingsToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.ToolStrip_settings);
+            settingsToolStripMenuItem1.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.ToolStrip_settings_setting);
+            addToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.ToolStrip_cloud_add);
+            removeToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.ToolStrip_cloud_remove);
 
-            cutToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_cut);
-            copyToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_copy);
-            pasteToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_paste);
-            deleteToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_delete);
-            dowloadSeletedToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_downloadsellected);
-            uploadFileToHereToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_uploadfile);
-            uploadFolderToHereToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TSMI_uploadfolder);
+            cutToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.TSMI_cut);
+            copyToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.TSMI_copy);
+            pasteToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.TSMI_paste);
+            deleteToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.TSMI_delete);
+            dowloadSeletedToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.TSMI_downloadsellected);
+            uploadFileToHereToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.TSMI_uploadfile);
+            uploadFolderToHereToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.TSMI_uploadfolder);
 
-            addNewTabToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.addtab);
-            closeThisTabToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.removetab);
+            addNewTabToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.addtab);
+            closeThisTabToolStripMenuItem.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.removetab);
 
             uC_Lv_ud1.LoadLanguage();
 
@@ -275,7 +275,7 @@ namespace FormUI.UI.MainForm
         }
         private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Setting_UI.reflection_eventtocore.TransferItems( AppClipboard.Items, 
+            Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems( AppClipboard.Items, 
                                                         AppClipboard.directory, 
                                                         ((TreeNode_)TV_item.SelectedNode).explorernode, 
                                                         AppClipboard.AreCut);
@@ -297,7 +297,7 @@ namespace FormUI.UI.MainForm
                     {
                         DeleteItems deleteitems = new DeleteItems() { PernamentDelete = d.CB_pernament.Checked };
                         deleteitems.Items.Add(((TreeNode_)TV_item.SelectedNode).explorernode);
-                        Setting_UI.reflection_eventtocore.DeletePath(deleteitems);
+                        Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.DeletePath(deleteitems);
                     }
                     break;
                 default://cloud
@@ -307,7 +307,7 @@ namespace FormUI.UI.MainForm
                     if (d.Delete)
                     {
                         TV_item.Nodes.Remove(TV_item.SelectedNode);
-                        Setting_UI.reflection_eventtocore.DeleteAccountCloud(TV_item.SelectedNode.Text, (CloudType)TV_item.SelectedNode.ImageIndex);
+                        Setting_UI.reflection_eventtocore.AccountsAndCloud.DeleteAccountCloud(TV_item.SelectedNode.Text, (CloudType)TV_item.SelectedNode.ImageIndex);
                     }
                     break;
             }
@@ -323,7 +323,7 @@ namespace FormUI.UI.MainForm
                 List<ExplorerNode> list_item_from = new List<ExplorerNode>();
                 ExplorerNode node = ExplorerNode.GetNodeFromDiskPath(TV_item.SelectedNode.FullPath);
                 list_item_from.Add(node);
-                Setting_UI.reflection_eventtocore.TransferItems(list_item_from, node.Parent,
+                Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(list_item_from, node.Parent,
                     ExplorerNode.GetNodeFromDiskPath(fbd.SelectedPath), false);
             }
         }
@@ -339,7 +339,7 @@ namespace FormUI.UI.MainForm
                 List<ExplorerNode> list_item_from = new List<ExplorerNode>();
                 ExplorerNode node = ExplorerNode.GetNodeFromDiskPath(fbd.SelectedPath);
                 list_item_from.Add(node);
-                Setting_UI.reflection_eventtocore.TransferItems(list_item_from, node.Parent,
+                Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(list_item_from, node.Parent,
                     ((UC_LVitem)tabControl1.SelectedTab.Controls[0]).managerexplorernodes.NodeWorking(), false);
             }
         }
@@ -366,7 +366,7 @@ namespace FormUI.UI.MainForm
                     rootnode.AddChild(n);
                     list_item_from.Add(n);
                 }
-                Setting_UI.reflection_eventtocore.TransferItems(list_item_from, rootnode, 
+                Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(list_item_from, rootnode, 
                     ((UC_LVitem)tabControl1.SelectedTab.Controls[0]).managerexplorernodes.NodeWorking(), false);
             }
         }
@@ -397,7 +397,7 @@ namespace FormUI.UI.MainForm
             bool returnnull = false;
             try
             {
-                if (Setting_UI.reflection_eventtocore.ListIteamRequest(o.node) == null) returnnull = true;
+                if (Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.ListIteamRequest(o.node) == null) returnnull = true;
             }
             catch(ThreadAbortException)
             {
@@ -508,7 +508,7 @@ namespace FormUI.UI.MainForm
         {
             //ui
             uiToolStripMenuItem.DropDownItems.Clear();
-            string dll_now = Setting_UI.reflection_eventtocore.GetSetting(SettingsKey.UI_dll_file);
+            string dll_now = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetSetting(SettingsKey.UI_dll_file);
             foreach (string file in GetList_UI_n_lang.GetListUiFile())
             {
                 ToolStripMenuItem item = new ToolStripMenuItem(file);
@@ -519,7 +519,7 @@ namespace FormUI.UI.MainForm
             }
             //lang
             languageToolStripMenuItem.DropDownItems.Clear();
-            string lang_now = Setting_UI.reflection_eventtocore.GetSetting(SettingsKey.lang);
+            string lang_now = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetSetting(SettingsKey.lang);
             foreach (string file in GetList_UI_n_lang.GetListLangFile())
             {
                 ToolStripMenuItem item = new ToolStripMenuItem(file);
@@ -533,14 +533,14 @@ namespace FormUI.UI.MainForm
         private void Lang_Item_Click(object sender, EventArgs e)
         {
             ToolStripMenuItem item = (ToolStripMenuItem)sender;
-            Setting_UI.reflection_eventtocore.SetSetting(SettingsKey.lang, item.Text);
+            Setting_UI.reflection_eventtocore.SettingAndLanguage.SetSetting(SettingsKey.lang, item.Text);
             LoadLanguage();
         }
         //change ui
         private void UI_Item_Click(object sender, EventArgs e)
         {
             ToolStripMenuItem item = (ToolStripMenuItem)sender;
-            Setting_UI.reflection_eventtocore.SetSetting(SettingsKey.UI_dll_file, item.Text);
+            Setting_UI.reflection_eventtocore.SettingAndLanguage.SetSetting(SettingsKey.UI_dll_file, item.Text);
             Setting_UI.ReloadUI_Flag = true;
             this.Close();
         }
@@ -554,7 +554,7 @@ namespace FormUI.UI.MainForm
         private void cloudToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
         {
             removeToolStripMenuItem.DropDownItems.Clear();
-            foreach (ExplorerNode cloud in Setting_UI.reflection_eventtocore.GetListAccountCloud())
+            foreach (ExplorerNode cloud in Setting_UI.reflection_eventtocore.AccountsAndCloud.GetListAccountCloud())
             {
                 ToolStripMenuItem item = new ToolStripMenuItem(cloud.RootInfo.Type.ToString()+":"+ cloud.RootInfo.Email);
                 item.Click += RemoveCloudItem_Click;
@@ -566,7 +566,7 @@ namespace FormUI.UI.MainForm
             var item = (ToolStripMenuItem)sender;
             string[] cloud = item.Text.Split(':');
             CloudType type = (CloudType)Enum.Parse(typeof(CloudType), cloud[0]);
-            Setting_UI.reflection_eventtocore.DeleteAccountCloud(cloud[1], type);
+            Setting_UI.reflection_eventtocore.AccountsAndCloud.DeleteAccountCloud(cloud[1], type);
             foreach(TreeNode node in TV_item.Nodes)
             {
                 if(node.Text == cloud[1] & node.ImageIndex == (int)type)

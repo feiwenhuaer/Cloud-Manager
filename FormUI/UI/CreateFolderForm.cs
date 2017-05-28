@@ -50,9 +50,9 @@ namespace FormUI.UI
         {
             this.BackColor = Setting_UI.Background;
             CenterToParent();
-            label1.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.CreateFolderForm_name);
-            BT_Create.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.BT_create);
-            BT_Cancel.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.BT_cancel);
+            label1.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.CreateFolderForm_name);
+            BT_Create.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.BT_create);
+            BT_Cancel.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.BT_cancel);
         }
 
         private void BT_Create_Click(object sender, EventArgs e)
@@ -90,7 +90,7 @@ namespace FormUI.UI
             ExplorerNode node = new ExplorerNode();
             node.Info.Name = textBox1.Text;
             this.parentnode.AddChild(node);
-            Setting_UI.reflection_eventtocore.CreateFolder(node);
+            Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.CreateFolder(node);
             Invoke(new Action(() => this.Close()));
         }
 

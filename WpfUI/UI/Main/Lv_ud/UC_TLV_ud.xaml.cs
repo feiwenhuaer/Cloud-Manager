@@ -43,8 +43,8 @@ namespace WpfUI.UI.Main.Lv_ud
 
         public void LoadLanguage()
         {
-            TI_process.Header = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TP_processing);
-            TI_complete.Header = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.TP_done);
+            TI_process.Header = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.TP_processing);
+            TI_complete.Header = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.TP_done);
         }
 
         public void RefreshAll()

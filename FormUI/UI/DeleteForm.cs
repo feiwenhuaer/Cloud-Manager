@@ -73,9 +73,9 @@ namespace FormUI.UI
         public DeleteForm()
         {
             InitializeComponent();
-            CB_autoclose.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.DeleteForm_CB_autoclose);
-            BT_cancel.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.BT_cancel);
-            this.Text = Setting_UI.reflection_eventtocore.GetTextLanguage(LanguageKey.DeleteForm_text);
+            CB_autoclose.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.DeleteForm_CB_autoclose);
+            BT_cancel.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.BT_cancel);
+            this.Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(LanguageKey.DeleteForm_text);
         }
 
         #region Event Form

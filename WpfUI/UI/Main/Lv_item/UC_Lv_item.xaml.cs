@@ -30,7 +30,7 @@ namespace WpfUI.UI.Main.Lv_item
             LV_items.Width = double.NaN;
             
             managerexplorernodes = new ManagerExplorerNodes();
-            timeformat = Setting_UI.reflection_eventtocore.GetSetting(SettingsKey.DATE_TIME_FORMAT);
+            timeformat = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetSetting(SettingsKey.DATE_TIME_FORMAT);
             time_default = new DateTime();
             UILanguage();
             lv_data = new ObservableCollection<LV_data>();
@@ -218,7 +218,7 @@ namespace WpfUI.UI.Main.Lv_item
         void Paste()
         {
             ExplorerNode roottonode = managerexplorernodes.NodeWorking();
-            Setting_UI.reflection_eventtocore.TransferItems(AppClipboard.Items, AppClipboard.directory, roottonode, AppClipboard.AreCut);
+            Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(AppClipboard.Items, AppClipboard.directory, roottonode, AppClipboard.AreCut);
         }
         void Rename()
         {
@@ -233,7 +233,7 @@ namespace WpfUI.UI.Main.Lv_item
             DeleteItems items = new DeleteItems();
             foreach (LV_data data in LV_items.SelectedItems) items.Items.Add(data.Node);
             items.PernamentDelete = result == MessageBoxResult.No;
-            Setting_UI.reflection_eventtocore.DeletePath(items);
+            Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.DeletePath(items);
         }
         void CreateFolder()
         {
@@ -251,7 +251,7 @@ namespace WpfUI.UI.Main.Lv_item
             if (result != DialogResult.OK | result != DialogResult.Yes) return;
             List<ExplorerNode> listitems = new List<ExplorerNode>();
             foreach (LV_data item in LV_items.SelectedItems) listitems.Add(item.Node);
-            Setting_UI.reflection_eventtocore.TransferItems(listitems, managerexplorernodes.NodeWorking(), ExplorerNode.GetNodeFromDiskPath(fbd.SelectedPath), false);
+            Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(listitems, managerexplorernodes.NodeWorking(), ExplorerNode.GetNodeFromDiskPath(fbd.SelectedPath), false);
         }
         void uploadfolder()
         {
@@ -261,7 +261,7 @@ namespace WpfUI.UI.Main.Lv_item
             DialogResult result = fbd.ShowDialog();
             if (result != DialogResult.OK | result != DialogResult.Yes) return;
             ExplorerNode node = ExplorerNode.GetNodeFromDiskPath(fbd.SelectedPath);
-            Setting_UI.reflection_eventtocore.TransferItems(new List<ExplorerNode>() { node }, node.Parent, managerexplorernodes.NodeWorking(), false);
+            Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(new List<ExplorerNode>() { node }, node.Parent, managerexplorernodes.NodeWorking(), false);
         }
         void uploadfile()
         {
@@ -283,7 +283,7 @@ namespace WpfUI.UI.Main.Lv_item
                 n.Info.DateMod = info.LastWriteTime;
                 items.Add(n);
             }
-            Setting_UI.reflection_eventtocore.TransferItems(items, root, managerexplorernodes.NodeWorking(), false);
+            Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(items, root, managerexplorernodes.NodeWorking(), false);
         }
 
         #endregion

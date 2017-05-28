@@ -17,7 +17,7 @@ namespace WpfUI.Class
         }
         public ContextMenuDataModel(LanguageKey Key)
         {
-            Text = Setting_UI.reflection_eventtocore.GetTextLanguage(Key);
+            Text = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetTextLanguage(Key);
             this.Key = Key;
             IsEnabled = true;
         }
