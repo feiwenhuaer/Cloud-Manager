@@ -35,6 +35,7 @@ namespace CloudManagerGeneralLib
         }
         public event ExitAppCallBack EventExitAppCallBack;
         
+
         SettingsAndLanguage SettingAndLanguage_ = new SettingsAndLanguage();
         public SettingsAndLanguage SettingAndLanguage { get { return SettingAndLanguage_; } }
         public class SettingsAndLanguage
@@ -90,6 +91,7 @@ namespace CloudManagerGeneralLib
             }
             public event GetTextLanguage EventGetTextLanguage;
         }
+
 
         AccountAndCloud AccountsAndCloud_ = new AccountAndCloud();
         public AccountAndCloud AccountsAndCloud { get { return AccountsAndCloud_; } }
@@ -158,6 +160,7 @@ namespace CloudManagerGeneralLib
             #endregion
         }
 
+
         ExplorerAndManagerFiles ExplorerAndManagerFile_ = new ExplorerAndManagerFiles();
         public ExplorerAndManagerFiles ExplorerAndManagerFile { get { return ExplorerAndManagerFile_; } }
         public class ExplorerAndManagerFiles
@@ -221,7 +224,6 @@ namespace CloudManagerGeneralLib
                 EventCreateFolder(node);
             }
             public event CreateFolder EventCreateFolder;
-
         }
     }
 }
