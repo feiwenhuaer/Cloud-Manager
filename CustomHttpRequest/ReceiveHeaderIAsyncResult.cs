@@ -4,6 +4,7 @@ using System.Threading;
 
 namespace CustomHttpRequest
 {
+#if DEBUG
     public class ReceiveHeaderIAsyncResult : IAsyncResult
     {
         public ReceiveHeaderIAsyncResult(Stream st)
@@ -44,4 +45,5 @@ namespace CustomHttpRequest
             }
         }
     }
+#endif
 }
