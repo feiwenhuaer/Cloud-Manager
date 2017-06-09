@@ -312,7 +312,7 @@ namespace CustomHttpRequest
                 throw new HttpException(statuscode,textdataresponse);
             }
         }
-        
+#if DEBUG
         public void ReadHeaderResponse_and_GetStreamResponse(AsyncCallback callback, bool SendDataHeader = true, bool CheckStatusCode = false)
         {
             Stream st = GetStream();
@@ -346,7 +346,7 @@ namespace CustomHttpRequest
             }
             st.BeginRead(buffer, 0, buffer.Length, BeginRead, null);
         }
-        
+#endif      
         /// <summary>
         /// Send header -> Receive header -> Read text data response.
         /// </summary>
