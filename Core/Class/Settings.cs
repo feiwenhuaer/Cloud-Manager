@@ -118,7 +118,7 @@ namespace Core.Class
             List<ExplorerNode> list = new List<ExplorerNode>();
             foreach (XmlNode node in GetCloudDataList())
             {
-                RootNode root = new RootNode();
+                TypeNode root = new TypeNode();
                 root.Email = node.Attributes["Email"].Value;
                 root.Type = (CloudType)Enum.Parse(typeof(CloudType), node.Attributes["CloudName"].Value);
 
@@ -135,7 +135,7 @@ namespace Core.Class
                 }
                 
                 ExplorerNode e_node = new ExplorerNode();
-                e_node.RootInfo = root;
+                e_node.NodeType = root;
                 e_node.Info = info;
                 list.Add(e_node);
             }
@@ -146,7 +146,7 @@ namespace Core.Class
         {
             foreach (XmlNode node in GetCloudDataList())
             {
-                RootNode root = new RootNode();
+                TypeNode root = new TypeNode();
                 root.Email = node.Attributes["Email"].Value;
                 root.Type = (CloudType)Enum.Parse(typeof(CloudType), node.Attributes["CloudName"].Value);
                 if (root.Email == Email && root.Type == cloudname)
@@ -166,7 +166,7 @@ namespace Core.Class
                     }
 
                     ExplorerNode e_node = new ExplorerNode();
-                    e_node.RootInfo = root;
+                    e_node.NodeType = root;
                     e_node.Info = info;
                     return e_node;
                 }

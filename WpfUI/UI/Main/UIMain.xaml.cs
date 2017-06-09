@@ -83,6 +83,7 @@ namespace WpfUI.UI.Main
             TreeObservableCollection = new ObservableCollection<TreeViewDataModel>();
             this.DataContext = this;
             InitializeComponent();
+            TLV_UD.Width = TLV_UD.Height = double.NaN;
             TV_LoadDisk();
             TV_LoadCloud();
             Newtab();
@@ -112,7 +113,7 @@ namespace WpfUI.UI.Main
         {
             foreach (var drive in DriveInfo.GetDrives())
             {
-                ExplorerNode n = new ExplorerNode(new RootNode() { Type = CloudType.LocalDisk});
+                ExplorerNode n = new ExplorerNode(new TypeNode() { Type = CloudType.LocalDisk});
                 n.Info.Name = drive.RootDirectory.ToString().TrimEnd('\\');
                 TreeObservableCollection.Add(new TreeViewDataModel() { DisplayData = new TreeviewDataItem(n) });
             }
@@ -143,7 +144,7 @@ namespace WpfUI.UI.Main
         {
             TreeViewItem item = Get_TreeViewItem(sender as StackPanel);
             TreeViewDataModel tv_datamodel = Get_TVDataMoldel(item);
-            ((UC_Lv_item)((TabItem)tabControl.Items[tabControl.SelectedIndex]).Content).managerexplorernodes.Root = tv_datamodel.DisplayData.Node.GetRoot();
+            ((UC_Lv_item)((TabItem)tabControl.Items[tabControl.SelectedIndex]).Content).managerexplorernodes.Root = tv_datamodel.DisplayData.Node.GetRoot;
             ((UC_Lv_item)((TabItem)tabControl.Items[tabControl.SelectedIndex]).Content).managerexplorernodes.Next(tv_datamodel.DisplayData.Node);
             ((UC_Lv_item)((TabItem)tabControl.Items[tabControl.SelectedIndex]).Content).ExplorerCurrentNode(false, true, tv_datamodel, item);
         }
@@ -246,11 +247,11 @@ namespace WpfUI.UI.Main
 
                 default:
                     result = System.Windows.MessageBox.Show(   this,
-                                                                                "Are you want to remove " + model.DisplayData.Type.ToString() + ":" + model.DisplayData.Node.RootInfo.Email,
+                                                                                "Are you want to remove " + model.DisplayData.Type.ToString() + ":" + model.DisplayData.Node.NodeType.Email,
                                                                                 "Confirm",
                                                                                 MessageBoxButton.YesNo,MessageBoxImage.Question);
                     if (result != MessageBoxResult.Yes) return;
-                    if (Setting_UI.reflection_eventtocore.AccountsAndCloud.DeleteAccountCloud(model.DisplayData.Node.RootInfo.Email, model.DisplayData.Type))
+                    if (Setting_UI.reflection_eventtocore.AccountsAndCloud.DeleteAccountCloud(model.DisplayData.Node.NodeType.Email, model.DisplayData.Type))
                     {
                         TreeObservableCollection.Remove(model);
                     }
@@ -434,7 +435,7 @@ namespace WpfUI.UI.Main
             CloudsRemove = new ObservableCollection<ContextMenuDataModel>();
             foreach (ExplorerNode cloud in Setting_UI.reflection_eventtocore.AccountsAndCloud.GetListAccountCloud())
             {
-                CloudsRemove.Add(new ContextMenuDataModel(cloud.RootInfo.Email, cloud.RootInfo.Type));
+                CloudsRemove.Add(new ContextMenuDataModel(cloud.NodeType.Email, cloud.NodeType.Type));
             }
             Cloud_remove.ItemsSource = CloudsRemove;
         }

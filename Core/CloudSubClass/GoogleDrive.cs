@@ -35,8 +35,8 @@ namespace Core.CloudSubClass
         public static ExplorerNode GetListFileFolder(ExplorerNode node, bool folderonly = false,bool read_only = false)
         {
             bool uri = false;
-            ExplorerNode root = node.GetRoot();
-            string Email = root.RootInfo.Email;
+            ExplorerNode root = node.GetRoot;
+            string Email = root.NodeType.Email;
             string parent_ID = null;
             string url = null;
             Regex rg;
@@ -46,9 +46,9 @@ namespace Core.CloudSubClass
             //Find id folder
             if (uri)//folder url
             {
-                if (root.RootInfo.uri != null)
+                if (root.NodeType.uri != null)
                 {
-                    url = root.RootInfo.uri.ToString();
+                    url = root.NodeType.uri.ToString();
                     rg = new Regex(Rg_url_idFolder);
                     match = rg.Match(url);
                     if (match.Success) parent_ID = match.Value;
@@ -94,7 +94,7 @@ namespace Core.CloudSubClass
                 {
                     ExplorerNode n = new ExplorerNode();
                     n.Info.ID = match.Value;
-                    n.RootInfo.Email = Email;
+                    n.NodeType.Email = Email;
                     GD_item item = GoogleDrive.GetMetadataItem(n);
                     n.Info.Size = item.fileSize;
                     n.Info.Name = item.title;
@@ -108,7 +108,7 @@ namespace Core.CloudSubClass
 
         public static Stream GetFileStream(ExplorerNode node, long Startpos = -1,long endpos = -1)
         {
-            DriveAPIHttprequestv2 gdclient = GetAPIv2(node.GetRoot().RootInfo.Email);
+            DriveAPIHttprequestv2 gdclient = GetAPIv2(node.GetRoot.NodeType.Email);
             return gdclient.Files.Get(node.Info.ID, Startpos, endpos);
         }
 
@@ -124,7 +124,7 @@ namespace Core.CloudSubClass
         static object sync_createfolder = new object();
         public static void CreateFolder(ExplorerNode node)
         {
-            string Email = node.GetRoot().RootInfo.Email;
+            string Email = node.GetRoot.NodeType.Email;
             DriveAPIHttprequestv2 gdclient = GetAPIv2(Email);
             string parent_id = "";
             try
@@ -158,7 +158,7 @@ namespace Core.CloudSubClass
 
         public static bool ReNameItem(ExplorerNode node,string newname)
         {
-            DriveAPIHttprequestv2 gdclient = GetAPIv2(node.GetRoot().RootInfo.Email);
+            DriveAPIHttprequestv2 gdclient = GetAPIv2(node.GetRoot.NodeType.Email);
             string json = "{\"title\": \"" + newname + "\"}";
             string response = gdclient.Files.Patch(node.Info.ID, json);
             dynamic json_ = JsonConvert.DeserializeObject(response);
@@ -170,10 +170,10 @@ namespace Core.CloudSubClass
         public static GD_item MoveItem(ExplorerNode nodemove, ExplorerNode newparent,string newname = null,bool copy = false)
         {
             //Same account
-            if (nodemove.GetRoot().RootInfo.Email != newparent.GetRoot().RootInfo.Email) throw new Exception("Email not match.");
-            if (nodemove.GetRoot().RootInfo.Type != newparent.GetRoot().RootInfo.Type) throw new Exception("TypeCloud not match.");
+            if (nodemove.GetRoot.NodeType.Email != newparent.GetRoot.NodeType.Email) throw new Exception("Email not match.");
+            if (nodemove.GetRoot.NodeType.Type != newparent.GetRoot.NodeType.Type) throw new Exception("TypeCloud not match.");
 
-            DriveAPIHttprequestv2 gdclient = GetAPIv2(nodemove.GetRoot().RootInfo.Email);
+            DriveAPIHttprequestv2 gdclient = GetAPIv2(nodemove.GetRoot.NodeType.Email);
             GD_item item_metadata = JsonConvert.DeserializeObject<GD_item>(gdclient.Files.Patch(nodemove.Info.ID));
             if (nodemove.Parent != newparent)
             {
@@ -192,14 +192,14 @@ namespace Core.CloudSubClass
 
         public static GD_item GetMetadataItem(ExplorerNode node)
         {
-            DriveAPIHttprequestv2 client = GetAPIv2(node.GetRoot().RootInfo.Email);
+            DriveAPIHttprequestv2 client = GetAPIv2(node.GetRoot.NodeType.Email);
             return JsonConvert.DeserializeObject<GD_item>(client.Files.Patch(node.Info.ID, null));
         }
         //trash/delete
         public static bool File_trash(ExplorerNode node, bool Permanently)
         {
-            DriveAPIHttprequestv2 gdclient = GetAPIv2(node.GetRoot().RootInfo.Email);
-            if (node == node.GetRoot()) throw new Exception("Can't delete root.");
+            DriveAPIHttprequestv2 gdclient = GetAPIv2(node.GetRoot.NodeType.Email);
+            if (node == node.GetRoot) throw new Exception("Can't delete root.");
             if (Permanently)
             {
                 gdclient.Files.Delete(node.Info.ID);

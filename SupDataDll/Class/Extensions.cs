@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
+
 namespace CloudManagerGeneralLib.Class
 {
     public static class Extensions
@@ -84,6 +87,18 @@ namespace CloudManagerGeneralLib.Class
                 else str += "\\u" + ((ushort)chr).ToString("X");
             }
             return str;
+        }
+
+        public static void CleanNotWorkingThread(this List<Thread> list)
+        {
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (!list[i].IsAlive)
+                {
+                    list.RemoveAt(i);
+                    i--;
+                }
+            }
         }
     }
 }

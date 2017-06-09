@@ -60,7 +60,7 @@ namespace WpfUI.UI.Main.Lv_item
 
                     string extension = item.GetExtension();
                     dt.ImgSource = Setting_UI.GetImage(
-                        item.GetRoot().RootInfo.Type == CloudType.LocalDisk ?
+                        item.GetRoot.NodeType.Type == CloudType.LocalDisk ?
                             IconReader.GetFileIcon(item.GetFullPathString(), IconReader.IconSize.Small, false) ://some large file make slow.
                             IconReader.GetFileIcon("." + extension, IconReader.IconSize.Small, false)
                         ).Source;
@@ -177,7 +177,7 @@ namespace WpfUI.UI.Main.Lv_item
                     case LanguageKey.TSMI_paste: if (selected_count > 1 | !AppClipboard.Clipboard) data.IsEnabled = false; else data.IsEnabled = true; break;
                     case LanguageKey.TSMI_rename: if (selected_count != 1) data.IsEnabled = false; else data.IsEnabled = true; break;
                     case LanguageKey.TSMI_delete: if (selected_count == 0) data.IsEnabled = false; else data.IsEnabled = true; break;
-                    case LanguageKey.TSMI_copyid: if (selected_count != 1 || managerexplorernodes.Root.RootInfo.Type == CloudType.LocalDisk) data.IsEnabled = false; else data.IsEnabled = true; break;
+                    case LanguageKey.TSMI_copyid: if (selected_count != 1 || managerexplorernodes.Root.NodeType.Type == CloudType.LocalDisk) data.IsEnabled = false; else data.IsEnabled = true; break;
                     case LanguageKey.TSMI_downloadsellected: if (selected_count == 0) data.IsEnabled = false; else data.IsEnabled = true; break;
                     default: continue;
                 }
@@ -300,7 +300,7 @@ namespace WpfUI.UI.Main.Lv_item
             }
             else
             {
-                if (data.Node.GetRoot().RootInfo.Type == CloudType.LocalDisk || string.IsNullOrEmpty(data.Node.GetRoot().RootInfo.Email))
+                if (data.Node.GetRoot.NodeType.Type == CloudType.LocalDisk || string.IsNullOrEmpty(data.Node.GetRoot.NodeType.Email))
                 {
                     System.Diagnostics.Process.Start(data.Node.GetFullPathString());
                 }

@@ -14,7 +14,7 @@ using CloudManagerGeneralLib.Class;
 
 namespace FormUI.UI.MainForm
 {
-    public partial class MainForm : System.Windows.Forms.Form, CloudManagerGeneralLib.UiInheritance.UIMain
+    public partial class MainForm : Form, UIMain
     {
         #region interface
         public bool AreReloadUI
@@ -227,7 +227,7 @@ namespace FormUI.UI.MainForm
             }
             TreeNode_ TN = e.Node as TreeNode_;
             if (TN == null) return;
-            list_UCLVitem[tabControl1.SelectedIndex].managerexplorernodes.Root = TN.explorernode.GetRoot();
+            list_UCLVitem[tabControl1.SelectedIndex].managerexplorernodes.Root = TN.explorernode.GetRoot;
             list_UCLVitem[tabControl1.SelectedIndex].managerexplorernodes.Next(TN.explorernode);
             list_UCLVitem[tabControl1.SelectedIndex].ExplorerCurrentNode(explandTV, true, TN);
         }
@@ -463,7 +463,7 @@ namespace FormUI.UI.MainForm
                     string extension = c.GetExtension();                    
                     ListItem_LV.Add(new ItemLV() {
                         str = new string[] { c.Info.Name, "File",c.Info.Size.ToString(), c.Info.DateMod.ToString(TimeFormat), c.Info.MimeType, c.Info.ID },
-                        icon = c.GetRoot().RootInfo.Type == CloudType.LocalDisk ? 
+                        icon = c.GetRoot.NodeType.Type == CloudType.LocalDisk ? 
                             IconReader.GetFileIcon(c.GetFullPathString(), IconReader.IconSize.Small,false) : //some large file make slow.
                             IconReader.GetFileIcon("." + extension, IconReader.IconSize.Small, false)});
                     
@@ -556,7 +556,7 @@ namespace FormUI.UI.MainForm
             removeToolStripMenuItem.DropDownItems.Clear();
             foreach (ExplorerNode cloud in Setting_UI.reflection_eventtocore.AccountsAndCloud.GetListAccountCloud())
             {
-                ToolStripMenuItem item = new ToolStripMenuItem(cloud.RootInfo.Type.ToString()+":"+ cloud.RootInfo.Email);
+                ToolStripMenuItem item = new ToolStripMenuItem(cloud.NodeType.Type.ToString()+":"+ cloud.NodeType.Email);
                 item.Click += RemoveCloudItem_Click;
                 removeToolStripMenuItem.DropDownItems.Add(item);
             }

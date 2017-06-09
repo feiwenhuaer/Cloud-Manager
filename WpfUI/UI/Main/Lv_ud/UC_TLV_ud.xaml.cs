@@ -24,7 +24,7 @@ namespace WpfUI.UI.Main.Lv_ud
         public int AddNewGroup(TransferGroup Group)
         {
             if (Setting_UI.ExitAPP_Flag) return -1;
-            Group.col[2] = Group.status.ToString();
+            Group.DataSource.Status = Group.status.ToString();
             if (groups.IndexOf(Group) >= 0) refresh();
             else
             {

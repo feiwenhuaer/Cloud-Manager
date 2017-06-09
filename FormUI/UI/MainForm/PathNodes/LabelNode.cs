@@ -20,9 +20,9 @@ namespace FormUI.UI.MainForm.PathNodes
 
         void ChangeText()
         {
-            if (node.Parent == null && node.RootInfo.Type != CloudType.LocalDisk)//root
+            if (node.Parent == null && node.NodeType.Type != CloudType.LocalDisk)//root
             {
-                this.Text = node.RootInfo.Type.ToString() + ":" + node.RootInfo.Email;
+                this.Text = node.NodeType.Type.ToString() + ":" + node.NodeType.Email;
             }
             else this.Text = node.Info.Name;
         }

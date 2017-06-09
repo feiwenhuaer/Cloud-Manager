@@ -170,7 +170,7 @@ namespace FormUI.UI.MainForm
             {
                 if (find.Info.Size > 0)//file
                 {
-                    if (find.GetRoot().RootInfo.Type != CloudType.LocalDisk)//cloud
+                    if (find.GetRoot.NodeType.Type != CloudType.LocalDisk)//cloud
                     {
                         MessageBox.Show("Not support now.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                     }
@@ -245,7 +245,7 @@ namespace FormUI.UI.MainForm
             cutToolStripMenuItem.Enabled = true;
             copyToolStripMenuItem.Enabled = true;
             deleteToolStripMenuItem.Enabled = true;
-            if (!string.IsNullOrEmpty(managerexplorernodes.Root.RootInfo.Email)) dowloadSeletedToolStripMenuItem.Enabled = true;
+            if (!string.IsNullOrEmpty(managerexplorernodes.Root.NodeType.Email)) dowloadSeletedToolStripMenuItem.Enabled = true;
             else dowloadSeletedToolStripMenuItem.Enabled = false;
         }
 
@@ -266,7 +266,7 @@ namespace FormUI.UI.MainForm
             AppClipboard.Clear();
             AppClipboard.AreCut = AreCut;
             AppClipboard.directory = managerexplorernodes.NodeWorking();
-            bool AreCloud = !string.IsNullOrEmpty(managerexplorernodes.Root.RootInfo.Email);
+            bool AreCloud = !string.IsNullOrEmpty(managerexplorernodes.Root.NodeType.Email);
             foreach (ListViewItem item in LV_item.SelectedItems)
             {
                 ExplorerNode node = FindNodeLV(item);

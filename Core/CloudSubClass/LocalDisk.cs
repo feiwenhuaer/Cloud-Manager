@@ -3,7 +3,6 @@ using CloudManagerGeneralLib.Class;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 
 namespace Core.CloudSubClass
 {
@@ -20,7 +19,7 @@ namespace Core.CloudSubClass
                 ExplorerNode f = new ExplorerNode();
                 f.Info.Name = info.Name;
                 f.Info.Size = -1;
-                f.Info.DateMod = info.LastWriteTimeUtc;
+                f.Info.DateMod = info.LastWriteTime;
                 node.AddChild(f);
             }
             foreach (string item in Directory.GetFiles(path))
@@ -30,7 +29,7 @@ namespace Core.CloudSubClass
                 ExplorerNode f = new ExplorerNode();
                 f.Info.Name = info.Name;
                 f.Info.Size = info.Length;
-                f.Info.DateMod = info.LastWriteTimeUtc;
+                f.Info.DateMod = info.LastWriteTime;
                 node.AddChild(f);
             }
             return node;
@@ -101,7 +100,7 @@ namespace Core.CloudSubClass
 
         public static bool Move(ExplorerNode node, ExplorerNode newparent,string newname = null)
         {
-            if (node.GetRoot().RootInfo.Type != CloudType.LocalDisk && newparent.GetRoot().RootInfo.Type != CloudType.LocalDisk) throw new Exception("CloudType is != LocalDisk.");
+            if (node.GetRoot.NodeType.Type != CloudType.LocalDisk && newparent.GetRoot.NodeType.Type != CloudType.LocalDisk) throw new Exception("CloudType is != LocalDisk.");
             string path_from = node.GetFullPathString();
             string path_to = newparent.GetFullPathString() + "\\" + newname == null ? node.Info.Name : newname;
             FileInfo info = new FileInfo(path_from);

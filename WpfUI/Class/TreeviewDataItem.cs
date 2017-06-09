@@ -20,13 +20,13 @@ namespace WpfUI.Class
 
         void Update()
         {
-            this.Type = Node.RootInfo.Type;
+            this.Type = Node.NodeType.Type;
             ImgSource = Setting_UI.GetImage(ListBitmapImageResource.list_bm_cloud[(int)this.Type]).Source;
             switch (this.Type)
             {
                 case CloudType.Folder: 
                 case CloudType.LocalDisk: this.Name = Node.Info.Name; break;
-                default: this.Name = Node.RootInfo.Email; break;
+                default: this.Name = Node.NodeType.Email; break;
             }
         }
     }

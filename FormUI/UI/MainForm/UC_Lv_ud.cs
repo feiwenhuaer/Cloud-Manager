@@ -12,12 +12,12 @@ namespace FormUI.UI.MainForm
     {
         
         System.Windows.Forms.Form mainform;
-        public object UIMain { set { mainform = (System.Windows.Forms.Form)value; } }
+        public object UIMain { set { mainform = (Form)value; } }
 
         public int AddNewGroup(TransferGroup group_work)
         {
             if (Setting_UI.ExitAPP_Flag) return -1;
-            group_work.col[2] = group_work.status.ToString();
+            group_work.DataSource.Status = group_work.status.ToString();
             Groups.Add(group_work);
             if (group_work.change == ChangeTLV.Processing) TLV_ud.AddObject(group_work);
             else TLV_done.AddObject(group_work);
@@ -163,13 +163,13 @@ namespace FormUI.UI.MainForm
                 int i = val - 1;
                 array_header[val].AspectGetter = delegate (object x)
                 {
-                    if (x is CloudManagerGeneralLib.Class.TransferItem)//item in group
+                    if (x is TransferItem)//item in group
                     {
-                        return ((CloudManagerGeneralLib.Class.TransferItem)x).col[i];
+                        return ((TransferItem)x).DataSource.Col[i];
                     }
                     if (x is TransferGroup)//group
                     {
-                        return ((TransferGroup)x).col[i];
+                        return ((TransferGroup)x).DataSource.Col[i];
                     }
                     return "";
                 };

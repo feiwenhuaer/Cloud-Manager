@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Core.StaticClass
+namespace CloudManagerGeneralLib.Class
 {
     public static class CurrentMillis
     {

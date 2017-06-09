@@ -50,11 +50,11 @@ namespace WpfUI.UI.Main
         }
         void UpdateData()
         {
-            switch (node.RootInfo.Type)
+            switch (node.NodeType.Type)
             {
                 case CloudType.Folder:
                 case CloudType.LocalDisk: this.Text = Node.Info.Name; break;
-                default: this.Text = node.RootInfo.Type.ToString() + ":" + Node.RootInfo.Email; break;
+                default: this.Text = node.NodeType.Type.ToString() + ":" + Node.NodeType.Email; break;
             }
         }
     }

@@ -46,6 +46,8 @@
   <ItemGroup>
     <Compile Include="BigInteger.cs" />
     <Compile Include="Class\AppClipboard.cs" />
+    <Compile Include="Class\CalTimeLeft.cs" />
+    <Compile Include="Class\CurrentMillis.cs" />
     <Compile Include="Class\DeleteItems.cs" />
     <Compile Include="Class\ExplorerListItem.cs" />
     <Compile Include="Class\Extensions.cs" />

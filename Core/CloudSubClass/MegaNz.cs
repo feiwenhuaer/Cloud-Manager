@@ -25,8 +25,8 @@ namespace Core.CloudSubClass
         public static ExplorerNode GetListFileFolder(ExplorerNode node)
         {
             node.Child.Clear();
-            ExplorerNode root = node.GetRoot();
-            MegaApiClient client = GetClient(root.RootInfo.Email);
+            ExplorerNode root = node.GetRoot;
+            MegaApiClient client = GetClient(root.NodeType.Email);
 
             if (root == node)
             {
@@ -35,8 +35,8 @@ namespace Core.CloudSubClass
                 if (!string.IsNullOrEmpty(ID)) n = new MegaNzNode(ID);
                 else
                 {
-                    n = GetRoot(root.RootInfo.Email, NodeType.Root);
-                    AppSetting.settings.SetRootID(root.RootInfo.Email, CloudType.Mega, n.Id);
+                    n = GetRoot(root.NodeType.Email, NodeType.Root);
+                    AppSetting.settings.SetRootID(root.NodeType.Email, CloudType.Mega, n.Id);
                 }
                 GetItems(client, n, node);
             }
@@ -52,7 +52,7 @@ namespace Core.CloudSubClass
         public static Stream GetStream(ExplorerNode node,long start_pos = -1,long end_pos = -1,bool IsUpload = false, object DataEx = null)
         {
             if (node.Info.Size < 1) throw new Exception("Mega GetStream: Filesize <= 0.");
-            MegaApiClient api = GetClient(node.GetRoot().RootInfo.Email);
+            MegaApiClient api = GetClient(node.GetRoot.NodeType.Email);
             MegaNzNode meganode = new MegaNzNode(node.Info.ID, node.Info.MegaCrypto);
             if (!IsUpload && start_pos >= 0)//download
             {
@@ -65,7 +65,7 @@ namespace Core.CloudSubClass
         public static void CreateFolder(ExplorerNode node)
         {
             MegaNzNode parent_meganode = new MegaNzNode(node.Parent.Info.ID);
-            MegaApiClient client = GetClient(node.GetRoot().RootInfo.Email);
+            MegaApiClient client = GetClient(node.GetRoot.NodeType.Email);
             INode folder_meganode = client.CreateFolder(node.Info.Name, parent_meganode);
             node.Info.ID = folder_meganode.Id;
         }
@@ -73,8 +73,8 @@ namespace Core.CloudSubClass
         public static void AutoCreateFolder(ExplorerNode node)
         {
             List<ExplorerNode> list = node.GetFullPath();
-            if (list[0].RootInfo.Type != CloudType.Mega) throw new Exception("Mega only.");
-            MegaApiClient client = GetClient(list[0].RootInfo.Email);
+            if (list[0].NodeType.Type != CloudType.Mega) throw new Exception("Mega only.");
+            MegaApiClient client = GetClient(list[0].NodeType.Email);
             list.RemoveAt(0);
             foreach(ExplorerNode child in list)
             {
@@ -232,7 +232,7 @@ namespace Core.CloudSubClass
 
         public static ExplorerNode GetItem(ExplorerNode node)
         {
-            MegaApiClient client = GetClient(node.GetRoot().RootInfo.Email);
+            MegaApiClient client = GetClient(node.GetRoot.NodeType.Email);
             MegaNzNode inode = new MegaNzNode(node.Info.ID);
             GetItems(client, inode, node);
             return node;

@@ -50,13 +50,11 @@
     <Compile Include="CloudSubClass\GoogleDrive.cs" />
     <Compile Include="CloudSubClass\LocalDisk.cs" />
     <Compile Include="CloudSubClass\MegaNz.cs" />
-    <Compile Include="Class\ManagerCoreThreads.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="StaticClass\CurrentMillis.cs" />
     <Compile Include="StaticClass\Get_mimeType.cs" />
     <Compile Include="Class\Languages.cs" />
     <Compile Include="StaticClass\LoadDllUI.cs" />

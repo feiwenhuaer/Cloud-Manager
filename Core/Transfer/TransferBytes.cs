@@ -32,11 +32,11 @@ namespace Core.Transfer
             if (item.From.node.Info.Size == 0) { item.ErrorMsg = "File size zero."; Dispose(); }
             this.item = item;
             this.GroupManager = GroupManager;
-            Type_root_to = this.item.To.node.GetRoot().RootInfo.Type;
-            Type_root_from = this.item.From.node.GetRoot().RootInfo.Type;
+            Type_root_to = this.item.To.node.GetRoot.NodeType.Type;
+            Type_root_from = this.item.From.node.GetRoot.NodeType.Type;
 
             if (GroupManager.AreCut && (Type_root_to | CloudType.LocalDisk) == Type_root_from &&
-                item.To.node.GetRoot().Info.Name == item.From.node.GetRoot().Info.Name)
+                item.To.node.GetRoot.Info.Name == item.From.node.GetRoot.Info.Name)
             {
                 LocalDisk.AutoCreateFolder(this.item.To.node.Parent);
                 File.Move(item.From.node.GetFullPathString(), item.To.node.GetFullPathString());
@@ -47,11 +47,11 @@ namespace Core.Transfer
             {
                 if (item.buffer == null) item.buffer = new byte[128 * 1024];
                 if (clientTo != null) this.clientTo = clientTo;
-                if (item.To.node.GetRoot().RootInfo.Type == CloudType.Mega) InitUploadMega();//InitUploadMega
+                if (item.To.node.GetRoot.NodeType.Type == CloudType.Mega) InitUploadMega();//InitUploadMega
 
                 //Make Stream From
                 item.From.stream = AppSetting.ManageCloud.GetFileStream(item.From.node, item.SaveSizeTransferSuccess,
-                    item.From.node.Info.Size - 1, item.To.node.GetRoot().RootInfo.Type != CloudType.LocalDisk, item.dataCryptoMega);
+                    item.From.node.Info.Size - 1, item.To.node.GetRoot.NodeType.Type != CloudType.LocalDisk, item.dataCryptoMega);
                 //Make Stream To
                 if (item.ChunkUploadSize > 0) MakeNextChunkUploadInStreamTo(true);//upload to cloud
                 else this.item.To.stream = AppSetting.ManageCloud.GetFileStream(item.To.node, item.SizeWasTransfer);//download to disk
@@ -141,7 +141,7 @@ namespace Core.Transfer
             long pos_end = item.SizeWasTransfer + item.ChunkUploadSize - 1;
             if (pos_end >= item.From.node.Info.Size) pos_end = item.From.node.Info.Size - 1;
 
-            switch (item.To.node.GetRoot().RootInfo.Type)
+            switch (item.To.node.GetRoot.NodeType.Type)
             {
                 case CloudType.Dropbox:
                     if (!CreateNew) ((DropboxRequestAPIv2)clientTo).GetResponse_upload_session_append();//get data return from server
@@ -242,10 +242,10 @@ namespace Core.Transfer
             completionHandle = null;
         }
 
-
-        class Dropbox_Request_UploadSessionFinish : Cloud.Dropbox.IDropbox_Request_UploadSessionFinish
+        #region Dropbox Private Class
+        class Dropbox_Request_UploadSessionFinish : IDropbox_Request_UploadSessionFinish
         {
-            public Dropbox_Request_UploadSessionFinish(Cloud.Dropbox.IDropbox_upload commit, Cloud.Dropbox.IDropbox_Request_UploadSessionAppend cursor)
+            public Dropbox_Request_UploadSessionFinish(IDropbox_upload commit,IDropbox_Request_UploadSessionAppend cursor)
             {
                 this.commit = commit;
                 this.cursor = cursor;
@@ -254,8 +254,7 @@ namespace Core.Transfer
             public IDropbox_upload commit { get; set; }
             public IDropbox_Request_UploadSessionAppend cursor { get; set; }
         }
-
-        class Dropbox_upload : Cloud.Dropbox.IDropbox_upload
+        class Dropbox_upload : IDropbox_upload
         {
             public Dropbox_upload(string path, Dropbox_WriteMode mode = Dropbox_WriteMode.add,bool autorename =false,bool mute =false)
             {
@@ -270,8 +269,7 @@ namespace Core.Transfer
             public bool mute { get; set; }
             public string path { get; set; }
         }
-
-        class Dropbox_Request_UploadSessionAppend : Cloud.Dropbox.IDropbox_Request_UploadSessionAppend
+        class Dropbox_Request_UploadSessionAppend : IDropbox_Request_UploadSessionAppend
         {
             public Dropbox_Request_UploadSessionAppend(string session_id,long offset)
             {
@@ -282,5 +280,6 @@ namespace Core.Transfer
             public long offset { get; set; }
             public string session_id { get; set; }
         }
+        #endregion
     }
 }

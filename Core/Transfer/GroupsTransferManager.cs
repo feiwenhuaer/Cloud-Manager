@@ -46,14 +46,8 @@ namespace Core.Transfer
             {
                 Thread.Sleep(100);
                 if (status == StatusUpDownApp.Pause) continue;
-                for (int i = 0; i < LoadGroupThreads.Count; i++)
-                {
-                    if (!LoadGroupThreads[i].IsAlive)
-                    {
-                        LoadGroupThreads.RemoveAt(i);
-                        i--;
-                    }
-                }
+                LoadGroupThreads.CleanNotWorkingThread();
+
                 switch (status)//UploadDownloadItems
                 {
                     case StatusUpDownApp.Start:
@@ -146,7 +140,7 @@ namespace Core.Transfer
                         Eventupdateclosingform(AppSetting.lang.GetText(LanguageKey.SaveData.ToString()));
                         SaveData();
 #if DEBUG
-                        Console.WriteLine("GroupsTransferManager Thread Closed.");
+                        Console.WriteLine("GroupsTransferManager Saved Data, Thread Closed.");
 #endif
                         Eventcloseapp();
                         #endregion
@@ -194,7 +188,7 @@ namespace Core.Transfer
         }
         #endregion
 
-        #region Closing Form
+        #region Closing UI
         public void Exit()
         {
             timestamp = CurrentMillis.Millis;

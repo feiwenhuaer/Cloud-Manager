@@ -12,20 +12,20 @@ namespace FormUI.UI.MainForm
             explorernode = new ExplorerNode();
             if ((CloudType)imageIndex != CloudType.LocalDisk)
             {
-                explorernode.RootInfo.Email = text;
-                explorernode.RootInfo.Type = (CloudType)imageIndex;
+                explorernode.NodeType.Email = text;
+                explorernode.NodeType.Type = (CloudType)imageIndex;
             }
             else
             {
                 explorernode.Info.Name = text;
                 explorernode.Info.Size = -1;
-                explorernode.RootInfo.Type = CloudType.LocalDisk;
+                explorernode.NodeType.Type = CloudType.LocalDisk;
             }
         }
         public TreeNode_(ExplorerNode node)
         {
-            this.Text = node.Info.Name;
-            this.ImageIndex = this.SelectedImageIndex = (int)CloudType.Folder;
+            this.Text = (node.NodeType.Type != CloudType.Folder && node.NodeType.Type != CloudType.LocalDisk) ? node.NodeType.Email : node.Info.Name;
+            this.ImageIndex = this.SelectedImageIndex = (int)node.NodeType.Type;//(int)CloudType.Folder;
             this.explorernode = node;
         }
     }

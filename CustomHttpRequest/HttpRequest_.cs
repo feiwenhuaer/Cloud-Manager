@@ -41,8 +41,7 @@ namespace CustomHttpRequest
         /// </summary>
         public string TextDataResponse { get { return textdataresponse; } }
         string textdataresponse;
-
-
+        
         #region Connection & SSL
         /// <summary>
         /// Get/Set ReceiveTimeout of tcpclient (default 30000ms)
@@ -112,7 +111,6 @@ namespace CustomHttpRequest
             }
         }
         #endregion
-
         
         #region Count byte send/receive
         long byte_receive = 0;
@@ -124,9 +122,7 @@ namespace CustomHttpRequest
         public long TotalByteSend { get { return byte_send; } }
         public long TotalByteReceive { get { return byte_receive; } }
         #endregion
-
-
-
+        
         #region HeaderSend
         bool WasSendHeader = false;
         public string HeaderSend { get { return header_send; } set { header_send = value; } }
@@ -168,9 +164,7 @@ namespace CustomHttpRequest
             header_send = RequestMethod.ToUpper() + " " + this.uri.PathAndQuery + " HTTP/1.1\r\n";
         }
         #endregion
-
-
-
+        
         #region HeaderReceive
         bool WasReceiveHeader = false;
 
@@ -229,7 +223,6 @@ namespace CustomHttpRequest
         }
         #endregion
         
-
         void ResetWasSendReceive()
         {
             WasReceiveHeader = false;
@@ -353,8 +346,7 @@ namespace CustomHttpRequest
             }
             st.BeginRead(buffer, 0, buffer.Length, BeginRead, null);
         }
-
-
+        
         /// <summary>
         /// Send header -> Receive header -> Read text data response.
         /// </summary>
@@ -466,9 +458,9 @@ namespace CustomHttpRequest
                 else return "";
             }catch(Exception ex) { throw ex; }
         }//read data text receive
-#endregion
+        #endregion
         
-#region SubMethod check,data processing,...
+        #region SubMethod check,data processing,...
         private List<string> RemoveOldDataHeader(List<string> headerlist)
         {
             for (int i = 0; i < headerlist.Count; i++)
