@@ -12,8 +12,8 @@ namespace WpfUI.UI
     /// </summary>
     public partial class UICreateFolder : Window
     {
-        ExplorerNode parent;
-        public UICreateFolder(ExplorerNode parent)
+        ItemNode parent;
+        public UICreateFolder(ItemNode parent)
         {
             InitializeComponent();
             BT_create.Visibility = Visibility.Hidden;
@@ -45,7 +45,7 @@ namespace WpfUI.UI
         }
         void CreateFolder(object obj)
         {
-            ExplorerNode n = new ExplorerNode();
+            ItemNode n = new ItemNode();
             n.Info.Name = (string)obj;
             parent.AddChild(n);
             Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.CreateFolder(n);

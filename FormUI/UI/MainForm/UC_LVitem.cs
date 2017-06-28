@@ -44,14 +44,14 @@ namespace FormUI.UI.MainForm
             index_collumn_Id = LV_item.Columns["LV_CH_Id"].Index;
             index_cullumn_size = LV_item.Columns["LV_CH_Size"].Index;
             index_cullumn_mimeType = LV_item.Columns["LV_CH_mimeType"].Index;
-            managerexplorernodes = new ManagerExplorerNodes();
+            managerhistory_itemnodes = new ManagerHistoryItemNodes();
             //TB_Path.Text = "https://drive.google.com/drive/u/0/folders/0B-yiWN2AF_cIeHZaTWVsU2duSVU";
             pathUC1.EventNodePathClick += PathUC1_EventNodePathClick;
         }
 
-        private void PathUC1_EventNodePathClick(ExplorerNode nodeclick)
+        private void PathUC1_EventNodePathClick(ItemNode nodeclick)
         {
-            managerexplorernodes.Next(nodeclick);
+            managerhistory_itemnodes.Next(nodeclick);
             ExplorerCurrentNode();
         }
 
@@ -137,11 +137,11 @@ namespace FormUI.UI.MainForm
         #region Navigate
         public delegate void ListViewFolderDoubleClickCallBack(ExplorerListItem load);
         public event ListViewFolderDoubleClickCallBack EventListViewFolderDoubleClickCallBack;
-        public ManagerExplorerNodes managerexplorernodes;
+        public ManagerHistoryItemNodes managerhistory_itemnodes;
         public void ExplorerCurrentNode(bool explandTV = false, bool addToTV = false, TreeNode Tnode = null)
         {
             ExplorerListItem load = new ExplorerListItem();
-            load.node = managerexplorernodes.NodeWorking();
+            load.node = managerhistory_itemnodes.NodeWorking();
             load.explandTV = explandTV;
             load.addToTV = addToTV;
             if (Tnode != null) load.TV_node = Tnode;
@@ -149,14 +149,14 @@ namespace FormUI.UI.MainForm
         }
         void Back()
         {
-            if(managerexplorernodes.Back() != null)
+            if(managerhistory_itemnodes.Back() != null)
             {
                 ExplorerCurrentNode();
             }
         }
         void Next()
         {
-            if (managerexplorernodes.Next() != null)
+            if (managerhistory_itemnodes.Next() != null)
             {
                 ExplorerCurrentNode();
             }
@@ -165,7 +165,7 @@ namespace FormUI.UI.MainForm
         private void OpenItemLV()
         {
             if (LV_item.SelectedItems.Count != 1) return;
-            ExplorerNode find = FindNodeLV(LV_item.SelectedItems[0]);
+            ItemNode find = FindNodeLV(LV_item.SelectedItems[0]);
             if (find != null)
             {
                 if (find.Info.Size > 0)//file
@@ -181,7 +181,7 @@ namespace FormUI.UI.MainForm
                 }
                 else//folder
                 {
-                    managerexplorernodes.Next(find);
+                    managerhistory_itemnodes.Next(find);
                     ExplorerCurrentNode();
                 }
             }
@@ -202,7 +202,7 @@ namespace FormUI.UI.MainForm
         #region Menu R click
         private void CMS_LVitem_Opening(object sender, CancelEventArgs e)
         {
-            if(managerexplorernodes.NodeWorking() != null) refreshToolStripMenuItem.Enabled = true;
+            if(managerhistory_itemnodes.NodeWorking() != null) refreshToolStripMenuItem.Enabled = true;
             else refreshToolStripMenuItem.Enabled = false;
 
             copyIDToClipboardToolStripMenuItem.Enabled = false;
@@ -216,7 +216,7 @@ namespace FormUI.UI.MainForm
                     dowloadSeletedToolStripMenuItem.Enabled = false;
                     deleteToolStripMenuItem.Enabled = false;
                     pasteToolStripMenuItem.Enabled = AppClipboard.Clipboard;
-                    if (managerexplorernodes.NodeWorking() != null) SetUpload_TSMI(true);
+                    if (managerhistory_itemnodes.NodeWorking() != null) SetUpload_TSMI(true);
                     break;
 
                 case 1:
@@ -224,13 +224,13 @@ namespace FormUI.UI.MainForm
                     renameToolStripMenuItem.Enabled = true;
                     copyIDToClipboardToolStripMenuItem.Enabled = true;
                     pasteToolStripMenuItem.Enabled = AppClipboard.Clipboard;
-                    if (managerexplorernodes.NodeWorking() != null) SetUpload_TSMI(true);
+                    if (managerhistory_itemnodes.NodeWorking() != null) SetUpload_TSMI(true);
                     SetCutCopyDeleteDownload_TSMI();
                     break;
 
                 default: // >1
                     pasteToolStripMenuItem.Enabled = false;
-                    if (managerexplorernodes.NodeWorking() == null) SetUpload_TSMI(false);
+                    if (managerhistory_itemnodes.NodeWorking() == null) SetUpload_TSMI(false);
                     SetCutCopyDeleteDownload_TSMI();
                     break; 
             }
@@ -245,7 +245,7 @@ namespace FormUI.UI.MainForm
             cutToolStripMenuItem.Enabled = true;
             copyToolStripMenuItem.Enabled = true;
             deleteToolStripMenuItem.Enabled = true;
-            if (!string.IsNullOrEmpty(managerexplorernodes.Root.NodeType.Email)) dowloadSeletedToolStripMenuItem.Enabled = true;
+            if (!string.IsNullOrEmpty(managerhistory_itemnodes.Root.NodeType.Email)) dowloadSeletedToolStripMenuItem.Enabled = true;
             else dowloadSeletedToolStripMenuItem.Enabled = false;
         }
 
@@ -265,28 +265,28 @@ namespace FormUI.UI.MainForm
         {
             AppClipboard.Clear();
             AppClipboard.AreCut = AreCut;
-            AppClipboard.directory = managerexplorernodes.NodeWorking();
-            bool AreCloud = !string.IsNullOrEmpty(managerexplorernodes.Root.NodeType.Email);
+            AppClipboard.directory = managerhistory_itemnodes.NodeWorking();
+            bool AreCloud = !string.IsNullOrEmpty(managerhistory_itemnodes.Root.NodeType.Email);
             foreach (ListViewItem item in LV_item.SelectedItems)
             {
-                ExplorerNode node = FindNodeLV(item);
+                ItemNode node = FindNodeLV(item);
                 if (node != null) AppClipboard.Add(node);
             }
             AppClipboard.Clipboard = true;
         }
         private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ExplorerNode rootto = managerexplorernodes.NodeWorking();
+            ItemNode rootto = managerhistory_itemnodes.NodeWorking();
             if (LV_item.SelectedItems.Count == 1)
             {
-                ExplorerNode find = FindNodeLV(LV_item.SelectedItems[0]);
+                ItemNode find = FindNodeLV(LV_item.SelectedItems[0]);
                 if (find != null) rootto = find;
             }
             Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(AppClipboard.Items, AppClipboard.directory, rootto, AppClipboard.AreCut);
         }
-        ExplorerNode FindNodeLV(ListViewItem item)
+        ItemNode FindNodeLV(ListViewItem item)
         {
-            foreach (ExplorerNode n in managerexplorernodes.NodeWorking().Child)
+            foreach (ItemNode n in managerhistory_itemnodes.NodeWorking().Child)
             {
                 if (string.IsNullOrEmpty(n.Info.ID))// disk
                 {
@@ -308,13 +308,13 @@ namespace FormUI.UI.MainForm
             DialogResult result = fbd.ShowDialog(MainForm);
             if (result == DialogResult.OK || result == DialogResult.Yes)
             {
-                List<ExplorerNode> list_item_from = new List<ExplorerNode>();
+                List<ItemNode> list_item_from = new List<ItemNode>();
                 foreach (ListViewItem item in LV_item.SelectedItems)
                 {
-                    ExplorerNode find = FindNodeLV(item);
+                    ItemNode find = FindNodeLV(item);
                     if(find != null) list_item_from.Add(find);
                 }
-                Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(list_item_from, managerexplorernodes.NodeWorking(), ExplorerNode.GetNodeFromDiskPath(fbd.SelectedPath), false);
+                Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(list_item_from, managerhistory_itemnodes.NodeWorking(), ItemNode.GetNodeFromDiskPath(fbd.SelectedPath), false);
             }
         }
         private void uploadFolderToHereToolStripMenuItem_Click(object sender, EventArgs e)
@@ -325,14 +325,14 @@ namespace FormUI.UI.MainForm
             DialogResult result = fbd.ShowDialog(MainForm);
             if (result == DialogResult.OK | result == DialogResult.Yes)
             {
-                List<ExplorerNode> list_item_from = new List<ExplorerNode>();
-                ExplorerNode node = ExplorerNode.GetNodeFromDiskPath(fbd.SelectedPath.TrimEnd('\\'));
+                List<ItemNode> list_item_from = new List<ItemNode>();
+                ItemNode node = ItemNode.GetNodeFromDiskPath(fbd.SelectedPath.TrimEnd('\\'));
                 list_item_from.Add(node);
 
-                ExplorerNode rootto = managerexplorernodes.NodeWorking();
+                ItemNode rootto = managerhistory_itemnodes.NodeWorking();
                 if(LV_item.SelectedItems.Count == 1)
                 {
-                    ExplorerNode find = FindNodeLV(LV_item.SelectedItems[0]);
+                    ItemNode find = FindNodeLV(LV_item.SelectedItems[0]);
                     if (find != null && find.Info.Size <= 0) rootto = find;
                 }
                 Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(list_item_from, node.Parent, rootto, false);
@@ -345,10 +345,10 @@ namespace FormUI.UI.MainForm
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string item = "";
-            List<ExplorerNode> item_arr = new List<ExplorerNode>();
+            List<ItemNode> item_arr = new List<ItemNode>();
             for (int i = 0; i < LV_item.SelectedItems.Count; i++)
             {
-                ExplorerNode find = FindNodeLV(LV_item.SelectedItems[i]);
+                ItemNode find = FindNodeLV(LV_item.SelectedItems[i]);
                 if (find != null)
                 {
                     item_arr.Add(find);
@@ -377,7 +377,7 @@ namespace FormUI.UI.MainForm
         }
         private void createFolderToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            CreateFolderForm f = new CreateFolderForm(managerexplorernodes.NodeWorking());
+            CreateFolderForm f = new CreateFolderForm(managerhistory_itemnodes.NodeWorking());
             f.Show(MainForm);
         }
         #endregion

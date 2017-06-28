@@ -24,7 +24,7 @@ namespace CustomHttpRequest
             if (string.IsNullOrEmpty(RequestMethod)) throw new ArgumentNullException("RequestMethod");
             MakeNewHeader(uri, RequestMethod);
         }
-        
+
         /// <summary>
         /// Get/Set url
         /// </summary>
@@ -41,7 +41,7 @@ namespace CustomHttpRequest
         /// </summary>
         public string TextDataResponse { get { return textdataresponse; } }
         string textdataresponse;
-        
+
         #region Connection & SSL
         /// <summary>
         /// Get/Set ReceiveTimeout of tcpclient (default 30000ms)
@@ -85,7 +85,8 @@ namespace CustomHttpRequest
                         throw e;
                     }
                 }
-            }catch(Exception ex) { throw ex; }
+            }
+            catch (Exception ex) { throw ex; }
         }
         bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
@@ -93,7 +94,7 @@ namespace CustomHttpRequest
             Console.WriteLine("Certificate error: {0}", sslPolicyErrors);
             return false;
         }
-        
+
         /// <summary>
         /// Get stream from tcpclient
         /// </summary>
@@ -111,7 +112,7 @@ namespace CustomHttpRequest
             }
         }
         #endregion
-        
+
         #region Count byte send/receive
         long byte_receive = 0;
         long byte_send = 0;
@@ -122,7 +123,7 @@ namespace CustomHttpRequest
         public long TotalByteSend { get { return byte_send; } }
         public long TotalByteReceive { get { return byte_receive; } }
         #endregion
-        
+
         #region HeaderSend
         bool WasSendHeader = false;
         public string HeaderSend { get { return header_send; } set { header_send = value; } }
@@ -164,7 +165,7 @@ namespace CustomHttpRequest
             header_send = RequestMethod.ToUpper() + " " + this.uri.PathAndQuery + " HTTP/1.1\r\n";
         }
         #endregion
-        
+
         #region HeaderReceive
         bool WasReceiveHeader = false;
 
@@ -180,7 +181,7 @@ namespace CustomHttpRequest
         /// <returns></returns>
         public int GetCodeResponse()
         {
-            if(WasReceiveHeader) return int.Parse(Regex.Split(GetHeaderResponse()[0], " ")[1]);
+            if (WasReceiveHeader) return int.Parse(Regex.Split(GetHeaderResponse()[0], " ")[1]);
             return -1;
         }
 
@@ -208,7 +209,7 @@ namespace CustomHttpRequest
             }
             throw new Exception("Header is null");
         }
-        
+
         public List<string> GetHeaderDataResponse(string HeaderName)
         {
             List<string> data = new List<string>();
@@ -222,7 +223,7 @@ namespace CustomHttpRequest
             return data;
         }
         #endregion
-        
+
         void ResetWasSendReceive()
         {
             WasReceiveHeader = false;
@@ -309,61 +310,27 @@ namespace CustomHttpRequest
                 int statuscode = GetCodeResponse();
                 if (statuscode == 200 | statuscode == 206) return st;
                 textdataresponse = ReadDataResponseText(CheckMethodTransfer());
-                throw new HttpException(statuscode,textdataresponse);
+                throw new HttpException(statuscode, textdataresponse);
             }
         }
-#if DEBUG
-        public void ReadHeaderResponse_and_GetStreamResponse(AsyncCallback callback, bool SendDataHeader = true, bool CheckStatusCode = false)
-        {
-            Stream st = GetStream();
-            byte_receive = 0;
-            byte_send = 0;
-            byte_header_receive = 0;
-            byte_header_send = 0;
-            if (SendDataHeader) SendHeader(st);
-            if (!WasReceiveHeader) st.BeginRead(buffer, 0, buffer.Length, BeginRead, callback);
-        }
 
-        void BeginRead(IAsyncResult asyncResult)
-        {
-            Stream st = GetStream();
-            int byteread = st.EndRead(asyncResult);
-            buffer_header[byte_receive] = buffer[0];
-            byte_receive += byteread;
-            //check
-            if(byte_receive > 4)
-            {
-                if (buffer_header[(int)byte_receive - 4] == 13 && buffer_header[(int)byte_receive - 3] == 10 &&
-                            buffer_header[(int)byte_receive - 2] == 13 && buffer_header[(int)byte_receive - 1] == 10)
-                {
-                    header_receive = Encoding.UTF8.GetString(buffer_header, 0, (int)byte_receive-4).TrimStart(' ');
-                    WasReceiveHeader = true;
-
-                    ReceiveHeaderIAsyncResult a = new ReceiveHeaderIAsyncResult(st);
-                    ((AsyncCallback)asyncResult.AsyncState).Invoke(a);
-                    return;
-                }
-            }
-            st.BeginRead(buffer, 0, buffer.Length, BeginRead, null);
-        }
-#endif      
         /// <summary>
         /// Send header -> Receive header -> Read text data response.
         /// </summary>
         /// <param name="AutoDirect"></param>
         /// <param name="CheckStatusCode"></param>
         /// <returns></returns>
-        public string GetTextDataResponse(bool AutoDirect = true,bool CheckStatusCode = false)
+        public string GetTextDataResponse(bool AutoDirect = true, bool CheckStatusCode = false)
         {
             if (!WasSendHeader) SendHeader_And_GetStream();
             bool redirect = false;
-        ReRequest:
+            ReRequest:
             List<string> HeaderOldRequest = new List<string>(Regex.Split(header_send, "\r\n"));
             HeaderOldRequest.RemoveAt(0);
             HeaderOldRequest = RemoveOldDataHeader(HeaderOldRequest);
 
             ReadHeaderResponse_and_GetStreamResponse();
-            
+
             ReadDataResponseText(CheckMethodTransfer());
             int response_code = GetCodeResponse();
             if (response_code >= 200 && response_code < 300) return textdataresponse;
@@ -376,7 +343,7 @@ namespace CustomHttpRequest
                 goto ReRequest;
             }
             if (!CheckStatusCode) return textdataresponse;
-            throw new HttpException(response_code,textdataresponse);
+            throw new HttpException(response_code, textdataresponse);
         }
 
         /// <summary>
@@ -403,7 +370,7 @@ namespace CustomHttpRequest
                     byte[] chunk_buffer = new byte[18];
                     byte[] trash_buffer = new byte[2];
                     buffer = new byte[5 * 1024 * 1024];
-                back:
+                    back:
                     stream.Read(chunk_buffer, 0, 1);
                     if (chunk_buffer[0] == 48)
                     {
@@ -456,10 +423,11 @@ namespace CustomHttpRequest
                     return textdataresponse;
                 }
                 else return "";
-            }catch(Exception ex) { throw ex; }
+            }
+            catch (Exception ex) { throw ex; }
         }//read data text receive
         #endregion
-        
+
         #region SubMethod check,data processing,...
         private List<string> RemoveOldDataHeader(List<string> headerlist)
         {
@@ -509,11 +477,43 @@ namespace CustomHttpRequest
         };
 
         public List<string> ListHeaderRemove = new List<string>() { "host" };
-#endregion
+        #endregion
 #if DEBUG
-        private void debugwrite(string title,string data)
+        public void ReadHeaderResponse_and_GetStreamResponse(AsyncCallback callback, bool SendDataHeader = true, bool CheckStatusCode = false)
         {
-            if(debug)
+            Stream st = GetStream();
+            byte_receive = 0;
+            byte_send = 0;
+            byte_header_receive = 0;
+            byte_header_send = 0;
+            if (SendDataHeader) SendHeader(st);
+            if (!WasReceiveHeader) st.BeginRead(buffer, 0, buffer.Length, BeginRead, callback);
+        }
+        void BeginRead(IAsyncResult asyncResult)
+        {
+            Stream st = GetStream();
+            int byteread = st.EndRead(asyncResult);
+            buffer_header[byte_receive] = buffer[0];
+            byte_receive += byteread;
+            //check
+            if (byte_receive > 4)
+            {
+                if (buffer_header[(int)byte_receive - 4] == 13 && buffer_header[(int)byte_receive - 3] == 10 &&
+                            buffer_header[(int)byte_receive - 2] == 13 && buffer_header[(int)byte_receive - 1] == 10)
+                {
+                    header_receive = Encoding.UTF8.GetString(buffer_header, 0, (int)byte_receive - 4).TrimStart(' ');
+                    WasReceiveHeader = true;
+
+                    ReceiveHeaderIAsyncResult a = new ReceiveHeaderIAsyncResult(st);
+                    ((AsyncCallback)asyncResult.AsyncState).Invoke(a);
+                    return;
+                }
+            }
+            st.BeginRead(buffer, 0, buffer.Length, BeginRead, null);
+        }
+        private void debugwrite(string title, string data)
+        {
+            if (debug)
             {
                 Console.WriteLine(">> " + title + "\r\n" + data);
             }

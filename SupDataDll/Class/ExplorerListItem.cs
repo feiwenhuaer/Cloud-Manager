@@ -2,7 +2,7 @@
 {
     public class ExplorerListItem
     {
-        public ExplorerNode node;
+        public ItemNode node;
         public bool addToTV = false;
         public bool explandTV = false;
         public object TV_data;

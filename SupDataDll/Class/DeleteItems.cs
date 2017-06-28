@@ -8,18 +8,18 @@ namespace CloudManagerGeneralLib.Class
         {
 
         }
-        public DeleteItems(ExplorerNode item)
+        public DeleteItems(ItemNode item)
         {
             Items.Add(item);
         }
 
-        public DeleteItems(List<ExplorerNode> items)
+        public DeleteItems(List<ItemNode> items)
         {
             Items.AddRange(items);
         }
-        List<ExplorerNode> items = new List<ExplorerNode>();
+        List<ItemNode> items = new List<ItemNode>();
 
-        public List<ExplorerNode> Items { get { return items; } set { items = value; } }
+        public List<ItemNode> Items { get { return items; } set { items = value; } }
         public bool PernamentDelete = false;
     }
 

@@ -52,6 +52,7 @@
         /// </summary>
         public MegaApiClient(IHttpRequestClient webClient)
         {
+            MegaNzAppKey.Check();
             if (webClient == null)
             {
                 throw new ArgumentNullException("webClient");

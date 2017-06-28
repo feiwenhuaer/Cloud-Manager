@@ -22,10 +22,10 @@ namespace Core.CloudSubClass
             return client;
         }
 
-        public static ExplorerNode GetListFileFolder(ExplorerNode node)
+        public static ItemNode GetListFileFolder(ItemNode node)
         {
             node.Child.Clear();
-            ExplorerNode root = node.GetRoot;
+            ItemNode root = node.GetRoot;
             MegaApiClient client = GetClient(root.NodeType.Email);
 
             if (root == node)
@@ -49,7 +49,7 @@ namespace Core.CloudSubClass
             return node;
         }
         
-        public static Stream GetStream(ExplorerNode node,long start_pos = -1,long end_pos = -1,bool IsUpload = false, object DataEx = null)
+        public static Stream GetStream(ItemNode node,long start_pos = -1,long end_pos = -1,bool IsUpload = false, object DataEx = null)
         {
             if (node.Info.Size < 1) throw new Exception("Mega GetStream: Filesize <= 0.");
             MegaApiClient api = GetClient(node.GetRoot.NodeType.Email);
@@ -62,7 +62,7 @@ namespace Core.CloudSubClass
             else throw new Exception("Not Support Upload.");
         }
 
-        public static void CreateFolder(ExplorerNode node)
+        public static void CreateFolder(ItemNode node)
         {
             MegaNzNode parent_meganode = new MegaNzNode(node.Parent.Info.ID);
             MegaApiClient client = GetClient(node.GetRoot.NodeType.Email);
@@ -70,13 +70,13 @@ namespace Core.CloudSubClass
             node.Info.ID = folder_meganode.Id;
         }
 
-        public static void AutoCreateFolder(ExplorerNode node)
+        public static void AutoCreateFolder(ItemNode node)
         {
-            List<ExplorerNode> list = node.GetFullPath();
+            List<ItemNode> list = node.GetFullPath();
             if (list[0].NodeType.Type != CloudType.Mega) throw new Exception("Mega only.");
             MegaApiClient client = GetClient(list[0].NodeType.Email);
             list.RemoveAt(0);
-            foreach(ExplorerNode child in list)
+            foreach(ItemNode child in list)
             {
                 if(string.IsNullOrEmpty(child.Info.ID))
                 {
@@ -110,11 +110,11 @@ namespace Core.CloudSubClass
             throw new Exception("Can't find " + type.ToString());
         }
         
-        static void GetItems(MegaApiClient client,INode node, ExplorerNode Enode)
+        static void GetItems(MegaApiClient client,INode node, ItemNode Enode)
         {
             foreach (INode child in client.GetNodes(node))
             {
-                ExplorerNode c = new ExplorerNode();
+                ItemNode c = new ItemNode();
                 c.Info.ID = child.Id;
                 c.Info.Name = child.Name;
                 c.Info.DateMod = child.LastModificationDate;
@@ -230,7 +230,7 @@ namespace Core.CloudSubClass
             #endregion
         }
 
-        public static ExplorerNode GetItem(ExplorerNode node)
+        public static ItemNode GetItem(ItemNode node)
         {
             MegaApiClient client = GetClient(node.GetRoot.NodeType.Email);
             MegaNzNode inode = new MegaNzNode(node.Info.ID);

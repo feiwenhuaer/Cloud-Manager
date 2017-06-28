@@ -100,10 +100,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cloud\Cloud.csproj">
-      <Project>{0b8a1a7d-0267-48a9-bad6-dcde5104d660}</Project>
-      <Name>Cloud</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Core\Core.csproj">
       <Project>{1ff27bdb-f1ed-4eb2-9f6f-1d28dc32e0f9}</Project>
       <Name>Core</Name>

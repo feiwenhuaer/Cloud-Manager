@@ -29,7 +29,7 @@ namespace WpfUI.UI.Main.Lv_item
             LV_items.Height = double.NaN;
             LV_items.Width = double.NaN;
             
-            managerexplorernodes = new ManagerExplorerNodes();
+            managerehistory_itemnodes = new ManagerHistoryItemNodes();
             timeformat = Setting_UI.reflection_eventtocore.SettingAndLanguage.GetSetting(SettingsKey.DATE_TIME_FORMAT);
             time_default = new DateTime();
             UILanguage();
@@ -45,10 +45,10 @@ namespace WpfUI.UI.Main.Lv_item
 
         #region Binding Listview 
         ObservableCollection<LV_data> lv_data { get; set; }
-        public void ShowDataToLV(ExplorerNode parent)
+        public void ShowDataToLV(ItemNode parent)
         {
             lv_data.Clear();
-            foreach (ExplorerNode item in parent.Child)
+            foreach (ItemNode item in parent.Child)
             {
                 LV_data dt = new LV_data();
                 dt.Node = item;
@@ -82,16 +82,16 @@ namespace WpfUI.UI.Main.Lv_item
             if (e.AddedItems.Count >0)
             {
                 data_add = e.AddedItems[0] as ComboBoxData;
-                if (data_add != null) if (data_add.Node == managerexplorernodes.NodeWorking()) return;
+                if (data_add != null) if (data_add.Node == managerehistory_itemnodes.NodeWorking()) return;
             }
             if(e.RemovedItems.Count > 0 && data_add != null)
             {
                 data_remove = e.RemovedItems[0] as ComboBoxData;
                 if (data_remove != null)
                 {
-                    if(data_remove.Node == managerexplorernodes.NodeWorking())
+                    if(data_remove.Node == managerehistory_itemnodes.NodeWorking())
                     {
-                        managerexplorernodes.Next(data_add.Node);
+                        managerehistory_itemnodes.Next(data_add.Node);
                         ExplorerCurrentNode();
                     }
                 }
@@ -101,11 +101,11 @@ namespace WpfUI.UI.Main.Lv_item
         #region Navigate
         public delegate void ListViewFolderDoubleClickCallBack(ExplorerListItem load);
         public event ListViewFolderDoubleClickCallBack EventListViewFolderDoubleClickCallBack;
-        public ManagerExplorerNodes managerexplorernodes;
+        public ManagerHistoryItemNodes managerehistory_itemnodes;
         public void ExplorerCurrentNode(bool explandTV = false, bool addToTV = false, TreeViewDataModel DataItem = null, TreeViewItem TV_item = null)
         {
             ExplorerListItem load = new ExplorerListItem();
-            load.node = managerexplorernodes.NodeWorking();
+            load.node = managerehistory_itemnodes.NodeWorking();
             load.explandTV = explandTV;
             load.addToTV = addToTV;
             if (TV_item != null) load.TV_node = TV_item;
@@ -114,14 +114,14 @@ namespace WpfUI.UI.Main.Lv_item
         }
         void Back()
         {
-            if (managerexplorernodes.Back() != null)
+            if (managerehistory_itemnodes.Back() != null)
             {
                 ExplorerCurrentNode();
             }
         }
         void Next()
         {
-            if (managerexplorernodes.Next() != null)
+            if (managerehistory_itemnodes.Next() != null)
             {
                 ExplorerCurrentNode();
             }
@@ -133,7 +133,7 @@ namespace WpfUI.UI.Main.Lv_item
             LV_data data = LV_items.SelectedItem as LV_data;
             if (data != null)
             {
-                managerexplorernodes.Next(data.Node);
+                managerehistory_itemnodes.Next(data.Node);
                 ExplorerCurrentNode();
             }
         }
@@ -167,7 +167,7 @@ namespace WpfUI.UI.Main.Lv_item
             foreach (ContextMenuDataModel data in LV_items.ContextMenu.Items)
             {
                 if (data == null) continue;
-                if (managerexplorernodes.NodeWorking() == null) { data.IsEnabled = false; continue; }
+                if (managerehistory_itemnodes.NodeWorking() == null) { data.IsEnabled = false; continue; }
                 switch (data.Key)
                 {
                     case LanguageKey.TSMI_refresh: data.IsEnabled = true; break;
@@ -177,7 +177,7 @@ namespace WpfUI.UI.Main.Lv_item
                     case LanguageKey.TSMI_paste: if (selected_count > 1 | !AppClipboard.Clipboard) data.IsEnabled = false; else data.IsEnabled = true; break;
                     case LanguageKey.TSMI_rename: if (selected_count != 1) data.IsEnabled = false; else data.IsEnabled = true; break;
                     case LanguageKey.TSMI_delete: if (selected_count == 0) data.IsEnabled = false; else data.IsEnabled = true; break;
-                    case LanguageKey.TSMI_copyid: if (selected_count != 1 || managerexplorernodes.Root.NodeType.Type == CloudType.LocalDisk) data.IsEnabled = false; else data.IsEnabled = true; break;
+                    case LanguageKey.TSMI_copyid: if (selected_count != 1 || managerehistory_itemnodes.Root.NodeType.Type == CloudType.LocalDisk) data.IsEnabled = false; else data.IsEnabled = true; break;
                     case LanguageKey.TSMI_downloadsellected: if (selected_count == 0) data.IsEnabled = false; else data.IsEnabled = true; break;
                     default: continue;
                 }
@@ -211,13 +211,13 @@ namespace WpfUI.UI.Main.Lv_item
         {
             AppClipboard.Clear();
             AppClipboard.AreCut = cut;
-            AppClipboard.directory = managerexplorernodes.NodeWorking();
+            AppClipboard.directory = managerehistory_itemnodes.NodeWorking();
             foreach (LV_data item in LV_items.SelectedItems) AppClipboard.Add(item.Node);
             AppClipboard.Clipboard = true;
         }
         void Paste()
         {
-            ExplorerNode roottonode = managerexplorernodes.NodeWorking();
+            ItemNode roottonode = managerehistory_itemnodes.NodeWorking();
             Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(AppClipboard.Items, AppClipboard.directory, roottonode, AppClipboard.AreCut);
         }
         void Rename()
@@ -237,7 +237,7 @@ namespace WpfUI.UI.Main.Lv_item
         }
         void CreateFolder()
         {
-            UICreateFolder ui_cf = new UICreateFolder(managerexplorernodes.NodeWorking());
+            UICreateFolder ui_cf = new UICreateFolder(managerehistory_itemnodes.NodeWorking());
             ui_cf.Owner = this.main_window;
             ui_cf.ShowDialog();
         }
@@ -249,9 +249,9 @@ namespace WpfUI.UI.Main.Lv_item
             fbd.ShowNewFolderButton = true;
             DialogResult result = fbd.ShowDialog();
             if (result != DialogResult.OK | result != DialogResult.Yes) return;
-            List<ExplorerNode> listitems = new List<ExplorerNode>();
+            List<ItemNode> listitems = new List<ItemNode>();
             foreach (LV_data item in LV_items.SelectedItems) listitems.Add(item.Node);
-            Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(listitems, managerexplorernodes.NodeWorking(), ExplorerNode.GetNodeFromDiskPath(fbd.SelectedPath), false);
+            Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(listitems, managerehistory_itemnodes.NodeWorking(), ItemNode.GetNodeFromDiskPath(fbd.SelectedPath), false);
         }
         void uploadfolder()
         {
@@ -260,8 +260,8 @@ namespace WpfUI.UI.Main.Lv_item
             fbd.ShowNewFolderButton = true;
             DialogResult result = fbd.ShowDialog();
             if (result != DialogResult.OK | result != DialogResult.Yes) return;
-            ExplorerNode node = ExplorerNode.GetNodeFromDiskPath(fbd.SelectedPath);
-            Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(new List<ExplorerNode>() { node }, node.Parent, managerexplorernodes.NodeWorking(), false);
+            ItemNode node = ItemNode.GetNodeFromDiskPath(fbd.SelectedPath);
+            Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(new List<ItemNode>() { node }, node.Parent, managerehistory_itemnodes.NodeWorking(), false);
         }
         void uploadfile()
         {
@@ -271,11 +271,11 @@ namespace WpfUI.UI.Main.Lv_item
             ofd.InitialDirectory = PCPath.Mycomputer;
             DialogResult result = ofd.ShowDialog();
             if (result != DialogResult.OK | result != DialogResult.Yes) return;
-            List<ExplorerNode> items = new List<ExplorerNode>();
-            ExplorerNode root = ExplorerNode.GetNodeFromDiskPath(System.IO.Path.GetDirectoryName(ofd.FileNames[0]));
+            List<ItemNode> items = new List<ItemNode>();
+            ItemNode root = ItemNode.GetNodeFromDiskPath(System.IO.Path.GetDirectoryName(ofd.FileNames[0]));
             foreach (string s in ofd.SafeFileNames)
             {
-                ExplorerNode n = new ExplorerNode();
+                ItemNode n = new ItemNode();
                 n.Info.Name = s;
                 root.AddChild(n);
                 FileInfo info = new FileInfo(n.GetFullPathString());
@@ -283,7 +283,7 @@ namespace WpfUI.UI.Main.Lv_item
                 n.Info.DateMod = info.LastWriteTime;
                 items.Add(n);
             }
-            Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(items, root, managerexplorernodes.NodeWorking(), false);
+            Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(items, root, managerehistory_itemnodes.NodeWorking(), false);
         }
 
         #endregion
@@ -295,7 +295,7 @@ namespace WpfUI.UI.Main.Lv_item
             if (data == null) return;
             if (data.Node.Info.Size < 1)//folder
             {
-                managerexplorernodes.Next(data.Node);
+                managerehistory_itemnodes.Next(data.Node);
                 ExplorerCurrentNode();
             }
             else

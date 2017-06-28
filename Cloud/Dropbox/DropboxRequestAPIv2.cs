@@ -21,8 +21,8 @@ namespace Cloud.Dropbox
         const int portListenMin = 22430;
 
         #region Constructors
-        public DropboxRequestAPIv2() { }
-        public DropboxRequestAPIv2(string access_token)
+        public DropboxRequestAPIv2() { DropboxAppKey.Check(); }
+        public DropboxRequestAPIv2(string access_token):this()
         {
             this.access_token = access_token;
         }

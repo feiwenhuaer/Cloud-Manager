@@ -9,24 +9,33 @@ using CloudManagerGeneralLib.UiInheritance;
 using Core.CloudSubClass;
 using Core.Transfer;
 using Core.Class;
+using System.Runtime.InteropServices;
+using System.Reflection;
 
 namespace Cloud_Manager
 {
-    static class Program
+    public static class Program
     {
-        static Mutex mutex = new Mutex(true, "{6f001441-e901-43d1-994e-9d92e94fdd37}");
+        public static string guid;
+        public static Mutex mutex;
         [STAThread]
         static void Main(string[] arg)
         {
+            Assembly assembly = typeof(Program).Assembly;
+            GuidAttribute attribute = (GuidAttribute)assembly.GetCustomAttributes(typeof(GuidAttribute), true)[0];
+            guid = attribute.Value;
+            mutex = new Mutex(true, "{" + guid + "}");
+
             if (mutex.WaitOne(TimeSpan.Zero, true))
             {
-                AppSetting.MainThread = System.Threading.Thread.CurrentThread;
+                AppSetting.MainThread = Thread.CurrentThread;
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 #if DEBUG
                 DeleteFile_dev();// dev mode
 #endif
                 //load instance class
+                AppSetting.LoadAPIKey();
                 ReadWriteData.CreateFolderSaveData();// create folder %appdata%\\CloudManager
                 Get_mimeType.Load();//mimeType (google drive upload)
                 AppSetting.ManageCloud = new CloudManager();//explorer
@@ -57,7 +66,7 @@ namespace Cloud_Manager
                     AppSetting.UIMain.ShowDialog_();
                     if (AppSetting.UIMain.AreReloadUI)//if reload ui
                     {
-                        if(AppSetting.UIOauth != null) AppSetting.UIOauth.CloseUI();
+                        AppSetting.CloseOauthUI();
                         AppSetting.TransferManager.status = StatusUpDownApp.Pause;
                         //clean memory
                         AppSetting.UIMain = null;

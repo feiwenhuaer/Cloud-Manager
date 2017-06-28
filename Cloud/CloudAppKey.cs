@@ -1,20 +1,32 @@
 ﻿namespace Cloud
 {
-    internal static class DropboxAppKey
+    public static class DropboxAppKey
     {
-        public const string ApiKey = "sdxv9bvu37pjd5r";
-        public const string ApiSecret = "xsfy8way52uuf1j";
+        internal static void Check()
+        {
+            if (ApiKey == null || ApiSecret == null) throw new System.Exception("API Key is null.");
+        }
+        public static string ApiKey { internal get; set; } = null;
+        public static string ApiSecret { internal get; set; } = null;
     }
 
-    internal static class GoogleDriveAppKey
+    public static class GoogleDriveAppKey
     {
-        public const string ClientID = "781410200428-kumskuv0ro9tspej1n8unfqv3d0c7ioq.apps.googleusercontent.com";
-        public const string Clientsecret = "zZqmUtCGwCmYqZzseRfCtN5m";
-        public const string ApiKey = "AIzaSyBFD-4QCymzcUChcf7lKa7v1jPevmK_9ew";
+        internal static void Check()
+        {
+            if( ApiKey == null || ClientID == null || Clientsecret == null) throw new System.Exception("API Key is null.");
+        }
+        public static string ClientID { internal get; set; } = null;
+        public static string Clientsecret { internal get; set; } = null;
+        public static string ApiKey { internal get; set; } = null;
     }
 
-    internal static class MegaNzAppKey
+    public static class MegaNzAppKey
     {
-        public const string ApiKey = "K1t33QJC";
+        internal static void Check()
+        {
+            if( ApiKey == null) throw new System.Exception("API Key is null.");
+        }
+        public static string ApiKey { internal get; set; } = null;
     }
 }

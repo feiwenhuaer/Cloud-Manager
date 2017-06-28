@@ -8,9 +8,9 @@ namespace FormUI.UI.MainForm.PathNodes
 {
     internal class LabelNode : Label
     {
-        ExplorerNode node;
-        public ExplorerNode Node { get { return node; } private set { node = value; ChangeText(); } }
-        public LabelNode(ExplorerNode node) : base()
+        ItemNode node;
+        public ItemNode Node { get { return node; } private set { node = value; ChangeText(); } }
+        public LabelNode(ItemNode node) : base()
         {
             this.Node = node;
             this.MouseEnter += C_MouseEnter;

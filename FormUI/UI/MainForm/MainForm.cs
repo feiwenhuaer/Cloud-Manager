@@ -25,7 +25,7 @@ namespace FormUI.UI.MainForm
             }
         }
 
-        public void AddNewCloudToTV(ExplorerNode newnode)
+        public void AddNewCloudToTV(ItemNode newnode)
         {
             if (InvokeRequired) Invoke(new Action(() => AddNewCloudToTV_(newnode)));
             else AddNewCloudToTV_(newnode);
@@ -45,7 +45,7 @@ namespace FormUI.UI.MainForm
             }
         }
 
-        public void FileSaveDialog(string InitialDirectory, string FileName, string Filter, ExplorerNode node)
+        public void FileSaveDialog(string InitialDirectory, string FileName, string Filter, ItemNode node)
         {
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.InitialDirectory = InitialDirectory;
@@ -56,8 +56,8 @@ namespace FormUI.UI.MainForm
                 DialogResult rs = sfd.ShowDialog();
                 if (rs == DialogResult.OK || rs == DialogResult.Yes)
                 {
-                    ExplorerNode filesave = ExplorerNode.GetNodeFromDiskPath(sfd.FileName, node.Info.Size);
-                    Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(new List<ExplorerNode>() { node }, node.Parent, filesave.Parent, false);
+                    ItemNode filesave = ItemNode.GetNodeFromDiskPath(sfd.FileName, node.Info.Size);
+                    Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(new List<ItemNode>() { node }, node.Parent, filesave.Parent, false);
                 }
             }));
         }
@@ -83,7 +83,7 @@ namespace FormUI.UI.MainForm
         }
         #endregion
 
-        void AddNewCloudToTV_(ExplorerNode newnode)
+        void AddNewCloudToTV_(ItemNode newnode)
         {
             TV_item.Nodes.Add(new TreeNode_(newnode));
         }
@@ -107,7 +107,7 @@ namespace FormUI.UI.MainForm
             foreach (var drive in DriveInfo.GetDrives())
                 TV_item.Nodes.Add(new TreeNode_(drive.RootDirectory.ToString().Replace("\\", null), 0));
 
-            foreach (ExplorerNode cloud in Setting_UI.reflection_eventtocore.AccountsAndCloud.GetListAccountCloud())
+            foreach (ItemNode cloud in Setting_UI.reflection_eventtocore.AccountsAndCloud.GetListAccountCloud())
                 TV_item.Nodes.Add(new TreeNode_(cloud));
             TV_item.EndUpdate();
 
@@ -227,8 +227,8 @@ namespace FormUI.UI.MainForm
             }
             TreeNode_ TN = e.Node as TreeNode_;
             if (TN == null) return;
-            list_UCLVitem[tabControl1.SelectedIndex].managerexplorernodes.Root = TN.explorernode.GetRoot;
-            list_UCLVitem[tabControl1.SelectedIndex].managerexplorernodes.Next(TN.explorernode);
+            list_UCLVitem[tabControl1.SelectedIndex].managerhistory_itemnodes.Root = TN.explorernode.GetRoot;
+            list_UCLVitem[tabControl1.SelectedIndex].managerhistory_itemnodes.Next(TN.explorernode);
             list_UCLVitem[tabControl1.SelectedIndex].ExplorerCurrentNode(explandTV, true, TN);
         }
         private void CMS_TVitem_Opening(object sender, CancelEventArgs e)
@@ -320,11 +320,11 @@ namespace FormUI.UI.MainForm
             DialogResult result = fbd.ShowDialog();
             if (result == DialogResult.OK | result == DialogResult.Yes)
             {
-                List<ExplorerNode> list_item_from = new List<ExplorerNode>();
-                ExplorerNode node = ExplorerNode.GetNodeFromDiskPath(TV_item.SelectedNode.FullPath);
+                List<ItemNode> list_item_from = new List<ItemNode>();
+                ItemNode node = ItemNode.GetNodeFromDiskPath(TV_item.SelectedNode.FullPath);
                 list_item_from.Add(node);
                 Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(list_item_from, node.Parent,
-                    ExplorerNode.GetNodeFromDiskPath(fbd.SelectedPath), false);
+                    ItemNode.GetNodeFromDiskPath(fbd.SelectedPath), false);
             }
         }
         private void uploadFolderToHereToolStripMenuItem_Click(object sender, EventArgs e)
@@ -336,11 +336,11 @@ namespace FormUI.UI.MainForm
             if (result == DialogResult.OK | result == DialogResult.Yes)
             {
 
-                List<ExplorerNode> list_item_from = new List<ExplorerNode>();
-                ExplorerNode node = ExplorerNode.GetNodeFromDiskPath(fbd.SelectedPath);
+                List<ItemNode> list_item_from = new List<ItemNode>();
+                ItemNode node = ItemNode.GetNodeFromDiskPath(fbd.SelectedPath);
                 list_item_from.Add(node);
                 Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(list_item_from, node.Parent,
-                    ((UC_LVitem)tabControl1.SelectedTab.Controls[0]).managerexplorernodes.NodeWorking(), false);
+                    ((UC_LVitem)tabControl1.SelectedTab.Controls[0]).managerhistory_itemnodes.NodeWorking(), false);
             }
         }
         private void uploadFileToHereToolStripMenuItem_Click(object sender, EventArgs e)
@@ -353,21 +353,21 @@ namespace FormUI.UI.MainForm
             DialogResult result = ofd.ShowDialog();
             if (result == DialogResult.OK | result == DialogResult.Yes)
             {
-                List<ExplorerNode> list_item_from = new List<ExplorerNode>();
+                List<ItemNode> list_item_from = new List<ItemNode>();
                 
                 string root = Path.GetDirectoryName(ofd.FileNames[0]);
-                ExplorerNode rootnode = ExplorerNode.GetNodeFromDiskPath(root);
+                ItemNode rootnode = ItemNode.GetNodeFromDiskPath(root);
                 foreach (string a in ofd.SafeFileNames)
                 {
                     FileInfo info = new FileInfo(root + "\\" + a);
-                    ExplorerNode n = new ExplorerNode();
+                    ItemNode n = new ItemNode();
                     n.Info.Name = a;
                     n.Info.Size = info.Length;
                     rootnode.AddChild(n);
                     list_item_from.Add(n);
                 }
                 Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(list_item_from, rootnode, 
-                    ((UC_LVitem)tabControl1.SelectedTab.Controls[0]).managerexplorernodes.NodeWorking(), false);
+                    ((UC_LVitem)tabControl1.SelectedTab.Controls[0]).managerhistory_itemnodes.NodeWorking(), false);
             }
         }
         private TreeNode_ GetRootParent(TreeNode node)
@@ -425,7 +425,7 @@ namespace FormUI.UI.MainForm
             {
                 if (returnnull || exception) Invoke(new Action(() =>
                                                     {
-                                                        list_UCLVitem[o.indexLV_tab].managerexplorernodes.Back();
+                                                        list_UCLVitem[o.indexLV_tab].managerhistory_itemnodes.Back();
                                                     }));
                 Invoke(new Action(() => CMS_Tabcontrol.Enabled = true));
             }
@@ -436,7 +436,7 @@ namespace FormUI.UI.MainForm
             if (load.addToTV && load.TV_node != null)//add folder to tree view
             {
                 ((TreeNode)load.TV_node).Nodes.Clear();
-                foreach (ExplorerNode c in load.node.Child)
+                foreach (ItemNode c in load.node.Child)
                 {
                     if (c.Info.Size >0) continue;
                     TreeNode_ child = new TreeNode_(c);
@@ -449,7 +449,7 @@ namespace FormUI.UI.MainForm
             {
                 List<ItemLV> ListItem_LV = new List<ItemLV>();
                 DateTime temp = new DateTime(0);
-                foreach (ExplorerNode c in load.node.Child)
+                foreach (ItemNode c in load.node.Child)
                 {
                     if (c.Info.Size > 0) continue;
                     string datetime = "";
@@ -457,7 +457,7 @@ namespace FormUI.UI.MainForm
 
                     ListItem_LV.Add(new ItemLV() { str = new string[] { c.Info.Name, "Folder", string.Empty, datetime, c.Info.MimeType, c.Info.ID }, icon = icon_folder });
                 }
-                foreach (ExplorerNode c in load.node.Child)
+                foreach (ItemNode c in load.node.Child)
                 {
                     if (c.Info.Size < 1) continue;
                     string extension = c.GetExtension();                    
@@ -554,7 +554,7 @@ namespace FormUI.UI.MainForm
         private void cloudToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
         {
             removeToolStripMenuItem.DropDownItems.Clear();
-            foreach (ExplorerNode cloud in Setting_UI.reflection_eventtocore.AccountsAndCloud.GetListAccountCloud())
+            foreach (ItemNode cloud in Setting_UI.reflection_eventtocore.AccountsAndCloud.GetListAccountCloud())
             {
                 ToolStripMenuItem item = new ToolStripMenuItem(cloud.NodeType.Type.ToString()+":"+ cloud.NodeType.Email);
                 item.Click += RemoveCloudItem_Click;

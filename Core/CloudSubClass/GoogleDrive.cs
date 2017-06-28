@@ -32,10 +32,10 @@ namespace Core.CloudSubClass
             return gdclient;
         }
 
-        public static ExplorerNode GetListFileFolder(ExplorerNode node, bool folderonly = false,bool read_only = false)
+        public static ItemNode GetListFileFolder(ItemNode node, bool folderonly = false,bool read_only = false)
         {
             bool uri = false;
-            ExplorerNode root = node.GetRoot;
+            ItemNode root = node.GetRoot;
             string Email = root.NodeType.Email;
             string parent_ID = null;
             string url = null;
@@ -43,7 +43,7 @@ namespace Core.CloudSubClass
             Match match;
             if (string.IsNullOrEmpty(Email)) { Email = AppSetting.settings.GetDefaultCloud(CloudType.GoogleDrive); uri = true; }
 
-            //Find id folder
+            #region Get parent_ID
             if (uri)//folder url
             {
                 if (root.NodeType.uri != null)
@@ -65,9 +65,10 @@ namespace Core.CloudSubClass
                 parent_ID = "root";//root
                 if (!string.IsNullOrEmpty(node.Info.ID)) parent_ID = node.Info.ID;//id root or id node
             }
+            #endregion
 
-            //if found id is folder
-            if (!string.IsNullOrEmpty(parent_ID))
+            #region Get Child Node Data
+            if (!string.IsNullOrEmpty(parent_ID))//if found id is folder
             {
                 GD_Files_list list_ = Search("'" + parent_ID + "' in parents and trashed=false", Email);
                 if (parent_ID == "root")//save root id
@@ -86,13 +87,13 @@ namespace Core.CloudSubClass
                 node.RenewChilds(list_.Convert(node));
                 return node;
             }
-            else if (string.IsNullOrEmpty(url))
+            else if (string.IsNullOrEmpty(url))//if id from url
             {
                 rg = new Regex(Rg_url_idFile);
                 match = rg.Match(url);
                 if(match.Success)
                 {
-                    ExplorerNode n = new ExplorerNode();
+                    ItemNode n = new ItemNode();
                     n.Info.ID = match.Value;
                     n.NodeType.Email = Email;
                     GD_item item = GoogleDrive.GetMetadataItem(n);
@@ -103,10 +104,12 @@ namespace Core.CloudSubClass
                     return null;
                 }
             }
+            #endregion
+
             throw new Exception("Can't Analyze Data Input.");
         }
 
-        public static Stream GetFileStream(ExplorerNode node, long Startpos = -1,long endpos = -1)
+        public static Stream GetFileStream(ItemNode node, long Startpos = -1,long endpos = -1)
         {
             DriveAPIHttprequestv2 gdclient = GetAPIv2(node.GetRoot.NodeType.Email);
             return gdclient.Files.Get(node.Info.ID, Startpos, endpos);
@@ -122,14 +125,14 @@ namespace Core.CloudSubClass
         }
 
         static object sync_createfolder = new object();
-        public static void CreateFolder(ExplorerNode node)
+        public static void CreateFolder(ItemNode node)
         {
             string Email = node.GetRoot.NodeType.Email;
             DriveAPIHttprequestv2 gdclient = GetAPIv2(Email);
             string parent_id = "";
             try
             {
-                List<ExplorerNode> listnode = node.GetFullPath();
+                List<ItemNode> listnode = node.GetFullPath();
                 Monitor.Enter(sync_createfolder);
                 int i;
                 for (i = listnode.Count - 1; i > 0; i--)
@@ -142,7 +145,7 @@ namespace Core.CloudSubClass
                 {
                     if (!create)
                     {
-                        List<ExplorerNode> listsearchnode = Search("'" + parent_id + "' in parents" +
+                        List<ItemNode> listsearchnode = Search("'" + parent_id + "' in parents" +
                             " and trashed=false" +
                             " and title='" + listnode[i].Info.Name.Replace("'", "\\'") + "'" +
                             " and mimeType = 'application/vnd.google-apps.folder'", Email).Convert(node);
@@ -156,7 +159,7 @@ namespace Core.CloudSubClass
             finally { Monitor.Exit(sync_createfolder); }
         }
 
-        public static bool ReNameItem(ExplorerNode node,string newname)
+        public static bool ReNameItem(ItemNode node,string newname)
         {
             DriveAPIHttprequestv2 gdclient = GetAPIv2(node.GetRoot.NodeType.Email);
             string json = "{\"title\": \"" + newname + "\"}";
@@ -167,7 +170,7 @@ namespace Core.CloudSubClass
             else return false;
         }
 
-        public static GD_item MoveItem(ExplorerNode nodemove, ExplorerNode newparent,string newname = null,bool copy = false)
+        public static GD_item MoveItem(ItemNode nodemove, ItemNode newparent,string newname = null,bool copy = false)
         {
             //Same account
             if (nodemove.GetRoot.NodeType.Email != newparent.GetRoot.NodeType.Email) throw new Exception("Email not match.");
@@ -190,13 +193,13 @@ namespace Core.CloudSubClass
             return JsonConvert.DeserializeObject<GD_item>(gdclient.Files.Patch(nodemove.Info.ID,JsonConvert.SerializeObject(item_metadata)));
         }
 
-        public static GD_item GetMetadataItem(ExplorerNode node)
+        public static GD_item GetMetadataItem(ItemNode node)
         {
             DriveAPIHttprequestv2 client = GetAPIv2(node.GetRoot.NodeType.Email);
             return JsonConvert.DeserializeObject<GD_item>(client.Files.Patch(node.Info.ID, null));
         }
         //trash/delete
-        public static bool File_trash(ExplorerNode node, bool Permanently)
+        public static bool File_trash(ItemNode node, bool Permanently)
         {
             DriveAPIHttprequestv2 gdclient = GetAPIv2(node.GetRoot.NodeType.Email);
             if (node == node.GetRoot) throw new Exception("Can't delete root.");
@@ -225,15 +228,15 @@ namespace Core.CloudSubClass
         public string id;
         public string nextPageToken;
         public List<GD_item> items = new List<GD_item>();
-        public List<ExplorerNode> Convert(ExplorerNode parent)
+        public List<ItemNode> Convert(ItemNode parent)
         {
-            List<ExplorerNode> list = new List<ExplorerNode>();
+            List<ItemNode> list = new List<ItemNode>();
             foreach (GD_item item in items)
             {
                 bool add = true;
                 GoogleDrive.mimeTypeGoogleRemove.ForEach(m => { if (item.mimeType == m) add = false; });
                 if (add) list.Add(
-                                    new ExplorerNode(
+                                    new ItemNode(
                                         new NodeInfo() { Name = item.title, MimeType = item.mimeType, ID = item.id, Size = item.fileSize, DateMod = DateTime.Parse(item.modifiedDate) }, 
                                         parent)
                                   );
@@ -253,7 +256,7 @@ namespace Core.CloudSubClass
         public string id;
         public string fileExtension;
         public string fullFileExtension;
-
+        public string md5Checksum;
         public string Email;
         public permissionsResource userPermission;
         public List<permissionsResource> permissions;

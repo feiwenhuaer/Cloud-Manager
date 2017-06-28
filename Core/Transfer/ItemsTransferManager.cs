@@ -23,9 +23,9 @@ namespace Core.Transfer
         #endregion
 
         #region Declare
-        List<ExplorerNode> items;
-        public ExplorerNode fromfolder;
-        public ExplorerNode savefolder;
+        List<ItemNode> items;
+        public ItemNode fromfolder;
+        public ItemNode savefolder;
         /// <summary>
         /// Load data from save file.
         /// </summary>
@@ -56,7 +56,7 @@ namespace Core.Transfer
         /// <param name="fromfolder"></param>
         /// <param name="savefolder"></param>
         /// <param name="AreCut"></param>
-        public ItemsTransferManager(List<ExplorerNode> items, ExplorerNode fromfolder, ExplorerNode savefolder, bool AreCut = false)
+        public ItemsTransferManager(List<ItemNode> items, ItemNode fromfolder, ItemNode savefolder, bool AreCut = false)
         {
             if (items.Count == 0) throw new Exception("List<NewTransferItem> items count = 0");
             if (fromfolder == null) throw new ArgumentNullException("fromfolder");
@@ -87,7 +87,7 @@ namespace Core.Transfer
 
             AppSetting.UIMain.UpdateGroup(GroupData, UpdateTransfer_TLVUD.Add);
             //string path = fromfolder.RootInfo.uri == null ? fromfolder.TypeCloud.ToString() + ":" + AppSetting.settings.GetDefaultCloud(fromfolder.TypeCloud) + "?id=" + fromfolder.ID : fromfolder.Path_Raw;
-            foreach (ExplorerNode item in items)
+            foreach (ItemNode item in items)
             {
                 if (item.Info.Size > 0) LoadFile(item);
                 else ListAllItemInFolder(item);
@@ -96,9 +96,9 @@ namespace Core.Transfer
             items.Clear();// clear Declare memory
         }
         
-        void ListAllItemInFolder(ExplorerNode node)
+        void ListAllItemInFolder(ItemNode node)
         {
-            ExplorerNode list;
+            ItemNode list;
             try
             {
                 list = AppSetting.ManageCloud.GetItemsList(node);
@@ -108,14 +108,14 @@ namespace Core.Transfer
             if(list.Child.Count == 0)//create empty folder
             {
 
-            }else foreach (ExplorerNode ffitem in list.Child)
+            }else foreach (ItemNode ffitem in list.Child)
             {
                 if (ffitem.Info.Size <= 0) ListAllItemInFolder(ffitem);
                 else LoadFile(ffitem);
             }
         }
         
-        void LoadFile(ExplorerNode node)
+        void LoadFile(ItemNode node)
         {
             TransferItem ud_item = new TransferItem();
             //From
@@ -278,8 +278,8 @@ namespace Core.Transfer
         void WorkThread(object obj)
         {
             TransferItem item = GroupData.items[(int)obj];
-            ExplorerNode root_from = fromfolder.GetRoot;
-            ExplorerNode root_to = savefolder.GetRoot;
+            ItemNode root_from = fromfolder.GetRoot;
+            ItemNode root_to = savefolder.GetRoot;
             try
             {
                 if (root_from.NodeType.Type == root_to.NodeType.Type && root_from.NodeType.Type != CloudType.LocalDisk) SameAccountCloud(item);//cloud, inport file from other account same cloud
@@ -308,7 +308,7 @@ namespace Core.Transfer
             int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.BufferSize), out buffer_length);//get buffer_length from setting
             item.buffer = item.From.node.GetRoot.NodeType.Type == CloudType.Mega ? new byte[buffer_length * 2048] : new byte[buffer_length * 1024];//create buffer
 
-            ExplorerNode rootnodeto = item.To.node.GetRoot;
+            ItemNode rootnodeto = item.To.node.GetRoot;
 
             item.byteread = 0;
             //this.group.items[x].UploadID = "";//resume

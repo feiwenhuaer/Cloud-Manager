@@ -6,14 +6,14 @@ namespace WpfUI.Class
 {
     public class TreeviewDataItem
     {
-        ExplorerNode node;
-        public ExplorerNode Node { get { return node; } set { node = value; Update(); } }
+        ItemNode node;
+        public ItemNode Node { get { return node; } set { node = value; Update(); } }
         public ImageSource ImgSource { get; private set; }
         public CloudType Type { get; private set; }
 
         public string Name { get; private set; }
 
-        public TreeviewDataItem(ExplorerNode Node)
+        public TreeviewDataItem(ItemNode Node)
         {
             this.Node = Node;
         }

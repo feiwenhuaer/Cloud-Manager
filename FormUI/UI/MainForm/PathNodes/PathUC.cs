@@ -5,7 +5,7 @@ using CloudManagerGeneralLib.Class;
 
 namespace FormUI.UI.MainForm.PathNodes
 {
-    public delegate void NodePathClick(ExplorerNode nodeclick);
+    public delegate void NodePathClick(ItemNode nodeclick);
     public partial class PathUC : UserControl
     {
         public PathUC()
@@ -15,14 +15,14 @@ namespace FormUI.UI.MainForm.PathNodes
 
         public event NodePathClick EventNodePathClick;
 
-        public PathUC(ExplorerNode node)
+        public PathUC(ItemNode node)
         {
             InitializeComponent();
             this.Node = node;
         }
-        ExplorerNode oldnode;
-        ExplorerNode node;
-        public ExplorerNode Node { get { return node; } set { node = value; Make(); } }
+        ItemNode oldnode;
+        ItemNode node;
+        public ItemNode Node { get { return node; } set { node = value; Make(); } }
 
         List<LabelNode> list_n_uc = new List<LabelNode>();
         int list_n_uc_HideIndex = 1;
@@ -30,10 +30,10 @@ namespace FormUI.UI.MainForm.PathNodes
         void Make()
         {
             if (node == oldnode) return;
-            List<ExplorerNode> list = node.GetFullPath();
+            List<ItemNode> list = node.GetFullPath();
             if (oldnode != null)//old node
             {
-                ExplorerNode sameparent = oldnode.FindSameParent(node);//find sameparent (new node and old node)
+                ItemNode sameparent = oldnode.FindSameParent(node);//find sameparent (new node and old node)
                 if (sameparent != null)
                 {
                     if (list.Count < oldnode.GetFullPath().Count) up = false;//explorer to child or parent?
@@ -61,7 +61,7 @@ namespace FormUI.UI.MainForm.PathNodes
                     list_n_uc.Clear();
                 }
             }
-            foreach (ExplorerNode n in list)//add 
+            foreach (ItemNode n in list)//add 
             {
                 LabelNode n_uc = new LabelNode(n);
                 n_uc.Dock = DockStyle.Left;

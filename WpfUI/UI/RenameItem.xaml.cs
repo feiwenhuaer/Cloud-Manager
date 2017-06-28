@@ -12,13 +12,13 @@ namespace WpfUI.UI
     /// </summary>
     public partial class RenameItem : Window
     {
-        public RenameItem(ExplorerNode node)
+        public RenameItem(ItemNode node)
         {
             InitializeComponent();
             TB_newname.Text = TB_oldname.Text = node.Info.Name;
             this.node = node;
         }
-        ExplorerNode node;
+        ItemNode node;
 
         private void BT_cancel_Click(object sender, RoutedEventArgs e)
         {

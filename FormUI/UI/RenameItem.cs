@@ -8,7 +8,7 @@ namespace FormUI.UI
 {
     public partial class RenameItem : Form
     {
-        public RenameItem(ExplorerNode node)
+        public RenameItem(ItemNode node)
         {
             InitializeComponent();
             this.node = node;
@@ -41,7 +41,7 @@ namespace FormUI.UI
         }
         #endregion
 
-        ExplorerNode node;
+        ItemNode node;
 
         private void BT_cancel_Click(object sender, EventArgs e)
         {

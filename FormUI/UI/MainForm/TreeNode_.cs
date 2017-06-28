@@ -6,10 +6,10 @@ namespace FormUI.UI.MainForm
 {
     internal class TreeNode_ : TreeNode
     {
-        public ExplorerNode explorernode { get; private set; }
+        public ItemNode explorernode { get; private set; }
         public TreeNode_(string text, int imageIndex) : base(text, imageIndex, imageIndex)
         {
-            explorernode = new ExplorerNode();
+            explorernode = new ItemNode();
             if ((CloudType)imageIndex != CloudType.LocalDisk)
             {
                 explorernode.NodeType.Email = text;
@@ -22,7 +22,7 @@ namespace FormUI.UI.MainForm
                 explorernode.NodeType.Type = CloudType.LocalDisk;
             }
         }
-        public TreeNode_(ExplorerNode node)
+        public TreeNode_(ItemNode node)
         {
             this.Text = (node.NodeType.Type != CloudType.Folder && node.NodeType.Type != CloudType.LocalDisk) ? node.NodeType.Email : node.Info.Name;
             this.ImageIndex = this.SelectedImageIndex = (int)node.NodeType.Type;//(int)CloudType.Folder;

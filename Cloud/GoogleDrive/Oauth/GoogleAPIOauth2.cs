@@ -34,12 +34,12 @@ namespace Cloud.GoogleDrive.Oauth
             get { return token; }
         }
         #endregion
-        public GoogleAPIOauth2() { }
-        public GoogleAPIOauth2(string[] scopes)
+        public GoogleAPIOauth2() { GoogleDriveAppKey.Check(); }
+        public GoogleAPIOauth2(string[] scopes):this()
         {
             this.default_scopes = scopes;
         }
-        public GoogleAPIOauth2(TokenGoogleDrive token)
+        public GoogleAPIOauth2(TokenGoogleDrive token):this()
         {
             this.token = token;
         }

@@ -29,7 +29,7 @@ namespace WpfUI.UI.Main
                 return Setting_UI.ReloadUI_Flag;
             }
         }
-        public void AddNewCloudToTV(ExplorerNode newnode)
+        public void AddNewCloudToTV(ItemNode newnode)
         {
             Dispatcher.Invoke(new Action(() => TreeObservableCollection.Add(new TreeViewDataModel(null) { DisplayData = new TreeviewDataItem(newnode) })));
         }
@@ -48,7 +48,7 @@ namespace WpfUI.UI.Main
             }
         }
 
-        public void FileSaveDialog(string InitialDirectory, string FileName, string Filter, ExplorerNode node)
+        public void FileSaveDialog(string InitialDirectory, string FileName, string Filter, ItemNode node)
         {
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.InitialDirectory = InitialDirectory;
@@ -59,7 +59,7 @@ namespace WpfUI.UI.Main
             {
                 if (sfd.ShowDialog().Value)
                 {
-                    Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(new List<ExplorerNode>() { node }, node.Parent, ExplorerNode.GetNodeFromDiskPath(sfd.FileName).Parent, false);
+                    Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(new List<ItemNode>() { node }, node.Parent, ItemNode.GetNodeFromDiskPath(sfd.FileName).Parent, false);
                 }
             }));
         }
@@ -113,7 +113,7 @@ namespace WpfUI.UI.Main
         {
             foreach (var drive in DriveInfo.GetDrives())
             {
-                ExplorerNode n = new ExplorerNode(new TypeNode() { Type = CloudType.LocalDisk});
+                ItemNode n = new ItemNode(new TypeNode() { Type = CloudType.LocalDisk});
                 n.Info.Name = drive.RootDirectory.ToString().TrimEnd('\\');
                 TreeObservableCollection.Add(new TreeViewDataModel() { DisplayData = new TreeviewDataItem(n) });
             }
@@ -121,7 +121,7 @@ namespace WpfUI.UI.Main
         }
         private void TV_LoadCloud()
         {
-            foreach (ExplorerNode cloud in Setting_UI.reflection_eventtocore.AccountsAndCloud.GetListAccountCloud())
+            foreach (ItemNode cloud in Setting_UI.reflection_eventtocore.AccountsAndCloud.GetListAccountCloud())
             {
                 TreeObservableCollection.Add(new TreeViewDataModel() { DisplayData = new TreeviewDataItem(cloud) });
             }
@@ -144,8 +144,8 @@ namespace WpfUI.UI.Main
         {
             TreeViewItem item = Get_TreeViewItem(sender as StackPanel);
             TreeViewDataModel tv_datamodel = Get_TVDataMoldel(item);
-            ((UC_Lv_item)((TabItem)tabControl.Items[tabControl.SelectedIndex]).Content).managerexplorernodes.Root = tv_datamodel.DisplayData.Node.GetRoot;
-            ((UC_Lv_item)((TabItem)tabControl.Items[tabControl.SelectedIndex]).Content).managerexplorernodes.Next(tv_datamodel.DisplayData.Node);
+            ((UC_Lv_item)((TabItem)tabControl.Items[tabControl.SelectedIndex]).Content).managerehistory_itemnodes.Root = tv_datamodel.DisplayData.Node.GetRoot;
+            ((UC_Lv_item)((TabItem)tabControl.Items[tabControl.SelectedIndex]).Content).managerehistory_itemnodes.Next(tv_datamodel.DisplayData.Node);
             ((UC_Lv_item)((TabItem)tabControl.Items[tabControl.SelectedIndex]).Content).ExplorerCurrentNode(false, true, tv_datamodel, item);
         }
         private void StackPanel_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -339,12 +339,12 @@ namespace WpfUI.UI.Main
         private void image_back_MouseUp(object sender, MouseButtonEventArgs e)
         {
             UC_Lv_item lv = ((TabItem)tabControl.Items[tabControl.SelectedIndex]).Content as UC_Lv_item;
-            if(lv!= null) if (lv.managerexplorernodes.Back() != null) lv.ExplorerCurrentNode();
+            if(lv!= null) if (lv.managerehistory_itemnodes.Back() != null) lv.ExplorerCurrentNode();
         }
         private void image_next_MouseUp(object sender, MouseButtonEventArgs e)
         {
             UC_Lv_item lv = ((TabItem)tabControl.Items[tabControl.SelectedIndex]).Content as UC_Lv_item;
-            if (lv != null) if (lv.managerexplorernodes.Next() != null) lv.ExplorerCurrentNode();
+            if (lv != null) if (lv.managerehistory_itemnodes.Next() != null) lv.ExplorerCurrentNode();
         }
         private void image_search_MouseUp(object sender, MouseButtonEventArgs e)
         {
@@ -390,7 +390,7 @@ namespace WpfUI.UI.Main
                 {
                     Dispatcher.Invoke(new Action(() =>
                     {
-                        ((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).managerexplorernodes.Back();
+                        ((tabControl.Items[tabControl.SelectedIndex] as TabItem).Content as UC_Lv_item).managerehistory_itemnodes.Back();
                     }
                     ));
                 }
@@ -406,7 +406,7 @@ namespace WpfUI.UI.Main
             if (load.addToTV && load.TV_data != null && load.TV_node != null)//add folder to tree view
             {
                 ((TreeViewDataModel)load.TV_data).Childrens.Clear();
-                foreach (ExplorerNode n in load.node.Child)
+                foreach (ItemNode n in load.node.Child)
                 {
                     if (n.Info.Size > 0) continue;
                     TreeViewDataModel child = new TreeViewDataModel((TreeViewDataModel)load.TV_data) { DisplayData = new TreeviewDataItem(n)};
@@ -433,7 +433,7 @@ namespace WpfUI.UI.Main
         private void MenuCloud_SubmenuOpened(object sender, RoutedEventArgs e)
         {
             CloudsRemove = new ObservableCollection<ContextMenuDataModel>();
-            foreach (ExplorerNode cloud in Setting_UI.reflection_eventtocore.AccountsAndCloud.GetListAccountCloud())
+            foreach (ItemNode cloud in Setting_UI.reflection_eventtocore.AccountsAndCloud.GetListAccountCloud())
             {
                 CloudsRemove.Add(new ContextMenuDataModel(cloud.NodeType.Email, cloud.NodeType.Type));
             }

@@ -27,6 +27,19 @@ namespace Core.StaticClass
         public static string Pass;
 
         //other
+        public static void LoadAPIKey()
+        {
+            DropboxAppKey.ApiKey = Properties.Resources.DropboxApiKey;
+            DropboxAppKey.ApiSecret = Properties.Resources.DropboxApiSecret;
+            GoogleDriveAppKey.ApiKey = Properties.Resources.GoogleDriveApiKey;
+            GoogleDriveAppKey.Clientsecret = Properties.Resources.GoogleDriveClientsecret;
+            GoogleDriveAppKey.ClientID = Properties.Resources.GoogleDriveClientID;
+            MegaNzAppKey.ApiKey = Properties.Resources.MegaNzApiKey;
+        }
+        public static void CloseOauthUI()
+        {
+            if (UIOauth != null) UIOauth.CloseUI();
+        }
         public static byte[] Crypt(byte[] Buffer,int val)
         {
             for (int i = 0; i < Buffer.Length; i++)
@@ -36,5 +49,7 @@ namespace Core.StaticClass
             return Buffer;
         }
         public static string RootDirectory = Directory.GetCurrentDirectory();
+
+        
     }
 }

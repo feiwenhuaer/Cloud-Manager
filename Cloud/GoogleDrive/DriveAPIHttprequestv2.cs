@@ -14,6 +14,11 @@ namespace Cloud.GoogleDrive
     public delegate void GD_LimitExceededDelegate();
     public class DriveAPIHttprequestv2
     {
+        public DriveAPIHttprequestv2()
+        {
+            GoogleDriveAppKey.Check();
+        }
+
         const string Host = "HOST: www.googleapis.com";
         const string uriAbout = "https://www.googleapis.com/drive/v2/about";
         const string uriFileList = "https://www.googleapis.com/drive/v2/files?orderBy={0}&corpus={1}&projection={2}&maxResults={3}&spaces={4}";

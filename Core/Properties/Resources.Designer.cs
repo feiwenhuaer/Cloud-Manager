@@ -61,6 +61,24 @@ namespace Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to sdxv9bvu37pjd5r.
+        /// </summary>
+        internal static string DropboxApiKey {
+            get {
+                return ResourceManager.GetString("DropboxApiKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to xsfy8way52uuf1j.
+        /// </summary>
+        internal static string DropboxApiSecret {
+            get {
+                return ResourceManager.GetString("DropboxApiSecret", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
         ///&lt;Configuration&gt;
         ///  &lt;LANG&gt;
@@ -79,6 +97,42 @@ namespace Core.Properties {
         internal static string eng {
             get {
                 return ResourceManager.GetString("eng", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to AIzaSyBFD-4QCymzcUChcf7lKa7v1jPevmK_9ew.
+        /// </summary>
+        internal static string GoogleDriveApiKey {
+            get {
+                return ResourceManager.GetString("GoogleDriveApiKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 781410200428-kumskuv0ro9tspej1n8unfqv3d0c7ioq.apps.googleusercontent.com.
+        /// </summary>
+        internal static string GoogleDriveClientID {
+            get {
+                return ResourceManager.GetString("GoogleDriveClientID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to zZqmUtCGwCmYqZzseRfCtN5m.
+        /// </summary>
+        internal static string GoogleDriveClientsecret {
+            get {
+                return ResourceManager.GetString("GoogleDriveClientsecret", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to K1t33QJC.
+        /// </summary>
+        internal static string MegaNzApiKey {
+            get {
+                return ResourceManager.GetString("MegaNzApiKey", resourceCulture);
             }
         }
         
@@ -106,13 +160,13 @@ namespace Core.Properties {
         ///    &lt;KEY NAME=&quot;Admin_user&quot; VALUE=&quot;admin&quot; /&gt;
         ///    &lt;KEY NAME=&quot;Admin_password&quot; VALUE =&quot;21232F297A57A5A743894A0E4A801FC3&quot; /&gt;
         ///    &lt;KEY NAME=&quot;AutoLogin&quot; VALUE=&quot;0&quot;/&gt;
-        ///    &lt;KEY NAME=&quot;UI_dll_file&quot; VALUE=&quot;Form.UI.dll&quot;/&gt;
+        ///    &lt;KEY NAME=&quot;UI_dll_file&quot; VALUE=&quot;WpfUI.dll&quot;/&gt;
         ///    &lt;KEY NAME=&quot;lang&quot; VALUE=&quot;eng.xml&quot;/&gt;
         ///    &lt;KEY NAME=&quot;DATE_TIME_FORMAT&quot; VALUE=&quot;HH:mm dd/MM/yyyy&quot; /&gt;
         ///
         ///    &lt;KEY NAME=&quot;AutoStartTransfer&quot; VALUE=&quot;1&quot;/&gt;
         ///    &lt;KEY NAME=&quot;ShutdownWhenDone&quot; VALUE=&quot;0&quot;/&gt;
-        ///    &lt;KEY NAME=&quot;MaxGroupsDownloa [rest of string was truncated]&quot;;.
+        ///    &lt;KEY NAME=&quot;MaxGroupsDownload&quot; [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string SettingDefault {
             get {

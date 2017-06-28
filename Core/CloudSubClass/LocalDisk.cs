@@ -8,7 +8,7 @@ namespace Core.CloudSubClass
 {
     internal static class LocalDisk
     {
-        public static ExplorerNode GetListFileFolder(ExplorerNode node)
+        public static ItemNode GetListFileFolder(ItemNode node)
         {
             string path = node.GetFullPathString();
             node.Child.Clear();
@@ -16,7 +16,7 @@ namespace Core.CloudSubClass
             {
                 DirectoryInfo info = new DirectoryInfo(item);
                 if (CheckAttribute(info.Attributes, FileAttributes.System) | CheckAttribute(info.Attributes, FileAttributes.Offline)) continue;
-                ExplorerNode f = new ExplorerNode();
+                ItemNode f = new ItemNode();
                 f.Info.Name = info.Name;
                 f.Info.Size = -1;
                 f.Info.DateMod = info.LastWriteTime;
@@ -26,7 +26,7 @@ namespace Core.CloudSubClass
             {
                 FileInfo info = new FileInfo(item);
                 if (CheckAttribute(info.Attributes, FileAttributes.System) | CheckAttribute(info.Attributes, FileAttributes.Offline)) continue;
-                ExplorerNode f = new ExplorerNode();
+                ItemNode f = new ItemNode();
                 f.Info.Name = info.Name;
                 f.Info.Size = info.Length;
                 f.Info.DateMod = info.LastWriteTime;
@@ -41,7 +41,7 @@ namespace Core.CloudSubClass
         }
 
 
-        public static Stream GetFileSteam(ExplorerNode node, bool GetfileForUpload,long Startpos = 0)
+        public static Stream GetFileSteam(ItemNode node, bool GetfileForUpload,long Startpos = 0)
         {
             string path = node.GetFullPathString();
             FileInfo info = new FileInfo(path);
@@ -57,7 +57,7 @@ namespace Core.CloudSubClass
             }
             else if (!info.Exists)
             {
-                List<ExplorerNode> nodelist = node.GetFullPath();
+                List<ItemNode> nodelist = node.GetFullPath();
                 DirectoryInfo dinfo;
                 for (int i = 1;i < nodelist.Count -1;i++ )
                 {
@@ -70,7 +70,7 @@ namespace Core.CloudSubClass
             return fs;
         }
 
-        public static bool Delete(ExplorerNode node, bool PernamentDelete)
+        public static bool Delete(ItemNode node, bool PernamentDelete)
         {
             string path = node.GetFullPathString();
             if (PernamentDelete)//delete
@@ -98,7 +98,7 @@ namespace Core.CloudSubClass
             }
         }
 
-        public static bool Move(ExplorerNode node, ExplorerNode newparent,string newname = null)
+        public static bool Move(ItemNode node, ItemNode newparent,string newname = null)
         {
             if (node.GetRoot.NodeType.Type != CloudType.LocalDisk && newparent.GetRoot.NodeType.Type != CloudType.LocalDisk) throw new Exception("CloudType is != LocalDisk.");
             string path_from = node.GetFullPathString();
@@ -110,15 +110,15 @@ namespace Core.CloudSubClass
             return false;
         }
 
-        public static void CreateFolder(ExplorerNode node)
+        public static void CreateFolder(ItemNode node)
         {
             DirectoryInfo dinfo = new DirectoryInfo(node.GetFullPathString());
             if (!dinfo.Exists) dinfo.Create();
         }
 
-        public static void AutoCreateFolder(ExplorerNode node_folder_target)
+        public static void AutoCreateFolder(ItemNode node_folder_target)
         {
-            List<ExplorerNode> nodelist = node_folder_target.GetFullPath();
+            List<ItemNode> nodelist = node_folder_target.GetFullPath();
             DirectoryInfo dinfo;
             for (int i = 1; i < nodelist.Count; i++)
             {
@@ -127,7 +127,7 @@ namespace Core.CloudSubClass
             }
         }
 
-        public static ExplorerNode GetFileInfo(ExplorerNode node)
+        public static ItemNode GetFileInfo(ItemNode node)
         {
             FileInfo info = new FileInfo(node.GetFullPathString());
             if(info.Exists)

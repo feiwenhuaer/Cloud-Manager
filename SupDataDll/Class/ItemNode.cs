@@ -7,27 +7,27 @@ using CloudManagerGeneralLib.Class.Mega;
 
 namespace CloudManagerGeneralLib.Class
 {
-   public class ManagerExplorerNodes
+   public class ManagerHistoryItemNodes
     {
-        public ExplorerNode Root { get; set; }
+        public ItemNode Root { get; set; }
 
         int index = -1;
-        List<ExplorerNode> nodes = new List<ExplorerNode>();
+        List<ItemNode> nodes = new List<ItemNode>();
 
-        public ExplorerNode NodeWorking()
+        public ItemNode NodeWorking()
         {
             if (index == -1 || nodes.Count == 0) return null;
             else if (nodes.Count < index + 1) return null;
             else return nodes[index];
         }
 
-        public ExplorerNode Back()
+        public ItemNode Back()
         {
             if (index > 0) { index--; return NodeWorking(); }
             else { nodes.Clear(); index = -1; return null; }
         }
 
-        public ExplorerNode Next(ExplorerNode next = null)
+        public ItemNode Next(ItemNode next = null)
         {
             if(next != null && next.GetRoot == Root)
             {
@@ -40,18 +40,18 @@ namespace CloudManagerGeneralLib.Class
         }
     }
 
-    public class ExplorerNode
+    public class ItemNode
     {
-        public ExplorerNode() { }
-        public ExplorerNode(TypeNode root)
+        public ItemNode() { }
+        public ItemNode(TypeNode root)
         {
             this.NodeType = root;
         }
-        public ExplorerNode(NodeInfo info)
+        public ItemNode(NodeInfo info)
         {
             this.Info = info;
         }
-        public ExplorerNode(NodeInfo info, ExplorerNode parent)
+        public ItemNode(NodeInfo info, ItemNode parent)
         {
             this.Info = info;
             parent.AddChild(this);
@@ -60,7 +60,7 @@ namespace CloudManagerGeneralLib.Class
 
         #region field
         [JsonProperty]
-        ExplorerNode parent;
+        ItemNode parent;
         [JsonProperty]
         NodeInfo info;
         [JsonProperty]
@@ -68,21 +68,21 @@ namespace CloudManagerGeneralLib.Class
 
 
         [JsonIgnore]
-        List<ExplorerNode> child;
+        List<ItemNode> child;
         [JsonIgnore]
-        public List<ExplorerNode> Child
+        public List<ItemNode> Child
         {
-            get { return child ?? (child = new List<ExplorerNode>()); }
+            get { return child ?? (child = new List<ItemNode>()); }
             private set { child = value; }
         }
 
         [JsonIgnore]
-        public ExplorerNode Parent
+        public ItemNode Parent
         {
             get { return parent; }
             set
             {
-                if (NodeType_ != null) throw new Exception("Root can't be got parent.");
+                if (NodeType_ != null) throw new Exception("Root can't get parent.");
                 else { parent = value; value.child.Add(this); }
             }
         }
@@ -97,30 +97,30 @@ namespace CloudManagerGeneralLib.Class
             }
             set
             {
-                if (parent != null) throw new Exception("Root can't be got parent.");
+                if (parent != null) throw new Exception("Root can't get parent.");
                 else NodeType_ = value;
             }
         }
         
         [JsonIgnore]
-        List<ExplorerNode> FullPathArrayNode;
+        List<ItemNode> FullPathArrayNode;
         /// <summary>
         /// Get List Node from root to this.
         /// </summary>
         /// <returns></returns>
         [JsonIgnore]
-        public ExplorerNode GetRoot { get { return GetFullPath()[0]; } }
+        public ItemNode GetRoot { get { return GetFullPath()[0]; } }
         #endregion
 
 
         #region public method
-        public void RemoveChild(ExplorerNode child)
+        public void RemoveChild(ItemNode child)
         {
             this.Child.Remove(child);
             child.Parent = null;
         }
 
-        public void AddChild(ExplorerNode child)
+        public void AddChild(ItemNode child)
         {
             this.Child.Add(child);
             child.parent = this;
@@ -130,17 +130,17 @@ namespace CloudManagerGeneralLib.Class
         /// Clean all child, and add new Childs
         /// </summary>
         /// <param name="childs"></param>
-        public void RenewChilds(List<ExplorerNode> childs)
+        public void RenewChilds(List<ItemNode> childs)
         {
             this.Child.Clear();
             childs.ForEach(c => AddChild(c));
         }
 
-        public List<ExplorerNode> GetFullPath()
+        public List<ItemNode> GetFullPath()
         {
-            List<ExplorerNode> FullPathArrayNode = new List<ExplorerNode>();
+            List<ItemNode> FullPathArrayNode = new List<ItemNode>();
             FullPathArrayNode.Add(this);
-            ExplorerNode parent = this.parent;
+            ItemNode parent = this.parent;
             while (parent != null)
             {
                 FullPathArrayNode.Insert(0, parent);
@@ -157,7 +157,7 @@ namespace CloudManagerGeneralLib.Class
         /// <returns></returns>
         public string GetFullPathString(bool CloudExplorerType = true,bool RemoveSpecialCharacter = false)
         {
-            List<ExplorerNode> fullpathlist = GetFullPath();
+            List<ItemNode> fullpathlist = GetFullPath();
             string path = "";
             switch(GetRoot.NodeType.Type)
             {
@@ -178,14 +178,14 @@ namespace CloudManagerGeneralLib.Class
             return path;
         }
 
-        public ExplorerNode MakeNodeTo(ExplorerNode RootFrom, ExplorerNode RootTo)
+        public ItemNode MakeNodeTo(ItemNode RootFrom, ItemNode RootTo)
         {
-            List<ExplorerNode> FullPathRootFrom = RootFrom.GetFullPath();
-            List<ExplorerNode> NodeFullPath = this.GetFullPath();
+            List<ItemNode> FullPathRootFrom = RootFrom.GetFullPath();
+            List<ItemNode> NodeFullPath = this.GetFullPath();
             CloudType type_rootto = RootTo.GetRoot.NodeType.Type;
             for (int i = NodeFullPath.IndexOf(RootFrom) + 1; i < NodeFullPath.Count; i++)
             {
-                ExplorerNode node = new ExplorerNode();
+                ItemNode node = new ItemNode();
                 node.Info.Size = NodeFullPath[i].Info.Size;
                 node.Info.Name = (type_rootto == CloudType.LocalDisk || type_rootto == CloudType.Dropbox) ? RemoveSpecialChar(NodeFullPath[i].Info.Name) : NodeFullPath[i].Info.Name;
                 RootTo.AddChild(node);
@@ -206,11 +206,11 @@ namespace CloudManagerGeneralLib.Class
             return extension;
         }
         
-        public ExplorerNode FindSameParent(ExplorerNode othernode)
+        public ItemNode FindSameParent(ItemNode othernode)
         {
-            List<ExplorerNode> list_other = othernode.GetFullPath();
-            List<ExplorerNode> list_this = GetFullPath();
-            ExplorerNode node = null;
+            List<ItemNode> list_other = othernode.GetFullPath();
+            List<ItemNode> list_this = GetFullPath();
+            ItemNode node = null;
             int max = list_other.Count <= list_this.Count ? list_other.Count : list_this.Count;
             for (int i = 0; i < max; i++)
             {
@@ -220,7 +220,6 @@ namespace CloudManagerGeneralLib.Class
             return node;
         }
         #endregion
-
 
         
         #region Static
@@ -233,16 +232,16 @@ namespace CloudManagerGeneralLib.Class
         /// <param name="path"></param>
         /// <param name="size"> <1 is folder</param>
         /// <returns></returns>
-        public static ExplorerNode GetNodeFromDiskPath(string path,long size = -1)
+        public static ItemNode GetNodeFromDiskPath(string path,long size = -1)
         {
             string[] path_split = path.Split('\\');
 
-            ExplorerNode parent = new ExplorerNode();
+            ItemNode parent = new ItemNode();
             parent.NodeType.Type = CloudType.LocalDisk;
             parent.Info.Name = path_split[0];
             for (int i = 1; i< path_split.Length;i++)
             {
-                ExplorerNode node = new ExplorerNode();
+                ItemNode node = new ItemNode();
                 node.Info.Name = path_split[i];
                 parent.AddChild(node);
                 parent = node;
@@ -280,6 +279,8 @@ namespace CloudManagerGeneralLib.Class
         public long Size { get; set; }
         public string MimeType { get; set; }
         public Permission permission { get; set; }
+        public byte[] Hash { get; set; }
+        public HashType TypeHash { get; set; }
         public string GetExtensionFile()
         {
             if (string.IsNullOrEmpty(Name)) throw new ArgumentNullException("Name");
@@ -292,6 +293,12 @@ namespace CloudManagerGeneralLib.Class
         }
     }
 
+    public enum HashType
+    {
+        None = 0,
+        md5
+    }
+    
     public class MegaKeyCrypto : INodeCrypto
     {
         public MegaKeyCrypto()
@@ -352,6 +359,7 @@ namespace CloudManagerGeneralLib.Class
     public class TypeNode
     {
         public string Email { get; set; }
+        [JsonIgnore]
         CloudType type = CloudType.Folder;
         public CloudType Type { get { return type; } set { type = value; } }
         public Uri uri { get; set; }

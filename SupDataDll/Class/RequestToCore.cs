@@ -4,18 +4,18 @@ using System.Collections.Generic;
 namespace CloudManagerGeneralLib
 {
     public delegate bool ChangeUserPass(string user, string pass, string newpass);
-    public delegate void TransferItems(List<ExplorerNode> items, ExplorerNode fromfolder, ExplorerNode savefolder, bool AreCut);
+    public delegate void TransferItems(List<ItemNode> items, ItemNode fromfolder, ItemNode savefolder, bool AreCut);
     public delegate void SaveSetting();
     public delegate string GetSetting(SettingsKey Key);
     public delegate string GetTextLanguage(string Key);
     public delegate bool DeleteAccountCloud(string Email, CloudType type);
-    public delegate List<ExplorerNode> GetListAccountCloud();
+    public delegate List<ItemNode> GetListAccountCloud();
     public delegate void ShowFormOauth(CloudType type);
-    public delegate ExplorerNode GetChildNode(ExplorerNode node);
+    public delegate ItemNode GetChildNode(ItemNode node);
     public delegate bool LoginApp(string User, string Pass, bool AutoLogin);
-    public delegate bool RenameItem(ExplorerNode node, ExplorerNode newparent, string newname = null, bool Copy = false);
+    public delegate bool RenameItem(ItemNode node, ItemNode newparent, string newname = null, bool Copy = false);
     public delegate void DeletePath(DeleteItems items);
-    public delegate void CreateFolder(ExplorerNode node);
+    public delegate void CreateFolder(ItemNode node);
     public delegate void ExitAppCallBack();
     public delegate void SetSetting(SettingsKey Key, string Data);
     public class RequestToCore
@@ -130,7 +130,7 @@ namespace CloudManagerGeneralLib
             /// Get List Cloud Account
             /// </summary>
             /// <returns></returns>
-            public List<ExplorerNode> GetListAccountCloud()
+            public List<ItemNode> GetListAccountCloud()
             {
                 return EventGetListAccountCloud();
             }
@@ -173,7 +173,7 @@ namespace CloudManagerGeneralLib
             /// <param name="fromfolder">From</param>
             /// <param name="savefolder">To</param>
             /// <param name="AreCut">Cut or Copy (Cut will delete items in From folder)</param>
-            public void TransferItems(List<ExplorerNode> items, ExplorerNode fromfolder, ExplorerNode savefolder, bool AreCut)
+            public void TransferItems(List<ItemNode> items, ItemNode fromfolder, ItemNode savefolder, bool AreCut)
             {
                 EventTransferItems(items, fromfolder, savefolder, AreCut);
             }
@@ -185,7 +185,7 @@ namespace CloudManagerGeneralLib
             /// <param name="path"></param>
             /// <param name="id"></param>
             /// <returns></returns>
-            public ExplorerNode ListIteamRequest(ExplorerNode node)
+            public ItemNode ListIteamRequest(ItemNode node)
             {
                 return EventGetChildNode(node);
             }
@@ -199,7 +199,7 @@ namespace CloudManagerGeneralLib
             /// <param name="newname"></param>
             /// <param name="Copy"></param>
             /// <returns></returns>
-            public bool RenameItem(ExplorerNode node, string newname)
+            public bool RenameItem(ItemNode node, string newname)
             {
                 return EventMoveItem(node, null, newname, false);
             }
@@ -219,7 +219,7 @@ namespace CloudManagerGeneralLib
             /// Create folder node
             /// </summary>
             /// <returns></returns>
-            public void CreateFolder(ExplorerNode node)
+            public void CreateFolder(ItemNode node)
             {
                 EventCreateFolder(node);
             }

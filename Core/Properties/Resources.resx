@@ -127,4 +127,22 @@
   <data name="SettingDefault" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\SettingDefault.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="DropboxApiKey" xml:space="preserve">
+    <value>sdxv9bvu37pjd5r</value>
+  </data>
+  <data name="DropboxApiSecret" xml:space="preserve">
+    <value>xsfy8way52uuf1j</value>
+  </data>
+  <data name="GoogleDriveApiKey" xml:space="preserve">
+    <value>AIzaSyBFD-4QCymzcUChcf7lKa7v1jPevmK_9ew</value>
+  </data>
+  <data name="GoogleDriveClientID" xml:space="preserve">
+    <value>781410200428-kumskuv0ro9tspej1n8unfqv3d0c7ioq.apps.googleusercontent.com</value>
+  </data>
+  <data name="GoogleDriveClientsecret" xml:space="preserve">
+    <value>zZqmUtCGwCmYqZzseRfCtN5m</value>
+  </data>
+  <data name="MegaNzApiKey" xml:space="preserve">
+    <value>K1t33QJC</value>
+  </data>
 </root>

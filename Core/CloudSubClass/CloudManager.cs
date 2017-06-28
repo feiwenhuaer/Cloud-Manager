@@ -31,7 +31,7 @@ namespace Core.CloudSubClass
         }
 
 
-        public ExplorerNode GetItemsList(ExplorerNode node)
+        public ItemNode GetItemsList(ItemNode node)
         {
             CheckThread(false);
             switch (node.GetRoot.NodeType.Type)
@@ -49,7 +49,7 @@ namespace Core.CloudSubClass
             }
         }
 
-        public Stream GetFileStream(ExplorerNode node, long Startpos = -1,long endpos =-1,bool IsUpload = false,object DataEx = null)
+        public Stream GetFileStream(ItemNode node, long Startpos = -1,long endpos =-1,bool IsUpload = false,object DataEx = null)
         {
             switch (node.GetRoot.NodeType.Type)
             {
@@ -66,7 +66,7 @@ namespace Core.CloudSubClass
             }
         }
 
-        public void CreateFolder(ExplorerNode node)
+        public void CreateFolder(ItemNode node)
         {
             CheckThread(false);
             switch (node.GetRoot.NodeType.Type)
@@ -163,11 +163,11 @@ namespace Core.CloudSubClass
         }
         private void SaveToken(string email, string token, CloudType type)
         {
-            if (AppSetting.settings.AddCloud(email, type, token, false)) AppSetting.UIMain.AddNewCloudToTV(new ExplorerNode(new TypeNode() { Email = email, Type = type }));
+            if (AppSetting.settings.AddCloud(email, type, token, false)) AppSetting.UIMain.AddNewCloudToTV(new ItemNode(new TypeNode() { Email = email, Type = type }));
         }
         #endregion
         
-        public bool MoveItem(ExplorerNode node, ExplorerNode newparent, string newname = null, bool Copy = false)
+        public bool MoveItem(ItemNode node, ItemNode newparent, string newname = null, bool Copy = false)
         {
             CheckThread(false);
             if (node.GetRoot == newparent.GetRoot)
@@ -202,10 +202,10 @@ namespace Core.CloudSubClass
 
         public class DeleteWork
         {
-            List<ExplorerNode> items;
+            List<ItemNode> items;
             CloudManagerGeneralLib.UiInheritance.UIDelete ui;
             bool PernamentDelete = false;
-            public DeleteWork(List<ExplorerNode> items, CloudManagerGeneralLib.UiInheritance.UIDelete ui, bool PernamentDelete = false)
+            public DeleteWork(List<ItemNode> items, CloudManagerGeneralLib.UiInheritance.UIDelete ui, bool PernamentDelete = false)
             {
                 if (ui == null) throw new Exception("UI is null.");
                 if (items == null || items.Count == 0) throw new Exception("Need >= 1 item.");
@@ -226,7 +226,7 @@ namespace Core.CloudSubClass
             void work()
             {
                 Thread.Sleep(500);
-                foreach (ExplorerNode item in items)
+                foreach (ItemNode item in items)
                 {
                     while (cancel) { Thread.Sleep(100); if (closedform) return; }
                     if (closedform) return;
@@ -289,7 +289,7 @@ namespace Core.CloudSubClass
         }
 
 
-        public ExplorerNode GetFileInfo(ExplorerNode node)
+        public ItemNode GetFileInfo(ItemNode node)
         {
             switch (node.GetRoot.NodeType.Type)
             {

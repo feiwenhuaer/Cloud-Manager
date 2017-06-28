@@ -38,8 +38,8 @@ namespace FormUI.UI
         }
         #endregion
 
-        ExplorerNode parentnode;
-        public CreateFolderForm(ExplorerNode parentnode)
+        ItemNode parentnode;
+        public CreateFolderForm(ItemNode parentnode)
         {
             InitializeComponent();
             this.parentnode = parentnode;
@@ -87,7 +87,7 @@ namespace FormUI.UI
         }
         void CreateFolder()
         {
-            ExplorerNode node = new ExplorerNode();
+            ItemNode node = new ItemNode();
             node.Info.Name = textBox1.Text;
             this.parentnode.AddChild(node);
             Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.CreateFolder(node);

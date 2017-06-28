@@ -43,7 +43,7 @@ namespace Core.Class
             Stream stream;
             long start_range = -1;
             long end_range = -1;
-            ExplorerNode filenode = null;
+            ItemNode filenode = null;
 
             if (range != null)
             {
@@ -58,14 +58,14 @@ namespace Core.Class
 
 
                 if (email == null) email = AppSetting.settings.GetDefaultCloud(type);
-                ExplorerNode rootnode = AppSetting.settings.GetCloudRootNode(email, type);
-                filenode = new ExplorerNode(new NodeInfo() {  ID = id });
+                ItemNode rootnode = AppSetting.settings.GetCloudRootNode(email, type);
+                filenode = new ItemNode(new NodeInfo() {  ID = id });
                 rootnode.AddChild(filenode);                
             }
             else if(path != null && File.Exists(path))
             {
                 type = CloudType.LocalDisk;
-                filenode = ExplorerNode.GetNodeFromDiskPath(path);
+                filenode = ItemNode.GetNodeFromDiskPath(path);
             }
             else//return 404 not found
             {

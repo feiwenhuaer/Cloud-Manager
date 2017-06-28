@@ -90,7 +90,7 @@ namespace CloudManagerGeneralLib.Class
     }
     public class FileTransferInfo
     {
-        public ExplorerNode node;
+        public ItemNode node;
         [JsonIgnore]
         public Stream stream;
     }

@@ -110,12 +110,12 @@ namespace Core.Class
         #endregion
         
         #region Cloud
-        public List<ExplorerNode> GetListAccountCloud()
+        public List<ItemNode> GetListAccountCloud()
         {
 #if DEBUG
             //Console.WriteLine("Check event handle multi?");
 #endif
-            List<ExplorerNode> list = new List<ExplorerNode>();
+            List<ItemNode> list = new List<ItemNode>();
             foreach (XmlNode node in GetCloudDataList())
             {
                 TypeNode root = new TypeNode();
@@ -134,7 +134,7 @@ namespace Core.Class
 #endif
                 }
                 
-                ExplorerNode e_node = new ExplorerNode();
+                ItemNode e_node = new ItemNode();
                 e_node.NodeType = root;
                 e_node.Info = info;
                 list.Add(e_node);
@@ -142,7 +142,7 @@ namespace Core.Class
             return list;
         }
 
-        public ExplorerNode GetCloudRootNode(string Email, CloudType cloudname)
+        public ItemNode GetCloudRootNode(string Email, CloudType cloudname)
         {
             foreach (XmlNode node in GetCloudDataList())
             {
@@ -165,7 +165,7 @@ namespace Core.Class
 #endif
                     }
 
-                    ExplorerNode e_node = new ExplorerNode();
+                    ItemNode e_node = new ItemNode();
                     e_node.NodeType = root;
                     e_node.Info = info;
                     return e_node;

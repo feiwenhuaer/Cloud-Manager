@@ -8,6 +8,12 @@ namespace Cloud.Dropbox.Oauth
 {
     public class DropboxOauthv2: OauthV2
     {
+        public DropboxOauthv2()
+        {
+            DropboxAppKey.Check();
+        }
+
+
         internal const string LoopbackCallback = "http://localhost:{0}";
         internal const int MaxPortRange = 22439;
         internal const int MinPortRange = 22430;

@@ -10,8 +10,8 @@ namespace WpfUI.UI.Main
     /// </summary>
     public partial class ComboBoxHeader : UserControl
     {
-        ExplorerNode node;
-        public ExplorerNode Node
+        ItemNode node;
+        public ItemNode Node
         {
             get { return node; }
             set { UpdateData(value); node = value; }
@@ -23,12 +23,12 @@ namespace WpfUI.UI.Main
             this.comboBox.ItemsSource = Source;
         }
 
-        void UpdateData(ExplorerNode newnode)
+        void UpdateData(ItemNode newnode)
         {
             int start_index = 0;
             if (node != null)
             {
-                ExplorerNode sameparent = newnode.FindSameParent(node);
+                ItemNode sameparent = newnode.FindSameParent(node);
                 if (sameparent == null) start_index = node.GetFullPath().IndexOf(node.GetFullPath().Find(n => n == sameparent)) + 1;
                 while (Source.Count - 1 >= start_index) Source.RemoveAt(start_index);
             }
@@ -41,10 +41,10 @@ namespace WpfUI.UI.Main
     public class ComboBoxData
     {
         public string Text { get; private set; }
-        ExplorerNode node;
-        public ExplorerNode Node { get { return node; } set { node = value; UpdateData(); } }
+        ItemNode node;
+        public ItemNode Node { get { return node; } set { node = value; UpdateData(); } }
 
-        public ComboBoxData(ExplorerNode Node)
+        public ComboBoxData(ItemNode Node)
         {
             this.Node = Node;
         }
