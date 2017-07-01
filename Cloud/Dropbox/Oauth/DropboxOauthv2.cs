@@ -18,7 +18,7 @@ namespace Cloud.Dropbox.Oauth
         internal const int MaxPortRange = 22439;
         internal const int MinPortRange = 22430;
         int port = -1;
-        public void GetCode(OauthUI ui, object owner)
+        public void GetCode(IOauth ui, object owner)
         {
             port = GetFirstAvailableRandomPort(MinPortRange, MaxPortRange);
             redirectURI = string.Format(LoopbackCallback, port) + "/";

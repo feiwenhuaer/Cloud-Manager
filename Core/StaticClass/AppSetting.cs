@@ -22,7 +22,7 @@ namespace Core.StaticClass
         public static UILogin UILogin;
         public static UIMain UIMain;
         public static UIClosing UIclose;
-        public static OauthUI UIOauth;
+        public static IOauth UIOauth;
         //pass
         public static string Pass;
 

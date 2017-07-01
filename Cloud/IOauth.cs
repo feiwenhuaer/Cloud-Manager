@@ -3,7 +3,7 @@
 namespace Cloud
 {
     public delegate void UriResponse(Uri uri);
-    public interface OauthUI
+    public interface IOauth
     {
         string Url { set; }
         string CheckUrl { set; }

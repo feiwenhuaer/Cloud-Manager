@@ -8,7 +8,7 @@ namespace WpfUI.UI.Oauth
     /// <summary>
     /// Interaction logic for GoogleDrive.xaml
     /// </summary>
-    public partial class UiOauth : Window, OauthUI
+    public partial class UiOauth : Window, IOauth
     {
         bool isclosed = false;
         string url;

@@ -71,7 +71,7 @@
     <Compile Include="MegaNz\HttpRequestClient.cs" />
     <Compile Include="MegaNz\Oauth\UIinterfaceMegaNz.cs" />
     <Compile Include="MegaNz\StreamMegaInterface.cs" />
-    <Compile Include="OauthUI.cs" />
+    <Compile Include="IOauth.cs" />
     <Compile Include="OauthV2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

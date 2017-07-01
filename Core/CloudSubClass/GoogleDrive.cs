@@ -118,7 +118,7 @@ namespace Core.CloudSubClass
         public static GD_Files_list Search(string query, string Email,string pageToken = null)
         {
             DriveAPIHttprequestv2 gdclient = GetAPIv2(Email);
-            GD_Files_list list = JsonConvert.DeserializeObject<GD_Files_list>(gdclient.Files.List(en, query, CorpusEnum.DEFAULT, ProjectionEnum.BASIC,pageToken));
+            GD_Files_list list = JsonConvert.DeserializeObject<GD_Files_list>(gdclient.Files.List(en, query, pageToken));
             if(!string.IsNullOrEmpty(list.nextPageToken)) list.items.AddRange(Search(query, Email, list.nextPageToken).items);
             list.nextPageToken = null;
             return list;

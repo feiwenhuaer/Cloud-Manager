@@ -44,7 +44,7 @@ namespace Cloud.GoogleDrive.Oauth
             this.token = token;
         }
 
-        public void GetCode(OauthUI ui, object owner)
+        public void GetCode(IOauth ui, object owner)
         {
             state = randomDataBase64url(32);
             code_verifier = randomDataBase64url(32);

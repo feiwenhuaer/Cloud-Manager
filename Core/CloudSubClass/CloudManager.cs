@@ -100,7 +100,7 @@ namespace Core.CloudSubClass
                     oauth_dropbox.TokenCallBack += Oauth_dropbox_TokenCallBack;
 
                     type_oauthUI = LoadDllUI.GetTypeInterface(typeof(UIinterfaceDB));
-                    AppSetting.UIOauth = (OauthUI)Activator.CreateInstance(type_oauthUI);
+                    AppSetting.UIOauth = (IOauth)Activator.CreateInstance(type_oauthUI);
 
                     oauth_dropbox.GetCode(AppSetting.UIOauth, AppSetting.UIMain);
                     break;
@@ -111,7 +111,7 @@ namespace Core.CloudSubClass
                     oauth_gd.TokenCallBack += Oauth_gd_TokenCallBack;
 
                     type_oauthUI = LoadDllUI.GetTypeInterface(typeof(UIinterfaceGD));
-                    AppSetting.UIOauth = (OauthUI)Activator.CreateInstance(type_oauthUI);
+                    AppSetting.UIOauth = (IOauth)Activator.CreateInstance(type_oauthUI);
 
                     oauth_gd.GetCode(AppSetting.UIOauth, AppSetting.UIMain);
                     break;

@@ -57,11 +57,7 @@
         public MegaAesCtrStreamDecrypter(Stream stream, long streamLength, byte[] fileKey, byte[] iv, byte[] expectedMetaMac)
           : base(stream, streamLength, Mode.Decrypt, fileKey, iv)
         {
-            if (expectedMetaMac == null || expectedMetaMac.Length != 8)
-            {
-                throw new ArgumentException("Invalid expectedMetaMac");
-            }
-
+            if (expectedMetaMac == null || expectedMetaMac.Length != 8) throw new ArgumentException("Invalid expectedMetaMac");
             this.expectedMetaMac = expectedMetaMac;
         }
 
@@ -107,10 +103,7 @@
 
         protected MegaAesCtrStream(Stream stream, long FileLength, Mode mode)
         {
-            if (stream == null)
-            {
-                throw new ArgumentNullException("stream");
-            }
+            if (stream == null) throw new ArgumentNullException("stream");
 
             this.stream = stream;
             this.streamLength = FileLength;
@@ -121,27 +114,14 @@
 
         protected MegaAesCtrStream(Stream stream, long streamLength, Mode mode, byte[] fileKey, byte[] iv)
         {
-            if (stream == null)
-            {
-                throw new ArgumentNullException("stream");
-            }
-
-            if (fileKey == null || fileKey.Length != 16)
-            {
-                throw new ArgumentException("Invalid fileKey");
-            }
-
-            if (iv == null || iv.Length != 8)
-            {
-                throw new ArgumentException("Invalid Iv");
-            }
-
+            if (stream == null) throw new ArgumentNullException("stream");
+            if (fileKey == null || fileKey.Length != 16) throw new ArgumentException("Invalid fileKey");
+            if (iv == null || iv.Length != 8) throw new ArgumentException("Invalid Iv");
             this.stream = stream;
             this.streamLength = streamLength;
             this.mode = mode;
             this.fileKey = fileKey;
             this.iv = iv;
-
             this.chunksPositions = this.GetChunksPositions(this.streamLength);
         }
 
@@ -198,17 +178,10 @@
 
             for (long pos = this.position; pos < Math.Min(this.position + count, this.streamLength); pos += 16)//16 byte(128 bit)
             {
-                // We are on a chunk bondary
-                if (this.chunksPositions.Any(chunk => chunk == pos))
+                if (this.chunksPositions.Any(chunk => chunk == pos))// We are on a chunk bondary
                 {
-                    if (pos != 0)
-                    {
-                        // Compute the current chunk mac data on each chunk bondary
-                        this.ComputeChunk();
-                    }
-
-                    // Init chunk mac with Iv values
-                    for (int i = 0; i < 8; i++)
+                    if (pos != 0) this.ComputeChunk();// Compute the current chunk mac data on each chunk bondary
+                    for (int i = 0; i < 8; i++)// Init chunk mac with Iv values
                     {
                         this.currentChunkMac[i] = this.iv[i];
                         this.currentChunkMac[i + 8] = this.iv[i];
@@ -216,17 +189,11 @@
                 }
 
                 this.IncrementCounter();
-
                 // Iterate each AES 16 bytes block
                 byte[] input = new byte[16];
                 byte[] output = new byte[input.Length];
                 int inputLength = this.stream.Read(input, 0, input.Length);
-                if (inputLength != input.Length)//read full 16 byte
-                {
-                    // Sometimes, the stream is not finished but the read is not complete
-                    inputLength += this.stream.Read(input, inputLength, input.Length - inputLength);
-                }
-
+                if (inputLength != input.Length) inputLength += this.stream.Read(input, inputLength, input.Length - inputLength);//read full 16 byte. Sometimes, the stream is not finished but the read is not complete
                 // Merge Iv and counter
                 byte[] ivCounter = new byte[16];
                 Array.Copy(this.iv, ivCounter, 8);
@@ -239,32 +206,24 @@
                     output[inputPos] = (byte)(encryptedIvCounter[inputPos] ^ input[inputPos]);
                     this.currentChunkMac[inputPos] ^= (this.mode == Mode.Crypt) ? input[inputPos] : output[inputPos];
                 }
-
-                // Copy to buffer
-                Array.Copy(output, 0, buffer, offset + pos - this.position, Math.Min(output.Length, this.streamLength - pos));
-
-                // Crypt to current chunk mac
-                this.currentChunkMac = Crypto.EncryptAes(this.currentChunkMac, this.fileKey);
+                Array.Copy(output, 0, buffer, offset + pos - this.position, Math.Min(output.Length, this.streamLength - pos)); // Copy to buffer
+                this.currentChunkMac = Crypto.EncryptAes(this.currentChunkMac, this.fileKey);// Crypt to current chunk mac
             }
 
             long len = Math.Min(count, this.streamLength - this.position);
             this.position += len;
 
-            // When stream is fully processed, we compute the last chunk
-            if (this.position == this.streamLength)
+            
+            if (this.position == this.streamLength)// When stream is fully processed, we compute the last chunk
             {
                 this.ComputeChunk();
-
-                // Compute Meta MAC
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < 4; i++)// Compute Meta MAC
                 {
                     this.metaMac[i] = (byte)(this.fileMac[i] ^ this.fileMac[i + 4]);
                     this.metaMac[i + 4] = (byte)(this.fileMac[i + 8] ^ this.fileMac[i + 12]);
                 }
-
                 this.OnStreamRead();
             }
-
             return (int)len;
         }
 

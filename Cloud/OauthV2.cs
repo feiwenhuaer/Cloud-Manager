@@ -18,7 +18,7 @@ namespace Cloud
         internal string authorizationRequest;
         public event DelegateToken TokenCallBack;
         //Process Cloud_Oauth;
-        internal void GetCode_(OauthUI ui, object owner)
+        internal void GetCode_(IOauth ui, object owner)
         {
             if (string.IsNullOrEmpty(authorizationRequest) | string.IsNullOrEmpty(redirectURI)) throw new Exception("Oauth:authorizationRequest or redirectURI is null.");
             //Cloud_Oauth = Process.Start(Directory.GetCurrentDirectory() + "\\Cloud_Oauth.exe", redirectURI);

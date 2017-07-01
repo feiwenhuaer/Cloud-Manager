@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace FormUI.UI.Oauth
 {
-    public partial class UIOauth : Form, OauthUI
+    public partial class UIOauth : Form, IOauth
     {
         bool isclosed = false;
         string url;

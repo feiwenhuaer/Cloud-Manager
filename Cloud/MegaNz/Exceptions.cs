@@ -17,13 +17,13 @@
     }
   }
 
-  public class DownloadException : Exception
-  {
-    public DownloadException()
-      : base("Invalid file checksum")
+    public class DownloadException : Exception
     {
+        public DownloadException()
+          : base("Invalid file checksum")
+        {
+        }
     }
-  }
 
   public class UploadException : Exception
   {
