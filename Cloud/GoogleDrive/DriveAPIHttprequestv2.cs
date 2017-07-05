@@ -1,4 +1,5 @@
-﻿using Cloud.GoogleDrive.Oauth;
+﻿using Cloud.GoogleDrive.JsonClass;
+using Cloud.GoogleDrive.Oauth;
 using CustomHttpRequest;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
+using Newtonsoft.Json;
 
 namespace Cloud.GoogleDrive
 {
@@ -186,15 +188,16 @@ namespace Cloud.GoogleDrive
                 string[] moreheader = { "Range: bytes=" + PosStart.ToString() + "-" + endpos.ToString() };
                 return client.Request<Stream>(url, TypeRequest.GET, null, (endpos < 0) ? moreheader : null).stream;
             }
-
-            public string Insert_ResumableGetUploadID(string jsondata, string typefileupload, long filesize)
+            
+            public string Insert_ResumableGetUploadID(string jsonMetaData, string typefileupload, long filesize)
             {
                 string url = string.Format(uriFiles_insert_resumable_getUploadID, uploadType.resumable.ToString());
                 string[] moreheader = {
                                 "Content-Type: application/json; charset=UTF-8",
                                 "X-Upload-Content-Type: " + typefileupload,
                                 "X-Upload-Content-Length: " + filesize.ToString() };
-                string data = client.Request<string>(url, TypeRequest.POST, Encoding.UTF8.GetBytes(jsondata), moreheader).HeaderResponse;
+                var reponse = client.Request<string>(url, TypeRequest.POST, Encoding.UTF8.GetBytes(jsonMetaData), moreheader);
+                string data = reponse.HeaderResponse;
                 string[] arrheader = Regex.Split(data, "\r\n");
                 foreach (string h in arrheader)
                 {
@@ -208,21 +211,24 @@ namespace Cloud.GoogleDrive
                 throw new Exception("Can't get data: \r\n" + data);
             }
 
+
             public Stream Insert_Resumable(string url_uploadid, long posstart, long posend, long filesize)
             {
+                if (posstart < 0 & posend < 0) throw new Exception("Pos can't be < 0.");
                 List<string> moreheader = new List<string>(){ "Content-Length: " + (posend - posstart + 1).ToString(),
                 "Content-Type: image/jpeg","Connection: keep-alive",
                 "Content-Range: bytes " + posstart.ToString() + "-" + posend.ToString()+"/" + filesize.ToString()};
                 return client.Request<Stream>(url_uploadid, TypeRequest.PUT, null, moreheader.ToArray()).stream;
             }
 
-            public string Insert_Resumable_Response()
+            public string Insert_Resumable_Response(bool GetMetaData = false)
             {
                 string data = client.http_request.GetTextDataResponse(false, true);
 #if DEBUG
                 Console.WriteLine("DriveAPIHttprequestv2: " + data);
 #endif
-                return client.http_request.HeaderReceive;
+                if (GetMetaData) return data;
+                else return client.http_request.HeaderReceive;
             }
 
             public string Insert_MetadataRequest(string json_filemetadata)
@@ -363,7 +369,7 @@ namespace Cloud.GoogleDrive
         public DriveExtend Extend { get; private set; }
         public class DriveExtend
         {
-            public DriveAPIHttprequestv2 client;
+            DriveAPIHttprequestv2 client;
             public DriveExtend(DriveAPIHttprequestv2 client)
             {
                 this.client = client;
@@ -372,7 +378,11 @@ namespace Cloud.GoogleDrive
             public string CreateFolder(string name, string parent_id)
             {
                 string json_data = "{\"mimeType\": \"application/vnd.google-apps.folder\", \"title\": \"" + name + "\", \"parents\": [{\"id\": \"" + parent_id + "\"}]}";
-                return client.Files.Insert_MetadataRequest(json_data);
+                return CreateFolder(json_data);
+            }
+            public string CreateFolder(string metadata)
+            {
+                return client.Files.Insert_MetadataRequest(metadata);
             }
         }
         #endregion
