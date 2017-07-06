@@ -102,26 +102,34 @@ namespace Cloud.GoogleDrive
                 result.DataTextResponse = http_request.TextDataResponse;
                 GoogleDriveErrorMessage message;
                 try { message = Newtonsoft.Json.JsonConvert.DeserializeObject<GoogleDriveErrorMessage>(ex.Message); }
-                catch { throw ex; }// other message;
+                catch { throw; }// other message;
                 switch (message.error.code)
                 {
                     case 204: if (typerequest == TypeRequest.DELETE) return result; break;// delete result
                     case 401:
                         if (Monitor.TryEnter(SyncRefreshToken))
                         {
+#if DEBUG
+                            Console.WriteLine("DriveAPIHttprequestv2 Start Refresh Token {Email:" + Token.Email + ", Thread id:" + Thread.CurrentThread.ManagedThreadId + "}");
+#endif
                             try
                             {
-                                Monitor.Enter(SyncRefreshToken);
+                                Lock();
                                 Token = oauth.RefreshToken();
                                 TokenRenewEvent.Invoke(Token);
                                 return Request<T>(url, typerequest, bytedata, moreheader);
-                            }
-                            finally { Monitor.Exit(SyncRefreshToken); }
+                            }finally { Unlock(); }
                         }
                         else
                         {
-                            try { Monitor.Enter(SyncRefreshToken); return Request<T>(url, typerequest, bytedata, moreheader); }
-                            finally { Monitor.Exit(SyncRefreshToken); }
+#if DEBUG
+                            Console.WriteLine("DriveAPIHttprequestv2 Start Wait Refresh Token {Email:" + Token.Email + ", Thread id:" + Thread.CurrentThread.ManagedThreadId + "}");
+#endif
+                            try
+                            {
+                                Lock();
+                                return Request<T>(url, typerequest, bytedata, moreheader);
+                            } finally { Unlock(); }
                         }
                     case 403:
                         Error403 err = (Error403)Enum.Parse(typeof(Error403), message.error.errors[0].reason);
@@ -161,9 +169,34 @@ namespace Cloud.GoogleDrive
                         else break;
                     default: break;
                 }
-                throw ex;
+                throw;
+            }catch(ThreadAbortException ex_thr_abort)
+            {
+                Unlock();
+                throw;
             }
         }
+        void Lock()
+        {
+#if DEBUG
+            Console.WriteLine("DriveAPIHttprequestv2 Monitor Start Enter");
+#endif
+            Monitor.Enter(SyncRefreshToken);
+#if DEBUG
+            Console.WriteLine("DriveAPIHttprequestv2 Monitor Entered");
+#endif
+        }
+        void Unlock()
+        {
+#if DEBUG
+            Console.WriteLine("DriveAPIHttprequestv2 Monitor Start Exit");
+#endif
+            Monitor.Exit(SyncRefreshToken);
+#if DEBUG
+            Console.WriteLine("DriveAPIHttprequestv2 Monitor Exited");
+#endif
+        }
+
         private class RequestReturn
         {
             public string HeaderResponse { get; set; }
