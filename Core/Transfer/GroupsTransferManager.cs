@@ -153,7 +153,7 @@ namespace Core.Transfer
 
         #region Add new items from UI
         public List<Thread> LoadGroupThreads = new List<Thread>();
-        public void AddItems(List<ItemNode> items, ItemNode fromfolder, ItemNode savefolder, bool AreCut)
+        public void AddItems(List<IItemNode> items, IItemNode fromfolder, IItemNode savefolder, bool AreCut)
         {
             ItemsTransferManager gr = new ItemsTransferManager(items, fromfolder, savefolder, AreCut);
             GroupsWork.Add(gr);

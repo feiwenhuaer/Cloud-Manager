@@ -8,9 +8,9 @@ namespace FormUI.UI.MainForm.PathNodes
 {
     internal class LabelNode : Label
     {
-        ItemNode node;
-        public ItemNode Node { get { return node; } private set { node = value; ChangeText(); } }
-        public LabelNode(ItemNode node) : base()
+        IItemNode node;
+        public IItemNode Node { get { return node; } private set { node = value; ChangeText(); } }
+        public LabelNode(IItemNode node) : base()
         {
             this.Node = node;
             this.MouseEnter += C_MouseEnter;
@@ -20,10 +20,8 @@ namespace FormUI.UI.MainForm.PathNodes
 
         void ChangeText()
         {
-            if (node.Parent == null && node.NodeType.Type != CloudType.LocalDisk)//root
-            {
-                this.Text = node.NodeType.Type.ToString() + ":" + node.NodeType.Email;
-            }
+            RootNode root = node as RootNode;
+            if (root != null && root.RootType.Type != CloudType.LocalDisk) this.Text = root.RootType.Type.ToString() + ":" + root.RootType.Email;//root
             else this.Text = node.Info.Name;
         }
         private void C_MouseLeave(object sender, EventArgs e)

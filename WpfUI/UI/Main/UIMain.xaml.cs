@@ -29,7 +29,7 @@ namespace WpfUI.UI.Main
                 return Setting_UI.ReloadUI_Flag;
             }
         }
-        public void AddNewCloudToTV(ItemNode newnode)
+        public void AddNewCloudToTV(RootNode newnode)
         {
             Dispatcher.Invoke(new Action(() => TreeObservableCollection.Add(new TreeViewDataModel(null) { DisplayData = new TreeviewDataItem(newnode) })));
         }
@@ -48,7 +48,7 @@ namespace WpfUI.UI.Main
             }
         }
 
-        public void FileSaveDialog(string InitialDirectory, string FileName, string Filter, ItemNode node)
+        public void FileSaveDialog(string InitialDirectory, string FileName, string Filter, IItemNode node)
         {
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.InitialDirectory = InitialDirectory;
@@ -59,7 +59,7 @@ namespace WpfUI.UI.Main
             {
                 if (sfd.ShowDialog().Value)
                 {
-                    Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(new List<ItemNode>() { node }, node.Parent, ItemNode.GetNodeFromDiskPath(sfd.FileName).Parent, false);
+                    Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(new List<IItemNode>() { node }, node.Parent, ItemNode.GetNodeFromDiskPath(sfd.FileName).Parent, false);
                 }
             }));
         }
@@ -113,7 +113,7 @@ namespace WpfUI.UI.Main
         {
             foreach (var drive in DriveInfo.GetDrives())
             {
-                ItemNode n = new ItemNode(new TypeNode() { Type = CloudType.LocalDisk});
+                RootNode n = new RootNode(new TypeNode() { Type = CloudType.LocalDisk});
                 n.Info.Name = drive.RootDirectory.ToString().TrimEnd('\\');
                 TreeObservableCollection.Add(new TreeViewDataModel() { DisplayData = new TreeviewDataItem(n) });
             }
@@ -121,7 +121,7 @@ namespace WpfUI.UI.Main
         }
         private void TV_LoadCloud()
         {
-            foreach (ItemNode cloud in Setting_UI.reflection_eventtocore.AccountsAndCloud.GetListAccountCloud())
+            foreach (RootNode cloud in Setting_UI.reflection_eventtocore.AccountsAndCloud.GetListAccountCloud())
             {
                 TreeObservableCollection.Add(new TreeViewDataModel() { DisplayData = new TreeviewDataItem(cloud) });
             }
@@ -242,23 +242,21 @@ namespace WpfUI.UI.Main
                                                                 "Confirm",
                                                                 MessageBoxButton.YesNo, MessageBoxImage.Question);
                     if (result != MessageBoxResult.Yes) return;
-                    Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.DeletePath(new DeleteItems(model.DisplayData.Node) { PernamentDelete = false });
+                    Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.DeletePath(new DeleteItems(model.DisplayData.Node as ItemNode) { PernamentDelete = false });
                     break;
 
                 default:
-                    result = System.Windows.MessageBox.Show(   this,
-                                                                                "Are you want to remove " + model.DisplayData.Type.ToString() + ":" + model.DisplayData.Node.NodeType.Email,
-                                                                                "Confirm",
-                                                                                MessageBoxButton.YesNo,MessageBoxImage.Question);
+                    result = System.Windows.MessageBox.Show(this,
+                        "Are you want to remove " + model.DisplayData.Type.ToString() + ":" + (model.DisplayData.Node as RootNode).RootType.Email,
+                        "Confirm", MessageBoxButton.YesNo,MessageBoxImage.Question);
                     if (result != MessageBoxResult.Yes) return;
-                    if (Setting_UI.reflection_eventtocore.AccountsAndCloud.DeleteAccountCloud(model.DisplayData.Node.NodeType.Email, model.DisplayData.Type))
+                    if (Setting_UI.reflection_eventtocore.AccountsAndCloud.DeleteAccountCloud((model.DisplayData.Node as RootNode).RootType.Email, model.DisplayData.Type))
                     {
                         TreeObservableCollection.Remove(model);
                     }
-                    else System.Windows.MessageBox.Show(    this, 
-                                                            "Remove cloud " + model.DisplayData.Type.ToString() + ":" + model.DisplayData.Node.Info.Name + " failed.",
-                                                            "Error"
-                                                            , MessageBoxButton.OK, MessageBoxImage.Error);
+                    else MessageBox.Show(this, 
+                        "Remove cloud " + model.DisplayData.Type.ToString() + ":" + model.DisplayData.Node.Info.Name + " failed.",
+                        "Error" , MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
             }
         }
@@ -406,7 +404,7 @@ namespace WpfUI.UI.Main
             if (load.addToTV && load.TV_data != null && load.TV_node != null)//add folder to tree view
             {
                 ((TreeViewDataModel)load.TV_data).Childrens.Clear();
-                foreach (ItemNode n in load.node.Child)
+                foreach (ItemNode n in load.node.Childs)
                 {
                     if (n.Info.Size > 0) continue;
                     TreeViewDataModel child = new TreeViewDataModel((TreeViewDataModel)load.TV_data) { DisplayData = new TreeviewDataItem(n)};
@@ -433,9 +431,9 @@ namespace WpfUI.UI.Main
         private void MenuCloud_SubmenuOpened(object sender, RoutedEventArgs e)
         {
             CloudsRemove = new ObservableCollection<ContextMenuDataModel>();
-            foreach (ItemNode cloud in Setting_UI.reflection_eventtocore.AccountsAndCloud.GetListAccountCloud())
+            foreach (RootNode cloud in Setting_UI.reflection_eventtocore.AccountsAndCloud.GetListAccountCloud())
             {
-                CloudsRemove.Add(new ContextMenuDataModel(cloud.NodeType.Email, cloud.NodeType.Type));
+                CloudsRemove.Add(new ContextMenuDataModel(cloud.RootType.Email, cloud.RootType.Type));
             }
             Cloud_remove.ItemsSource = CloudsRemove;
         }

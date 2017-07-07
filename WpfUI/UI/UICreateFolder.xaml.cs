@@ -12,8 +12,8 @@ namespace WpfUI.UI
     /// </summary>
     public partial class UICreateFolder : Window
     {
-        ItemNode parent;
-        public UICreateFolder(ItemNode parent)
+        IItemNode parent;
+        public UICreateFolder(IItemNode parent)
         {
             InitializeComponent();
             BT_create.Visibility = Visibility.Hidden;

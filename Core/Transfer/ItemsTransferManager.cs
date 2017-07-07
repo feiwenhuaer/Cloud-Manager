@@ -23,9 +23,9 @@ namespace Core.Transfer
         #endregion
 
         #region Declare
-        List<ItemNode> items;
-        public ItemNode fromfolder;
-        public ItemNode savefolder;
+        List<IItemNode> items;
+        public IItemNode fromfolder;
+        public IItemNode savefolder;
         /// <summary>
         /// Load data from save file.
         /// </summary>
@@ -56,7 +56,7 @@ namespace Core.Transfer
         /// <param name="fromfolder"></param>
         /// <param name="savefolder"></param>
         /// <param name="AreCut"></param>
-        public ItemsTransferManager(List<ItemNode> items, ItemNode fromfolder, ItemNode savefolder, bool AreCut = false)
+        public ItemsTransferManager(List<IItemNode> items, IItemNode fromfolder, IItemNode savefolder, bool AreCut = false)
         {
             if (items.Count == 0) throw new Exception("List<NewTransferItem> items count = 0");
             if (fromfolder == null) throw new ArgumentNullException("fromfolder");
@@ -96,23 +96,24 @@ namespace Core.Transfer
             items.Clear();// clear Declare memory
         }
         
-        void ListAllItemInFolder(ItemNode node)
+        void ListAllItemInFolder(IItemNode node)
         {
-            ItemNode list;
+            IItemNode list;
             try
             {
                 list = AppSetting.ManageCloud.GetItemsList(node);
             }
             catch (UnauthorizedAccessException ex) { Console.WriteLine(ex.Message); return; }
 
-            if(list.Child.Count == 0)//create empty folder
+            if (list.Childs.Count == 0)//create empty folder
             {
 
-            }else foreach (ItemNode ffitem in list.Child)
-            {
-                if (ffitem.Info.Size <= 0) ListAllItemInFolder(ffitem);
-                else LoadFile(ffitem);
             }
+            else foreach (ItemNode ffitem in list.Childs)
+                {
+                    if (ffitem.Info.Size <= 0) ListAllItemInFolder(ffitem);
+                    else LoadFile(ffitem);
+                }
         }
         
         void LoadFile(ItemNode node)
@@ -278,11 +279,11 @@ namespace Core.Transfer
         void WorkThread(object obj)
         {
             TransferItem item = GroupData.items[(int)obj];
-            ItemNode root_from = fromfolder.GetRoot;
-            ItemNode root_to = savefolder.GetRoot;
+            RootNode root_from = fromfolder.GetRoot;
+            RootNode root_to = savefolder.GetRoot;
             try
             {
-                if (root_from.NodeType.Type == root_to.NodeType.Type && root_from.NodeType.Type != CloudType.LocalDisk) SameAccountCloud(item);//cloud, inport file from other account same cloud
+                if (root_from.RootType.Type == root_to.RootType.Type && root_from.RootType.Type != CloudType.LocalDisk) SameAccountCloud(item);//cloud, inport file from other account same cloud
                 else Transfer(item);//not same type
             }
             catch (Exception ex){ item.ErrorMsg = ex.Message + ex.StackTrace; item.status = StatusTransfer.Error; return; }
@@ -295,6 +296,10 @@ namespace Core.Transfer
         /// <param name="import">False is copy</param>
         void SameAccountCloud(TransferItem item,bool import = true)
         {
+            switch(item.From.node.GetRoot.RootType.Type)
+            {
+
+            }
             throw new Exception("SameAccountCloud not support now.");
         }
 
@@ -306,7 +311,7 @@ namespace Core.Transfer
 #endif
             int buffer_length = 32;//default
             int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.BufferSize), out buffer_length);//get buffer_length from setting
-            item.buffer = item.From.node.GetRoot.NodeType.Type == CloudType.Mega ? new byte[buffer_length * 2048] : new byte[buffer_length * 1024];//create buffer
+            item.buffer = item.From.node.GetRoot.RootType.Type == CloudType.Mega ? new byte[buffer_length * 2048] : new byte[buffer_length * 1024];//create buffer
 
             ItemNode rootnodeto = item.To.node.GetRoot;
 
@@ -316,7 +321,7 @@ namespace Core.Transfer
             item.ErrorMsg = "";//clear error
             item.TimeStamp = CurrentMillis.Millis;
             if (GroupData.status != StatusTransfer.Running) return;
-            switch (rootnodeto.NodeType.Type)
+            switch (rootnodeto.GetRoot.RootType.Type)
             {
                 case CloudType.LocalDisk:
                     #region LocalDisk
@@ -330,7 +335,7 @@ namespace Core.Transfer
                     int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.Dropbox_ChunksSize), out chunksizedb);
                     item.ChunkUploadSize = chunksizedb * 1024 * 1024;
 
-                    DropboxRequestAPIv2 DropboxClient = Dropbox.GetAPIv2(rootnodeto.NodeType.Email);
+                    DropboxRequestAPIv2 DropboxClient = Dropbox.GetAPIv2(rootnodeto.GetRoot.RootType.Email);
 
                     if (string.IsNullOrEmpty(item.UploadID))//create upload id
                     {
@@ -345,7 +350,7 @@ namespace Core.Transfer
 
                 case CloudType.GoogleDrive:
                     #region GoogleDrive
-                    DriveAPIHttprequestv2 gdclient = GoogleDrive.GetAPIv2(rootnodeto.NodeType.Email);
+                    DriveAPIHttprequestv2 gdclient = GoogleDrive.GetAPIv2(rootnodeto.GetRoot.RootType.Email);
                     GoogleDrive.CreateFolder(item.To.node.Parent);
                     int chunksizeGD = 5;//default
                     int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.GD_ChunksSize), out chunksizeGD);
@@ -365,7 +370,7 @@ namespace Core.Transfer
 
                 case CloudType.Mega:
                     #region Mega
-                    MegaApiClient MegaClient = MegaNz.GetClient(rootnodeto.NodeType.Email);
+                    MegaApiClient MegaClient = MegaNz.GetClient(rootnodeto.GetRoot.RootType.Email);
                     item.buffer = new byte[128 * 1024];
                     if (string.IsNullOrEmpty(item.UploadID))//create upload id
                     {

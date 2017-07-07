@@ -10,8 +10,8 @@ namespace WpfUI.UI.Main
     /// </summary>
     public partial class ComboBoxHeader : UserControl
     {
-        ItemNode node;
-        public ItemNode Node
+        IItemNode node;
+        public IItemNode Node
         {
             get { return node; }
             set { UpdateData(value); node = value; }
@@ -23,39 +23,34 @@ namespace WpfUI.UI.Main
             this.comboBox.ItemsSource = Source;
         }
 
-        void UpdateData(ItemNode newnode)
+        void UpdateData(IItemNode newnode)
         {
             int start_index = 0;
             if (node != null)
             {
-                ItemNode sameparent = newnode.FindSameParent(node);
+                IItemNode sameparent = newnode.FindSameParent(node);
                 if (sameparent == null) start_index = node.GetFullPath().IndexOf(node.GetFullPath().Find(n => n == sameparent)) + 1;
                 while (Source.Count - 1 >= start_index) Source.RemoveAt(start_index);
             }
             newnode.GetFullPath().ForEach(n => { Source.Add(new ComboBoxData(n)); });
-            if (Source.Count >= 0)
-                comboBox.SelectedIndex = Source.Count - 1;
+            if (Source.Count >= 0) comboBox.SelectedIndex = Source.Count - 1;
         }
     }
 
     public class ComboBoxData
     {
         public string Text { get; private set; }
-        ItemNode node;
-        public ItemNode Node { get { return node; } set { node = value; UpdateData(); } }
+        IItemNode node;
+        public IItemNode Node { get { return node; } set { node = value; UpdateData(); } }
 
-        public ComboBoxData(ItemNode Node)
+        public ComboBoxData(IItemNode Node)
         {
             this.Node = Node;
         }
         void UpdateData()
         {
-            switch (node.NodeType.Type)
-            {
-                case CloudType.Folder:
-                case CloudType.LocalDisk: this.Text = Node.Info.Name; break;
-                default: this.Text = node.NodeType.Type.ToString() + ":" + Node.NodeType.Email; break;
-            }
+            if(node is RootNode && (node as RootNode).RootType.Type != CloudType.LocalDisk) this.Text = (node as RootNode).RootType.Type.ToString() + ":" + (node as RootNode).RootType.Email;
+            else this.Text = Node.Info.Name;
         }
     }
 }

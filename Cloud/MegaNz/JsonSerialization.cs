@@ -188,7 +188,7 @@
 
     internal class CreateNodeRequest : RequestBase
     {
-        private CreateNodeRequest(INode parentNode, NodeType type, string attributes, string encryptedKey, byte[] key, string completionHandle)
+        private CreateNodeRequest(INode parentNode, RootType type, string attributes, string encryptedKey, byte[] key, string completionHandle)
           : base("p")
         {
             this.ParentId = parentNode.Id;
@@ -227,12 +227,12 @@
 
         public static CreateNodeRequest CreateFileNodeRequest(INode parentNode, string attributes, string encryptedkey, byte[] fileKey, string completionHandle)
         {
-            return new CreateNodeRequest(parentNode, NodeType.File, attributes, encryptedkey, fileKey, completionHandle);
+            return new CreateNodeRequest(parentNode, RootType.File, attributes, encryptedkey, fileKey, completionHandle);
         }
 
         public static CreateNodeRequest CreateFolderNodeRequest(INode parentNode, string attributes, string encryptedkey, byte[] key)
         {
-            return new CreateNodeRequest(parentNode, NodeType.Directory, attributes, encryptedkey, key, "xxxxxxxx");
+            return new CreateNodeRequest(parentNode, RootType.Directory, attributes, encryptedkey, key, "xxxxxxxx");
         }
 
         internal class CreateNodeRequestData
@@ -241,7 +241,7 @@
             public string CompletionHandle { get; set; }
 
             [JsonProperty("t")]
-            public NodeType Type { get; set; }
+            public RootType Type { get; set; }
 
             [JsonProperty("a")]
             public string Attributes { get; set; }
@@ -293,7 +293,7 @@
 
         private IEnumerable<INode> GetRecursiveChildren(INode[] nodes, INode parent)
         {
-            foreach (var node in nodes.Where(x => x.Type == NodeType.Directory || x.Type == NodeType.File))
+            foreach (var node in nodes.Where(x => x.Type == RootType.Directory || x.Type == RootType.File))
             {
                 string parentId = node.Id;
                 do

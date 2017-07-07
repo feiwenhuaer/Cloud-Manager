@@ -43,7 +43,7 @@ namespace Core.Class
             Stream stream;
             long start_range = -1;
             long end_range = -1;
-            ItemNode filenode = null;
+            IItemNode filenode = null;
 
             if (range != null)
             {
@@ -54,11 +54,8 @@ namespace Core.Class
 
             if (cloudname != null && id != null && Enum.TryParse<CloudType>(cloudname, out type) && type != CloudType.LocalDisk && type != CloudType.Folder)
             {
-
-
-
                 if (email == null) email = AppSetting.settings.GetDefaultCloud(type);
-                ItemNode rootnode = AppSetting.settings.GetCloudRootNode(email, type);
+                RootNode rootnode = AppSetting.settings.GetCloudRootNode(email, type);
                 filenode = new ItemNode(new NodeInfo() {  ID = id });
                 rootnode.AddChild(filenode);                
             }

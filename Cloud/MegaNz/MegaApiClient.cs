@@ -264,7 +264,7 @@
             Node[] nodes = response.Nodes;
             if (this.trashNode == null)
             {
-                this.trashNode = nodes.First(n => n.Type == NodeType.Trash);
+                this.trashNode = nodes.First(n => n.Type == RootType.Trash);
             }
             this.Nodes = nodes.Distinct().Cast<INode>();
             return this.Nodes;
@@ -291,7 +291,7 @@
         /// Delete a node from the filesytem
         /// </summary>
         /// <remarks>
-        /// You can only delete <see cref="NodeType.Directory" /> or <see cref="NodeType.File" /> node
+        /// You can only delete <see cref="RootType.Directory" /> or <see cref="RootType.File" /> node
         /// </remarks>
         /// <param name="node">Node to delete</param>
         /// <param name="moveToTrash">Moved to trash if true, Permanently deleted if false</param>
@@ -306,7 +306,7 @@
                 throw new ArgumentNullException("node");
             }
 
-            if (node.Type != NodeType.Directory && node.Type != NodeType.File)
+            if (node.Type != RootType.Directory && node.Type != RootType.File)
             {
                 throw new ArgumentException("Invalid node type");
             }
@@ -331,7 +331,7 @@
         /// <exception cref="NotSupportedException">Not logged in</exception>
         /// <exception cref="ApiException">Mega.co.nz service reports an error</exception>
         /// <exception cref="ArgumentNullException">name or parent is null</exception>
-        /// <exception cref="ArgumentException">parent is not valid (all types are allowed expect <see cref="NodeType.File" />)</exception>
+        /// <exception cref="ArgumentException">parent is not valid (all types are allowed expect <see cref="RootType.File" />)</exception>
         public INode CreateFolder(string name, INode parent)
         {
             if (string.IsNullOrEmpty(name))
@@ -344,7 +344,7 @@
                 throw new ArgumentNullException("parent");
             }
 
-            if (parent.Type == NodeType.File)
+            if (parent.Type == RootType.File)
             {
                 throw new ArgumentException("Invalid parent node");
             }
@@ -363,12 +363,12 @@
         /// <summary>
         /// Retrieve an url to download specified node
         /// </summary>
-        /// <param name="node">Node to retrieve the download link (only <see cref="NodeType.File" /> or <see cref="NodeType.Directory" /> can be downloaded)</param>
+        /// <param name="node">Node to retrieve the download link (only <see cref="RootType.File" /> or <see cref="RootType.Directory" /> can be downloaded)</param>
         /// <returns>Download link to retrieve the node with associated key</returns>
         /// <exception cref="NotSupportedException">Not logged in</exception>
         /// <exception cref="ApiException">Mega.co.nz service reports an error</exception>
         /// <exception cref="ArgumentNullException">node is null</exception>
-        /// <exception cref="ArgumentException">node is not valid (only <see cref="NodeType.File" /> or <see cref="NodeType.Directory" /> can be downloaded)</exception>
+        /// <exception cref="ArgumentException">node is not valid (only <see cref="RootType.File" /> or <see cref="RootType.Directory" /> can be downloaded)</exception>
         public Uri GetDownloadLink(INode node)
         {
             if (node == null)
@@ -376,14 +376,14 @@
                 throw new ArgumentNullException("node");
             }
 
-            if (node.Type != NodeType.File && node.Type != NodeType.Directory)
+            if (node.Type != RootType.File && node.Type != RootType.Directory)
             {
                 throw new ArgumentException("Invalid node");
             }
 
             this.EnsureLoggedIn();
 
-            if (node.Type == NodeType.Directory)
+            if (node.Type == RootType.Directory)
             {
                 // Request an export share on the node or we will receive an AccessDenied
                 this.Request(new ShareNodeRequest(node, this.masterKey, this.GetNodes()));
@@ -402,20 +402,20 @@
 
             return new Uri(BaseUri, string.Format(
                 "/#{0}!{1}!{2}",
-                node.Type == NodeType.Directory ? "F" : string.Empty,
+                node.Type == RootType.Directory ? "F" : string.Empty,
                 response,
-                node.Type == NodeType.Directory ? nodeCrypto.SharedKey.ToBase64() : nodeCrypto.FullKey.ToBase64()));
+                node.Type == RootType.Directory ? nodeCrypto.SharedKey.ToBase64() : nodeCrypto.FullKey.ToBase64()));
         }
 
         /// <summary>
         /// Download a specified node and save it to the specified file
         /// </summary>
-        /// <param name="node">Node to download (only <see cref="NodeType.File" /> can be downloaded)</param>
+        /// <param name="node">Node to download (only <see cref="RootType.File" /> can be downloaded)</param>
         /// <param name="outputFile">File to save the node to</param>
         /// <exception cref="NotSupportedException">Not logged in</exception>
         /// <exception cref="ApiException">Mega.co.nz service reports an error</exception>
         /// <exception cref="ArgumentNullException">node or outputFile is null</exception>
-        /// <exception cref="ArgumentException">node is not valid (only <see cref="NodeType.File" /> can be downloaded)</exception>
+        /// <exception cref="ArgumentException">node is not valid (only <see cref="RootType.File" /> can be downloaded)</exception>
         /// <exception cref="DownloadException">Checksum is invalid. Downloaded data are corrupted</exception>
         public void DownloadFile(INode node, string outputFile)
         {
@@ -466,11 +466,11 @@
         /// <summary>
         /// Retrieve a Stream to download and decrypt the specified node
         /// </summary>
-        /// <param name="node">Node to download (only <see cref="NodeType.File" /> can be downloaded)</param>
+        /// <param name="node">Node to download (only <see cref="RootType.File" /> can be downloaded)</param>
         /// <exception cref="NotSupportedException">Not logged in</exception>
         /// <exception cref="ApiException">Mega.co.nz service reports an error</exception>
         /// <exception cref="ArgumentNullException">node or outputFile is null</exception>
-        /// <exception cref="ArgumentException">node is not valid (only <see cref="NodeType.File" /> can be downloaded)</exception>
+        /// <exception cref="ArgumentException">node is not valid (only <see cref="RootType.File" /> can be downloaded)</exception>
         /// <exception cref="DownloadException">Checksum is invalid. Downloaded data are corrupted</exception>
         public Stream Download(INode node, long start_pos = -1, long end_pos = -1,object DataEx = null)
         {
@@ -479,7 +479,7 @@
                 throw new ArgumentNullException("node");
             }
 
-            if (node.Type != NodeType.File)
+            if (node.Type != RootType.File)
             {
                 throw new ArgumentException("Invalid node");
             }
@@ -561,13 +561,13 @@
         /// Upload a file on Mega.co.nz and attach created node to selected parent
         /// </summary>
         /// <param name="filename">File to upload</param>
-        /// <param name="parent">Node to attach the uploaded file (all types except <see cref="NodeType.File" /> are supported)</param>
+        /// <param name="parent">Node to attach the uploaded file (all types except <see cref="RootType.File" /> are supported)</param>
         /// <returns>Created node</returns>
         /// <exception cref="NotSupportedException">Not logged in</exception>
         /// <exception cref="ApiException">Mega.co.nz service reports an error</exception>
         /// <exception cref="ArgumentNullException">filename or parent is null</exception>
         /// <exception cref="FileNotFoundException">filename is not found</exception>
-        /// <exception cref="ArgumentException">parent is not valid (all types except <see cref="NodeType.File" /> are supported)</exception>
+        /// <exception cref="ArgumentException">parent is not valid (all types except <see cref="RootType.File" /> are supported)</exception>
         public INode UploadFile(string filename, INode parent)
         {
             if (string.IsNullOrEmpty(filename))
@@ -636,18 +636,18 @@
         /// </summary>
         /// <param name="stream">Data to upload</param>
         /// <param name="name">Created node name</param>
-        /// <param name="parent">Node to attach the uploaded file (all types except <see cref="NodeType.File" /> are supported)</param>
+        /// <param name="parent">Node to attach the uploaded file (all types except <see cref="RootType.File" /> are supported)</param>
         /// <returns>Created node</returns>
         /// <exception cref="NotSupportedException">Not logged in</exception>
         /// <exception cref="ApiException">Mega.co.nz service reports an error</exception>
         /// <exception cref="ArgumentNullException">stream or name or parent is null</exception>
-        /// <exception cref="ArgumentException">parent is not valid (all types except <see cref="NodeType.File" /> are supported)</exception>
+        /// <exception cref="ArgumentException">parent is not valid (all types except <see cref="RootType.File" /> are supported)</exception>
         public INode Upload(Stream stream, string name, INode parent)
         {
             if (stream == null) throw new ArgumentNullException("stream");
             if (string.IsNullOrEmpty(name)) throw new ArgumentNullException("name");
             if (parent == null) throw new ArgumentNullException("parent");
-            if (parent.Type == NodeType.File) throw new ArgumentException("Invalid parent node");
+            if (parent.Type == RootType.File) throw new ArgumentException("Invalid parent node");
             this.EnsureLoggedIn();//check are login
 
             string completionHandle = "-";
@@ -723,8 +723,8 @@
         /// <exception cref="NotSupportedException">Not logged in</exception>
         /// <exception cref="ApiException">Mega.co.nz service reports an error</exception>
         /// <exception cref="ArgumentNullException">node or destinationParentNode is null</exception>
-        /// <exception cref="ArgumentException">node is not valid (only <see cref="NodeType.Directory" /> and <see cref="NodeType.File" /> are supported)</exception>
-        /// <exception cref="ArgumentException">parent is not valid (all types except <see cref="NodeType.File" /> are supported)</exception>
+        /// <exception cref="ArgumentException">node is not valid (only <see cref="RootType.Directory" /> and <see cref="RootType.File" /> are supported)</exception>
+        /// <exception cref="ArgumentException">parent is not valid (all types except <see cref="RootType.File" /> are supported)</exception>
         public INode Move(INode node, INode destinationParentNode)
         {
             if (node == null)
@@ -737,12 +737,12 @@
                 throw new ArgumentNullException("destinationParentNode");
             }
 
-            if (node.Type != NodeType.Directory && node.Type != NodeType.File)
+            if (node.Type != RootType.Directory && node.Type != RootType.File)
             {
                 throw new ArgumentException("Invalid node type");
             }
 
-            if (destinationParentNode.Type == NodeType.File)
+            if (destinationParentNode.Type == RootType.File)
             {
                 throw new ArgumentException("Invalid destination parent node");
             }
@@ -760,7 +760,7 @@
                 throw new ArgumentNullException("node");
             }
 
-            if (node.Type != NodeType.Directory && node.Type != NodeType.File)
+            if (node.Type != RootType.Directory && node.Type != RootType.File)
             {
                 throw new ArgumentException("Invalid node type");
             }

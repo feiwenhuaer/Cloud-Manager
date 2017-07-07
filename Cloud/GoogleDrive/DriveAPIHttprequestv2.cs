@@ -43,7 +43,9 @@ namespace Cloud.GoogleDrive
         
         public HttpRequest_ http_request { get; set; }
         public event TokenRenewCallback TokenRenewEvent;
-        public bool Debug = false;
+#if DEBUG
+        public bool Debug { get; set; } = false;
+#endif
 
         #region Constructors
         public DriveAPIHttprequestv2(TokenGoogleDrive token, GD_LimitExceededDelegate LimitExceeded = null)
@@ -384,7 +386,12 @@ namespace Cloud.GoogleDrive
             {
                 return client.Request<string>(uriDriveFile + fileid + "/parents/"+ parentid, TypeRequest.GET).DataTextResponse;
             }
-
+            /// <summary>
+            /// Adds a parent folder for a file.
+            /// </summary>
+            /// <param name="fileid"></param>
+            /// <param name="json_metadata">Json data parent</param>
+            /// <returns></returns>
             public string Insert(string fileid,string json_metadata)
             {
                 return client.Request<string>(uriDriveFile + fileid + "/parents?alt=json&key="+ GoogleDriveAppKey.ApiKey, 

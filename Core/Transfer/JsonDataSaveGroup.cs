@@ -4,8 +4,8 @@ namespace Core.Transfer
 {
     public class JsonDataSaveGroup
     {
-        public ItemNode fromfolder;
-        public ItemNode savefolder;
+        public IItemNode fromfolder;
+        public IItemNode savefolder;
         public bool AreCut = false;
         public TransferGroup Group = new TransferGroup();
     }

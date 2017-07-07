@@ -49,7 +49,7 @@ namespace FormUI.UI.MainForm
             pathUC1.EventNodePathClick += PathUC1_EventNodePathClick;
         }
 
-        private void PathUC1_EventNodePathClick(ItemNode nodeclick)
+        private void PathUC1_EventNodePathClick(IItemNode nodeclick)
         {
             managerhistory_itemnodes.Next(nodeclick);
             ExplorerCurrentNode();
@@ -170,7 +170,7 @@ namespace FormUI.UI.MainForm
             {
                 if (find.Info.Size > 0)//file
                 {
-                    if (find.GetRoot.NodeType.Type != CloudType.LocalDisk)//cloud
+                    if (find.GetRoot.RootType.Type != CloudType.LocalDisk)//cloud
                     {
                         MessageBox.Show("Not support now.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                     }
@@ -245,7 +245,7 @@ namespace FormUI.UI.MainForm
             cutToolStripMenuItem.Enabled = true;
             copyToolStripMenuItem.Enabled = true;
             deleteToolStripMenuItem.Enabled = true;
-            if (!string.IsNullOrEmpty(managerhistory_itemnodes.Root.NodeType.Email)) dowloadSeletedToolStripMenuItem.Enabled = true;
+            if (!string.IsNullOrEmpty(managerhistory_itemnodes.Root.RootType.Email)) dowloadSeletedToolStripMenuItem.Enabled = true;
             else dowloadSeletedToolStripMenuItem.Enabled = false;
         }
 
@@ -266,7 +266,7 @@ namespace FormUI.UI.MainForm
             AppClipboard.Clear();
             AppClipboard.AreCut = AreCut;
             AppClipboard.directory = managerhistory_itemnodes.NodeWorking();
-            bool AreCloud = !string.IsNullOrEmpty(managerhistory_itemnodes.Root.NodeType.Email);
+            bool AreCloud = !string.IsNullOrEmpty(managerhistory_itemnodes.Root.RootType.Email);
             foreach (ListViewItem item in LV_item.SelectedItems)
             {
                 ItemNode node = FindNodeLV(item);
@@ -276,7 +276,7 @@ namespace FormUI.UI.MainForm
         }
         private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ItemNode rootto = managerhistory_itemnodes.NodeWorking();
+            IItemNode rootto = managerhistory_itemnodes.NodeWorking();
             if (LV_item.SelectedItems.Count == 1)
             {
                 ItemNode find = FindNodeLV(LV_item.SelectedItems[0]);
@@ -286,7 +286,7 @@ namespace FormUI.UI.MainForm
         }
         ItemNode FindNodeLV(ListViewItem item)
         {
-            foreach (ItemNode n in managerhistory_itemnodes.NodeWorking().Child)
+            foreach (ItemNode n in managerhistory_itemnodes.NodeWorking().Childs)
             {
                 if (string.IsNullOrEmpty(n.Info.ID))// disk
                 {
@@ -308,7 +308,7 @@ namespace FormUI.UI.MainForm
             DialogResult result = fbd.ShowDialog(MainForm);
             if (result == DialogResult.OK || result == DialogResult.Yes)
             {
-                List<ItemNode> list_item_from = new List<ItemNode>();
+                List<IItemNode> list_item_from = new List<IItemNode>();
                 foreach (ListViewItem item in LV_item.SelectedItems)
                 {
                     ItemNode find = FindNodeLV(item);
@@ -325,14 +325,14 @@ namespace FormUI.UI.MainForm
             DialogResult result = fbd.ShowDialog(MainForm);
             if (result == DialogResult.OK | result == DialogResult.Yes)
             {
-                List<ItemNode> list_item_from = new List<ItemNode>();
-                ItemNode node = ItemNode.GetNodeFromDiskPath(fbd.SelectedPath.TrimEnd('\\'));
+                List<IItemNode> list_item_from = new List<IItemNode>();
+                IItemNode node = ItemNode.GetNodeFromDiskPath(fbd.SelectedPath.TrimEnd('\\'));
                 list_item_from.Add(node);
 
-                ItemNode rootto = managerhistory_itemnodes.NodeWorking();
+                IItemNode rootto = managerhistory_itemnodes.NodeWorking();
                 if(LV_item.SelectedItems.Count == 1)
                 {
-                    ItemNode find = FindNodeLV(LV_item.SelectedItems[0]);
+                    IItemNode find = FindNodeLV(LV_item.SelectedItems[0]);
                     if (find != null && find.Info.Size <= 0) rootto = find;
                 }
                 Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.TransferItems(list_item_from, node.Parent, rootto, false);

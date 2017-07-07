@@ -66,6 +66,7 @@
     <Compile Include="CustomException.cs" />
     <Compile Include="Enum.cs" />
     <Compile Include="Class\ItemNode.cs" />
+    <Compile Include="JsonBuilder.cs" />
     <Compile Include="ListBitmapImageResource.cs" />
     <Compile Include="PCPath.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

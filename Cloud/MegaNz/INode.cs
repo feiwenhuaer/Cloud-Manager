@@ -17,11 +17,11 @@ namespace Cloud.MegaNz
 
         string Owner { get; }
 
-        NodeType Type { get; }
+        RootType Type { get; }
 
         DateTime LastModificationDate { get; }
     }
-    public enum NodeType
+    public enum RootType
     {
         File = 0,
         Directory,

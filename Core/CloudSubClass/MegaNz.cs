@@ -22,11 +22,11 @@ namespace Core.CloudSubClass
             return client;
         }
 
-        public static ItemNode GetListFileFolder(ItemNode node)
+        public static IItemNode GetListFileFolder(IItemNode node)
         {
-            node.Child.Clear();
-            ItemNode root = node.GetRoot;
-            MegaApiClient client = GetClient(root.NodeType.Email);
+            node.Childs.Clear();
+            RootNode root = node.GetRoot;
+            MegaApiClient client = GetClient(root.RootType.Email);
 
             if (root == node)
             {
@@ -35,24 +35,24 @@ namespace Core.CloudSubClass
                 if (!string.IsNullOrEmpty(ID)) n = new MegaNzNode(ID);
                 else
                 {
-                    n = GetRoot(root.NodeType.Email, NodeType.Root);
-                    AppSetting.settings.SetRootID(root.NodeType.Email, CloudType.Mega, n.Id);
+                    n = GetRoot(root.RootType.Email, RootType.Root);
+                    AppSetting.settings.SetRootID(root.RootType.Email, CloudType.Mega, n.Id);
                 }
                 GetItems(client, n, node);
             }
             else
             {
                 if (node.Info.Size != -1) throw new Exception("Can't explorer,this item is not folder.");
-                MegaNzNode inode = new MegaNzNode(node.Info.Name, node.Info.ID, node.Parent.Info.ID, -1, NodeType.Directory, node.Info.DateMod);
+                MegaNzNode inode = new MegaNzNode(node.Info.Name, node.Info.ID, node.Parent.Info.ID, -1, RootType.Directory, node.Info.DateMod);
                 GetItems(client, inode, node);
             }
             return node;
         }
         
-        public static Stream GetStream(ItemNode node,long start_pos = -1,long end_pos = -1,bool IsUpload = false, object DataEx = null)
+        public static Stream GetStream(IItemNode node,long start_pos = -1,long end_pos = -1,bool IsUpload = false, object DataEx = null)
         {
             if (node.Info.Size < 1) throw new Exception("Mega GetStream: Filesize <= 0.");
-            MegaApiClient api = GetClient(node.GetRoot.NodeType.Email);
+            MegaApiClient api = GetClient(node.GetRoot.RootType.Email);
             MegaNzNode meganode = new MegaNzNode(node.Info.ID, node.Info.MegaCrypto);
             if (!IsUpload && start_pos >= 0)//download
             {
@@ -62,21 +62,21 @@ namespace Core.CloudSubClass
             else throw new Exception("Not Support Upload.");
         }
 
-        public static void CreateFolder(ItemNode node)
+        public static void CreateFolder(IItemNode node)
         {
             MegaNzNode parent_meganode = new MegaNzNode(node.Parent.Info.ID);
-            MegaApiClient client = GetClient(node.GetRoot.NodeType.Email);
+            MegaApiClient client = GetClient(node.GetRoot.RootType.Email);
             INode folder_meganode = client.CreateFolder(node.Info.Name, parent_meganode);
             node.Info.ID = folder_meganode.Id;
         }
 
-        public static void AutoCreateFolder(ItemNode node)
+        public static void AutoCreateFolder(IItemNode node)
         {
-            List<ItemNode> list = node.GetFullPath();
-            if (list[0].NodeType.Type != CloudType.Mega) throw new Exception("Mega only.");
-            MegaApiClient client = GetClient(list[0].NodeType.Email);
+            List<IItemNode> list = node.GetFullPath();
+            if ((list[0] as RootNode).RootType.Type != CloudType.Mega) throw new Exception("Mega only.");
+            MegaApiClient client = GetClient((list[0] as RootNode).RootType.Email);
             list.RemoveAt(0);
-            foreach(ItemNode child in list)
+            foreach(IItemNode child in list)
             {
                 if(string.IsNullOrEmpty(child.Info.ID))
                 {
@@ -90,27 +90,27 @@ namespace Core.CloudSubClass
         
 
 
-        static INode GetRoot(string Email,NodeType type)
+        static INode GetRoot(string Email,RootType type)
         {
             switch (type)
             {
-                case NodeType.Directory:
-                case NodeType.File:
-                case NodeType.Inbox:
+                case RootType.Directory:
+                case RootType.File:
+                case RootType.Inbox:
                     throw new Exception("That isn't root.");
-                case NodeType.Root:
-                case NodeType.Trash:
+                case RootType.Root:
+                case RootType.Trash:
                     MegaApiClient client = GetClient(Email);
-                    foreach (INode n in client.GetNodes().Where<INode>(n => n.Type == NodeType.Root))
+                    foreach (INode n in client.GetNodes().Where<INode>(n => n.Type == RootType.Root))
                     {
-                        if (n.Type == NodeType.Root) return n;
+                        if (n.Type == RootType.Root) return n;
                     }
                     break;
             }
             throw new Exception("Can't find " + type.ToString());
         }
         
-        static void GetItems(MegaApiClient client,INode node, ItemNode Enode)
+        static void GetItems(MegaApiClient client,INode node, IItemNode Enode)
         {
             foreach (INode child in client.GetNodes(node))
             {
@@ -121,11 +121,11 @@ namespace Core.CloudSubClass
                 c.Info.MegaCrypto = new MegaKeyCrypto(child as INodeCrypto);
                 switch (child.Type)
                 {
-                    case NodeType.File:
+                    case RootType.File:
                         c.Info.Size = child.Size;
                         Enode.AddChild(c);
                         break;
-                    case NodeType.Directory:
+                    case RootType.Directory:
                         c.Info.Size = -1;
                         Enode.AddChild(c);
                         break;
@@ -147,13 +147,13 @@ namespace Core.CloudSubClass
             }
             
             
-            public MegaNzNode(string ID, INodeCrypto keyDeCrypt) : this(null, ID, null, -1, NodeType.File, new DateTime(), keyDeCrypt)
+            public MegaNzNode(string ID, INodeCrypto keyDeCrypt) : this(null, ID, null, -1, RootType.File, new DateTime(), keyDeCrypt)
             {
             }
-            public MegaNzNode(string Name, string ID, string parentid, long Size, NodeType type, DateTime mod_d) : this(Name, ID, parentid, Size, type, mod_d, null)
+            public MegaNzNode(string Name, string ID, string parentid, long Size, RootType type, DateTime mod_d) : this(Name, ID, parentid, Size, type, mod_d, null)
             {
             }
-            public MegaNzNode(string Name, string ID, string parentid, long Size, NodeType type, DateTime mod_d, INodeCrypto keyDeCrypt) : base(keyDeCrypt)
+            public MegaNzNode(string Name, string ID, string parentid, long Size, RootType type, DateTime mod_d, INodeCrypto keyDeCrypt) : base(keyDeCrypt)
             {
                 this.name = Name;
                 this.id = ID;
@@ -213,8 +213,8 @@ namespace Core.CloudSubClass
                     return size;
                 }
             }
-            NodeType type;//default = 0 => File
-            public NodeType Type
+            RootType type;//default = 0 => File
+            public RootType Type
             {
                 get
                 {
@@ -230,9 +230,9 @@ namespace Core.CloudSubClass
             #endregion
         }
 
-        public static ItemNode GetItem(ItemNode node)
+        public static IItemNode GetItem(IItemNode node)
         {
-            MegaApiClient client = GetClient(node.GetRoot.NodeType.Email);
+            MegaApiClient client = GetClient(node.GetRoot.RootType.Email);
             MegaNzNode inode = new MegaNzNode(node.Info.ID);
             GetItems(client, inode, node);
             return node;

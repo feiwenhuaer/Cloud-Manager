@@ -45,12 +45,12 @@ namespace WpfUI.UI
             Thread thr = new Thread(Rename);
             Setting_UI.ManagerThreads.rename.Add(thr);
             Setting_UI.ManagerThreads.CleanThr();
-            thr.Start();
+            thr.Start(TB_newname.Text);
         }
 
-        void Rename()
+        void Rename(object name)
         {
-            if (Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.RenameItem(node,TB_newname.Text))
+            if (Setting_UI.reflection_eventtocore.ExplorerAndManagerFile.RenameItem(node,(string)name))
             {
                 Dispatcher.Invoke(new Action(() =>
                 {
@@ -68,7 +68,7 @@ namespace WpfUI.UI
                     if (result == MessageBoxResult.OK) flag = true;
                     else this.Close();
                 }));
-                if (flag) Rename();
+                if (flag) Rename(name);
             }
         }
 

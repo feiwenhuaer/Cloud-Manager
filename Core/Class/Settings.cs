@@ -110,12 +110,12 @@ namespace Core.Class
         #endregion
         
         #region Cloud
-        public List<ItemNode> GetListAccountCloud()
+        public List<RootNode> GetListAccountCloud()
         {
 #if DEBUG
             //Console.WriteLine("Check event handle multi?");
 #endif
-            List<ItemNode> list = new List<ItemNode>();
+            List<RootNode> list = new List<RootNode>();
             foreach (XmlNode node in GetCloudDataList())
             {
                 TypeNode root = new TypeNode();
@@ -134,15 +134,15 @@ namespace Core.Class
 #endif
                 }
                 
-                ItemNode e_node = new ItemNode();
-                e_node.NodeType = root;
+                RootNode e_node = new RootNode(root);
+                e_node.RootType = root;
                 e_node.Info = info;
                 list.Add(e_node);
             }
             return list;
         }
 
-        public ItemNode GetCloudRootNode(string Email, CloudType cloudname)
+        public RootNode GetCloudRootNode(string Email, CloudType cloudname)
         {
             foreach (XmlNode node in GetCloudDataList())
             {
@@ -151,8 +151,6 @@ namespace Core.Class
                 root.Type = (CloudType)Enum.Parse(typeof(CloudType), node.Attributes["CloudName"].Value);
                 if (root.Email == Email && root.Type == cloudname)
                 {
-
-
                     NodeInfo info = new NodeInfo();
                     try
                     {
@@ -165,8 +163,8 @@ namespace Core.Class
 #endif
                     }
 
-                    ItemNode e_node = new ItemNode();
-                    e_node.NodeType = root;
+                    RootNode e_node = new RootNode();
+                    e_node.RootType = root;
                     e_node.Info = info;
                     return e_node;
                 }

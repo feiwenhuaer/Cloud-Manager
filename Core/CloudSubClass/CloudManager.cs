@@ -31,10 +31,10 @@ namespace Core.CloudSubClass
         }
 
 
-        public ItemNode GetItemsList(ItemNode node)
+        public IItemNode GetItemsList(IItemNode node)
         {
             CheckThread(false);
-            switch (node.GetRoot.NodeType.Type)
+            switch (node.GetRoot.RootType.Type)
             {
                 case CloudType.Dropbox:
                     return Dropbox.GetListFileFolder(node);
@@ -45,13 +45,13 @@ namespace Core.CloudSubClass
                 case CloudType.Mega:
                     return MegaNz.GetListFileFolder(node);
                 default:
-                    throw new UnknowCloudNameException("Error Unknow Cloud Type: " + node.GetRoot.NodeType.Type.ToString());
+                    throw new UnknowCloudNameException("Error Unknow Cloud Type: " + node.GetRoot.RootType.Type.ToString());
             }
         }
 
-        public Stream GetFileStream(ItemNode node, long Startpos = -1,long endpos =-1,bool IsUpload = false,object DataEx = null)
+        public Stream GetFileStream(IItemNode node, long Startpos = -1,long endpos =-1,bool IsUpload = false,object DataEx = null)
         {
-            switch (node.GetRoot.NodeType.Type)
+            switch (node.GetRoot.RootType.Type)
             {
                 case CloudType.Dropbox:
                     return Dropbox.GetFileStream(node, Startpos, endpos);//download only
@@ -62,14 +62,14 @@ namespace Core.CloudSubClass
                 case CloudType.Mega:
                     return MegaNz.GetStream(node, Startpos, endpos, IsUpload, DataEx);//
                 default:
-                    throw new UnknowCloudNameException("Error Unknow Cloud Type: " + node.GetRoot.NodeType.Type.ToString());
+                    throw new UnknowCloudNameException("Error Unknow Cloud Type: " + node.GetRoot.RootType.Type.ToString());
             }
         }
 
-        public void CreateFolder(ItemNode node)
+        public void CreateFolder(IItemNode node)
         {
             CheckThread(false);
-            switch (node.GetRoot.NodeType.Type)
+            switch (node.GetRoot.RootType.Type)
             {
                 case CloudType.Dropbox:
                     Dropbox.CreateFolder(node);
@@ -84,7 +84,7 @@ namespace Core.CloudSubClass
                     MegaNz.CreateFolder(node);
                     break;
                 default:
-                    throw new UnknowCloudNameException("Error Unknow Cloud Type: " + node.GetRoot.NodeType.Type.ToString());
+                    throw new UnknowCloudNameException("Error Unknow Cloud Type: " + node.GetRoot.RootType.Type.ToString());
             }
         }
 
@@ -163,28 +163,36 @@ namespace Core.CloudSubClass
         }
         private void SaveToken(string email, string token, CloudType type)
         {
-            if (AppSetting.settings.AddCloud(email, type, token, false)) AppSetting.UIMain.AddNewCloudToTV(new ItemNode(new TypeNode() { Email = email, Type = type }));
+            if (AppSetting.settings.AddCloud(email, type, token, false)) AppSetting.UIMain.AddNewCloudToTV(new RootNode(new TypeNode() { Email = email, Type = type }));
         }
         #endregion
         
-        public bool MoveItem(ItemNode node, ItemNode newparent, string newname = null, bool Copy = false)
+        public bool MoveItem(IItemNode node, IItemNode newparent, string newname = null, bool Copy = false)
         {
             CheckThread(false);
-            if (node.GetRoot == newparent.GetRoot)
+            if ((newparent!= null && node.GetRoot == newparent.GetRoot) | newparent == null)
             {
                 bool flag = false;
-                switch (node.GetRoot.NodeType.Type)
+                switch (node.GetRoot.RootType.Type)
                 {
                     case CloudType.Dropbox: flag = Dropbox.Move(node, newparent, newname); break;
-                    case CloudType.GoogleDrive: GoogleDrive.MoveItem(node, newparent, newname).parents.ForEach(s => { if (!flag && s.id == newparent.Info.ID) flag = true; }); break;
+                    case CloudType.GoogleDrive:
+                        GD_item item = GoogleDrive.MoveItem(node, newparent, newname);
+                        if (item.title == newname) flag = true;
+                        item.parents.ForEach(s => { if (!flag && newparent != null && s.id == newparent.Info.ID) flag = true; });
+                        break;
                     case CloudType.LocalDisk: flag = LocalDisk.Move(node, newparent, newname); break;
                     case CloudType.Mega:
-                    default: throw new Exception("CloudType not support (" + node.GetRoot.NodeType.Type.ToString() + ").");
+                    default: throw new Exception("CloudType not support (" + node.GetRoot.RootType.Type.ToString() + ").");
                 }
                 if (flag)
                 {
-                    node.Parent.RemoveChild(node);
-                    newparent.AddChild(node);
+                    if (newparent != null)
+                    {
+                        node.Parent.RemoveChild(node);
+                        newparent.AddChild(node);
+                    }
+                    else node.Info.Name = newname;
                 }
                 return flag;
             }
@@ -234,7 +242,7 @@ namespace Core.CloudSubClass
                     ui.UpdateText(AppSetting.lang.GetText(LanguageKey.DeleteForm_updatetext_Deleting.ToString()) + item);
                     try
                     {
-                        switch (item.GetRoot.NodeType.Type)
+                        switch (item.GetRoot.RootType.Type)
                         {
                             case CloudType.Dropbox:
                                 if (!Dropbox.Delete(item, PernamentDelete)) Iserror = true;
@@ -246,7 +254,7 @@ namespace Core.CloudSubClass
                                 if (!LocalDisk.Delete(item, PernamentDelete)) Iserror = true;
                                 break;
                             case CloudType.Mega:
-                            default: throw new UnknowCloudNameException("Error Unknow Cloud Type: " + item.GetRoot.NodeType.Type.ToString());
+                            default: throw new UnknowCloudNameException("Error Unknow Cloud Type: " + item.GetRoot.RootType.Type.ToString());
                         }
                         if (!Iserror) ui.UpdateText(AppSetting.lang.GetText(LanguageKey.DeleteForm_updatetext_Deleted.ToString()) + "\r\n");
                         else
@@ -289,9 +297,9 @@ namespace Core.CloudSubClass
         }
 
 
-        public ItemNode GetFileInfo(ItemNode node)
+        public IItemNode GetFileInfo(IItemNode node)
         {
-            switch (node.GetRoot.NodeType.Type)
+            switch (node.GetRoot.RootType.Type)
             {
                 case CloudType.Dropbox:
                     return Dropbox.GetMetaData(node);
@@ -306,7 +314,7 @@ namespace Core.CloudSubClass
                 case CloudType.Mega:
                     return MegaNz.GetItem(node);
                 default:
-                    throw new UnknowCloudNameException("Error Unknow Cloud Type: " + node.GetRoot.NodeType.Type.ToString());
+                    throw new UnknowCloudNameException("Error Unknow Cloud Type: " + node.GetRoot.RootType.Type.ToString());
             }
         }
     }

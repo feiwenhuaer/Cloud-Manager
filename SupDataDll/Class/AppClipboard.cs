@@ -7,26 +7,26 @@ namespace CloudManagerGeneralLib
     {
         public static bool Clipboard = false;
         public static bool AreCut = false;
-        public static ItemNode directory;
-        public static List<ItemNode> Items = new List<ItemNode>();
+        public static IItemNode directory;
+        public static List<IItemNode> Items = new List<IItemNode>();
         public static void Clear()
         {
-            Items = new List<ItemNode>();
+            Items = new List<IItemNode>();
             Clipboard = false;
             directory = null;
         }
 
-        public static void Add(ItemNode item)
+        public static void Add(IItemNode item)
         {
             Items.Add(item);
         }
 
-        public static void Add(ItemNode[] item)
+        public static void Add(IItemNode[] item)
         {
             Items.AddRange(item);
         }
 
-        public static void Add(List<ItemNode> item)
+        public static void Add(List<IItemNode> item)
         {
             Items.AddRange(item);
         }

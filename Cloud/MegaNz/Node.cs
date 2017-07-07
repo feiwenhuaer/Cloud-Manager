@@ -89,7 +89,7 @@
 
                 this.LastModificationDate = OriginalDateTime.AddSeconds(this.SerializedLastModificationDate).ToLocalTime();
 
-                if (this.Type == NodeType.File || this.Type == NodeType.Directory)
+                if (this.Type == RootType.File || this.Type == RootType.Directory)
                 {
                     // There are cases where the SerializedKey property contains multiple keys separated with /
                     // This can occur when a folder is shared and the parent is shared too.
@@ -106,7 +106,7 @@
                         if (sharedKey != null)
                         {
                             masterKey = Crypto.DecryptKey(sharedKey.Key.FromBase64(), masterKey);
-                            if (this.Type == NodeType.Directory)
+                            if (this.Type == RootType.Directory)
                             {
                                 this.SharedKey = masterKey;
                             }
@@ -119,7 +119,7 @@
 
                     this.FullKey = Crypto.DecryptKey(encryptedKey, masterKey);
 
-                    if (this.Type == NodeType.File)
+                    if (this.Type == RootType.File)
                     {
                         byte[] iv, metaMac, fileKey;
                         Crypto.GetPartsFromDecryptedKey(this.FullKey, out iv, out metaMac, out fileKey);
@@ -168,7 +168,7 @@
       Attributes attributes = Crypto.DecryptAttributes(downloadResponse.SerializedAttributes.FromBase64(), fileKey);
       this.Name = attributes.Name;
       this.Size = downloadResponse.Size;
-      this.Type = NodeType.File;
+      this.Type = RootType.File;
     }
 
     protected NodePublic()
@@ -182,6 +182,6 @@
     public long Size { get; protected set; }
 
     [JsonProperty("t")]
-    public NodeType Type { get; protected set; }
+    public RootType Type { get; protected set; }
   }
 }

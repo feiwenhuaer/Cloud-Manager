@@ -32,8 +32,8 @@ namespace Core.Transfer
             if (item.From.node.Info.Size == 0) { item.ErrorMsg = "File size zero."; Dispose(); }
             this.item = item;
             this.GroupManager = GroupManager;
-            Type_root_to = this.item.To.node.GetRoot.NodeType.Type;
-            Type_root_from = this.item.From.node.GetRoot.NodeType.Type;
+            Type_root_to = this.item.To.node.GetRoot.RootType.Type;
+            Type_root_from = this.item.From.node.GetRoot.RootType.Type;
 
             if (GroupManager.AreCut && (Type_root_to | CloudType.LocalDisk) == Type_root_from &&
                 item.To.node.GetRoot.Info.Name == item.From.node.GetRoot.Info.Name)
@@ -47,11 +47,11 @@ namespace Core.Transfer
             {
                 if (item.buffer == null) item.buffer = new byte[128 * 1024];
                 if (clientTo != null) this.clientTo = clientTo;
-                if (item.To.node.GetRoot.NodeType.Type == CloudType.Mega) InitUploadMega();//InitUploadMega
+                if (item.To.node.GetRoot.RootType.Type == CloudType.Mega) InitUploadMega();//InitUploadMega
 
                 //Make Stream From
                 item.From.stream = AppSetting.ManageCloud.GetFileStream(item.From.node, item.SaveSizeTransferSuccess,
-                    item.From.node.Info.Size - 1, item.To.node.GetRoot.NodeType.Type != CloudType.LocalDisk, item.dataCryptoMega);
+                    item.From.node.Info.Size - 1, item.To.node.GetRoot.RootType.Type != CloudType.LocalDisk, item.dataCryptoMega);
                 //Make Stream To
                 if (item.ChunkUploadSize > 0) MakeNextChunkUploadInStreamTo(true);//upload to cloud
                 else this.item.To.stream = AppSetting.ManageCloud.GetFileStream(item.To.node, item.SizeWasTransfer);//download to disk
@@ -141,7 +141,7 @@ namespace Core.Transfer
             long pos_end = item.SizeWasTransfer + item.ChunkUploadSize - 1;
             if (pos_end >= item.From.node.Info.Size) pos_end = item.From.node.Info.Size - 1;
 
-            switch (item.To.node.GetRoot.NodeType.Type)
+            switch (item.To.node.GetRoot.RootType.Type)
             {
                 case CloudType.Dropbox:
                     if (!CreateNew) ((DropboxRequestAPIv2)clientTo).GetResponse_upload_session_append();//get data return from server

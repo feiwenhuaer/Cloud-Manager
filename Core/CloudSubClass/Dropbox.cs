@@ -18,12 +18,12 @@ namespace Core.CloudSubClass
         #endregion
 
         #region Public Method
-        public static ItemNode GetListFileFolder(ItemNode node)
+        public static IItemNode GetListFileFolder(IItemNode node)
         {
-            DropboxRequestAPIv2 client = GetAPIv2(node.GetRoot.NodeType.Email);
+            DropboxRequestAPIv2 client = GetAPIv2(node.GetRoot.RootType.Email);
 
             IDropbox_Response_ListFolder response = client.ListFolder(new Dropbox_Request_ListFolder(node.GetFullPathString(false)));
-            node.Child.Clear();
+            node.Childs.Clear();
             foreach (IDropbox_Response_MetaData metadata in response.entries)
                 if (metadata.tag == "folder")
                     new ItemNode(
@@ -36,23 +36,23 @@ namespace Core.CloudSubClass
             return node;
         }
         
-        public static Stream GetFileStream(ItemNode node,long Startpos = -1,long endpos = -1)
+        public static Stream GetFileStream(IItemNode node,long Startpos = -1,long endpos = -1)
         {
-            DropboxRequestAPIv2 client = GetAPIv2(node.GetRoot.NodeType.Email);
+            DropboxRequestAPIv2 client = GetAPIv2(node.GetRoot.RootType.Email);
             return client.Download(new Dropbox_path(node.GetFullPathString(false)), Startpos, endpos);
         }
         
-        public static void CreateFolder(ItemNode node)
+        public static void CreateFolder(IItemNode node)
         {
             if (node == node.GetRoot) throw new Exception("Node is root.");
-            DropboxRequestAPIv2 client = GetAPIv2(node.GetRoot.NodeType.Email);
+            DropboxRequestAPIv2 client = GetAPIv2(node.GetRoot.RootType.Email);
             IDropbox_Response_MetaData metadata = client.create_folder(new Dropbox_path(node.GetFullPathString(false)));
             node.Info.ID = metadata.id;
         }
 
-        public static bool Delete(ItemNode node, bool PernamentDelete)
+        public static bool Delete(IItemNode node, bool PernamentDelete)
         {
-            DropboxRequestAPIv2 dropbox_client = GetAPIv2(node.GetRoot.NodeType.Email);
+            DropboxRequestAPIv2 dropbox_client = GetAPIv2(node.GetRoot.RootType.Email);
             string path = node.GetFullPathString(false);
             if (PernamentDelete)
             {
@@ -66,10 +66,10 @@ namespace Core.CloudSubClass
             }
         }
 
-        public static bool Move(ItemNode nodemove, ItemNode newparent, string newname = null)
+        public static bool Move(IItemNode nodemove, IItemNode newparent, string newname = null)
         {
-            if (nodemove.GetRoot.NodeType.Email != newparent.GetRoot.NodeType.Email || nodemove.GetRoot.NodeType.Type != newparent.GetRoot.NodeType.Type) throw new Exception("Cloud not match.");
-            DropboxRequestAPIv2 client = GetAPIv2(nodemove.GetRoot.NodeType.Email);
+            if (nodemove.GetRoot.RootType.Email != newparent.GetRoot.RootType.Email || nodemove.GetRoot.RootType.Type != newparent.GetRoot.RootType.Type) throw new Exception("Cloud not match.");
+            DropboxRequestAPIv2 client = GetAPIv2(nodemove.GetRoot.RootType.Email);
             IDropbox_Response_MetaData metadata = client.move(
                 new Dropbox_Request_MoveCopy(   nodemove.GetFullPathString(false), 
                                                 newparent.GetFullPathString(false) + "/" + newname == null ? nodemove.Info.Name : newname
@@ -77,15 +77,15 @@ namespace Core.CloudSubClass
             return newparent.GetFullPathString(false) == metadata.path_display;
         }
         
-        public static string AutoCreateFolder(ItemNode node)
+        public static string AutoCreateFolder(IItemNode node)
         {
             if (node.Info.Size > 0) throw new Exception("Node is file.");
-            DropboxRequestAPIv2 client = GetAPIv2(node.GetRoot.NodeType.Email);
+            DropboxRequestAPIv2 client = GetAPIv2(node.GetRoot.RootType.Email);
             try
             {
                 Monitor.Enter(sync_CreateFolder);
 
-                List<ItemNode> pathlist = node.GetFullPath();
+                List<IItemNode> pathlist = node.GetFullPath();
                 int i;
                 for (i = 1; i < pathlist.Count; i++)
                 {
@@ -105,9 +105,9 @@ namespace Core.CloudSubClass
             finally { Monitor.Exit(sync_CreateFolder); }
         }
 
-        public static ItemNode GetMetaData(ItemNode node)
+        public static IItemNode GetMetaData(IItemNode node)
         {
-            DropboxRequestAPIv2 client = GetAPIv2(node.GetRoot.NodeType.Email);
+            DropboxRequestAPIv2 client = GetAPIv2(node.GetRoot.RootType.Email);
             IDropbox_Response_MetaData metadata = client.GetMetadata(
                 new Dropbox_Request_Metadata(string.IsNullOrEmpty(node.Info.ID) ? node.GetFullPathString(false, true) : "id:" + node.Info.ID));
             node.Info.Name = metadata.name;

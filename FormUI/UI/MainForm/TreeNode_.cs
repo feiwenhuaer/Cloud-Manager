@@ -6,27 +6,28 @@ namespace FormUI.UI.MainForm
 {
     internal class TreeNode_ : TreeNode
     {
-        public ItemNode explorernode { get; private set; }
+        public IItemNode ExplorerNode { get; private set; }
         public TreeNode_(string text, int imageIndex) : base(text, imageIndex, imageIndex)
         {
-            explorernode = new ItemNode();
+            RootNode explorernode = new RootNode();
             if ((CloudType)imageIndex != CloudType.LocalDisk)
             {
-                explorernode.NodeType.Email = text;
-                explorernode.NodeType.Type = (CloudType)imageIndex;
+                explorernode.RootType.Email = text;
+                explorernode.RootType.Type = (CloudType)imageIndex;
             }
             else
             {
                 explorernode.Info.Name = text;
                 explorernode.Info.Size = -1;
-                explorernode.NodeType.Type = CloudType.LocalDisk;
+                explorernode.RootType.Type = CloudType.LocalDisk;
             }
+            this.ExplorerNode = explorernode;
         }
-        public TreeNode_(ItemNode node)
+        public TreeNode_(IItemNode node)
         {
-            this.Text = (node.NodeType.Type != CloudType.Folder && node.NodeType.Type != CloudType.LocalDisk) ? node.NodeType.Email : node.Info.Name;
-            this.ImageIndex = this.SelectedImageIndex = (int)node.NodeType.Type;//(int)CloudType.Folder;
-            this.explorernode = node;
+            this.Text = ((node is RootNode) && (node as RootNode).RootType.Type != CloudType.LocalDisk) ? (node as RootNode).RootType.Email : node.Info.Name;
+            this.ImageIndex = this.SelectedImageIndex = (node is RootNode) ? (int)(node as RootNode).RootType.Type : (int)CloudType.Folder;//(int)CloudType.Folder;
+            this.ExplorerNode = node;
         }
     }
 }
