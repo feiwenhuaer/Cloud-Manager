@@ -13,7 +13,8 @@
             <Setter Property="Padding" Value="0"/>
         </Style>
     </UserControl.Resources>
-    <ListView x:Name="LV_items" Margin="0,0,0,0" ContextMenuOpening="LVitems_ContextMenu_ContextMenuOpening" MouseDoubleClick="LV_items_MouseDoubleClick" SelectionMode="Extended" MouseDown="LV_items_MouseDown">
+    <ListView x:Name="LV_items" Margin="0,0,0,0" ContextMenuOpening="LVitems_ContextMenu_ContextMenuOpening" 
+              MouseDoubleClick="LV_items_MouseDoubleClick" SelectionMode="Extended" MouseDown="LV_items_MouseDown">
         <ListView.View>
             <GridView>
                 <GridViewColumn Header="Name" Width="250">
