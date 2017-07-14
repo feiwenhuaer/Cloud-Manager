@@ -1,5 +1,4 @@
-﻿using Cloud.GoogleDrive.JsonClass;
-using Cloud.GoogleDrive.Oauth;
+﻿using Cloud.GoogleDrive.Oauth;
 using CustomHttpRequest;
 using System;
 using System.Collections.Generic;
@@ -16,10 +15,6 @@ namespace Cloud.GoogleDrive
   public delegate void GD_LimitExceededDelegate();
   public class DriveAPIHttprequestv2
   {
-    public DriveAPIHttprequestv2()
-    {
-      GoogleDriveAppKey.Check();
-    }
     const string Host = "HOST: www.googleapis.com";
     const string uriAbout = "https://www.googleapis.com/drive/v2/about";
     const string uriFileList = "https://www.googleapis.com/drive/v2/files?orderBy={0}&corpus={1}&projection={2}&maxResults={3}&spaces={4}";
@@ -53,6 +48,7 @@ namespace Cloud.GoogleDrive
       this.Token = token;
       oauth = new GoogleAPIOauth2(token);
       this.limit = LimitExceeded;
+      GoogleDriveAppKey.Check();
       this.Files = new DriveFiles(this);
       this.About = new DriveAbout(this);
       this.Parent = new DriveParent(this);
@@ -202,11 +198,22 @@ namespace Cloud.GoogleDrive
 #endif
     }
 
-    private class RequestReturn
+    public class RequestReturn
     {
-      public string HeaderResponse { get; set; }
-      public string DataTextResponse { get; set; }
-      public Stream stream { get; set; }
+      public string HeaderResponse { get; internal set; }
+      public string DataTextResponse { get; internal set; }
+      public Stream stream { get; internal set; }
+      public T GetObjectResponse<T>()
+      {
+        try
+        {
+          return JsonConvert.DeserializeObject<T>(this.DataTextResponse);
+        }
+        catch(Exception)
+        {
+          return default(T);
+        }
+      }
     }
     #endregion
 
@@ -220,14 +227,27 @@ namespace Cloud.GoogleDrive
         this.client = client;
       }
 
+      /// <summary>
+      /// Download file
+      /// </summary>
+      /// <param name="fileId"></param>
+      /// <param name="PosStart"></param>
+      /// <param name="endpos"></param>
+      /// <returns>Stream</returns>
       public Stream Get(string fileId, long PosStart = -1, long endpos = -1)
       {
         string url = string.Format(uriFileGet, fileId);
         string[] moreheader = { "Range: bytes=" + PosStart.ToString() + "-" + endpos.ToString() };
         return client.Request<Stream>(url, TypeRequest.GET, null, (endpos < 0) ? moreheader : null).stream;
       }
-
-      public string Insert_ResumableGetUploadID(string jsonMetaData, string typefileupload, long filesize)
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="jsonMetaData"></param>
+      /// <param name="typefileupload"></param>
+      /// <param name="filesize"></param>
+      /// <returns>Url upload</returns>
+      public string Insert_Resumable_GetUploadID(string jsonMetaData, string typefileupload, long filesize)
       {
         string url = string.Format(uriFiles_insert_resumable_getUploadID, uploadType.resumable.ToString());
         string[] moreheader = {
@@ -248,8 +268,14 @@ namespace Cloud.GoogleDrive
         }
         throw new Exception("Can't get data: \r\n" + data);
       }
-
-
+      /// <summary>
+      /// Continue upload
+      /// </summary>
+      /// <param name="url_uploadid"></param>
+      /// <param name="posstart"></param>
+      /// <param name="posend"></param>
+      /// <param name="filesize"></param>
+      /// <returns></returns>
       public Stream Insert_Resumable(string url_uploadid, long posstart, long posend, long filesize)
       {
         if (posstart < 0 & posend < 0) throw new Exception("Pos can't be < 0.");
@@ -259,63 +285,51 @@ namespace Cloud.GoogleDrive
         return client.Request<Stream>(url_uploadid, TypeRequest.PUT, null, moreheader.ToArray()).stream;
       }
 
-      public string Insert_Resumable_Response(bool GetMetaData = false)
-      {
-        string data = client.http_request.GetTextDataResponse(false, true);
-#if DEBUG
-        Console.WriteLine("DriveAPIHttprequestv2: " + data);
-#endif
-        if (GetMetaData) return data;
-        else return client.http_request.HeaderReceive;
-      }
-
-      public string Insert_MetadataRequest(string json_filemetadata)
-      {
-        return client.Request<string>(uriDriveFile, TypeRequest.POST, Encoding.UTF8.GetBytes(json_filemetadata)).DataTextResponse;
-      }
-
       /// <summary>
-      /// Updates and get response file metadata.
+      /// Get response after Insert_Resumable
       /// </summary>
-      /// <param name="id">Item id</param>
-      /// <param name="json_metadata">Json data (drive#file)</param>
-      /// <returns>string or GD_ItemMetaData</returns>
-      //public T Patch<T>(string id, string json_metadata = null)
-      //{
-      //  byte[] buffer = null;
-      //  if (!string.IsNullOrEmpty(json_metadata)) buffer = Encoding.UTF8.GetBytes(json_metadata);
-      //  string data = client.Request<string>(uriDriveFile + id + "?key=" + GoogleDriveAppKey.ApiKey + "&alt=json",
-      //          TypeRequest.PATCH, buffer).DataTextResponse;
-      //  if (typeof(T) == typeof(string)) return (T)(object)data;
-      //  if (typeof(T) == typeof(GD_ItemMetaData)) return (T)(object)JsonConvert.DeserializeObject<GD_ItemMetaData>(data);
-      //  throw new Exception("Require T is string or Cloud.GoogleDrive.JsonClass.GD_ItemMetaData");
-      //}
-
-      public string Patch(string id, string json_metadata = null)
+      /// <param name="GetMetaData">if false then return HeaderReceive</param>
+      /// <returns>HeaderReceive or DataReceive</returns>
+      public RequestReturn Insert_Resumable_Response(bool GetMetaData = false)
+      {
+        RequestReturn rr = new RequestReturn();
+        rr.DataTextResponse = client.http_request.GetTextDataResponse(false, true);
+#if DEBUG
+        Console.WriteLine("DriveAPIHttprequestv2: " + rr.DataTextResponse);
+#endif
+        rr.HeaderResponse = client.http_request.HeaderReceive;
+        return rr;;
+      }
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="json_filemetadata"></param>
+      /// <returns>ItemMetadata</returns>
+      public DriveItemMetadata_Item Insert_MetadataRequest(string json_filemetadata)
+      {
+        return JsonConvert.DeserializeObject<DriveItemMetadata_Item>(client.Request<string>(uriDriveFile, TypeRequest.POST, Encoding.UTF8.GetBytes(json_filemetadata)).DataTextResponse);
+      }
+      
+      public DriveItemMetadata_Item Patch(string id, string json_metadata = null)
       {
         byte[] buffer = null;
         if (!string.IsNullOrEmpty(json_metadata)) buffer = Encoding.UTF8.GetBytes(json_metadata);
         return client.Request<string>(uriDriveFile + id + "?key=" + GoogleDriveAppKey.ApiKey + "&alt=json",
-                TypeRequest.PATCH, buffer).DataTextResponse;
+                TypeRequest.PATCH, buffer).GetObjectResponse<DriveItemMetadata_Item>();
       }
       
-      //public string Update()
-      //{
-
-      //}
-
-      public string Copy(string file_id, string parent_id)
+      public DriveItemMetadata_Item Copy(string file_id, string parent_id)
       {
         string post_data = "{\"parents\": [{\"id\": \"" + parent_id + "\"}]}";
-        return client.Request<string>("https://www.googleapis.com/drive/v2/files/" + file_id + "/copy", TypeRequest.POST, Encoding.UTF8.GetBytes(post_data)).DataTextResponse;
+        return client.Request<string>("https://www.googleapis.com/drive/v2/files/" + file_id + "/copy", TypeRequest.POST, Encoding.UTF8.GetBytes(post_data)).GetObjectResponse<DriveItemMetadata_Item>();
       }
 
-      public string Delete(string fileId)
+      public DriveItemMetadata_Item Delete(string fileId)
       {
-        return client.Request<string>(uriDriveFile + fileId + "?key=" + GoogleDriveAppKey.ApiKey, TypeRequest.DELETE, null, null).DataTextResponse;
+        return client.Request<string>(uriDriveFile + fileId + "?key=" + GoogleDriveAppKey.ApiKey, TypeRequest.DELETE, null, null).GetObjectResponse<DriveItemMetadata_Item>();
       }
 
-      public string List(OrderByEnum[] order, string query = null, string pageToken = null,
+      public Drive_Files_list List(OrderByEnum[] order, string query = null, string pageToken = null,
           CorpusEnum corpus = CorpusEnum.DEFAULT, ProjectionEnum projection = ProjectionEnum.BASIC,
               int maxResults = 1000, SpacesEnum spaces = SpacesEnum.drive)
       {
@@ -323,7 +337,7 @@ namespace Cloud.GoogleDrive
         projection.ToString(), maxResults.ToString(), spaces.ToString());
         if (pageToken != null) url += "&pageToken=" + pageToken;
         if (query != null) url += "&q=" + HttpUtility.UrlEncode(query, Encoding.UTF8);
-        return client.Request<string>(url, TypeRequest.GET).DataTextResponse;
+        return client.Request<string>(url, TypeRequest.GET).GetObjectResponse<Drive_Files_list>();
       }
 
       //public string Touch()
@@ -331,14 +345,14 @@ namespace Cloud.GoogleDrive
 
       //}
 
-      public string Trash(string id)
+      public DriveItemMetadata_Item Trash(string id)
       {
-        return client.Request<string>(uriDriveFile + id + "/trash?fields=labels%2Ftrashed&key=" + GoogleDriveAppKey.ApiKey, TypeRequest.POST, null, null).DataTextResponse;
+        return client.Request<string>(uriDriveFile + id + "/trash?fields=labels%2Ftrashed&key=" + GoogleDriveAppKey.ApiKey, TypeRequest.POST, null, null).GetObjectResponse<DriveItemMetadata_Item>();
       }
 
-      public string UnTrash(string id)
+      public DriveItemMetadata_Item UnTrash(string id)
       {
-        return client.Request<string>(uriDriveFile + id + "/untrash", TypeRequest.POST).DataTextResponse;
+        return client.Request<string>(uriDriveFile + id + "/untrash", TypeRequest.POST).GetObjectResponse<DriveItemMetadata_Item>();
       }
 
       //public string Watch()
@@ -356,6 +370,7 @@ namespace Cloud.GoogleDrive
 
       //}
     }
+    
     #endregion
 
     #region DriveAbout
@@ -368,7 +383,7 @@ namespace Cloud.GoogleDrive
         this.client = client;
       }
 
-      public string Get(bool includeSubscribed = true, long maxChangeIdCount = -1, long startChangeId = -1)
+      public Drive_About Get(bool includeSubscribed = true, long maxChangeIdCount = -1, long startChangeId = -1)
       {
         string parameters = "";
         if (!includeSubscribed) parameters += "includeSubscribed=false";
@@ -376,7 +391,7 @@ namespace Cloud.GoogleDrive
           else parameters = "maxChangeIdCount=" + maxChangeIdCount;
         if (!(startChangeId == -1)) if (parameters.Length > 0) parameters += "&startChangeId=" + startChangeId;
           else parameters = "startChangeId=" + startChangeId;
-        return client.Request<string>(uriAbout, TypeRequest.GET, string.IsNullOrEmpty(parameters) ? null : Encoding.UTF8.GetBytes(parameters)).DataTextResponse;
+        return client.Request<string>(uriAbout, TypeRequest.GET, string.IsNullOrEmpty(parameters) ? null : Encoding.UTF8.GetBytes(parameters)).GetObjectResponse<Drive_About>();
       }
     }
     #endregion
@@ -391,30 +406,31 @@ namespace Cloud.GoogleDrive
         this.client = client;
       }
 
-      public string Delete(string fileid, string parentid)
+      public void Delete(string fileid, string parentid)
       {
-        return client.Request<string>(uriDriveFile + fileid + "/parents/" + parentid, TypeRequest.DELETE).DataTextResponse;
+        client.Request<string>(uriDriveFile + fileid + "/parents/" + parentid, TypeRequest.DELETE);
       }
 
-      public string Get(string fileid, string parentid)
+      public DriveItemMetadata_parent Get(string fileid, string parentid)
       {
-        return client.Request<string>(uriDriveFile + fileid + "/parents/" + parentid, TypeRequest.GET).DataTextResponse;
+        return client.Request<string>(uriDriveFile + fileid + "/parents/" + parentid, TypeRequest.GET).GetObjectResponse<DriveItemMetadata_parent>();
       }
+
       /// <summary>
       /// Adds a parent folder for a file.
       /// </summary>
       /// <param name="fileid"></param>
       /// <param name="json_metadata">Json data parent</param>
       /// <returns></returns>
-      public string Insert(string fileid, string json_metadata)
+      public DriveItemMetadata_parent Insert(string fileid, string json_metadata)
       {
         return client.Request<string>(uriDriveFile + fileid + "/parents?alt=json&key=" + GoogleDriveAppKey.ApiKey,
-            TypeRequest.POST, Encoding.UTF8.GetBytes(json_metadata)).DataTextResponse;
+            TypeRequest.POST, Encoding.UTF8.GetBytes(json_metadata)).GetObjectResponse<DriveItemMetadata_parent>();
       }
 
-      public string List(string fileid)
+      public Drive_Parent_List List(string fileid)
       {
-        return client.Request<string>(uriDriveFile + fileid + "/parents", TypeRequest.GET).DataTextResponse;
+        return client.Request<string>(uriDriveFile + fileid + "/parents", TypeRequest.GET).GetObjectResponse<Drive_Parent_List>(); ;
       }
     }
     #endregion
@@ -429,16 +445,17 @@ namespace Cloud.GoogleDrive
         this.client = client;
       }
 
-      public string CreateFolder(string name, string parent_id)
+      public DriveItemMetadata_Item CreateFolder(string name, string parent_id)
       {
         string json_data = "{\"mimeType\": \"application/vnd.google-apps.folder\", \"title\": \"" + name + "\", \"parents\": [{\"id\": \"" + parent_id + "\"}]}";
         return CreateFolder(json_data);
       }
-      public string CreateFolder(string metadata)
+      public DriveItemMetadata_Item CreateFolder(string metadata)
       {
         return client.Files.Insert_MetadataRequest(metadata);
       }
     }
     #endregion
   }
+  
 }
