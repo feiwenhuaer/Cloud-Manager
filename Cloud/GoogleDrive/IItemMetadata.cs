@@ -131,7 +131,7 @@ namespace Cloud.GoogleDrive
     public string fileExtension { get; set; }
     public string fullFileExtension { get; set; }
     public string md5Checksum { get; set; }
-    public long fileSize { get; set; }
+    public long fileSize { get; set; } = -1;
     public long quotaBytesUsed { get; set; }
     public List<string> ownerNames { get; set; }
     public List<Drive_User> owners { get; set; }
