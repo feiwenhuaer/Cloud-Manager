@@ -199,6 +199,9 @@
     <EmbeddedResource Include="UI\Oauth\UIOauth.resx">
       <DependentUpon>UIOauth.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\SettingForm\main_setting.resx">
+      <DependentUpon>main_setting.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

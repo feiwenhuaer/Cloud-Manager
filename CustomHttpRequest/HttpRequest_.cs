@@ -291,7 +291,6 @@ namespace CustomHttpRequest
             byte_header_receive += byteread;
           }
           while (!Find_CRLFCRLF(buffer_header, (int)byte_receive - 4));
-          Console.WriteLine("testtttttttttttttttt");
         }
         catch (Exception ex)
         { throw; }

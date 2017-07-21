@@ -445,6 +445,13 @@ namespace Cloud.GoogleDrive
         this.client = client;
       }
 
+      public DriveItemMetadata_Item CreateFolder(string name, List<DriveItemMetadata_parent> parent_id)
+      {
+
+        string json_data = "{\"mimeType\": \"application/vnd.google-apps.folder\", \"title\": \"" + name + "\", \"parents\": [{\"id\": \"" + parent_id + "\"}]}";
+        return CreateFolder(json_data);
+      }
+
       public DriveItemMetadata_Item CreateFolder(string name, string parent_id)
       {
         string json_data = "{\"mimeType\": \"application/vnd.google-apps.folder\", \"title\": \"" + name + "\", \"parents\": [{\"id\": \"" + parent_id + "\"}]}";

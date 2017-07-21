@@ -37,6 +37,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CloudAppKey.cs" />
@@ -69,7 +70,6 @@
     <Compile Include="MegaNz\Node.cs" />
     <Compile Include="MegaNz\HttpRequestClient.cs" />
     <Compile Include="MegaNz\Oauth\UIinterfaceMegaNz.cs" />
-    <Compile Include="MegaNz\StreamMegaInterface.cs" />
     <Compile Include="IOauth.cs" />
     <Compile Include="OauthV2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
