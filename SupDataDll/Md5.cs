@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace CloudManagerGeneralLib.Crypt
+namespace CloudManagerGeneralLib
 {
     public static class Md5
     {

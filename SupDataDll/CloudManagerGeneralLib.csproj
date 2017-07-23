@@ -57,7 +57,7 @@
     <Compile Include="Class\Transfer.cs" />
     <Compile Include="Class\UI_n_lang.cs" />
     <Compile Include="Class\UnitConventer.cs" />
-    <Compile Include="Crypt\Md5.cs" />
+    <Compile Include="Md5.cs" />
     <Compile Include="CustomException.cs" />
     <Compile Include="Enum.cs" />
     <Compile Include="Class\ItemNode.cs" />
