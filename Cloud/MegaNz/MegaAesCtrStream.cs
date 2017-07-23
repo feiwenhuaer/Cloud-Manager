@@ -1,7 +1,5 @@
 ﻿namespace Cloud.MegaNz
 {
-  using CloudManagerGeneralLib.Class.Mega;
-  using CloudManagerGeneralLib.Crypt;
   using System;
   using System.Collections.Generic;
   using System.IO;

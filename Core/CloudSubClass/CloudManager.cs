@@ -156,7 +156,7 @@ namespace Core.CloudSubClass
         if (token.IsError) throw new Exception("Accesstoken:" + token.access_token + ",RefreshToken:" + token.refresh_token);
         string token_text = JsonConvert.SerializeObject(token);
         DriveAPIHttprequestv2 client = new DriveAPIHttprequestv2(token);
-        Drive_About about = client.About.Get();
+        Drive2_About about = client.About.Get();
         SaveToken(about.user.emailAddress, token_text, CloudType.GoogleDrive);
       }
       else throw new Exception("Oauth token GD failed.");
@@ -177,7 +177,7 @@ namespace Core.CloudSubClass
         {
           case CloudType.Dropbox: flag = Dropbox.Move(node, newparent, newname); break;
           case CloudType.GoogleDrive:
-            DriveItemMetadata_Item item = GoogleDrive.MoveItem(node, newparent, newname);
+            Drive2_File item = GoogleDrive.MoveItem(node, newparent, newname);
             if (item.title == newname) flag = true;
             item.parents.ForEach(s => { if (!flag && newparent != null && s.id == newparent.Info.ID) flag = true; });
             break;
@@ -304,7 +304,7 @@ namespace Core.CloudSubClass
         case CloudType.Dropbox:
           return Dropbox.GetMetaData(node);
         case CloudType.GoogleDrive:
-          DriveItemMetadata_Item item = GoogleDrive.GetMetadataItem(node);
+          Drive2_File item = GoogleDrive.GetMetadataItem(node);
           node.Info.Size = item.fileSize;
           node.Info.Name = item.title;
           node.Info.DateMod = item.modifiedDate;

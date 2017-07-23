@@ -8,8 +8,6 @@
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
-    using CloudManagerGeneralLib.Crypt;
-    using CloudManagerGeneralLib.Class.Mega;
 
     #region Base
 

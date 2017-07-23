@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml;
 using static Cloud.GoogleDrive.DriveAPIHttprequestv2;
+using Cloud;
 
 namespace Core.CloudSubClass
 {
@@ -70,12 +71,12 @@ namespace Core.CloudSubClass
       #region Get Child Node Data
       if (!string.IsNullOrEmpty(parent_ID))//if found id is folder
       {
-        Drive_Files_list list_ = Search("'" + parent_ID + "' in parents and trashed=false", Email);
+        Drive2_Files_list list_ = Search("'" + parent_ID + "' in parents and trashed=false", Email);
         if (parent_ID == "root")//save root id
         {
-          foreach (DriveItemMetadata_Item item in list_.items)
+          foreach (Drive2_File item in list_.items)
           {
-            foreach (DriveItemMetadata_parent parent in item.parents)
+            foreach (Drive2_Parent parent in item.parents)
             {
               if (parent.isRoot) { parent_ID = parent.id; break; }
             }
@@ -96,7 +97,7 @@ namespace Core.CloudSubClass
           RootNode n = new RootNode();
           n.Info.ID = match.Value;
           n.RootType.Email = Email;
-          DriveItemMetadata_Item item = GoogleDrive.GetMetadataItem(n);
+          Drive2_File item = GoogleDrive.GetMetadataItem(n);
           n.Info.Size = item.fileSize;
           n.Info.Name = item.title;
           n.Info.MimeType = item.mimeType;
@@ -115,10 +116,10 @@ namespace Core.CloudSubClass
       return gdclient.Files.Get(node.Info.ID, Startpos, endpos);
     }
 
-    public static Drive_Files_list Search(string query, string Email, string pageToken = null)
+    public static Drive2_Files_list Search(string query, string Email, string pageToken = null)
     {
       DriveAPIHttprequestv2 gdclient = GetAPIv2(Email);
-      Drive_Files_list list = gdclient.Files.List(en, query, pageToken);
+      Drive2_Files_list list = gdclient.Files.List(en, query, pageToken);
       if (!string.IsNullOrEmpty(list.nextPageToken)) list.items.AddRange(Search(query, Email, list.nextPageToken).items);
       return list;
     }
@@ -162,12 +163,12 @@ namespace Core.CloudSubClass
     {
       DriveAPIHttprequestv2 gdclient = GetAPIv2(node.GetRoot.RootType.Email);
       string json = "{\"title\": \"" + newname + "\"}";
-      DriveItemMetadata_Item response = gdclient.Files.Patch(node.Info.ID, json);
+      Drive2_File response = gdclient.Files.Patch(node.Info.ID, json);
       if (response.title == newname) return true;
       else return false;
     }
 
-    public static DriveItemMetadata_Item MoveItem(IItemNode nodemove, IItemNode newparent, string newname = null, bool copy = false)
+    public static Drive2_File MoveItem(IItemNode nodemove, IItemNode newparent, string newname = null, bool copy = false)
     {
       //Same account
       DriveAPIHttprequestv2 gdclient = GetAPIv2(nodemove.GetRoot.RootType.Email);
@@ -184,16 +185,16 @@ namespace Core.CloudSubClass
       }
       else//move
       {
-        Drive_Parent_List parents = gdclient.Parent.List(nodemove.Info.ID);
-        DriveItemMetadata_parent found = parents.items.Find(p => p.id == nodemove.Parent.Info.ID);
+        Drive2_Parents_list parents = gdclient.Parent.List(nodemove.Info.ID);
+        Drive2_Parent found = parents.items.Find(p => p.id == nodemove.Parent.Info.ID);
         if (found != null) parents.items.Remove(found);
-        parents.items.Add(new DriveItemMetadata_parent() { id = newparent.Info.ID });
+        parents.items.Add(new Drive2_Parent() { id = newparent.Info.ID });
         gdclient.Parent.Insert(nodemove.Info.ID, JsonConvert.SerializeObject(parents.items));
       }
       return gdclient.Files.Patch(nodemove.Info.ID, build == null ? null : build.GetJson());
     }
 
-    public static DriveItemMetadata_Item GetMetadataItem(IItemNode node)
+    public static Drive2_File GetMetadataItem(IItemNode node)
     {
       DriveAPIHttprequestv2 client = GetAPIv2(node.GetRoot.RootType.Email);
       return client.Files.Patch(node.Info.ID, null);
@@ -223,10 +224,10 @@ namespace Core.CloudSubClass
       else throw new Exception("Can't save token.");
     }
 
-    public static List<IItemNode> Convert(this List<DriveItemMetadata_Item> items, IItemNode parent)
+    public static List<IItemNode> Convert(this List<Drive2_File> items, IItemNode parent)
     {
       List<IItemNode> list = new List<IItemNode>();
-      foreach (DriveItemMetadata_Item item in items)
+      foreach (Drive2_File item in items)
       {
         bool add = true;
         GoogleDrive.mimeTypeGoogleRemove.ForEach(m => { if (item.mimeType == m) add = false; });

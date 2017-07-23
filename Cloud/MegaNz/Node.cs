@@ -4,10 +4,7 @@
     using System.Diagnostics;
     using System.Linq;
     using System.Runtime.Serialization;
-
     using Newtonsoft.Json;
-    using CloudManagerGeneralLib.Class.Mega;
-    using CloudManagerGeneralLib.Crypt;
 
     [DebuggerDisplay("Type: {Type} - Name: {Name} - Id: {Id}")]
   internal class Node : NodePublic, INode, INodeCrypto

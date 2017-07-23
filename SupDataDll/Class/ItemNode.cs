@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Newtonsoft.Json;
-using CloudManagerGeneralLib.Class.Mega;
 using System.ComponentModel;
+using Cloud.MegaNz;
 
 namespace CloudManagerGeneralLib.Class
 {

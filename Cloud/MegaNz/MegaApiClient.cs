@@ -13,8 +13,6 @@
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
-    using CloudManagerGeneralLib.Class.Mega;
-    using CloudManagerGeneralLib.Crypt;
 
     public partial class MegaApiClient : IMegaApiClient
     {

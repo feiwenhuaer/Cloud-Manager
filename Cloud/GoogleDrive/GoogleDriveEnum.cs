@@ -28,15 +28,6 @@
     {
         media, multipart, resumable
     }
-    
-    enum TypeRequest
-    {
-        POST,
-        GET,
-        DELETE,
-        PUT,
-        PATCH
-    }
 
     public enum audio
     {

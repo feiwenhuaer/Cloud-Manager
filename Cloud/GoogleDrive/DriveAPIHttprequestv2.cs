@@ -197,24 +197,6 @@ namespace Cloud.GoogleDrive
       Console.WriteLine("DriveAPIHttprequestv2 Monitor Exited");
 #endif
     }
-
-    public class RequestReturn
-    {
-      public string HeaderResponse { get; internal set; }
-      public string DataTextResponse { get; internal set; }
-      public Stream stream { get; internal set; }
-      public T GetObjectResponse<T>()
-      {
-        try
-        {
-          return JsonConvert.DeserializeObject<T>(this.DataTextResponse);
-        }
-        catch(Exception)
-        {
-          return default(T);
-        }
-      }
-    }
     #endregion
 
     #region DriveFiles
@@ -305,39 +287,39 @@ namespace Cloud.GoogleDrive
       /// </summary>
       /// <param name="json_filemetadata"></param>
       /// <returns>ItemMetadata</returns>
-      public DriveItemMetadata_Item Insert_MetadataRequest(string json_filemetadata)
+      public Drive2_File Insert_MetadataRequest(string json_filemetadata)
       {
-        return JsonConvert.DeserializeObject<DriveItemMetadata_Item>(client.Request<string>(uriDriveFile, TypeRequest.POST, Encoding.UTF8.GetBytes(json_filemetadata)).DataTextResponse);
+        return JsonConvert.DeserializeObject<Drive2_File>(client.Request<string>(uriDriveFile, TypeRequest.POST, Encoding.UTF8.GetBytes(json_filemetadata)).DataTextResponse);
       }
       
-      public DriveItemMetadata_Item Patch(string id, string json_metadata = null)
+      public Drive2_File Patch(string id, string json_metadata = null)
       {
         byte[] buffer = null;
         if (!string.IsNullOrEmpty(json_metadata)) buffer = Encoding.UTF8.GetBytes(json_metadata);
         return client.Request<string>(uriDriveFile + id + "?key=" + GoogleDriveAppKey.ApiKey + "&alt=json",
-                TypeRequest.PATCH, buffer).GetObjectResponse<DriveItemMetadata_Item>();
+                TypeRequest.PATCH, buffer).GetObjectResponse<Drive2_File>();
       }
       
-      public DriveItemMetadata_Item Copy(string file_id, string parent_id)
+      public Drive2_File Copy(string file_id, string parent_id)
       {
         string post_data = "{\"parents\": [{\"id\": \"" + parent_id + "\"}]}";
-        return client.Request<string>("https://www.googleapis.com/drive/v2/files/" + file_id + "/copy", TypeRequest.POST, Encoding.UTF8.GetBytes(post_data)).GetObjectResponse<DriveItemMetadata_Item>();
+        return client.Request<string>("https://www.googleapis.com/drive/v2/files/" + file_id + "/copy", TypeRequest.POST, Encoding.UTF8.GetBytes(post_data)).GetObjectResponse<Drive2_File>();
       }
 
-      public DriveItemMetadata_Item Delete(string fileId)
+      public Drive2_File Delete(string fileId)
       {
-        return client.Request<string>(uriDriveFile + fileId + "?key=" + GoogleDriveAppKey.ApiKey, TypeRequest.DELETE, null, null).GetObjectResponse<DriveItemMetadata_Item>();
+        return client.Request<string>(uriDriveFile + fileId + "?key=" + GoogleDriveAppKey.ApiKey, TypeRequest.DELETE, null, null).GetObjectResponse<Drive2_File>();
       }
 
-      public Drive_Files_list List(OrderByEnum[] order, string query = null, string pageToken = null,
+      public Drive2_Files_list List(OrderByEnum[] order, string query = null, string pageToken = null,
           CorpusEnum corpus = CorpusEnum.DEFAULT, ProjectionEnum projection = ProjectionEnum.BASIC,
               int maxResults = 1000, SpacesEnum spaces = SpacesEnum.drive)
       {
-        string url = string.Format(uriFileList, HttpUtility.UrlEncode(OrderBy.Get(order), Encoding.UTF8), corpus.ToString(),
+        string url = string.Format(uriFileList, HttpUtility.UrlEncode(order.Get(), Encoding.UTF8), corpus.ToString(),
         projection.ToString(), maxResults.ToString(), spaces.ToString());
         if (pageToken != null) url += "&pageToken=" + pageToken;
         if (query != null) url += "&q=" + HttpUtility.UrlEncode(query, Encoding.UTF8);
-        return client.Request<string>(url, TypeRequest.GET).GetObjectResponse<Drive_Files_list>();
+        return client.Request<string>(url, TypeRequest.GET).GetObjectResponse<Drive2_Files_list>();
       }
 
       //public string Touch()
@@ -345,14 +327,14 @@ namespace Cloud.GoogleDrive
 
       //}
 
-      public DriveItemMetadata_Item Trash(string id)
+      public Drive2_File Trash(string id)
       {
-        return client.Request<string>(uriDriveFile + id + "/trash?fields=labels%2Ftrashed&key=" + GoogleDriveAppKey.ApiKey, TypeRequest.POST, null, null).GetObjectResponse<DriveItemMetadata_Item>();
+        return client.Request<string>(uriDriveFile + id + "/trash?fields=labels%2Ftrashed&key=" + GoogleDriveAppKey.ApiKey, TypeRequest.POST, null, null).GetObjectResponse<Drive2_File>();
       }
 
-      public DriveItemMetadata_Item UnTrash(string id)
+      public Drive2_File UnTrash(string id)
       {
-        return client.Request<string>(uriDriveFile + id + "/untrash", TypeRequest.POST).GetObjectResponse<DriveItemMetadata_Item>();
+        return client.Request<string>(uriDriveFile + id + "/untrash", TypeRequest.POST).GetObjectResponse<Drive2_File>();
       }
 
       //public string Watch()
@@ -383,7 +365,7 @@ namespace Cloud.GoogleDrive
         this.client = client;
       }
 
-      public Drive_About Get(bool includeSubscribed = true, long maxChangeIdCount = -1, long startChangeId = -1)
+      public Drive2_About Get(bool includeSubscribed = true, long maxChangeIdCount = -1, long startChangeId = -1)
       {
         string parameters = "";
         if (!includeSubscribed) parameters += "includeSubscribed=false";
@@ -391,7 +373,7 @@ namespace Cloud.GoogleDrive
           else parameters = "maxChangeIdCount=" + maxChangeIdCount;
         if (!(startChangeId == -1)) if (parameters.Length > 0) parameters += "&startChangeId=" + startChangeId;
           else parameters = "startChangeId=" + startChangeId;
-        return client.Request<string>(uriAbout, TypeRequest.GET, string.IsNullOrEmpty(parameters) ? null : Encoding.UTF8.GetBytes(parameters)).GetObjectResponse<Drive_About>();
+        return client.Request<string>(uriAbout, TypeRequest.GET, string.IsNullOrEmpty(parameters) ? null : Encoding.UTF8.GetBytes(parameters)).GetObjectResponse<Drive2_About>();
       }
     }
     #endregion
@@ -411,9 +393,9 @@ namespace Cloud.GoogleDrive
         client.Request<string>(uriDriveFile + fileid + "/parents/" + parentid, TypeRequest.DELETE);
       }
 
-      public DriveItemMetadata_parent Get(string fileid, string parentid)
+      public Drive2_Parent Get(string fileid, string parentid)
       {
-        return client.Request<string>(uriDriveFile + fileid + "/parents/" + parentid, TypeRequest.GET).GetObjectResponse<DriveItemMetadata_parent>();
+        return client.Request<string>(uriDriveFile + fileid + "/parents/" + parentid, TypeRequest.GET).GetObjectResponse<Drive2_Parent>();
       }
 
       /// <summary>
@@ -422,15 +404,15 @@ namespace Cloud.GoogleDrive
       /// <param name="fileid"></param>
       /// <param name="json_metadata">Json data parent</param>
       /// <returns></returns>
-      public DriveItemMetadata_parent Insert(string fileid, string json_metadata)
+      public Drive2_Parent Insert(string fileid, string json_metadata)
       {
         return client.Request<string>(uriDriveFile + fileid + "/parents?alt=json&key=" + GoogleDriveAppKey.ApiKey,
-            TypeRequest.POST, Encoding.UTF8.GetBytes(json_metadata)).GetObjectResponse<DriveItemMetadata_parent>();
+            TypeRequest.POST, Encoding.UTF8.GetBytes(json_metadata)).GetObjectResponse<Drive2_Parent>();
       }
 
-      public Drive_Parent_List List(string fileid)
+      public Drive2_Parents_list List(string fileid)
       {
-        return client.Request<string>(uriDriveFile + fileid + "/parents", TypeRequest.GET).GetObjectResponse<Drive_Parent_List>(); ;
+        return client.Request<string>(uriDriveFile + fileid + "/parents", TypeRequest.GET).GetObjectResponse<Drive2_Parents_list>(); ;
       }
     }
     #endregion
@@ -445,19 +427,19 @@ namespace Cloud.GoogleDrive
         this.client = client;
       }
 
-      public DriveItemMetadata_Item CreateFolder(string name, List<DriveItemMetadata_parent> parent_id)
+      public Drive2_File CreateFolder(string name, List<string> parent_id)
       {
 
         string json_data = "{\"mimeType\": \"application/vnd.google-apps.folder\", \"title\": \"" + name + "\", \"parents\": [{\"id\": \"" + parent_id + "\"}]}";
         return CreateFolder(json_data);
       }
 
-      public DriveItemMetadata_Item CreateFolder(string name, string parent_id)
+      public Drive2_File CreateFolder(string name, string parent_id)
       {
         string json_data = "{\"mimeType\": \"application/vnd.google-apps.folder\", \"title\": \"" + name + "\", \"parents\": [{\"id\": \"" + parent_id + "\"}]}";
         return CreateFolder(json_data);
       }
-      public DriveItemMetadata_Item CreateFolder(string metadata)
+      public Drive2_File CreateFolder(string metadata)
       {
         return client.Files.Insert_MetadataRequest(metadata);
       }

@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
-using CloudManagerGeneralLib.Class.Mega;
 using System.Collections.Generic;
 using System.IO;
+using Cloud.MegaNz;
 
 namespace CloudManagerGeneralLib.Class
 {
@@ -85,8 +85,6 @@ namespace CloudManagerGeneralLib.Class
         public byte[] buffer;//buffer
 
         public DataCryptoMega dataCryptoMega;//for mega only
-
-
     }
     public class FileTransferInfo
     {

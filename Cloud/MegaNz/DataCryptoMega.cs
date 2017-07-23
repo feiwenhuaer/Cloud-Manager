@@ -1,4 +1,4 @@
-﻿namespace CloudManagerGeneralLib.Class.Mega
+﻿namespace Cloud.MegaNz
 {
   public class DataCryptoMega
   {

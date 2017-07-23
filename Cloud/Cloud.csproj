@@ -48,22 +48,33 @@
     <Compile Include="Dropbox\Oauth\DropboxOauthv2.cs" />
     <Compile Include="Dropbox\DropboxRequestAPIv2.cs" />
     <Compile Include="Dropbox\Oauth\UIinterfaceDB.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="GoogleDrive\DriveApiHttprequest.cs" />
     <Compile Include="GoogleDrive\DriveAPIHttprequestv2.cs" />
+    <Compile Include="GoogleDrive\DriveAPIHttprequestv3.cs" />
     <Compile Include="GoogleDrive\GoogleDriveEnum.cs" />
     <Compile Include="GoogleDrive\GoogleDriveErrorMessage.cs" />
-    <Compile Include="GoogleDrive\IItemMetadata.cs" />
+    <Compile Include="GoogleDrive\MetadataV2.cs" />
+    <Compile Include="GoogleDrive\MetadataV3.cs" />
     <Compile Include="GoogleDrive\mimeType.cs" />
     <Compile Include="GoogleDrive\Oauth\GoogleAPIOauth2.cs" />
     <Compile Include="GoogleDrive\Oauth\UIinterfaceGD.cs" />
     <Compile Include="GoogleDrive\OrderBy.cs" />
+    <Compile Include="GoogleDrive\RequestReturn.cs" />
     <Compile Include="GoogleDrive\Scope.cs" />
     <Compile Include="GoogleDrive\TokenGoogleDrive.cs" />
+    <Compile Include="JsonBuilder.cs" />
+    <Compile Include="MegaNz\Attributes.cs" />
+    <Compile Include="MegaNz\BigInteger.cs" />
+    <Compile Include="MegaNz\Crypto.cs" />
+    <Compile Include="MegaNz\DataCryptoMega.cs" />
     <Compile Include="MegaNz\Exceptions.cs" />
     <Compile Include="MegaNz\Extensions.cs" />
-    <Compile Include="MegaNz\IAccountInformation.cs" />
-    <Compile Include="MegaNz\IMegaApiClient.cs" />
-    <Compile Include="MegaNz\INode.cs" />
-    <Compile Include="MegaNz\IHttpRequestClient.cs" />
+    <Compile Include="MegaNz\Interface\IAccountInformation.cs" />
+    <Compile Include="MegaNz\Interface\IMegaApiClient.cs" />
+    <Compile Include="MegaNz\Interface\INode.cs" />
+    <Compile Include="MegaNz\Interface\IHttpRequestClient.cs" />
+    <Compile Include="MegaNz\Interface\INodeCrypto.cs" />
     <Compile Include="MegaNz\JsonSerialization.cs" />
     <Compile Include="MegaNz\MegaAesCtrStream.cs" />
     <Compile Include="MegaNz\MegaApiClient.cs" />
@@ -73,19 +84,17 @@
     <Compile Include="IOauth.cs" />
     <Compile Include="OauthV2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TypeRequest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CustomHttpRequest\CustomHttpRequest.csproj">
       <Project>{1d279a6b-ce8d-4184-b9ab-bc24c6f69045}</Project>
       <Name>CustomHttpRequest</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SupDataDll\CloudManagerGeneralLib.csproj">
-      <Project>{700eed73-135e-422d-a06e-738d3ad057a1}</Project>
-      <Name>CloudManagerGeneralLib</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="FTPClient\" />
+    <Folder Include="MegaNz\Class\" />
     <Folder Include="OneDrive\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
