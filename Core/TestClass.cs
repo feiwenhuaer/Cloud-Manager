@@ -30,6 +30,7 @@ namespace Core
       //return;
       //Drivev3();
       //TestDrive2Copy();
+      Drive2Checkquotas();
     }
 
     static void Mega()
@@ -69,6 +70,16 @@ namespace Core
       DriveAPIHttprequestv2 v2 = new DriveAPIHttprequestv2(Token);
       v2.TokenRenewEvent += TokenRenewEvent;
       Drive2_File f = v2.Files.Copy("0Bx154iMNwuyWUUJEUTNRMnAwc0k", "0B2T-102UejylQmwxSnFGN3RsLWM");
+      return;
+    }
+
+    static void Drive2Checkquotas()
+    {
+      string token = AppSetting.settings.GetToken(email_gd, CloudType.GoogleDrive);
+      Token = JsonConvert.DeserializeObject<TokenGoogleDrive>(token);
+      DriveAPIHttprequestv2 v2 = new DriveAPIHttprequestv2(Token);
+      v2.TokenRenewEvent += TokenRenewEvent;
+      var about = v2.About.Get();
       return;
     }
   }
