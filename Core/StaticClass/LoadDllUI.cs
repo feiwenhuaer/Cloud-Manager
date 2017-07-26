@@ -12,7 +12,7 @@ namespace Core.StaticClass
         {
             try
             {
-                myLibrary = Assembly.LoadFile(Directory.GetCurrentDirectory() + "\\" + AppSetting.settings.GetSettingsAsString(SettingsKey.UI_dll_file));
+                myLibrary = Assembly.LoadFile(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\" + AppSetting.settings.GetSettingsAsString(SettingsKey.UI_dll_file));
                 return true;
             }
             catch (Exception ex)

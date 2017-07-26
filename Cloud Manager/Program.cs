@@ -95,11 +95,11 @@ namespace Cloud_Manager
     private static void DeleteFile_dev()
     {
       Console.WriteLine("Debug mode");
-      //FileInfo info = new FileInfo(Directory.GetCurrentDirectory() + "\\lang\\" + "eng.xml");
+      //FileInfo info = new FileInfo(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\lang\\" + "eng.xml");
       //if (info.Exists) info.Delete();
       //info = new FileInfo("Settings.dat");
       //if (info.Exists) info.Delete();
-      //info = new FileInfo(Directory.GetCurrentDirectory() + "\\" + "DataUploadDownload.dat");
+      //info = new FileInfo(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)() + "\\" + "DataUploadDownload.dat");
       //if (info.Exists) info.Delete();
 
       DirectoryInfo dinfo = new DirectoryInfo(@"E:\temp");

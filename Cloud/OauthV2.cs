@@ -21,7 +21,7 @@ namespace Cloud
         internal void GetCode_(IOauth ui, object owner)
         {
             if (string.IsNullOrEmpty(authorizationRequest) | string.IsNullOrEmpty(redirectURI)) throw new Exception("Oauth:authorizationRequest or redirectURI is null.");
-            //Cloud_Oauth = Process.Start(Directory.GetCurrentDirectory() + "\\Cloud_Oauth.exe", redirectURI);
+            //Cloud_Oauth = Process.Start(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)() + "\\Cloud_Oauth.exe", redirectURI);
             //Cloud_Oauth.OutputDataReceived += Cloud_Oauth_OutputDataReceived;
             ui.Url = authorizationRequest;
             ui.CheckUrl = redirectURI;

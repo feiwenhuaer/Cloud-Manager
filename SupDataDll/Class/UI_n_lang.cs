@@ -11,7 +11,7 @@ namespace CloudManagerGeneralLib
         public static List<string> GetListUiFile()
         {
             List<string> list = new List<string>();
-            foreach (string file in Directory.GetFiles(Directory.GetCurrentDirectory(), "*UI.dll"))
+            foreach (string file in Directory.GetFiles(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "*UI.dll"))
             {
                 FileInfo info = new FileInfo(file);
                 list.Add(info.Name);
@@ -22,7 +22,7 @@ namespace CloudManagerGeneralLib
         public static List<string> GetListLangFile()
         {
             List<string> list = new List<string>();
-            foreach (string file in Directory.GetFiles(Directory.GetCurrentDirectory() + "\\lang", "*.xml"))
+            foreach (string file in Directory.GetFiles(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\lang", "*.xml"))
             {
                 FileInfo info = new FileInfo(file);
                 list.Add(info.Name);

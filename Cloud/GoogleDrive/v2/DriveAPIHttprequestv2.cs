@@ -304,7 +304,7 @@ namespace Cloud.GoogleDrive
       public Drive2_File Copy(string file_id, string parent_id)
       {
         string post_data = "{\"parents\": [{\"id\": \"" + parent_id + "\"}]}";
-        return client.Request<string>("https://www.googleapis.com/drive/v2/files/" + file_id + "/copy", TypeRequest.POST, Encoding.UTF8.GetBytes(post_data)).GetObjectResponse<Drive2_File>();
+        return client.Request<string>("https://www.googleapis.com/drive/v2/files/" + file_id + "/copy" , TypeRequest.POST, Encoding.UTF8.GetBytes(post_data)).GetObjectResponse<Drive2_File>();
       }
 
       public Drive2_File Delete(string fileId)
@@ -434,7 +434,8 @@ namespace Cloud.GoogleDrive
         f.mimeType = "application/vnd.google-apps.folder";
         f.title = name;
         f.parents = parents_id;
-        string json = JsonConvert.SerializeObject(f, JsonSetting._settings);
+        f.etag = "test";
+        string json = JsonConvert.SerializeObject(f, JsonSetting._settings_serialize);
         return CreateFolder(json);
       }
 

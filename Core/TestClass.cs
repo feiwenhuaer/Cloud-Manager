@@ -20,6 +20,7 @@ namespace Core
     const string email = "games_tqk@yahoo.com.vn";
     const string filepath = @"E:\Music\music\mp3tagv270setup.exe";
     const string filepath2 = @"E:\Music\music\XviD4PSP_5.10.346.0_(2015-04-07)_rc34.2.exe";
+    const string email_gd = "HaDT.46C3@dhtm.edu.vn";//tqk2811@gmail.com
     public static void Test()
     {
       //testWindowCutCopy();
@@ -27,7 +28,8 @@ namespace Core
       //FileInfo info = new FileInfo(filepath);
       //info.MoveTo(@"E:\test_folder\mp3tagv270setup.exe");
       //return;
-      Drivev3();
+      //Drivev3();
+      //TestDrive2Copy();
     }
 
     static void Mega()
@@ -46,17 +48,28 @@ namespace Core
     static TokenGoogleDrive Token;
     static void Drivev3()
     {
-      Token = JsonConvert.DeserializeObject<TokenGoogleDrive>(AppSetting.settings.GetToken("tqk2811@gmail.com", CloudType.GoogleDrive));
+      Token = JsonConvert.DeserializeObject<TokenGoogleDrive>(AppSetting.settings.GetToken(email_gd, CloudType.GoogleDrive));
       DriveAPIHttprequestv3 v3 = new DriveAPIHttprequestv3(Token);
-      v3.TokenRenewEvent += V3_TokenRenewEvent;
+      v3.TokenRenewEvent += TokenRenewEvent;
       string data = v3.About_Get();
       Console.WriteLine(data);
     }
 
-    private static void V3_TokenRenewEvent(TokenGoogleDrive token)
+    private static void TokenRenewEvent(TokenGoogleDrive token)
     {
       Token = token;
-      AppSetting.settings.ChangeToken(AppSetting.settings.GetCloud("tqk2811@gmail.com", CloudType.GoogleDrive), JsonConvert.SerializeObject(token));
+      AppSetting.settings.ChangeToken(AppSetting.settings.GetCloud(token.Email, CloudType.GoogleDrive), JsonConvert.SerializeObject(token));
+    }
+
+    static void TestDrive2Copy()
+    {
+      //file 0Bx154iMNwuyWUUJEUTNRMnAwc0k           folder 0B2T-102UejylQmwxSnFGN3RsLWM
+      string token = AppSetting.settings.GetToken(email_gd, CloudType.GoogleDrive);
+      Token = JsonConvert.DeserializeObject<TokenGoogleDrive>(token);
+      DriveAPIHttprequestv2 v2 = new DriveAPIHttprequestv2(Token);
+      v2.TokenRenewEvent += TokenRenewEvent;
+      Drive2_File f = v2.Files.Copy("0Bx154iMNwuyWUUJEUTNRMnAwc0k", "0B2T-102UejylQmwxSnFGN3RsLWM");
+      return;
     }
   }
 #endif

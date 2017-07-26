@@ -7,15 +7,16 @@ namespace Cloud
 {
   public static class JsonSetting
   {
-
-    public static readonly JsonSerializerSettings _settings = new JsonSerializerSettings
+    public static readonly JsonSerializerSettings _settings_serialize = new JsonSerializerSettings
     {
       TypeNameHandling = TypeNameHandling.None,//ignore field not found in class (serialize)
       NullValueHandling = NullValueHandling.Ignore,//ignore null (serialize)
-      ContractResolver = new GetOnlyContractResolver()//serialize and donot deserialize in tag [GetOnlyJsonProperty]
+      //ReferenceResolver = new IgnoreJsonSerializeReferenceResolver()
+      //ContractResolver = new GetOnlyContractResolver()//serialize and donot deserialize in tag [GetOnlyJsonProperty]
     };
   }
 
+  #region serialize and donot deserialize in tag [GetOnlyJsonProperty]
   [System.AttributeUsage(System.AttributeTargets.Property, AllowMultiple = false)]
   public class GetOnlyJsonPropertyAttribute : Attribute
   {
@@ -32,6 +33,36 @@ namespace Cloud
           property.Writable = false;
       }
       return property;
+    }
+  }
+  #endregion
+
+  [System.AttributeUsage(System.AttributeTargets.Property, AllowMultiple = false)]
+  public class IgnoreJsonSerialize: Attribute
+  {
+
+  }
+
+  public class IgnoreJsonSerializeReferenceResolver : IReferenceResolver
+  {
+    public void AddReference(object context, string reference, object value)
+    {
+      throw new NotImplementedException();
+    }
+
+    public string GetReference(object context, object value)
+    {
+      throw new NotImplementedException();
+    }
+
+    public bool IsReferenced(object context, object value)
+    {
+      throw new NotImplementedException();
+    }
+
+    public object ResolveReference(object context, string reference)
+    {
+      throw new NotImplementedException();
     }
   }
 }

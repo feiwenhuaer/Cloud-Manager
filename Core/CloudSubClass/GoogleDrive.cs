@@ -150,10 +150,14 @@ namespace Core.CloudSubClass
                 " and title='" + listnode[i].Info.Name.Replace("'", "\\'") + "'" +
                 " and mimeType = 'application/vnd.google-apps.folder'", Email).items.Convert(node);
             if (listsearchnode.Count == 0) create = true;
-            else parent_id = listsearchnode[0].Info.ID;
+            else parent_id = listnode[i].Info.ID = listsearchnode[0].Info.ID;
           }
 
-          if (create) gdclient.Extend.CreateFolder(listnode[i].Info.Name, parent_id);
+          if (create)
+          {
+            Drive2_File folder = gdclient.Extend.CreateFolder(listnode[i].Info.Name, parent_id);
+            parent_id = listnode[i].Info.ID = folder.id;
+          }
         }
       }
       finally { Monitor.Exit(sync_createfolder); }
@@ -168,30 +172,48 @@ namespace Core.CloudSubClass
       else return false;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="nodemove">Item move</param>
+    /// <param name="newparent">if cut then parent, copy then item</param>
+    /// <param name="newname">rename (cut)</param>
+    /// <param name="copy"></param>
+    /// <returns></returns>
     public static Drive2_File MoveItem(IItemNode nodemove, IItemNode newparent, string newname = null, bool copy = false)
     {
-      //Same account
-      DriveAPIHttprequestv2 gdclient = GetAPIv2(nodemove.GetRoot.RootType.Email);
-      if (newparent != null)
+      if (newparent != null && nodemove.GetRoot.RootType.Type != newparent.GetRoot.RootType.Type) throw new Exception("TypeCloud not match.");
+      DriveAPIHttprequestv2 gdclient;
+      if (!copy)
       {
-        if (nodemove.GetRoot.RootType.Email != newparent.GetRoot.RootType.Email) throw new Exception("Email not match.");
-        if (nodemove.GetRoot.RootType.Type != newparent.GetRoot.RootType.Type) throw new Exception("TypeCloud not match.");
+        //Same account
+        gdclient = GetAPIv2(nodemove.GetRoot.RootType.Email);
+        if (newparent != null && nodemove.GetRoot.RootType.Email != newparent.GetRoot.RootType.Email) throw new Exception("Email not match.");
+        Drive2_File item = null;
+        if (newparent == null & newname != null)//rename
+        {
+          item = new Drive2_File();
+          item.title = newname;
+        }
+        else//move
+        {
+          Drive2_Parents_list parents = gdclient.Parent.List(nodemove.Info.ID);
+          Drive2_Parent found = parents.items.Find(p => p.id == nodemove.Parent.Info.ID);
+          if (found != null) parents.items.Remove(found);
+          parents.items.Add(new Drive2_Parent() { id = newparent.Info.ID });
+          gdclient.Parent.Insert(nodemove.Info.ID, JsonConvert.SerializeObject(parents.items));
+        }
+        return gdclient.Files.Patch(nodemove.Info.ID, item == null ? null : JsonConvert.SerializeObject(item));
       }
-      Drive2_File item = null;
-      if (newparent == null & newname != null)//rename
+      else
       {
-        item = new Drive2_File();
-        item.title = newname;
+        CreateFolder(newparent.Parent);
+        if(string.IsNullOrEmpty(newparent.Parent.Info.ID))
+        {
+          Console.WriteLine("error");
+        }
+        return GetAPIv2(newparent.GetRoot.RootType.Email).Files.Copy(nodemove.Info.ID, newparent.Parent.Info.ID);
       }
-      else//move
-      {
-        Drive2_Parents_list parents = gdclient.Parent.List(nodemove.Info.ID);
-        Drive2_Parent found = parents.items.Find(p => p.id == nodemove.Parent.Info.ID);
-        if (found != null) parents.items.Remove(found);
-        parents.items.Add(new Drive2_Parent() { id = newparent.Info.ID });
-        gdclient.Parent.Insert(nodemove.Info.ID, JsonConvert.SerializeObject(parents.items));
-      }
-      return gdclient.Files.Patch(nodemove.Info.ID, item == null ? null : JsonConvert.SerializeObject(item,JsonSetting._settings));
     }
 
     public static Drive2_File GetMetadataItem(IItemNode node)

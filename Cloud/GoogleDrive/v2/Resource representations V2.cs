@@ -255,7 +255,7 @@ namespace Cloud.GoogleDrive
     /// The size of the file in bytes. This field is only populated for files with content stored in Drive; it is not populated for Google Docs or shortcut files.	
     /// </summary>
     [GetOnlyJsonProperty]
-    public long? fileSize { get; set; } = -1;
+    public long? fileSize { get; set; }
 
     /// <summary>
     /// The number of quota bytes used by this file.	

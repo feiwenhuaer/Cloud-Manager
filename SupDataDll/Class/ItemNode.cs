@@ -207,6 +207,11 @@ namespace CloudManagerGeneralLib.Class
     }
     #endregion
 
+    public override string ToString()
+    {
+      return info.Name;
+    }
+
     #region Static
     [JsonIgnore]
     static List<char> listcannot = new List<char>() { '/', '\\', ':', '?', '*', '"', '<', '>', '|' };
