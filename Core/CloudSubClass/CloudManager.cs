@@ -305,9 +305,9 @@ namespace Core.CloudSubClass
           return Dropbox.GetMetaData(node);
         case CloudType.GoogleDrive:
           Drive2_File item = GoogleDrive.GetMetadataItem(node);
-          node.Info.Size = item.fileSize;
+          node.Info.Size = item.fileSize ?? -1;
           node.Info.Name = item.title;
-          node.Info.DateMod = item.modifiedDate;
+          node.Info.DateMod = item.modifiedDate ?? DateTime.Now;
           return node;
         case CloudType.LocalDisk:
           return LocalDisk.GetFileInfo(node);

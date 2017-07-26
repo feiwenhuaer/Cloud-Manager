@@ -22,8 +22,8 @@ namespace Core.CloudSubClass
     Rg_url_idFile = "(?<=file\\/d\\/)[A-Za-z0-9-_]+";
 
     static OrderByEnum[] en = { OrderByEnum.folder, OrderByEnum.title, OrderByEnum.createdDate };
-    internal static List<string> mimeTypeGoogleRemove = new List<string>() {mimeType.audio, mimeType.drawing, mimeType.file,mimeType.form,mimeType.fusiontable,
-            mimeType.map,mimeType.presentation,mimeType.script,mimeType.sites,mimeType.unknown,mimeType.video,mimeType.photo,mimeType.spreadsheet,mimeType.document};
+    internal static List<string> GoogleAppsmimeTypeGoogleRemove = new List<string>() {GoogleAppsmimeType.audio, GoogleAppsmimeType.drawing, GoogleAppsmimeType.file,GoogleAppsmimeType.form,GoogleAppsmimeType.fusiontable,
+            GoogleAppsmimeType.map,GoogleAppsmimeType.presentation,GoogleAppsmimeType.script,GoogleAppsmimeType.sites,GoogleAppsmimeType.unknown,GoogleAppsmimeType.video,GoogleAppsmimeType.photo,GoogleAppsmimeType.spreadsheet,GoogleAppsmimeType.document};
 
     internal static DriveAPIHttprequestv2 GetAPIv2(string Email, GD_LimitExceededDelegate LimitExceeded = null)
     {
@@ -78,7 +78,7 @@ namespace Core.CloudSubClass
           {
             foreach (Drive2_Parent parent in item.parents)
             {
-              if (parent.isRoot) { parent_ID = parent.id; break; }
+              if (parent.isRoot ?? false) { parent_ID = parent.id; break; }
             }
             if (parent_ID != "root") break;
           }
@@ -98,7 +98,7 @@ namespace Core.CloudSubClass
           n.Info.ID = match.Value;
           n.RootType.Email = Email;
           Drive2_File item = GoogleDrive.GetMetadataItem(n);
-          n.Info.Size = item.fileSize;
+          n.Info.Size = item.fileSize ?? -1;
           n.Info.Name = item.title;
           n.Info.MimeType = item.mimeType;
           AppSetting.UIMain.FileSaveDialog(PCPath.Mycomputer, item.title, PCPath.FilterAllFiles, n);
@@ -177,11 +177,11 @@ namespace Core.CloudSubClass
         if (nodemove.GetRoot.RootType.Email != newparent.GetRoot.RootType.Email) throw new Exception("Email not match.");
         if (nodemove.GetRoot.RootType.Type != newparent.GetRoot.RootType.Type) throw new Exception("TypeCloud not match.");
       }
-      JsonBuilder build = null;
+      Drive2_File item = null;
       if (newparent == null & newname != null)//rename
       {
-        build = new JsonBuilder();
-        build.Items.Add(new JsonItem() { Value = "title", Data = newname });
+        item = new Drive2_File();
+        item.title = newname;
       }
       else//move
       {
@@ -191,7 +191,7 @@ namespace Core.CloudSubClass
         parents.items.Add(new Drive2_Parent() { id = newparent.Info.ID });
         gdclient.Parent.Insert(nodemove.Info.ID, JsonConvert.SerializeObject(parents.items));
       }
-      return gdclient.Files.Patch(nodemove.Info.ID, build == null ? null : build.GetJson());
+      return gdclient.Files.Patch(nodemove.Info.ID, item == null ? null : JsonConvert.SerializeObject(item,JsonSetting._settings));
     }
 
     public static Drive2_File GetMetadataItem(IItemNode node)
@@ -230,7 +230,7 @@ namespace Core.CloudSubClass
       foreach (Drive2_File item in items)
       {
         bool add = true;
-        GoogleDrive.mimeTypeGoogleRemove.ForEach(m => { if (item.mimeType == m) add = false; });
+        GoogleAppsmimeTypeGoogleRemove.ForEach(m => { if (item.mimeType == m) add = false; });
         if (add) list.Add(
                             new ItemNode(
                                 new NodeInfo()
@@ -238,8 +238,8 @@ namespace Core.CloudSubClass
                                   Name = item.title,
                                   MimeType = item.mimeType,
                                   ID = item.id,
-                                  Size = item.fileSize,
-                                  DateMod = item.modifiedDate
+                                  Size = item.fileSize ?? -1,
+                                  DateMod = item.modifiedDate ?? DateTime.Now
                                 },
                                 parent)
                           );
@@ -257,7 +257,7 @@ namespace Core.CloudSubClass
 
     }
   }
-  
+
   public enum rolePermissions
   {
     owner, reader, writer
@@ -267,6 +267,4 @@ namespace Core.CloudSubClass
   {
     user, group, domain, anyone
   }
-
-  
 }

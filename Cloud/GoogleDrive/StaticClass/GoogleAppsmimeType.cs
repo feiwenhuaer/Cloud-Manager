@@ -1,6 +1,6 @@
 ﻿namespace Cloud.GoogleDrive
 {
-    public static class mimeType
+    public static class GoogleAppsmimeType
     {
         public const string audio = "application/vnd.google-apps.audio";
         public const string document = "application/vnd.google-apps.document";//

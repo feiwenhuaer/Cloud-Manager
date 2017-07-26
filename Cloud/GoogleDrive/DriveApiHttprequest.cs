@@ -47,7 +47,7 @@ namespace Cloud.GoogleDrive
 
 
     #region Request
-    protected RequestReturn Request<T>(string url, TypeRequest typerequest, byte[] bytedata = null, string[] moreheader = null)
+    internal RequestReturn Request<T>(string url, TypeRequest typerequest, byte[] bytedata = null, string[] moreheader = null)
     {
       RequestReturn result = new RequestReturn();
       http_request = new HttpRequest_(new Uri(ApiUri + version + url), typerequest.ToString());

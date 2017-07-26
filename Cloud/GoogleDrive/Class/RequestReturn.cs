@@ -1,13 +1,10 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace Cloud.GoogleDrive
 {
-  public class RequestReturn
+  internal class RequestReturn: IRequestReturn
   {
     public string HeaderResponse { get; internal set; }
     public string DataTextResponse { get; internal set; }

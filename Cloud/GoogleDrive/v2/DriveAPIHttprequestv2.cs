@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
 using Newtonsoft.Json;
+using System.Dynamic;
 
 namespace Cloud.GoogleDrive
 {
@@ -272,7 +273,7 @@ namespace Cloud.GoogleDrive
       /// </summary>
       /// <param name="GetMetaData">if false then return HeaderReceive</param>
       /// <returns>HeaderReceive or DataReceive</returns>
-      public RequestReturn Insert_Resumable_Response(bool GetMetaData = false)
+      public IRequestReturn Insert_Resumable_Response(bool GetMetaData = false)
       {
         RequestReturn rr = new RequestReturn();
         rr.DataTextResponse = client.http_request.GetTextDataResponse(false, true);
@@ -427,11 +428,14 @@ namespace Cloud.GoogleDrive
         this.client = client;
       }
 
-      public Drive2_File CreateFolder(string name, List<string> parent_id)
+      public Drive2_File CreateFolder(string name, List<Drive2_Parent> parents_id)
       {
-
-        string json_data = "{\"mimeType\": \"application/vnd.google-apps.folder\", \"title\": \"" + name + "\", \"parents\": [{\"id\": \"" + parent_id + "\"}]}";
-        return CreateFolder(json_data);
+        Drive2_File f = new Drive2_File();
+        f.mimeType = "application/vnd.google-apps.folder";
+        f.title = name;
+        f.parents = parents_id;
+        string json = JsonConvert.SerializeObject(f, JsonSetting._settings);
+        return CreateFolder(json);
       }
 
       public Drive2_File CreateFolder(string name, string parent_id)
