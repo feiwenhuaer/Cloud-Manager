@@ -177,7 +177,7 @@ namespace Core.CloudSubClass
         {
           case CloudType.Dropbox: flag = Dropbox.Move(node, newparent, newname); break;
           case CloudType.GoogleDrive:
-            Drive2_File item = GoogleDrive.MoveItem(node, newparent, newname);
+            IDrive2_File item = GoogleDrive.MoveItem(node, newparent, newname);
             if (item.title == newname) flag = true;
             item.parents.ForEach(s => { if (!flag && newparent != null && s.id == newparent.Info.ID) flag = true; });
             break;
@@ -304,7 +304,7 @@ namespace Core.CloudSubClass
         case CloudType.Dropbox:
           return Dropbox.GetMetaData(node);
         case CloudType.GoogleDrive:
-          Drive2_File item = GoogleDrive.GetMetadataItem(node);
+          IDrive2_File item = GoogleDrive.GetMetadataItem(node);
           node.Info.Size = item.fileSize ?? -1;
           node.Info.Name = item.title;
           node.Info.DateMod = item.modifiedDate ?? DateTime.Now;

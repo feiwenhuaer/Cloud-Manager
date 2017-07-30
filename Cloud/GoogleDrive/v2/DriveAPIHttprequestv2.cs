@@ -12,44 +12,17 @@ using System.Dynamic;
 
 namespace Cloud.GoogleDrive
 {
-  public delegate void TokenRenewCallback(TokenGoogleDrive token);
-  public delegate void GD_LimitExceededDelegate();
-  public class DriveAPIHttprequestv2
+  
+  public class DriveAPIHttprequestv2: DriveApiHttprequest
   {
-    const string Host = "HOST: www.googleapis.com";
-    const string uriAbout = "https://www.googleapis.com/drive/v2/about";
-    const string uriFileList = "https://www.googleapis.com/drive/v2/files?orderBy={0}&corpus={1}&projection={2}&maxResults={3}&spaces={4}";
-    const string uriFileGet = "https://www.googleapis.com/drive/v2/files/{0}?alt=media";
-    const string uriFiles_insert_resumable_getUploadID = "https://www.googleapis.com/upload/drive/v2/files?uploadType={0}";
-    const string uriDriveFile = "https://www.googleapis.com/drive/v2/files/";
-    const string Header_ContentTypeApplicationJson = "Content-Type: application/json";
-
-    public int ReceiveTimeout { set { ReceiveTimeout_ = value; } get { return ReceiveTimeout; } }
-    int ReceiveTimeout_ = 20000;
-
-    public bool acknowledgeAbuse { get { return acknowledgeAbuse_; } set { acknowledgeAbuse_ = value; } }
-    bool acknowledgeAbuse_ = true;
-
-    public TokenGoogleDrive Token { get; set; }
-
-    GD_LimitExceededDelegate limit;
-    GoogleAPIOauth2 oauth;
-    static object SyncRefreshToken = new object();
-    static object SyncLimitExceeded = new object();
-
-    public HttpRequest_ http_request { get; set; }
-    public event TokenRenewCallback TokenRenewEvent;
-#if DEBUG
-    public bool Debug { get; set; } = false;
-#endif
+    internal const string uriFileList = "files?orderBy={0}&corpus={1}&projection={2}&maxResults={3}&spaces={4}";
+    internal const string uriFileGet = "files/{0}?alt=media";
+    internal const string uriFiles_insert_resumable_getUploadID = "https://www.googleapis.com/upload/drive/v2/files?uploadType={0}";
+    internal const string uriDriveFile = "files/";
 
     #region Constructors
-    public DriveAPIHttprequestv2(TokenGoogleDrive token, GD_LimitExceededDelegate LimitExceeded = null)
+    public DriveAPIHttprequestv2(TokenGoogleDrive token):base(token,DriveApiVersion.v2)
     {
-      this.Token = token;
-      oauth = new GoogleAPIOauth2(token);
-      this.limit = LimitExceeded;
-      GoogleDriveAppKey.Check();
       this.Files = new DriveFiles(this);
       this.About = new DriveAbout(this);
       this.Parent = new DriveParent(this);
@@ -57,146 +30,27 @@ namespace Cloud.GoogleDrive
     }
     #endregion
 
-    #region Request
-    private RequestReturn Request<T>(string url, TypeRequest typerequest, byte[] bytedata = null, string[] moreheader = null)
+    #region DriveAbout
+    public DriveAbout About { get; private set; }
+    public class DriveAbout
     {
-      RequestReturn result = new RequestReturn();
-      http_request = new HttpRequest_(new Uri(url), typerequest.ToString());
-#if DEBUG
-      http_request.debug = Debug;
-#endif
-      if (typeof(T) == typeof(Stream) && bytedata == null && typerequest != TypeRequest.PUT) http_request.ReceiveTimeout = this.ReceiveTimeout_;
-      http_request.AddHeader(Host);
-      http_request.AddHeader("Authorization", "Bearer " + Token.access_token);
-      if (moreheader != null) foreach (string h in moreheader) http_request.AddHeader(h);
-      else if (bytedata != null && (typerequest == TypeRequest.POST || typerequest == TypeRequest.PATCH)) http_request.AddHeader(Header_ContentTypeApplicationJson);
-      if ((typerequest == TypeRequest.POST || typerequest == TypeRequest.DELETE) && bytedata == null) http_request.AddHeader("Content-Length: 0");
-      if (bytedata != null && (typerequest == TypeRequest.POST || typerequest == TypeRequest.PATCH))
+      const string uriAbout = "about";
+      DriveAPIHttprequestv2 client;
+      public DriveAbout(DriveAPIHttprequestv2 client)
       {
-        http_request.AddHeader("Content-Length: " + bytedata.Length.ToString());
-        Stream stream = http_request.SendHeader_And_GetStream();
-        stream.Write(bytedata, 0, bytedata.Length);
-        stream.Flush();
-#if DEBUG
-        Console.WriteLine("DriveAPIHttprequestv2: >>send data: " + Encoding.UTF8.GetString(bytedata));
-#endif
+        this.client = client;
       }
-      try //get response
-      {
-        if (typeof(T) == typeof(string))
-        {
-          result.DataTextResponse = http_request.GetTextDataResponse(false, true);
-          result.HeaderResponse = http_request.HeaderReceive;
-        }
-        else if (typeof(T) == typeof(Stream))
-        {
-          if (bytedata != null || typerequest == TypeRequest.PUT) result.stream = http_request.SendHeader_And_GetStream();//get stream upload
-          else result.stream = http_request.ReadHeaderResponse_and_GetStreamResponse(true);//get stream response
-        }
-        else throw new Exception("Error typereturn.");
-        return result;
-      }
-      catch (HttpException ex)
-      {
-        result.DataTextResponse = http_request.TextDataResponse;
-        GoogleDriveErrorMessage message;
-        try { message = Newtonsoft.Json.JsonConvert.DeserializeObject<GoogleDriveErrorMessage>(ex.Message); }
-        catch { throw; }// other message;
-        switch (message.error.code)
-        {
-          case 204: if (typerequest == TypeRequest.DELETE) return result; break;// delete result
-          case 401:
-            if (Monitor.TryEnter(SyncRefreshToken))
-            {
-#if DEBUG
-              Console.WriteLine("DriveAPIHttprequestv2 Start Refresh Token {Email:" + Token.Email + ", Thread id:" + Thread.CurrentThread.ManagedThreadId + "}");
-#endif
-              try
-              {
-                Lock();
-                Token = oauth.RefreshToken();
-                TokenRenewEvent.Invoke(Token);
-                return Request<T>(url, typerequest, bytedata, moreheader);
-              }
-              finally { Unlock(); }
-            }
-            else
-            {
-#if DEBUG
-              Console.WriteLine("DriveAPIHttprequestv2 Start Wait Refresh Token {Email:" + Token.Email + ", Thread id:" + Thread.CurrentThread.ManagedThreadId + "}");
-#endif
-              try
-              {
-                Lock();
-                return Request<T>(url, typerequest, bytedata, moreheader);
-              }
-              finally { Unlock(); }
-            }
-          case 403:
-            Error403 err = (Error403)Enum.Parse(typeof(Error403), message.error.errors[0].reason);
-            switch (err)
-            {
-              case Error403.forbidden:
-              case Error403.appNotAuthorizedToFile:
-              case Error403.domainPolicy:
-              case Error403.insufficientFilePermissions:
-#if DEBUG
-                Console.WriteLine("DriveAPIHttprequestv2 Error403: " + result.DataTextResponse);
-#endif
-                break;
 
-              case Error403.dailyLimitExceeded:
-              case Error403.rateLimitExceeded:
-              case Error403.sharingRateLimitExceeded:
-              case Error403.userRateLimitExceeded:
-                if (limit != null) limit.Invoke();
-#if DEBUG
-                Console.WriteLine("DriveAPIHttprequestv2 LimitExceeded: " + err.ToString());
-#endif
-                try { Monitor.Enter(SyncLimitExceeded); Thread.Sleep(5000); } finally { Monitor.Exit(SyncLimitExceeded); }
-                return Request<T>(url, typerequest, bytedata, moreheader);
-
-              case Error403.abuse://file malware or virut
-                if (acknowledgeAbuse_) return Request<T>(url + "&acknowledgeAbuse=true", typerequest, bytedata, moreheader); else break;
-              default: break;
-            }
-            break;
-          case 308:
-            if (typerequest == TypeRequest.PUT && typeof(T) == typeof(Stream))
-            {
-              result.stream = http_request.GetStream();
-              return result;
-            }
-            else break;
-          default: break;
-        }
-        throw;
-      }
-      catch (ThreadAbortException ex_thr_abort)
+      public Drive2_About Get(bool includeSubscribed = true, long maxChangeIdCount = -1, long startChangeId = -1)
       {
-        Unlock();
-        throw;
+        string parameters = "";
+        if (!includeSubscribed) parameters += "includeSubscribed=false";
+        if (!(maxChangeIdCount == -1)) if (parameters.Length > 0) parameters += "&maxChangeIdCount=" + maxChangeIdCount;
+          else parameters = "maxChangeIdCount=" + maxChangeIdCount;
+        if (!(startChangeId == -1)) if (parameters.Length > 0) parameters += "&startChangeId=" + startChangeId;
+          else parameters = "startChangeId=" + startChangeId;
+        return client.Request<string>(uriAbout, TypeRequest.GET, string.IsNullOrEmpty(parameters) ? null : Encoding.UTF8.GetBytes(parameters)).GetObjectResponse<Drive2_About>();
       }
-    }
-    void Lock()
-    {
-#if DEBUG
-      Console.WriteLine("DriveAPIHttprequestv2 Monitor Start Enter");
-#endif
-      Monitor.Enter(SyncRefreshToken);
-#if DEBUG
-      Console.WriteLine("DriveAPIHttprequestv2 Monitor Entered");
-#endif
-    }
-    void Unlock()
-    {
-#if DEBUG
-      Console.WriteLine("DriveAPIHttprequestv2 Monitor Start Exit");
-#endif
-      Monitor.Exit(SyncRefreshToken);
-#if DEBUG
-      Console.WriteLine("DriveAPIHttprequestv2 Monitor Exited");
-#endif
     }
     #endregion
 
@@ -288,12 +142,12 @@ namespace Cloud.GoogleDrive
       /// </summary>
       /// <param name="json_filemetadata"></param>
       /// <returns>ItemMetadata</returns>
-      public Drive2_File Insert_MetadataRequest(string json_filemetadata)
+      public IDrive2_File Insert_MetadataRequest(string json_filemetadata)
       {
         return JsonConvert.DeserializeObject<Drive2_File>(client.Request<string>(uriDriveFile, TypeRequest.POST, Encoding.UTF8.GetBytes(json_filemetadata)).DataTextResponse);
       }
       
-      public Drive2_File Patch(string id, string json_metadata = null)
+      public IDrive2_File Patch(string id, string json_metadata = null)
       {
         byte[] buffer = null;
         if (!string.IsNullOrEmpty(json_metadata)) buffer = Encoding.UTF8.GetBytes(json_metadata);
@@ -301,18 +155,18 @@ namespace Cloud.GoogleDrive
                 TypeRequest.PATCH, buffer).GetObjectResponse<Drive2_File>();
       }
       
-      public Drive2_File Copy(string file_id, string parent_id)
+      public IDrive2_File Copy(string file_id, string parent_id)
       {
         string post_data = "{\"parents\": [{\"id\": \"" + parent_id + "\"}]}";
-        return client.Request<string>("https://www.googleapis.com/drive/v2/files/" + file_id + "/copy" , TypeRequest.POST, Encoding.UTF8.GetBytes(post_data)).GetObjectResponse<Drive2_File>();
+        return client.Request<string>(uriDriveFile + file_id + "/copy", TypeRequest.POST, Encoding.UTF8.GetBytes(post_data)).GetObjectResponse<Drive2_File>();
       }
 
-      public Drive2_File Delete(string fileId)
+      public IDrive2_File Delete(string fileId)
       {
         return client.Request<string>(uriDriveFile + fileId + "?key=" + GoogleDriveAppKey.ApiKey, TypeRequest.DELETE, null, null).GetObjectResponse<Drive2_File>();
       }
 
-      public Drive2_Files_list List(OrderByEnum[] order, string query = null, string pageToken = null,
+      public IDrive2_Files_list List(OrderByEnum[] order, string query = null, string pageToken = null,
           CorpusEnum corpus = CorpusEnum.DEFAULT, ProjectionEnum projection = ProjectionEnum.BASIC,
               int maxResults = 1000, SpacesEnum spaces = SpacesEnum.drive)
       {
@@ -328,12 +182,12 @@ namespace Cloud.GoogleDrive
 
       //}
 
-      public Drive2_File Trash(string id)
+      public IDrive2_File Trash(string id)
       {
         return client.Request<string>(uriDriveFile + id + "/trash?fields=labels%2Ftrashed&key=" + GoogleDriveAppKey.ApiKey, TypeRequest.POST, null, null).GetObjectResponse<Drive2_File>();
       }
 
-      public Drive2_File UnTrash(string id)
+      public IDrive2_File UnTrash(string id)
       {
         return client.Request<string>(uriDriveFile + id + "/untrash", TypeRequest.POST).GetObjectResponse<Drive2_File>();
       }
@@ -354,29 +208,6 @@ namespace Cloud.GoogleDrive
       //}
     }
     
-    #endregion
-
-    #region DriveAbout
-    public DriveAbout About { get; private set; }
-    public class DriveAbout
-    {
-      DriveAPIHttprequestv2 client;
-      public DriveAbout(DriveAPIHttprequestv2 client)
-      {
-        this.client = client;
-      }
-
-      public Drive2_About Get(bool includeSubscribed = true, long maxChangeIdCount = -1, long startChangeId = -1)
-      {
-        string parameters = "";
-        if (!includeSubscribed) parameters += "includeSubscribed=false";
-        if (!(maxChangeIdCount == -1)) if (parameters.Length > 0) parameters += "&maxChangeIdCount=" + maxChangeIdCount;
-          else parameters = "maxChangeIdCount=" + maxChangeIdCount;
-        if (!(startChangeId == -1)) if (parameters.Length > 0) parameters += "&startChangeId=" + startChangeId;
-          else parameters = "startChangeId=" + startChangeId;
-        return client.Request<string>(uriAbout, TypeRequest.GET, string.IsNullOrEmpty(parameters) ? null : Encoding.UTF8.GetBytes(parameters)).GetObjectResponse<Drive2_About>();
-      }
-    }
     #endregion
 
     #region DriveParent
@@ -428,7 +259,7 @@ namespace Cloud.GoogleDrive
         this.client = client;
       }
 
-      public Drive2_File CreateFolder(string name, List<Drive2_Parent> parents_id)
+      public IDrive2_File CreateFolder(string name, List<Drive2_Parent> parents_id)
       {
         Drive2_File f = new Drive2_File();
         f.mimeType = "application/vnd.google-apps.folder";
@@ -439,17 +270,16 @@ namespace Cloud.GoogleDrive
         return CreateFolder(json);
       }
 
-      public Drive2_File CreateFolder(string name, string parent_id)
+      public IDrive2_File CreateFolder(string name, string parent_id)
       {
         string json_data = "{\"mimeType\": \"application/vnd.google-apps.folder\", \"title\": \"" + name + "\", \"parents\": [{\"id\": \"" + parent_id + "\"}]}";
         return CreateFolder(json_data);
       }
-      public Drive2_File CreateFolder(string metadata)
+      public IDrive2_File CreateFolder(string metadata)
       {
         return client.Files.Insert_MetadataRequest(metadata);
       }
     }
     #endregion
-  }
-  
+  }  
 }

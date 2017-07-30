@@ -11,50 +11,73 @@ using System.Web;
 
 namespace Cloud.GoogleDrive
 {
+  public delegate void TokenRenewCallback(TokenGoogleDrive token);
+  public delegate void GD_LimitExceededDelegate();
   public class DriveApiHttprequest
   {
+    #region const/readonly
     const string Host = "HOST: www.googleapis.com";
     const string Header_ContentTypeApplicationJson = "Content-Type: application/json";
-    protected const string ApiUri = "https://www.googleapis.com/drive/";
+    internal protected readonly string ApiUri = "";
+    #endregion
 
+    #region sync
     static object SyncRefreshToken = new object();
     static object SyncLimitExceeded = new object();
+    #endregion
 
-    GD_LimitExceededDelegate limit;
-    GoogleAPIOauth2 oauth;
-    int ReceiveTimeout_ = 20000;
-    bool acknowledgeAbuse_ = true;
+    #region public event & properties
+    /// <summary>
+    /// Timeout for socket (default 2000ms)
+    /// </summary>
+    public int ReceiveTimeout { get; set; } = 2000;
 
-    public int ReceiveTimeout { set { ReceiveTimeout_ = value; } get { return ReceiveTimeout; } }
-    public bool acknowledgeAbuse { get { return acknowledgeAbuse_; } set { acknowledgeAbuse_ = value; } }
-    public TokenGoogleDrive Token { get; set; }
-    public HttpRequest_ http_request { get; set; }
+    /// <summary>
+    /// Still download if file have virus/malware (default true)
+    /// </summary>
+    public bool acknowledgeAbuse { get; set; } = true;
+
+    /// <summary>
+    /// Token
+    /// </summary>
+    public TokenGoogleDrive Token { get { return token; } set { if (!value.CheckToken()) throw new Exception("Token error"); else token = value; } }
+
     public event TokenRenewCallback TokenRenewEvent;
 
-    internal protected string version = "";
+    public event GD_LimitExceededDelegate LimitExceeded;
+    #endregion
+
+    #region private & internal field
+    GoogleAPIOauth2 oauth;
+    TokenGoogleDrive token;
+    internal protected HttpRequest_ http_request;
+    #endregion
 
 #if DEBUG
     public bool Debug { get; set; } = false;
 #endif
 
-    public DriveApiHttprequest(TokenGoogleDrive token, GD_LimitExceededDelegate LimitExceeded = null)
+    #region Constructors
+    internal DriveApiHttprequest(TokenGoogleDrive token, DriveApiVersion version)
     {
+      GoogleDriveAppKey.Check();//check key api
       this.Token = token;
+      this.ApiUri = "https://www.googleapis.com/drive/" + version + "/";
       oauth = new GoogleAPIOauth2(token);
-      this.limit = LimitExceeded;
-      GoogleDriveAppKey.Check();
     }
-
+    #endregion
 
     #region Request
     internal RequestReturn Request<T>(string url, TypeRequest typerequest, byte[] bytedata = null, string[] moreheader = null)
     {
       RequestReturn result = new RequestReturn();
-      http_request = new HttpRequest_(new Uri(ApiUri + version + url), typerequest.ToString());
+      Uri uri;
+      if (!Uri.TryCreate(ApiUri + url, UriKind.RelativeOrAbsolute, out uri)) Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out uri);
+      http_request = new HttpRequest_(uri, typerequest.ToString());
 #if DEBUG
       http_request.debug = Debug;
 #endif
-      if (typeof(T) == typeof(Stream) && bytedata == null && typerequest != TypeRequest.PUT) http_request.ReceiveTimeout = this.ReceiveTimeout_;
+      if (typeof(T) == typeof(Stream) && bytedata == null && typerequest != TypeRequest.PUT) http_request.ReceiveTimeout = this.ReceiveTimeout;
       http_request.AddHeader(Host);
       http_request.AddHeader("Authorization", "Bearer " + Token.access_token);
       if (moreheader != null) foreach (string h in moreheader) http_request.AddHeader(h);
@@ -138,7 +161,7 @@ namespace Cloud.GoogleDrive
               case Error403.rateLimitExceeded:
               case Error403.sharingRateLimitExceeded:
               case Error403.userRateLimitExceeded:
-                if (limit != null) limit.Invoke();
+                if (LimitExceeded != null) LimitExceeded.Invoke();
 #if DEBUG
                 Console.WriteLine("DriveAPIHttprequestv2 LimitExceeded: " + err.ToString());
 #endif
@@ -146,7 +169,7 @@ namespace Cloud.GoogleDrive
                 return Request<T>(url, typerequest, bytedata, moreheader);
 
               case Error403.abuse://file malware or virut
-                if (acknowledgeAbuse_) return Request<T>(url + "&acknowledgeAbuse=true", typerequest, bytedata, moreheader); else break;
+                if (acknowledgeAbuse) return Request<T>(url + "&acknowledgeAbuse=true", typerequest, bytedata, moreheader); else break;
               default: break;
             }
             break;
@@ -188,6 +211,10 @@ namespace Cloud.GoogleDrive
 #endif
     }
     #endregion
+  }
 
+  internal enum DriveApiVersion
+  {
+    v2,v3
   }
 }

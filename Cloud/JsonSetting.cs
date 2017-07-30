@@ -1,68 +1,61 @@
-﻿using Newtonsoft.Json;
+﻿using Cloud.GoogleDrive;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace Cloud
 {
   public static class JsonSetting
   {
+    static List<Type> types = new List<Type>() { typeof(IDrive2_File),typeof(IDrive2_Files_list) };
     public static readonly JsonSerializerSettings _settings_serialize = new JsonSerializerSettings
     {
       TypeNameHandling = TypeNameHandling.None,//ignore field not found in class (serialize)
       NullValueHandling = NullValueHandling.Ignore,//ignore null (serialize)
-      //ReferenceResolver = new IgnoreJsonSerializeReferenceResolver()
-      //ContractResolver = new GetOnlyContractResolver()//serialize and donot deserialize in tag [GetOnlyJsonProperty]
+      ContractResolver = new JsonIgnoreSerializeResolver(types)//custom ContractResolver
     };
   }
 
-  #region serialize and donot deserialize in tag [GetOnlyJsonProperty]
-  [System.AttributeUsage(System.AttributeTargets.Property, AllowMultiple = false)]
-  public class GetOnlyJsonPropertyAttribute : Attribute
+  #region serialize and donot deserialize in tag [JsonIgnoreSerialize]
+  [System.AttributeUsage(System.AttributeTargets.All, AllowMultiple = false)]
+  public class JsonIgnoreSerialize : Attribute
   {
   }
-  public class GetOnlyContractResolver : DefaultContractResolver
+
+  public class JsonIgnoreSerializeResolver : DefaultContractResolver
   {
+    readonly List<Type> types = new List<Type>();
+    public JsonIgnoreSerializeResolver() { }
+    public JsonIgnoreSerializeResolver(List<Type> types) { this.types = types; }
     protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
     {
-      var property = base.CreateProperty(member, memberSerialization);
-      if (property != null && property.Writable)
+      JsonProperty property = base.CreateProperty(member, memberSerialization);
+
+      #region deserialize and donot serialize in tag [JsonIgnoreSerialize]
+      var member_attribute = member.GetCustomAttributes(typeof(JsonIgnoreSerialize), true);
+      if ((property != null && property.Writable) | (member_attribute != null))
       {
-        var attributes = property.AttributeProvider.GetAttributes(typeof(GetOnlyJsonPropertyAttribute), true);
-        if (attributes != null && attributes.Count > 0)
-          property.Writable = false;
+        IList<Attribute> attributes = property.AttributeProvider.GetAttributes(typeof(JsonIgnoreSerialize), true);
+        if ((attributes != null && attributes.Count > 0 ) |  member_attribute.Length > 0)
+          property.ShouldSerialize = Instance => { return false; };
       }
+      #endregion
+
       return property;
+    }
+
+    protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
+    {  
+      if (types.Count != 0)// find interface
+      {
+        Type found = null;
+        foreach (Type Ti in type.GetInterfaces()) found = types.Find(t => t == Ti);
+        if(found != null) return base.CreateProperties(found, memberSerialization);
+      }
+      return base.CreateProperties(type, memberSerialization);
     }
   }
   #endregion
-
-  [System.AttributeUsage(System.AttributeTargets.Property, AllowMultiple = false)]
-  public class IgnoreJsonSerialize: Attribute
-  {
-
-  }
-
-  public class IgnoreJsonSerializeReferenceResolver : IReferenceResolver
-  {
-    public void AddReference(object context, string reference, object value)
-    {
-      throw new NotImplementedException();
-    }
-
-    public string GetReference(object context, object value)
-    {
-      throw new NotImplementedException();
-    }
-
-    public bool IsReferenced(object context, object value)
-    {
-      throw new NotImplementedException();
-    }
-
-    public object ResolveReference(object context, string reference)
-    {
-      throw new NotImplementedException();
-    }
-  }
 }

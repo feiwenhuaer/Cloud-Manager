@@ -11,6 +11,7 @@ using System.Threading;
 using Cloud.GoogleDrive;
 using Core.StaticClass;
 using Newtonsoft.Json;
+using Cloud;
 
 namespace Core
 {
@@ -30,7 +31,8 @@ namespace Core
       //return;
       //Drivev3();
       //TestDrive2Copy();
-      Drive2Checkquotas();
+      //Drive2Checkquotas();
+      Drive2Test();
     }
 
     static void Mega()
@@ -61,6 +63,14 @@ namespace Core
       Token = token;
       AppSetting.settings.ChangeToken(AppSetting.settings.GetCloud(token.Email, CloudType.GoogleDrive), JsonConvert.SerializeObject(token));
     }
+    static DriveAPIHttprequestv2 GetAPIv2(string email)
+    {
+      string token = AppSetting.settings.GetToken(email, CloudType.GoogleDrive);
+      Token = JsonConvert.DeserializeObject<TokenGoogleDrive>(token);
+      DriveAPIHttprequestv2 v2 = new DriveAPIHttprequestv2(Token);
+      v2.TokenRenewEvent += TokenRenewEvent;
+      return v2;
+    }
 
     static void TestDrive2Copy()
     {
@@ -69,18 +79,32 @@ namespace Core
       Token = JsonConvert.DeserializeObject<TokenGoogleDrive>(token);
       DriveAPIHttprequestv2 v2 = new DriveAPIHttprequestv2(Token);
       v2.TokenRenewEvent += TokenRenewEvent;
-      Drive2_File f = v2.Files.Copy("0Bx154iMNwuyWUUJEUTNRMnAwc0k", "0B2T-102UejylQmwxSnFGN3RsLWM");
+      IDrive2_File f = v2.Files.Copy("0Bx154iMNwuyWUUJEUTNRMnAwc0k", "0B2T-102UejylQmwxSnFGN3RsLWM");
       return;
     }
 
     static void Drive2Checkquotas()
     {
-      string token = AppSetting.settings.GetToken(email_gd, CloudType.GoogleDrive);
-      Token = JsonConvert.DeserializeObject<TokenGoogleDrive>(token);
-      DriveAPIHttprequestv2 v2 = new DriveAPIHttprequestv2(Token);
-      v2.TokenRenewEvent += TokenRenewEvent;
-      var about = v2.About.Get();
+      DriveAPIHttprequestv2 v2 = GetAPIv2(email_gd);
+      //var about = v2.About.Get();
+      //string about_string = JsonConvert.SerializeObject(about, JsonSetting._settings_serialize);
+      var file = v2.Files.Patch("0B2T-102UejylMXZpbUwtUU13c2c");
+      string file_string = JsonConvert.SerializeObject(file, JsonSetting._settings_serialize);
       return;
+    }
+
+    static void Drive2Test()
+    {
+      //TestDrive2Copy();
+      //Drive2Checkquotas();
+      Drive2Test_FileList();
+    }
+
+    static void Drive2Test_FileList()
+    {
+      DriveAPIHttprequestv2 v2 = GetAPIv2(email_gd);
+      var list = v2.Files.List(GoogleDrive.en, "'0B2T-102UejylMXZpbUwtUU13c2c' in parents and trashed=false");
+      string list_string = JsonConvert.SerializeObject(list.items, JsonSetting._settings_serialize);
     }
   }
 #endif

@@ -7,9 +7,9 @@ namespace Cloud.GoogleDrive
 {
   public class DriveAPIHttprequestv3: DriveApiHttprequest
   {
-    public DriveAPIHttprequestv3(TokenGoogleDrive token, GD_LimitExceededDelegate LimitExceeded = null):base(token,LimitExceeded)
+    public DriveAPIHttprequestv3(TokenGoogleDrive token):base(token, DriveApiVersion.v3)
     {
-      version = "v3/";
+
     }
 
 
