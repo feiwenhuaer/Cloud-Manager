@@ -142,12 +142,12 @@ namespace Cloud.GoogleDrive
       /// </summary>
       /// <param name="json_filemetadata"></param>
       /// <returns>ItemMetadata</returns>
-      public IDrive2_File Insert_MetadataRequest(string json_filemetadata)
+      public Drive2_File Insert_MetadataRequest(string json_filemetadata)
       {
         return JsonConvert.DeserializeObject<Drive2_File>(client.Request<string>(uriDriveFile, TypeRequest.POST, Encoding.UTF8.GetBytes(json_filemetadata)).DataTextResponse);
       }
       
-      public IDrive2_File Patch(string id, string json_metadata = null)
+      public Drive2_File Patch(string id, string json_metadata = null)
       {
         byte[] buffer = null;
         if (!string.IsNullOrEmpty(json_metadata)) buffer = Encoding.UTF8.GetBytes(json_metadata);
@@ -155,18 +155,18 @@ namespace Cloud.GoogleDrive
                 TypeRequest.PATCH, buffer).GetObjectResponse<Drive2_File>();
       }
       
-      public IDrive2_File Copy(string file_id, string parent_id)
+      public Drive2_File Copy(string file_id, string parent_id)
       {
         string post_data = "{\"parents\": [{\"id\": \"" + parent_id + "\"}]}";
         return client.Request<string>(uriDriveFile + file_id + "/copy", TypeRequest.POST, Encoding.UTF8.GetBytes(post_data)).GetObjectResponse<Drive2_File>();
       }
 
-      public IDrive2_File Delete(string fileId)
+      public Drive2_File Delete(string fileId)
       {
         return client.Request<string>(uriDriveFile + fileId + "?key=" + GoogleDriveAppKey.ApiKey, TypeRequest.DELETE, null, null).GetObjectResponse<Drive2_File>();
       }
 
-      public IDrive2_Files_list List(OrderByEnum[] order, string query = null, string pageToken = null,
+      public Drive2_Files_list List(OrderByEnum[] order, string query = null, string pageToken = null,
           CorpusEnum corpus = CorpusEnum.DEFAULT, ProjectionEnum projection = ProjectionEnum.BASIC,
               int maxResults = 1000, SpacesEnum spaces = SpacesEnum.drive)
       {
@@ -182,12 +182,12 @@ namespace Cloud.GoogleDrive
 
       //}
 
-      public IDrive2_File Trash(string id)
+      public Drive2_File Trash(string id)
       {
         return client.Request<string>(uriDriveFile + id + "/trash?fields=labels%2Ftrashed&key=" + GoogleDriveAppKey.ApiKey, TypeRequest.POST, null, null).GetObjectResponse<Drive2_File>();
       }
 
-      public IDrive2_File UnTrash(string id)
+      public Drive2_File UnTrash(string id)
       {
         return client.Request<string>(uriDriveFile + id + "/untrash", TypeRequest.POST).GetObjectResponse<Drive2_File>();
       }
@@ -236,10 +236,10 @@ namespace Cloud.GoogleDrive
       /// <param name="fileid"></param>
       /// <param name="json_metadata">Json data parent</param>
       /// <returns></returns>
-      public Drive2_Parent Insert(string fileid, string json_metadata)
+      public Drive2_Parent Insert(string fileid, List<Drive2_Parent> parents)
       {
         return client.Request<string>(uriDriveFile + fileid + "/parents?alt=json&key=" + GoogleDriveAppKey.ApiKey,
-            TypeRequest.POST, Encoding.UTF8.GetBytes(json_metadata)).GetObjectResponse<Drive2_Parent>();
+            TypeRequest.POST, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(parents,JsonSetting._settings_serialize))).GetObjectResponse<Drive2_Parent>();
       }
 
       public Drive2_Parents_list List(string fileid)
@@ -259,7 +259,7 @@ namespace Cloud.GoogleDrive
         this.client = client;
       }
 
-      public IDrive2_File CreateFolder(string name, List<Drive2_Parent> parents_id)
+      public Drive2_File CreateFolder(string name, List<Drive2_Parent> parents_id)
       {
         Drive2_File f = new Drive2_File();
         f.mimeType = "application/vnd.google-apps.folder";
@@ -270,12 +270,12 @@ namespace Cloud.GoogleDrive
         return CreateFolder(json);
       }
 
-      public IDrive2_File CreateFolder(string name, string parent_id)
+      public Drive2_File CreateFolder(string name, string parent_id)
       {
         string json_data = "{\"mimeType\": \"application/vnd.google-apps.folder\", \"title\": \"" + name + "\", \"parents\": [{\"id\": \"" + parent_id + "\"}]}";
         return CreateFolder(json_data);
       }
-      public IDrive2_File CreateFolder(string metadata)
+      public Drive2_File CreateFolder(string metadata)
       {
         return client.Files.Insert_MetadataRequest(metadata);
       }

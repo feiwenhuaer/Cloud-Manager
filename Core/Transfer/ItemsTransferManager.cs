@@ -299,7 +299,7 @@ namespace Core.Transfer
       switch (item.From.node.GetRoot.RootType.Type)
       {
         case CloudType.GoogleDrive:
-          IDrive2_File f = GoogleDrive.MoveItem(item.From.node,item.To.node,null,true);
+          Drive2_File f = GoogleDrive.MoveItem(item.From.node,item.To.node,null,true);
 
           foreach (var p in f.parents) if (p.id == item.To.node.Parent.Info.ID) item.status = StatusTransfer.Done;
                                       else item.status = StatusTransfer.Error;

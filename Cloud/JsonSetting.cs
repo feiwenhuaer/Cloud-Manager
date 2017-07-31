@@ -9,53 +9,79 @@ namespace Cloud
 {
   public static class JsonSetting
   {
-    static List<Type> types = new List<Type>() { typeof(IDrive2_File),typeof(IDrive2_Files_list) };
+    //static List<Type> types_interface_cast = new List<Type>() { typeof(IDrive2_File),typeof(IDrive2_Files_list) };
+    static List<Type> type_attribute_ignore = new List<Type>() { typeof(JsonIgnoreSerialize) };
     public static readonly JsonSerializerSettings _settings_serialize = new JsonSerializerSettings
     {
       TypeNameHandling = TypeNameHandling.None,//ignore field not found in class (serialize)
       NullValueHandling = NullValueHandling.Ignore,//ignore null (serialize)
-      ContractResolver = new JsonIgnoreSerializeResolver(types)//custom ContractResolver
+      ContractResolver = new SerializeResolver(){ types_attribute_ignore = type_attribute_ignore }//custom ContractResolver
+    };
+
+    public static readonly JsonSerializerSettings _settings_deserialize = new JsonSerializerSettings
+    {
+      ContractResolver = new DeserializeResolver()//custom ContractResolver
     };
   }
-
-  #region serialize and donot deserialize in tag [JsonIgnoreSerialize]
+  
   [System.AttributeUsage(System.AttributeTargets.All, AllowMultiple = false)]
   public class JsonIgnoreSerialize : Attribute
   {
   }
 
-  public class JsonIgnoreSerializeResolver : DefaultContractResolver
+  public class SerializeResolver : DefaultContractResolver
   {
-    readonly List<Type> types = new List<Type>();
-    public JsonIgnoreSerializeResolver() { }
-    public JsonIgnoreSerializeResolver(List<Type> types) { this.types = types; }
+    public List<Type> types_interface_cast { get; set; } = new List<Type>();
+    public List<Type> types_attribute_ignore { get; set; } = new List<Type>();
+    public SerializeResolver() { }
+
     protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
     {
       JsonProperty property = base.CreateProperty(member, memberSerialization);
-
-      #region deserialize and donot serialize in tag [JsonIgnoreSerialize]
-      var member_attribute = member.GetCustomAttributes(typeof(JsonIgnoreSerialize), true);
-      if ((property != null && property.Writable) | (member_attribute != null))
+      if (types_attribute_ignore.Count != 0)
       {
-        IList<Attribute> attributes = property.AttributeProvider.GetAttributes(typeof(JsonIgnoreSerialize), true);
-        if ((attributes != null && attributes.Count > 0 ) |  member_attribute.Length > 0)
-          property.ShouldSerialize = Instance => { return false; };
+        foreach (Type type in types_attribute_ignore)
+        {
+          object[] member_attribute = member.GetCustomAttributes(typeof(JsonIgnoreSerialize), true);
+          if (member_attribute != null && member_attribute.Length > 0)
+          {
+            property.ShouldSerialize = Instance => { return false; };
+            break;
+          }
+          else if (property != null && property.Writable)
+          {
+            IList<Attribute> attributes = property.AttributeProvider.GetAttributes(typeof(JsonIgnoreSerialize), true);
+            if (attributes != null && attributes.Count > 0)
+            {
+              property.ShouldSerialize = Instance => { return false; };
+              break;
+            }
+          }
+        }
       }
-      #endregion
-
       return property;
     }
 
     protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
-    {  
-      if (types.Count != 0)// find interface
-      {
-        Type found = null;
-        foreach (Type Ti in type.GetInterfaces()) found = types.Find(t => t == Ti);
-        if(found != null) return base.CreateProperties(found, memberSerialization);
-      }
-      return base.CreateProperties(type, memberSerialization);
+    {
+      Type found = null;
+      if (types_interface_cast.Count != 0) foreach (Type Ti in type.GetInterfaces())
+        {
+          found = types_interface_cast.Find(t => t == Ti);//cast class to interface if found in types_interface
+          if (found != null) break;
+        }
+      return found == null ? base.CreateProperties(type, memberSerialization) : base.CreateProperties(found, memberSerialization);
     }
   }
-  #endregion
+
+  public class DeserializeResolver: DefaultContractResolver
+  {
+    protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
+    {
+      JsonProperty property = base.CreateProperty(member, memberSerialization);
+      var propInfo = member as PropertyInfo;
+      if(propInfo!=null) property.Writable = propInfo.CanWrite;
+      return property;
+    }
+  }
 }

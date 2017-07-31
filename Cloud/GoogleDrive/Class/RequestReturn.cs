@@ -13,7 +13,7 @@ namespace Cloud.GoogleDrive
     {
       try
       {
-        return JsonConvert.DeserializeObject<T>(this.DataTextResponse);
+        return JsonConvert.DeserializeObject<T>(this.DataTextResponse,JsonSetting._settings_deserialize);
       }
       catch (Exception)
       {

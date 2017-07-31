@@ -72,10 +72,10 @@ namespace Core.CloudSubClass
       #region Get Child Node Data
       if (!string.IsNullOrEmpty(parent_ID))//if found id is folder
       {
-        List<IDrive2_File> list_ = Search("'" + parent_ID + "' in parents and trashed=false", Email);
+        List<Drive2_File> list_ = Search("'" + parent_ID + "' in parents and trashed=false", Email);
         if (parent_ID == "root")//save root id
         {
-          foreach (IDrive2_File item in list_)
+          foreach (Drive2_File item in list_)
           {
             foreach (Drive2_Parent parent in item.parents)
             {
@@ -98,7 +98,7 @@ namespace Core.CloudSubClass
           RootNode n = new RootNode();
           n.Info.ID = match.Value;
           n.RootType.Email = Email;
-          IDrive2_File item = GoogleDrive.GetMetadataItem(n);
+          Drive2_File item = GoogleDrive.GetMetadataItem(n);
           n.Info.Size = item.fileSize ?? -1;
           n.Info.Name = item.title;
           n.Info.MimeType = item.mimeType;
@@ -117,13 +117,12 @@ namespace Core.CloudSubClass
       return gdclient.Files.Get(node.Info.ID, Startpos, endpos);
     }
 
-    public static List<IDrive2_File> Search(string query, string Email, string pageToken = null)
+    public static List<Drive2_File> Search(string query, string Email, string pageToken = null)
     {
       DriveAPIHttprequestv2 gdclient = GetAPIv2(Email);
-      IDrive2_Files_list list = gdclient.Files.List(en, query, pageToken);
-      List<IDrive2_File> items = new List<IDrive2_File>(list.items);
-      if (!string.IsNullOrEmpty(list.nextPageToken)) items.AddRange(Search(query, Email, list.nextPageToken));
-      return items;
+      Drive2_Files_list list = gdclient.Files.List(en, query, pageToken);
+      if (!string.IsNullOrEmpty(list.nextPageToken)) list.items.AddRange(Search(query, Email, list.nextPageToken));
+      return list.items;
     }
 
     static object sync_createfolder = new object();
@@ -157,7 +156,7 @@ namespace Core.CloudSubClass
 
           if (create)
           {
-            IDrive2_File folder = gdclient.Extend.CreateFolder(listnode[i].Info.Name, parent_id);
+            Drive2_File folder = gdclient.Extend.CreateFolder(listnode[i].Info.Name, parent_id);
             parent_id = listnode[i].Info.ID = folder.id;
           }
         }
@@ -169,7 +168,7 @@ namespace Core.CloudSubClass
     {
       DriveAPIHttprequestv2 gdclient = GetAPIv2(node.GetRoot.RootType.Email);
       string json = "{\"title\": \"" + newname + "\"}";
-      IDrive2_File response = gdclient.Files.Patch(node.Info.ID, json);
+      Drive2_File response = gdclient.Files.Patch(node.Info.ID, json);
       if (response.title == newname) return true;
       else return false;
     }
@@ -182,7 +181,7 @@ namespace Core.CloudSubClass
     /// <param name="newname">rename (cut)</param>
     /// <param name="copy"></param>
     /// <returns></returns>
-    public static IDrive2_File MoveItem(IItemNode nodemove, IItemNode newparent, string newname = null, bool copy = false)
+    public static Drive2_File MoveItem(IItemNode nodemove, IItemNode newparent, string newname = null, bool copy = false)
     {
       if (newparent != null && nodemove.GetRoot.RootType.Type != newparent.GetRoot.RootType.Type) throw new Exception("TypeCloud not match.");
       DriveAPIHttprequestv2 gdclient;
@@ -191,10 +190,10 @@ namespace Core.CloudSubClass
         //Same account
         gdclient = GetAPIv2(nodemove.GetRoot.RootType.Email);
         if (newparent != null && nodemove.GetRoot.RootType.Email != newparent.GetRoot.RootType.Email) throw new Exception("Email not match.");
-        Drive2_File_ item = null;
+        Drive2_File item = null;
         if (newparent == null & newname != null)//rename
         {
-          item = new Drive2_File_();
+          item = new Drive2_File();
           item.title = newname;
         }
         else//move
@@ -203,7 +202,7 @@ namespace Core.CloudSubClass
           Drive2_Parent found = parents.items.Find(p => p.id == nodemove.Parent.Info.ID);
           if (found != null) parents.items.Remove(found);
           parents.items.Add(new Drive2_Parent() { id = newparent.Info.ID });
-          gdclient.Parent.Insert(nodemove.Info.ID, JsonConvert.SerializeObject(parents.items));
+          gdclient.Parent.Insert(nodemove.Info.ID, parents.items);
         }
         return gdclient.Files.Patch(nodemove.Info.ID, item == null ? null : JsonConvert.SerializeObject(item));
       }
@@ -218,7 +217,7 @@ namespace Core.CloudSubClass
       }
     }
 
-    public static IDrive2_File GetMetadataItem(IItemNode node)
+    public static Drive2_File GetMetadataItem(IItemNode node)
     {
       DriveAPIHttprequestv2 client = GetAPIv2(node.GetRoot.RootType.Email);
       return client.Files.Patch(node.Info.ID, null);
@@ -248,10 +247,10 @@ namespace Core.CloudSubClass
       else throw new Exception("Can't save token.");
     }
 
-    public static List<IItemNode> Convert(this List<IDrive2_File> items, IItemNode parent)
+    public static List<IItemNode> Convert(this List<Drive2_File> items, IItemNode parent)
     {
       List<IItemNode> list = new List<IItemNode>();
-      foreach (Drive2_File_ item in items)
+      foreach (Drive2_File item in items)
       {
         bool add = true;
         GoogleAppsmimeTypeGoogleRemove.ForEach(m => { if (item.mimeType == m) add = false; });
@@ -290,134 +289,5 @@ namespace Core.CloudSubClass
   public enum typePermissions
   {
     user, group, domain, anyone
-  }
-
-  internal class Drive2_File_ : IDrive2_File
-  {
-    public string alternateLink { get; }
-
-    public bool? appDataContents { get; }
-
-    public bool? canComment { get; }
-
-    public bool? canReadRevisions{ get; }
-
-    public Drive2_File_capability capabilities{ get; }
-
-    public bool? copyable{ get; }
-
-    public DateTime? createdDate{ get; }
-
-    public string defaultOpenWithLink{ get; }
-
-    public string description{ get; set; }
-
-    public string downloadUrl{ get; }
-
-    public bool? editable{ get; }
-
-    public string embedLink{ get; }
-
-    public string etag{ get; }
-
-    public bool? explicitlyTrashed{ get; }
-
-    public string fileExtension{ get; }
-
-    public long? fileSize{ get; }
-
-    public string folderColorRgb{ get; set; }
-
-    public string fullFileExtension{ get; }
-
-    public bool? hasAugmentedPermissions{ get; }
-
-    public bool? hasThumbnail{ get; }
-
-    public string headRevisionId{ get; }
-
-    public string iconLink{ get; }
-
-    public string id{ get; }
-
-    public Drive2_File_imageMediaMetadata imageMediaMetadata{ get; }
-
-    public Drive2_File_indexableText indexableText{ get; set; }
-
-    public bool? isAppAuthorized{ get; }
-
-    public string kind{ get; }
-
-    public Drive2_File_label labels{ get; set; }
-
-    public Drive2_User lastModifyingUser{ get; }
-
-    public string lastModifyingUserName{ get; }
-
-    public DateTime? lastViewedByMeDate{ get; set; }
-
-    public DateTime? markedViewedByMeDate{ get; set; }
-
-    public string md5Checksum{ get; }
-
-    public string mimeType{ get; set; }
-
-    public DateTime? modifiedByMeDate{ get; }
-
-    public DateTime? modifiedDate{ get; set; }
-
-    public string originalFilename{ get; set; }
-
-    public bool? ownedByMe{ get; }
-
-    public List<string> ownerNames{ get; }
-
-    public List<Drive2_User> owners{ get; }
-
-    public List<Drive2_Parent> parents{ get; set; }
-
-    public List<Drive2_Permission> permissions{ get; set; }
-
-    public List<Drive2_File_property> properties{ get; set; }
-
-    public long? quotaBytesUsed{ get; }
-
-    public string selfLink{ get; }
-
-    public bool? shareable{ get; }
-
-    public bool? shared{ get; }
-
-    public DateTime? sharedWithMeDate{ get; }
-
-    public Drive2_User sharingUser{ get; }
-
-    public List<string> spaces{ get; }
-
-    public string teamDriveId{ get; }
-
-    public IDrive2_File_thumbnail thumbnail{ get; }
-
-    public string thumbnailLink{ get; }
-
-    public long? thumbnailVersion{ get; }
-
-    public string title{ get; set; }
-
-    public DateTime? trashedDate{ get; }
-
-    public Drive2_User trashingUser{ get; }
-
-    public Drive2_Permission userPermission{ get; set; }
-
-    public long? version{ get; }
-
-    public Drive2_File_videoMediaMetadata videoMediaMetadata{ get; }
-
-    public string webContentLink{ get; }
-
-    public string webViewLink{ get; }
-
-    public bool? writersCanShare{ get; set; }
   }
 }

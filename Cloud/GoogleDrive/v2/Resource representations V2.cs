@@ -2,527 +2,415 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Cloud;
-
+using System.Linq;
 namespace Cloud.GoogleDrive
 {
   #region Files
-  public interface IDrive2_Files_list
+  public class Drive2_Files_list
   {
     /// <summary>
     /// This is always drive#fileList.	
     /// </summary>
-    string kind { get; }
+    public string kind { get; internal set; }
     /// <summary>
     /// The ETag of the list.	
     /// </summary>
-    string etag { get; }
+    public string etag { get; internal set; }
     /// <summary>
     /// A link back to this list.	
     /// </summary>
-    string selfLink { get;}
+    public string selfLink { get;}
     /// <summary>
     /// The page token for the next page of files. This will be absent if the end of the files list has been reached. If the token is rejected for any reason, it should be discarded, and pagination should be restarted from the first page of results.	
     /// </summary>
-    string nextPageToken { get; }
+    public string nextPageToken { get; internal set; }
     /// <summary>
     /// A link to the next page of files.	
     /// </summary>
-    string nextLink { get; }
+    public string nextLink { get; internal set; }
     /// <summary>
     /// Whether the search process was incomplete. If true, then some search results may be missing, since all documents were not searched. This may occur when searching multiple Team Drives with the "default,allTeamDrives" corpora, but all corpora could not be searched. When this happens, it is suggested that clients narrow their query by choosing a different corpus such as "default" or "teamDrive".	
     /// </summary>
-    bool? incompleteSearch { get; }
+    public bool? incompleteSearch { get; internal set; }
     /// <summary>
     /// The list of files. If nextPageToken is populated, then this list may be incomplete and an additional page of results should be fetched.	
     /// </summary>
-    IDrive2_File[] items { get; }
-  }
-  internal class Drive2_Files_list : IDrive2_Files_list
-  {
-    [JsonProperty("items")]
-    Drive2_File[] items_;
-    public string etag { get; set; }
-    public bool? incompleteSearch { get; set; }
-    [JsonIgnore]
-    public IDrive2_File[] items { get { return items_; } }
-    public string kind { get; set; }
-    public string nextLink { get; set; }
-    public string nextPageToken { get; set; }
-    public string selfLink { get; set; }
+    public List<Drive2_File> items { get; internal set; }
   }
 
-  public interface IDrive2_File
+  public class Drive2_File
   {
+    //exportLinks { (key): string }
+    //openWithLinks { (key): string }
+
+    #region public get, internal set
     /// <summary>
     /// The type of file. This is always drive#file.	
     /// </summary>
     [JsonIgnoreSerialize]
-    string kind { get; }
+    public string kind { get; internal set; }
 
     /// <summary>
     /// The ID of the file.
     /// </summary>
     [JsonIgnoreSerialize]
-    string id { get; }
+    public string id { get; internal set; }
 
     /// <summary>
     /// ETag of the file.	
     /// </summary>
     [JsonIgnoreSerialize]
-    string etag { get; }
+    public string etag { get; internal set; }
 
     /// <summary>
     /// A link back to this file.	
     /// </summary>
     [JsonIgnoreSerialize]
-    string selfLink { get; }
+    public string selfLink { get; internal set; }
 
     /// <summary>
     /// A link for downloading the content of the file in a browser using cookie based authentication. In cases where the content is shared publicly, the content can be downloaded without any credentials.	
     /// </summary>
     [JsonIgnoreSerialize]
-    string webContentLink { get; }
+    public string webContentLink { get; internal set; }
 
     /// <summary>
     /// A link only available on folders for viewing their static web assets (HTML, CSS, JS, etc) via Google Drive's Website Hosting.	
     /// </summary>
     [JsonIgnoreSerialize]
-    string webViewLink { get; }
+    public string webViewLink { get; internal set; }
 
     /// <summary>
     /// A link for opening the file in a relevant Google editor or viewer.	
     /// </summary>
     [JsonIgnoreSerialize]
-    string alternateLink { get; }
+    public string alternateLink { get; internal set; }
 
     /// <summary>
     /// A link for embedding the file.	
     /// </summary>
     [JsonIgnoreSerialize]
-    string embedLink { get; }
-
-    //openWithLinks { (key): string }
+    public string embedLink { get; internal set; }
 
     /// <summary>
     /// A link to open this file with the user's default app for this file. Only populated when the drive.apps.readonly scope is used.	
     /// </summary>
     [JsonIgnoreSerialize]
-    string defaultOpenWithLink { get; }
+    public string defaultOpenWithLink { get; internal set; }
 
     /// <summary>
     /// A link to the file's icon.	
     /// </summary>
     [JsonIgnoreSerialize]
-    string iconLink { get; }
+    public string iconLink { get; internal set; }
 
     /// <summary>
     /// Whether this file has a thumbnail. This does not indicate whether the requesting app has access to the thumbnail. To check access, look for the presence of the thumbnailLink field.	
     /// </summary>
     [JsonIgnoreSerialize]
-    bool? hasThumbnail { get; }
+    public bool? hasThumbnail { get; internal set; }
 
     /// <summary>
     /// A short-lived link to the file's thumbnail. Typically lasts on the order of hours. Only populated when the requesting app can access the file's content.	
     /// </summary>
     [JsonIgnoreSerialize]
-    string thumbnailLink { get; }
+    public string thumbnailLink { get; internal set; }
 
     /// <summary>
     /// The thumbnail version for use in thumbnail cache invalidation.	
     /// </summary>
     [JsonIgnoreSerialize]
-    long? thumbnailVersion { get; }
+    public long? thumbnailVersion { get; internal set; }
     
     /// <summary>
     /// A thumbnail for the file. This will only be used if Drive cannot generate a standard thumbnail.	
     /// </summary>
     [JsonIgnoreSerialize]
-    IDrive2_File_thumbnail thumbnail { get; }
-
-    /// <summary>
-    /// The title of this file. Note that for immutable items such as the top level folders of Team Drives, My Drive root folder, and Application Data folder the title is constant.	
-    /// </summary>
-    string title { get; set; }
-
-    /// <summary>
-    /// The MIME type of the file. This is only mutable on update when uploading new content. This field can be left blank, and the mimetype will be determined from the uploaded content's MIME type.	
-    /// </summary>
-    string mimeType { get; set; }
-
-    /// <summary>
-    /// A short description of the file.	
-    /// </summary>
-    string description { get; set; }
-
-    /// <summary>
-    /// A group of labels for the file.	
-    /// </summary>
-    Drive2_File_label labels { get; set; }
+    public Drive2_File_thumbnail thumbnail { get; internal set; }
 
     /// <summary>
     /// Create time for this file (formatted RFC 3339 timestamp).	
     /// </summary>
     [JsonIgnoreSerialize]
-    DateTime? createdDate { get; }
-
-    /// <summary>
-    /// Last time this file was modified by anyone (formatted RFC 3339 timestamp). This is only mutable on update when the setModifiedDate parameter is set.	
-    /// </summary>
-    DateTime? modifiedDate { get; set; }
+    public DateTime? createdDate { get; internal set; }
 
     /// <summary>
     /// Last time this file was modified by the user (formatted RFC 3339 timestamp). Note that setting modifiedDate will also update the modifiedByMe date for the user which set the date.	
     /// </summary>
     [JsonIgnoreSerialize]
-    DateTime? modifiedByMeDate { get; }
-
-    /// <summary>
-    /// Last time this file was viewed by the user (formatted RFC 3339 timestamp).	
-    /// </summary>
-    DateTime? lastViewedByMeDate { get; set; }
-
-    /// <summary>
-    /// Deprecated
-    /// </summary>
-    DateTime? markedViewedByMeDate { get; set; }
+    public DateTime? modifiedByMeDate { get; internal set; }
 
     /// <summary>
     /// Time at which this file was shared with the user (formatted RFC 3339 timestamp).	
     /// </summary>
     [JsonIgnoreSerialize]
-    DateTime? sharedWithMeDate { get; }
+    public DateTime? sharedWithMeDate { get; internal set; }
 
     /// <summary>
     /// A monotonically increasing version number for the file. This reflects every change made to the file on the server, even those not visible to the requesting user.	
     /// </summary>
     [JsonIgnoreSerialize]
-    long? version { get; }
+    public long? version { get; internal set; }
 
     /// <summary>
     /// User that shared the item with the current user, if available.	
     /// </summary>
     [JsonIgnoreSerialize]
-    Drive2_User sharingUser { get; }
-
-    /// <summary>
-    /// Collection of parent folders which contain this file. Setting this field will put the file in all of the provided folders.On insert, if no folders are provided, the file will be placed in the default root folder.
-    /// </summary>
-    List<Drive2_Parent> parents { get; set; }
+    public Drive2_User sharingUser { get; internal set; }
 
     /// <summary>
     /// 
     /// </summary>
     [JsonIgnoreSerialize]
-    string downloadUrl { get; }
-
-    //exportLinks { (key): string }
-
-    /// <summary>
-    /// Indexable text attributes for the file. This property can only be written, and is not returned by files.get. For more information, see https://developers.google.com/drive/v3/web/practices#custom_thumbnails_and_indexable_text
-    /// </summary>
-    Drive2_File_indexableText indexableText { get; set; }
-
-    /// <summary>
-    /// The permissions for the authenticated user on this file.	
-    /// </summary>
-    Drive2_Permission userPermission { get; set; }
-
-    /// <summary>
-    /// The list of permissions for users with access to this file. Not populated for Team Drive files.	
-    /// </summary>
-    List<Drive2_Permission> permissions { get; set; }
+    public string downloadUrl { get; internal set; }
 
     /// <summary>
     /// Whether any users are granted file access directly on this file. This field is only populated for Team Drive files.	
     /// </summary>
     [JsonIgnoreSerialize]
-    bool? hasAugmentedPermissions { get; }
-
-    /// <summary>
-    /// The original filename of the uploaded content if available, or else the original value of the title field. This is only available for files with binary content in Drive.	
-    /// </summary>
-    string originalFilename { get; set; }
+    public bool? hasAugmentedPermissions { get; internal set; }
 
     /// <summary>
     /// The final component of fullFileExtension with trailing text that does not appear to be part of the extension removed. This field is only populated for files with content stored in Drive; it is not populated for Google Docs or shortcut files.	
     /// </summary>
     [JsonIgnoreSerialize]
-    string fileExtension { get; }
+    public string fileExtension { get; internal set; }
 
     /// <summary>
     /// The full file extension; extracted from the title. May contain multiple concatenated extensions, such as "tar.gz". Removing an extension from the title does not clear this field; however, changing the extension on the title does update this field. This field is only populated for files with content stored in Drive; it is not populated for Google Docs or shortcut files.	
     /// </summary>
     [JsonIgnoreSerialize]
-    string fullFileExtension { get; }
+    public string fullFileExtension { get; internal set; }
 
     /// <summary>
     /// An MD5 checksum for the content of this file. This field is only populated for files with content stored in Drive; it is not populated for Google Docs or shortcut files.	
     /// </summary>
     [JsonIgnoreSerialize]
-    string md5Checksum { get; }
+    public string md5Checksum { get; internal set; }
 
     /// <summary>
     /// The size of the file in bytes. This field is only populated for files with content stored in Drive; it is not populated for Google Docs or shortcut files.	
     /// </summary>
     [JsonIgnoreSerialize]
-    long? fileSize { get; }
+    public long? fileSize { get; internal set; }
 
     /// <summary>
     /// The number of quota bytes used by this file.	
     /// </summary>
     [JsonIgnoreSerialize]
-    long? quotaBytesUsed { get; }
+    public long? quotaBytesUsed { get; internal set; }
 
     /// <summary>
     /// Name(s) of the owner(s) of this file. Not populated for Team Drive files.	
     /// </summary>
     [JsonIgnoreSerialize]
-    List<string> ownerNames { get; }
+    public string[] ownerNames { get; internal set; }
 
     /// <summary>
     /// The owner(s) of this file. Not populated for Team Drive files.	
     /// </summary>
     [JsonIgnoreSerialize]
-    List<Drive2_User> owners { get; }
+    public Drive2_User[] owners { get; internal set; }
 
     /// <summary>
     /// ID of the Team Drive the file resides in.	
     /// </summary>
     [JsonIgnoreSerialize]
-    string teamDriveId { get; }
+    public string teamDriveId { get; internal set; }
 
     /// <summary>
     /// Name of the last user to modify this file.	
     /// </summary>
     [JsonIgnoreSerialize]
-    string lastModifyingUserName { get; }
+    public string lastModifyingUserName { get; internal set; }
 
     /// <summary>
     /// The last user to modify this file.	
     /// </summary>
     [JsonIgnoreSerialize]
-    Drive2_User lastModifyingUser { get; }
+    public Drive2_User lastModifyingUser { get; internal set; }
 
     /// <summary>
     /// Whether the file is owned by the current user. Not populated for Team Drive files.	
     /// </summary>
     [JsonIgnoreSerialize]
-    bool? ownedByMe { get; }
+    public bool? ownedByMe { get; internal set; }
 
     /// <summary>
     /// Capabilities the current user has on this file. Each capability corresponds to a fine-grained action that a user may take.
     /// </summary>
     [JsonIgnoreSerialize]
-    Drive2_File_capability capabilities { get; }
+    public Drive2_File_capability capabilities { get; internal set; }
 
     /// <summary>
     /// Deprecated: use capabilities/canEdit.	
     /// </summary>
     [JsonIgnoreSerialize]
-    bool? editable { get; }
+    public bool? editable { get; internal set; }
 
     /// <summary>
     /// Deprecated: use capabilities/canComment.
     /// </summary>
     [JsonIgnoreSerialize]
-    bool? canComment { get; }
+    public bool? canComment { get; internal set; }
 
     /// <summary>
     /// Deprecated: use capabilities/canReadRevisions.	
     /// </summary>
     [JsonIgnoreSerialize]
-    bool? canReadRevisions { get; }
+    public bool? canReadRevisions { get; internal set; }
 
     /// <summary>
     /// Deprecated: use capabilities/canShare.	
     /// </summary>
     [JsonIgnoreSerialize]
-    bool? shareable { get; }
+    public bool? shareable { get; internal set; }
 
     /// <summary>
     /// Deprecated: use capabilities/canCopy.	
     /// </summary>
     [JsonIgnoreSerialize]
-    bool? copyable { get; }
-
-    /// <summary>
-    /// Whether writers can share the document with other users. Not populated for Team Drive files.	
-    /// </summary>
-    bool? writersCanShare { get; set; }
+    public bool? copyable { get; internal set; }
 
     /// <summary>
     /// Whether the file has been shared. Not populated for Team Drive files.	
     /// </summary>
     [JsonIgnoreSerialize]
-    bool? shared { get; }
+    public bool? shared { get; internal set; }
 
     /// <summary>
     /// Whether this file has been explicitly trashed, as opposed to recursively trashed.	
     /// </summary>
     [JsonIgnoreSerialize]
-    bool? explicitlyTrashed { get; }
+    public bool? explicitlyTrashed { get; internal set; }
 
     /// <summary>
     /// If the file has been explicitly trashed, the user who trashed it. Only populated for Team Drive files.	
     /// </summary>
     [JsonIgnoreSerialize]
-    Drive2_User trashingUser { get; }
+    public Drive2_User trashingUser { get; internal set; }
 
     /// <summary>
     /// The time that the item was trashed (formatted RFC 3339 timestamp). Only populated for Team Drive files.	
     /// </summary>
     [JsonIgnoreSerialize]
-    DateTime? trashedDate { get; }
+    public DateTime? trashedDate { get; internal set; }
 
     /// <summary>
     /// Whether this file is in the Application Data folder.	
     /// </summary>
     [JsonIgnoreSerialize]
-    bool? appDataContents { get; }
+    public bool? appDataContents { get; internal set; }
 
     /// <summary>
     /// The ID of the file's head revision. This field is only populated for files with content stored in Drive; it is not populated for Google Docs or shortcut files.	
     /// </summary>
     [JsonIgnoreSerialize]
-    string headRevisionId { get; }
-
-    /// <summary>
-    /// The list of properties.	
-    /// </summary>
-    List<Drive2_File_property> properties { get; set; }
-
-    /// <summary>
-    /// Folder color as an RGB hex string if the file is a folder. The list of supported colors is available in the folderColorPalette field of the About resource. If an unsupported color is specified, it will be changed to the closest color in the palette. Not populated for Team Drive files.	
-    /// </summary>
-    string folderColorRgb { get; set; }
+    public string headRevisionId { get; internal set; }
 
     /// <summary>
     /// Metadata about image media. This will only be present for image types, and its contents will depend on what can be parsed from the image content.	
     /// </summary>
     [JsonIgnoreSerialize]
-    Drive2_File_imageMediaMetadata imageMediaMetadata { get; }
+    public Drive2_File_imageMediaMetadata imageMediaMetadata { get; internal set; }
 
     /// <summary>
     /// Metadata about video media. This will only be present for video types.	
     /// </summary>
     [JsonIgnoreSerialize]
-    Drive2_File_videoMediaMetadata videoMediaMetadata { get; }
+    public Drive2_File_videoMediaMetadata videoMediaMetadata { get; internal set; }
 
     /// <summary>
     /// The list of spaces which contain the file. Supported values are 'drive', 'appDataFolder' and 'photos'.	
     /// </summary>
     [JsonIgnoreSerialize]
-    List<string> spaces { get; }
+    public string[] spaces { get; internal set; }
 
     /// <summary>
     /// Whether the file was created or opened by the requesting app.	
     /// </summary>
     [JsonIgnoreSerialize]
-    bool? isAppAuthorized { get; }
-  }
-  internal class Drive2_File: IDrive2_File//for deserialize
-  {
-    public override string ToString()
-    {
-      return title;
-    }
-    public string kind { get; set; }
-    public string id { get; set; }
-    public string etag { get; set; }
-    public string selfLink { get; set; }
-    public string webContentLink { get; set; }
-    public string webViewLink { get; set; }
-    public string alternateLink { get; set; }
-    public string embedLink { get; set; }
-    //openWithLinks { (key): string }
-    public string defaultOpenWithLink { get; set; }
-    public string iconLink { get; set; }
-    public bool? hasThumbnail { get; set; }
-    public string thumbnailLink { get; set; }
-    public long? thumbnailVersion { get; set; }
-    [JsonProperty("thumbnail")]
-    Drive2_File_thumbnail thumbnail_;
-    [JsonIgnore]
-    public IDrive2_File_thumbnail thumbnail { get { return thumbnail_; } }
+    public bool? isAppAuthorized { get; internal set; }
+    #endregion
+
+    #region public get;set;
+    /// <summary>
+    /// The title of this file. Note that for immutable items such as the top level folders of Team Drives, My Drive root folder, and Application Data folder the title is constant.	
+    /// </summary>
     public string title { get; set; }
+
+    /// <summary>
+    /// The MIME type of the file. This is only mutable on update when uploading new content. This field can be left blank, and the mimetype will be determined from the uploaded content's MIME type.	
+    /// </summary>
     public string mimeType { get; set; }
+
+    /// <summary>
+    /// A short description of the file.	
+    /// </summary>
     public string description { get; set; }
+
+    /// <summary>
+    /// A group of labels for the file.	
+    /// </summary>
     public Drive2_File_label labels { get; set; }
-    public DateTime? createdDate { get; set; }
+
+    /// <summary>
+    /// Last time this file was modified by anyone (formatted RFC 3339 timestamp). This is only mutable on update when the setModifiedDate parameter is set.	
+    /// </summary>
     public DateTime? modifiedDate { get; set; }
-    public DateTime? modifiedByMeDate { get; set; }
+
+    /// <summary>
+    /// Last time this file was viewed by the user (formatted RFC 3339 timestamp).	
+    /// </summary>
     public DateTime? lastViewedByMeDate { get; set; }
+
+    /// <summary>
+    /// Deprecated
+    /// </summary>
     public DateTime? markedViewedByMeDate { get; set; }
-    public DateTime? sharedWithMeDate { get; set; }
-    public long? version { get; set; }
-    public Drive2_User sharingUser { get; set; }
+
+    /// <summary>
+    /// Collection of parent folders which contain this file. Setting this field will put the file in all of the provided folders.On insert, if no folders are provided, the file will be placed in the default root folder.
+    /// </summary>
     public List<Drive2_Parent> parents { get; set; }
-    public string downloadUrl { get; set; }
-    //exportLinks { (key): string }
+
+    /// <summary>
+    /// Indexable text attributes for the file. This property can only be written, and is not returned by files.get. For more information, see https://developers.google.com/drive/v3/web/practices#custom_thumbnails_and_indexable_text
+    /// </summary>
     public Drive2_File_indexableText indexableText { get; set; }
+
+    /// <summary>
+    /// The permissions for the authenticated user on this file.	
+    /// </summary>
     public Drive2_Permission userPermission { get; set; }
-    public List<Drive2_Permission> permissions { get; set; }
-    public bool? hasAugmentedPermissions { get; set; }
+
+    /// <summary>
+    /// The list of permissions for users with access to this file. Not populated for Team Drive files.	
+    /// </summary>
+    public Drive2_Permission[] permissions { get; set; }
+
+    /// <summary>
+    /// The original filename of the uploaded content if available, or else the original value of the title field. This is only available for files with binary content in Drive.	
+    /// </summary>
     public string originalFilename { get; set; }
-    public string fileExtension { get; set; }
-    public string fullFileExtension { get; set; }
-    public string md5Checksum { get; set; }
-    public long? fileSize { get; set; }
-    public long? quotaBytesUsed { get; set; }
-    public List<string> ownerNames { get; set; }
-    public List<Drive2_User> owners { get; set; }
-    public string teamDriveId { get; set; }
-    public string lastModifyingUserName { get; set; }
-    public Drive2_User lastModifyingUser { get; set; }
-    public bool? ownedByMe { get; set; }
-    public Drive2_File_capability capabilities { get; set; }
-    public bool? editable { get; set; }
-    public bool? canComment { get; set; }
-    public bool? canReadRevisions { get; set; }
-    public bool? shareable { get; set; }
-    public bool? copyable { get; set; }
+
+    /// <summary>
+    /// Whether writers can share the document with other users. Not populated for Team Drive files.	
+    /// </summary>
     public bool? writersCanShare { get; set; }
-    public bool? shared { get; set; }
-    public bool? explicitlyTrashed { get; set; }
-    public Drive2_User trashingUser { get; set; }
-    public DateTime? trashedDate { get; set; }
-    public bool? appDataContents { get; set; }
-    public string headRevisionId { get; set; }
-    public List<Drive2_File_property> properties { get; set; }
+
+    /// <summary>
+    /// The list of properties.	
+    /// </summary>
+    public Drive2_File_property[] properties { get; set; }
+
+    /// <summary>
+    /// Folder color as an RGB hex string if the file is a folder. The list of supported colors is available in the folderColorPalette field of the About resource. If an unsupported color is specified, it will be changed to the closest color in the palette. Not populated for Team Drive files.	
+    /// </summary>
     public string folderColorRgb { get; set; }
-    public Drive2_File_imageMediaMetadata imageMediaMetadata { get; set; }
-    public Drive2_File_videoMediaMetadata videoMediaMetadata { get; set; }
-    public List<string> spaces { get; set; }
-    public bool? isAppAuthorized { get; set; }
+    #endregion
   }
-
-  
-  public interface IDrive2_File_thumbnail
-  {
-    /// <summary>
-    /// The URL-safe Base64 encoded bytes of the thumbnail image. It should conform to RFC 4648 section 5.	
-    /// </summary>
-    byte[] image { get; }
-    /// <summary>
-    /// The MIME type of the thumbnail.	
-    /// </summary>
-    string mimeType { get; }
-  }
-  internal class Drive2_File_thumbnail : IDrive2_File_thumbnail//for deserialize
-  {
-    public byte[] image { get; set; }
-    public string mimeType { get; set; }
-  }
-
-  
-  public class Drive2_File_indexableText//writable
-  {
-    /// <summary>
-    /// The text to be indexed for this file.	
-    /// </summary>
-    public string text { get; set; }
-  }
-  public class Drive2_File_label//writable
+  public class Drive2_File_label
   {
     /// <summary>
     /// Whether this file is starred by the user.	
@@ -553,318 +441,339 @@ namespace Cloud.GoogleDrive
     /// Whether the file has been modified by this user.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public bool? modified { get; set; }
-  }
-  public class Drive2_File_capability//read-only
+    public bool? modified { get; internal set; }
+  }//writeable
+  public class Drive2_File_indexableText
+  {
+    /// <summary>
+    /// The text to be indexed for this file.	
+    /// </summary>
+    public string text { get; set; }
+  }//writeable
+
+  public class Drive2_File_thumbnail
+  {
+    /// <summary>
+    /// The URL-safe Base64 encoded bytes of the thumbnail image. It should conform to RFC 4648 section 5.	
+    /// </summary>
+    [JsonIgnoreSerialize]
+    public byte[] image { get; internal set; }
+    /// <summary>
+    /// The MIME type of the thumbnail.	
+    /// </summary>
+    [JsonIgnoreSerialize]
+    public string mimeType { get; internal set; }
+  }//readonly  
+  public class Drive2_File_capability
   {
     /// <summary>
     /// Whether the current user can add children to this folder. This is always false when the item is not a folder.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public bool? canAddChildren { get; set; }
+    public bool? canAddChildren { get; internal set; }
 
     /// <summary>
     /// Whether the current user can change the restricted download label of this file.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public bool? canChangeRestrictedDownload { get; set; }
+    public bool? canChangeRestrictedDownload { get; internal set; }
 
     /// <summary>
     /// Whether the current user can comment on this file.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public bool? canComment { get; set; }
+    public bool? canComment { get; internal set; }
 
     /// <summary>
     /// Whether the current user can copy this file. For a Team Drive item, whether the current user can copy non-folder descendants of this item, or this item itself if it is not a folder.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public bool? canCopy { get; set; }
+    public bool? canCopy { get; internal set; }
 
     /// <summary>
     /// Whether the current user can delete this file.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public bool? canDelete { get; set; }
+    public bool? canDelete { get; internal set; }
 
     /// <summary>
     /// Whether the current user can download this file.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public bool? canDownload { get; set; }
+    public bool? canDownload { get; internal set; }
 
     /// <summary>
     /// Whether the current user can edit this file.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public bool? canEdit { get; set; }
+    public bool? canEdit { get; internal set; }
 
     /// <summary>
     /// Whether the current user can list the children of this folder. This is always false when the item is not a folder.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public bool? canListChildren { get; set; }
+    public bool? canListChildren { get; internal set; }
 
     /// <summary>
     /// Whether the current user can move this item into a Team Drive. If the item is in a Team Drive, this field is equivalent to canMoveTeamDriveItem.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public bool? canMoveItemIntoTeamDrive { get; set; }
+    public bool? canMoveItemIntoTeamDrive { get; internal set; }
 
     /// <summary>
     /// Whether the current user can move this Team Drive item by changing its parent. Note that a request to change the parent for this item may still fail depending on the new parent that is being added. Only populated for Team Drive files.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public bool? canMoveTeamDriveItem { get; set; }
+    public bool? canMoveTeamDriveItem { get; internal set; }
 
     /// <summary>
     /// Whether the current user can read the revisions resource of this file. For a Team Drive item, whether revisions of non-folder descendants of this item, or this item itself if it is not a folder, can be read.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public bool? canReadRevisions { get; set; }
+    public bool? canReadRevisions { get; internal set; }
 
     /// <summary>
     /// Whether the current user can read the Team Drive to which this file belongs. Only populated for Team Drive files.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public bool? canReadTeamDrive { get; set; }
+    public bool? canReadTeamDrive { get; internal set; }
 
     /// <summary>
     /// Whether the current user can remove children from this folder. This is always false when the item is not a folder.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public bool? canRemoveChildren { get; set; }
+    public bool? canRemoveChildren { get; internal set; }
 
     /// <summary>
     /// Whether the current user can rename this file.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public bool? canRename { get; set; }
+    public bool? canRename { get; internal set; }
 
     /// <summary>
     /// Whether the current user can modify the sharing settings for this file.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public bool? canShare { get; set; }
+    public bool? canShare { get; internal set; }
 
     /// <summary>
     /// Whether the current user can move this file to trash.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public bool? canTrash { get; set; }
+    public bool? canTrash { get; internal set; }
 
     /// <summary>
     /// Whether the current user can restore this file from trash.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public bool? canUntrash { get; set; }
-  }
-  public class Drive2_File_property//read-only
+    public bool? canUntrash { get; internal set; }
+  }//readonly
+  public class Drive2_File_property
   {
     /// <summary>
     /// This is always drive#property.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public string kind { get; set; }
+    public string kind { get; internal set; }
 
     /// <summary>
     /// ETag of the property.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public string etag { get; set; }
+    public string etag { get; internal set; }
 
     /// <summary>
     /// The link back to this property.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public string selfLink { get; set; }
+    public string selfLink { get; internal set; }
 
     /// <summary>
     /// The key of this property.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public string key { get; set; }
+    public string key { get; internal set; }
 
     /// <summary>
     /// The visibility of this property.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public string visibility { get; set; }
+    public string visibility { get; internal set; }
 
     /// <summary>
     /// The value of this property.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public string value { get; set; }
-  }
-  public class Drive2_File_imageMediaMetadata//read-only
+    public string value { get; internal set; }
+  }//read-only
+  public class Drive2_File_imageMediaMetadata
   {
     /// <summary>
     /// The width of the image in pixels.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public int? width { get; set; }
+    public int? width { get; internal set; }
 
     /// <summary>
     /// The height of the image in pixels.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public int? height { get; set; }
+    public int? height { get; internal set; }
 
     /// <summary>
     /// The rotation in clockwise degrees from the image's original orientation.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public int? rotation { get; set; }
+    public int? rotation { get; internal set; }
 
     /// <summary>
     /// Geographic location information stored in the image.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public Drive2_File_location location { get; set; }
+    public Drive2_File_location location { get; internal set; }
 
     /// <summary>
     /// The date and time the photo was taken (EXIF format timestamp).	
     /// </summary>
     [JsonIgnoreSerialize]
-    public string date { get; set; }
+    public string date { get; internal set; }
 
     /// <summary>
     /// The make of the camera used to create the photo.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public string cameraMake { get; set; }
+    public string cameraMake { get; internal set; }
 
     /// <summary>
     /// The model of the camera used to create the photo.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public string cameraModel { get; set; }
+    public string cameraModel { get; internal set; }
 
     /// <summary>
     /// The length of the exposure, in seconds.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public float? exposureTime { get; set; }
+    public float? exposureTime { get; internal set; }
 
     /// <summary>
     /// The aperture used to create the photo (f-number).	
     /// </summary>
     [JsonIgnoreSerialize]
-    public float? aperture { get; set; }
+    public float? aperture { get; internal set; }
 
     /// <summary>
     /// Whether a flash was used to create the photo.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public bool? flashUsed { get; set; }
+    public bool? flashUsed { get; internal set; }
 
     /// <summary>
     /// The focal length used to create the photo, in millimeters.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public float? focalLength { get; set; }
+    public float? focalLength { get; internal set; }
 
     /// <summary>
     /// The ISO speed used to create the photo.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public int? isoSpeed { get; set; }
+    public int? isoSpeed { get; internal set; }
 
     /// <summary>
     /// The metering mode used to create the photo.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public string meteringMode { get; set; }
+    public string meteringMode { get; internal set; }
 
     /// <summary>
     /// The type of sensor used to create the photo.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public string sensor { get; set; }
+    public string sensor { get; internal set; }
 
     /// <summary>
     /// The exposure mode used to create the photo.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public string exposureMode { get; set; }
+    public string exposureMode { get; internal set; }
 
     /// <summary>
     /// The color space of the photo.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public string colorSpace { get; set; }
+    public string colorSpace { get; internal set; }
 
     /// <summary>
     /// The white balance mode used to create the photo.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public string whiteBalance { get; set; }
+    public string whiteBalance { get; internal set; }
 
     /// <summary>
     /// The exposure bias of the photo (APEX value).	
     /// </summary>
     [JsonIgnoreSerialize]
-    public float? exposureBias { get; set; }
+    public float? exposureBias { get; internal set; }
 
     /// <summary>
     /// The smallest f-number of the lens at the focal length used to create the photo (APEX value).	
     /// </summary>
     [JsonIgnoreSerialize]
-    public float? maxApertureValue { get; set; }
+    public float? maxApertureValue { get; internal set; }
 
     /// <summary>
     /// The distance to the subject of the photo, in meters.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public int? subjectDistance { get; set; }
+    public int? subjectDistance { get; internal set; }
 
     /// <summary>
     /// The lens used to create the photo.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public string lens { get; set; }
-  }
-  public class Drive2_File_videoMediaMetadata//read-only
+    public string lens { get; internal set; }
+  }//read-only
+  public class Drive2_File_videoMediaMetadata
   {
     /// <summary>
     /// The width of the video in pixels.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public int? width { get; set; }
+    public int? width { get; internal set; }
 
     /// <summary>
     /// The height of the video in pixels.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public int? height { get; set; }
+    public int? height { get; internal set; }
 
     /// <summary>
     /// The duration of the video in milliseconds.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public long? durationMillis { get; set; }
-  }
-  public class Drive2_File_location//read-only
+    public long? durationMillis { get; internal set; }
+  }//read-only
+  public class Drive2_File_location
   {
     /// <summary>
     /// The latitude stored in the image.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public double? latitude { get; set; }
+    public double? latitude { get; internal set; }
 
     /// <summary>
     /// The longitude stored in the image.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public double? longitude { get; set; }
+    public double? longitude { get; internal set; }
 
     /// <summary>
     /// The altitude stored in the image.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public double? altitude { get; set; }
-  }
+    public double? altitude { get; internal set; }
+  }//read-only
   #endregion
 
   #region About
@@ -873,149 +782,124 @@ namespace Cloud.GoogleDrive
     /// <summary>
     /// This is always drive#about.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public string kind { get; set; }
+    public string kind { get; internal set; }
 
     /// <summary>
     /// The ETag of the item.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public string etag { get; set; }
+    public string etag { get; internal set; }
 
     /// <summary>
     /// A link back to this item.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public string selfLink { get; set; }
+    public string selfLink { get; internal set; }
 
     /// <summary>
     /// The name of the current user.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public string name { get; set; }
+    public string name { get; internal set; }
 
     /// <summary>
     /// The authenticated user.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public Drive2_User user { get; set; }
+    public Drive2_User user { get; internal set; }
 
     /// <summary>
     /// The total number of quota bytes.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public long? quotaBytesTotal { get; set; }
+    public long? quotaBytesTotal { get; internal set; }
 
     /// <summary>
     /// The number of quota bytes used by Google Drive.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public long? quotaBytesUsed { get; set; }
+    public long? quotaBytesUsed { get; internal set; }
 
     /// <summary>
     /// The number of quota bytes used by all Google apps (Drive, Picasa, etc.).	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public long? quotaBytesUsedAggregate { get; set; }
+    public long? quotaBytesUsedAggregate { get; internal set; }
 
     /// <summary>
     /// The number of quota bytes used by trashed items.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public long? quotaBytesUsedInTrash { get; set; }
+    public long? quotaBytesUsedInTrash { get; internal set; }
 
     /// <summary>
     /// The type of the user's storage quota.
     /// </summary>
-    [JsonIgnoreSerialize]
-    public Drive2_About_quotaType quotaType { get; set; }
+    public Drive2_About_quotaType quotaType { get; internal set; }
 
-    [JsonIgnoreSerialize]
-    public List<Drive2_About_quotaBytesByService> quotaBytesByService { get; set; }
+    public Drive2_About_quotaBytesByService[] quotaBytesByService { get; internal set; }
 
     /// <summary>
     /// The largest change id.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public long? largestChangeId { get; set; }
+    public long? largestChangeId { get; internal set; }
 
     /// <summary>
     /// The number of remaining change ids, limited to no more than 2500.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public long? remainingChangeIds { get; set; }
+    public long? remainingChangeIds { get; internal set; }
 
     /// <summary>
     /// The id of the root folder.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public string rootFolderId { get; set; }
+    public string rootFolderId { get; internal set; }
 
     /// <summary>
     /// The domain sharing policy for the current user.
     /// </summary>
-    [JsonIgnoreSerialize]
-    public Drive2_About_domainSharingPolicy domainSharingPolicy { get; set; }
+    public Drive2_About_domainSharingPolicy domainSharingPolicy { get; internal set; }
 
     /// <summary>
     /// The current user's ID as visible in the permissions collection.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public string permissionId { get; set; }
+    public string permissionId { get; internal set; }
 
     /// <summary>
     /// The allowable import formats.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public List<Drive2_About_Format> importFormats { get; set; }
+    public Drive2_About_Format[] importFormats { get; internal set; }
 
     /// <summary>
     /// The allowable export formats.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public List<Drive2_About_Format> exportFormats { get; set; }
+    public Drive2_About_Format[] exportFormats { get; internal set; }
 
     /// <summary>
     /// Information about supported additional roles per file type. The most specific type takes precedence.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public List<Drive2_About_additionalRoleInfo> additionalRoleInfo { get; set; }
+    public Drive2_About_additionalRoleInfo[] additionalRoleInfo { get; internal set; }
 
     /// <summary>
     /// List of additional features enabled on this account.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public List<Drive2_About_feature> features { get; set; }
+    public Drive2_About_feature[] features { get; internal set; }
 
     /// <summary>
     /// List of max upload sizes for each file type. The most specific type takes precedence.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public List<Drive2_About_maxUploadSize> maxUploadSizes { get; set; }
+    public Drive2_About_maxUploadSize[] maxUploadSizes { get; internal set; }
 
     /// <summary>
     /// A boolean indicating whether the authenticated app is installed by the authenticated user.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public bool? isCurrentAppInstalled { get; set; }
+    public bool? isCurrentAppInstalled { get; internal set; }
 
     /// <summary>
     /// The user's language or locale code, as defined by BCP 47, with some extensions from Unicode's LDML format (http://www.unicode.org/reports/tr35/).	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public string languageCode { get; set; }
+    public string languageCode { get; internal set; }
 
     /// <summary>
     /// The palette of allowable folder colors as RGB hex strings.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public List<string> folderColorPalette { get; set; }
+    public string[] folderColorPalette { get; internal set; }
 
     /// <summary>
     /// A list of themes that are supported for Team Drives.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public List<Drive2_About_teamDriveTheme> teamDriveThemes { get; set; }
+    public Drive2_About_teamDriveTheme[] teamDriveThemes { get; internal set; }
   }
 
   public enum Drive2_About_quotaType
@@ -1030,109 +914,94 @@ namespace Cloud.GoogleDrive
     incomingOnly,
     disallowed
   }
-  public class Drive2_About_quotaBytesByService//read-only
+  public class Drive2_About_quotaBytesByService
   {
     /// <summary>
     /// The service's name, e.g. DRIVE, GMAIL, or PHOTOS.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public string serviceName { get; set; }
+    public string serviceName { get; internal set; }
 
     /// <summary>
     /// The storage quota bytes used by the service.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public long? bytesUsed { get; set; }
+    public long? bytesUsed { get; internal set; }
   }
-  public class Drive2_About_Format//read-only
+  public class Drive2_About_Format
   {
     /// <summary>
     /// The imported file's content type to convert from.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public string source { get; set; }
+    public string source { get; internal set; }
 
     /// <summary>
     /// The possible content types to convert to.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public List<string> targets { get; set; }
+    public string[] targets { get; internal set; }
   }
-  public class Drive2_About_additionalRoleInfo//read-only
+  public class Drive2_About_additionalRoleInfo
   {
     /// <summary>
     /// The content type that this additional role info applies to.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public string type { get; set; }
+    public string type { get; internal set; }
 
     /// <summary>
     /// The supported additional roles per primary role.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public List<Drive2_About_roleSet> roleSets { get; set; }
+    public Drive2_About_roleSet[] roleSets { get; internal set; }
   }
-  public class Drive2_About_roleSet//read-only
+  public class Drive2_About_roleSet
   {
     /// <summary>
     /// A primary permission role.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public string primaryRole { get; set; }
+    public string primaryRole { get; internal set; }
 
     /// <summary>
     /// The supported additional roles with the primary role.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public List<string> additionalRoles { get; set; }
+    public string[] additionalRoles { get; internal set; }
   }
-  public class Drive2_About_feature//read-only
+  public class Drive2_About_feature
   {
     /// <summary>
     /// The name of the feature.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public string featureName { get; set; }
+    public string featureName { get; internal set; }
 
     /// <summary>
     /// The request limit rate for this feature, in queries per second.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public double? featureRate { get; set; }
+    public double? featureRate { get; internal set; }
   }
-  public class Drive2_About_maxUploadSize//read-only
+  public class Drive2_About_maxUploadSize
   {
     /// <summary>
     /// The file type.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public string type { get; set; }
+    public string type { get; internal set; }
 
     /// <summary>
     /// The max upload size for this type.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public long? size { get; set; }
+    public long? size { get; internal set; }
   }
-  public class Drive2_About_teamDriveTheme//read-only
+  public class Drive2_About_teamDriveTheme
   {
     /// <summary>
     /// The ID of the theme.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public string id { get; set; }
+    public string id { get; internal set; }
 
     /// <summary>
     /// A link to this Team Drive theme's background image.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public string backgroundImageLink { get; set; }
+    public string backgroundImageLink { get; internal set; }
 
     /// <summary>
     /// The color of this Team Drive theme as an RGB hex string.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public string colorRgb { get; set; }
+    public string colorRgb { get; internal set; }
   }
   #endregion
 
@@ -1143,38 +1012,35 @@ namespace Cloud.GoogleDrive
   #endregion
 
   #region Parents
-  public class Drive2_Parents_list//read-only
+  public class Drive2_Parents_list
   {
     /// <summary>
     /// This is always drive#parentList.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public string kind { get; set; }
+    public string kind { get; internal set; }
 
     /// <summary>
     /// The ETag of the list.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public string etag { get; set; }
+    public string etag { get; internal set; }
 
     /// <summary>
     /// A link back to this list.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public string selfLink { get; set; }
+    public string selfLink { get; internal set; }
 
     /// <summary>
     /// The list of parents.	
     /// </summary>
-    public List<Drive2_Parent> items { get; set; }
-  }
+    public List<Drive2_Parent> items { get; internal set; }
+  }//read-only
   public class Drive2_Parent
   {
     /// <summary>
     /// This is always drive#parent Reference.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public string kind { get; set; }
+    public string kind { get; internal set; }
 
     /// <summary>
     /// The ID of the parent.	
@@ -1185,35 +1051,36 @@ namespace Cloud.GoogleDrive
     /// A link back to this reference.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public string selfLink { get; set; }
+    public string selfLink { get; internal set; }
 
     /// <summary>
     /// A link to the parent.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public string parentLink { get; set; }
+    public string parentLink { get; internal set; }
 
     /// <summary>
     /// Whether or not the parent is the root folder.	
     /// </summary>
-    public bool? isRoot { get; set; }
-  }
+    [JsonIgnoreSerialize]
+    public bool? isRoot { get; internal set; }
+  }//isRoot { get; internal set; } [JsonIgnoreSerialize]
   #endregion
 
   #region Permissions
-  public class Drive2_Permission//writeable
+  public class Drive2_Permission
   {
     /// <summary>
     /// This is always drive#permission.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public string kind { get; set; }
+    public string kind { get; internal set; }
 
     /// <summary>
     /// The ETag of the permission.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public string etag { get; set; }
+    public string etag { get; internal set; }
 
     /// <summary>
     /// The ID of the user this permission refers to, and identical to the permissionId in the About and Files resources. When making a drive.permissions.insert request, exactly one of the id or value fields must be specified unless the permission type is anyone, in which case both id and value are ignored.	
@@ -1224,25 +1091,25 @@ namespace Cloud.GoogleDrive
     /// A link back to this permission.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public string selfLink { get; set; }
+    public string selfLink { get; internal set; }
 
     /// <summary>
     /// The name for this permission.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public string name { get; set; }
+    public string name { get; internal set; }
 
     /// <summary>
     /// The email address of the user or group this permission refers to. This is an output-only field which is present when the permission type is user or group.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public string emailAddress { get; set; }
+    public string emailAddress { get; internal set; }
 
     /// <summary>
     /// The domain name of the entity this permission refers to. This is an output-only field which is present when the permission type is user, group or domain.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public string domain { get; set; }
+    public string domain { get; internal set; }
 
     /// <summary>
     /// The primary role for this user. While new values may be supported in the future
@@ -1252,7 +1119,7 @@ namespace Cloud.GoogleDrive
     /// <summary>
     /// Additional roles for this user. Only commenter is currently allowed, though more may be supported in the future.	
     /// </summary>
-    public List<string> additionalRoles { get; set; }
+    public string[] additionalRoles { get; set; }
 
     /// <summary>
     /// The account type
@@ -1268,7 +1135,7 @@ namespace Cloud.GoogleDrive
     /// The authkey parameter required for this permission.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public string authKey { get; set; }
+    public string authKey { get; internal set; }
 
     /// <summary>
     /// Whether the link is required for this permission.	
@@ -1279,7 +1146,7 @@ namespace Cloud.GoogleDrive
     /// A link to the profile photo, if available.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public string photoLink { get; set; }
+    public string photoLink { get; internal set; }
 
     /// <summary>
     /// The time at which this permission will expire (RFC 3339 date-time). Expiration dates have the following restrictions:
@@ -1294,16 +1161,15 @@ namespace Cloud.GoogleDrive
     /// Details of whether the permissions on this Team Drive item are inherited or directly on this item. This is an output-only field which is present only for Team Drive items.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public List<Drive2_Permission_teamDrivePermissionDetail> teamDrivePermissionDetails { get; set; }
+    public Drive2_Permission_teamDrivePermissionDetail[] teamDrivePermissionDetails { get; internal set; }
 
     /// <summary>
     /// Whether the account associated with this permission has been deleted. This field only pertains to user and group permissions.	
     /// </summary>
     [JsonIgnoreSerialize]
-    public bool? deleted { get; set; }
-  }
-
-
+    public bool? deleted { get; internal set; }
+  }//writeable
+  
   public enum Drive2_Permission_type
   {
     user,
@@ -1323,38 +1189,33 @@ namespace Cloud.GoogleDrive
     reader,
     writer
   }
-  public class Drive2_Permission_teamDrivePermissionDetail//read-only
+  public class Drive2_Permission_teamDrivePermissionDetail
   {
     /// <summary>
     /// The Team Drive permission type for this user. While new values may be added in future
     /// </summary>
-    [JsonIgnoreSerialize]
-    public Drive2_Permission_TeamPermissionType teamDrivePermissionType { get; set; }
+    public Drive2_Permission_TeamPermissionType teamDrivePermissionType { get; internal set; }
 
     /// <summary>
     /// The primary role for this user. While new values may be added in the future
     /// </summary>
-    [JsonIgnoreSerialize]
-    public Drive2_Permission_PermissionRole role { get; set; }
+    public Drive2_Permission_PermissionRole role { get; internal set; }
 
     /// <summary>
     /// Additional roles for this user. Only commenter is currently possible, though more may be supported in the future.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public List<string> additionalRoles { get; set; }
+    public string[] additionalRoles { get; internal set; }
 
     /// <summary>
     /// The ID of the item from which this permission is inherited. This is an output-only field and is only populated for members of the Team Drive.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public string inheritedFrom { get; set; }
+    public string inheritedFrom { get; internal set; }
 
     /// <summary>
     /// Whether this permission is inherited. This field is always populated. This is an output-only field.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public bool? inherited { get; set; }
-  }
+    public bool? inherited { get; internal set; }
+  }//read-only
   #endregion
 
   #region Revisions
@@ -1380,52 +1241,50 @@ namespace Cloud.GoogleDrive
 
   #region Teamdrives
   #endregion
-  
+
 
   #region Other
   /// <summary>
   /// User metadata. This class is read-only
   /// </summary>
-  public class Drive2_User//read-only
+  public class Drive2_User
   {
     /// <summary>
     /// This is always drive#user.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public string kind { get; set; }
+    public string kind { get; internal set; }
+
     /// <summary>
     /// A plain text displayable name for this user.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public string displayName { get; set; }
+    public string displayName { get; internal set; }
+
     /// <summary>
     /// The user's profile picture.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public Drive2_User_picture picture { get; set; }
+    public Drive2_User_picture picture { get; internal set; }
+
     /// <summary>
     /// Whether this user is the same as the authenticated user for whom the request was made.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public bool? isAuthenticatedUser { get; set; }
+    public bool? isAuthenticatedUser { get; internal set; }
+
     /// <summary>
     /// The user's ID as visible in the permissions collection.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public string permissionId { get; set; }
+    public string permissionId { get; internal set; }
+
     /// <summary>
     /// The email address of the user.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public string emailAddress { get; set; }
-  }
-  public class Drive2_User_picture//read-only
+    public string emailAddress { get; internal set; }
+  }//read-only
+  public class Drive2_User_picture
   {
     /// <summary>
     /// A URL that points to a profile picture of this user.	
     /// </summary>
-    [JsonIgnoreSerialize]
-    public string url { get; set; }
-  }
+    public string url { get; internal set; }
+  }//read-only
   #endregion
 }
