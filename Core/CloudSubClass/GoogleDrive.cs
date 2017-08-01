@@ -156,7 +156,10 @@ namespace Core.CloudSubClass
 
           if (create)
           {
-            Drive2_File folder = gdclient.Extend.CreateFolder(listnode[i].Info.Name, parent_id);
+            Drive2_File metadata = new Drive2_File() { title = listnode[i].Info.Name };
+            metadata.parents = new List<Drive2_Parent>() { new Drive2_Parent() { id = parent_id } };
+
+            Drive2_File folder = gdclient.Extend.CreateFolder(metadata);
             parent_id = listnode[i].Info.ID = folder.id;
           }
         }
@@ -167,8 +170,7 @@ namespace Core.CloudSubClass
     public static bool ReNameItem(IItemNode node, string newname)
     {
       DriveAPIHttprequestv2 gdclient = GetAPIv2(node.GetRoot.RootType.Email);
-      string json = "{\"title\": \"" + newname + "\"}";
-      Drive2_File response = gdclient.Files.Patch(node.Info.ID, json);
+      Drive2_File response = gdclient.Files.Patch(node.Info.ID, new Drive2_File() { title = newname});
       if (response.title == newname) return true;
       else return false;
     }
@@ -204,7 +206,7 @@ namespace Core.CloudSubClass
           parents.items.Add(new Drive2_Parent() { id = newparent.Info.ID });
           gdclient.Parent.Insert(nodemove.Info.ID, parents.items);
         }
-        return gdclient.Files.Patch(nodemove.Info.ID, item == null ? null : JsonConvert.SerializeObject(item));
+        return gdclient.Files.Patch(nodemove.Info.ID, item);
       }
       else
       {

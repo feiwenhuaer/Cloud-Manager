@@ -366,8 +366,11 @@ namespace Core.Transfer
             if (string.IsNullOrEmpty(item.To.node.Parent.Info.ID)) throw new Exception("Can't get root id.");
             string parentid = item.To.node.Parent.Info.ID;
             string mimeType = Get_mimeType.Get_mimeType_From_FileExtension(item.To.node.GetExtension());
-            string jsondata = "{\"title\": \"" + item.From.node.Info.Name + "\", \"mimeType\": \"" + mimeType + "\", \"parents\": [{\"id\": \"" + parentid + "\"}]}";
-            item.UploadID = gdclient.Files.Insert_Resumable_GetUploadID(jsondata, mimeType, item.From.node.Info.Size);
+
+            Drive2_File f_metadata = new Drive2_File() {  title = item.From.node.Info.Name, mimeType = mimeType};
+            f_metadata.parents = new List<Drive2_Parent>() { new Drive2_Parent() { id = parentid } };
+
+            item.UploadID = gdclient.Files.Insert_Resumable_GetUploadID(f_metadata, mimeType, item.From.node.Info.Size);
           }
           ItemsTransferWork.Add(new TransferBytes(item, this, gdclient));
           return;

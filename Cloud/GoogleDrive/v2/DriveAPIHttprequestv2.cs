@@ -80,18 +80,18 @@ namespace Cloud.GoogleDrive
       /// <summary>
       /// 
       /// </summary>
-      /// <param name="jsonMetaData"></param>
+      /// <param name="MetaData"></param>
       /// <param name="typefileupload"></param>
       /// <param name="filesize"></param>
       /// <returns>Url upload</returns>
-      public string Insert_Resumable_GetUploadID(string jsonMetaData, string typefileupload, long filesize)
+      public string Insert_Resumable_GetUploadID(Drive2_File MetaData, string typefileupload, long filesize)
       {
         string url = string.Format(uriFiles_insert_resumable_getUploadID, uploadType.resumable.ToString());
         string[] moreheader = {
                                 "Content-Type: application/json; charset=UTF-8",
                                 "X-Upload-Content-Type: " + typefileupload,
                                 "X-Upload-Content-Length: " + filesize.ToString() };
-        var reponse = client.Request<string>(url, TypeRequest.POST, Encoding.UTF8.GetBytes(jsonMetaData), moreheader);
+        var reponse = client.Request<string>(url, TypeRequest.POST, MetaData, moreheader);
         string data = reponse.HeaderResponse;
         string[] arrheader = Regex.Split(data, "\r\n");
         foreach (string h in arrheader)
@@ -140,25 +140,23 @@ namespace Cloud.GoogleDrive
       /// <summary>
       /// 
       /// </summary>
-      /// <param name="json_filemetadata"></param>
+      /// <param name="filemetadata"></param>
       /// <returns>ItemMetadata</returns>
-      public Drive2_File Insert_MetadataRequest(string json_filemetadata)
+      public Drive2_File Insert_MetadataRequest(Drive2_File filemetadata)
       {
-        return JsonConvert.DeserializeObject<Drive2_File>(client.Request<string>(uriDriveFile, TypeRequest.POST, Encoding.UTF8.GetBytes(json_filemetadata)).DataTextResponse);
+        return client.Request<string>(uriDriveFile, TypeRequest.POST, filemetadata).GetObjectResponse<Drive2_File>();
       }
-      
-      public Drive2_File Patch(string id, string json_metadata = null)
+
+      public Drive2_File Patch(string id, Drive2_File file_metadata = null)
       {
-        byte[] buffer = null;
-        if (!string.IsNullOrEmpty(json_metadata)) buffer = Encoding.UTF8.GetBytes(json_metadata);
         return client.Request<string>(uriDriveFile + id + "?key=" + GoogleDriveAppKey.ApiKey + "&alt=json",
-                TypeRequest.PATCH, buffer).GetObjectResponse<Drive2_File>();
+          TypeRequest.PATCH, file_metadata).GetObjectResponse<Drive2_File>();
       }
       
       public Drive2_File Copy(string file_id, string parent_id)
       {
-        string post_data = "{\"parents\": [{\"id\": \"" + parent_id + "\"}]}";
-        return client.Request<string>(uriDriveFile + file_id + "/copy", TypeRequest.POST, Encoding.UTF8.GetBytes(post_data)).GetObjectResponse<Drive2_File>();
+        Drive2_File metadata = new Drive2_File() { parents = new List<Drive2_Parent>() { new Drive2_Parent() { id = parent_id } } };
+        return client.Request<string>(uriDriveFile + file_id + "/copy", TypeRequest.POST, metadata).GetObjectResponse<Drive2_File>();
       }
 
       public Drive2_File Delete(string fileId)
@@ -239,7 +237,7 @@ namespace Cloud.GoogleDrive
       public Drive2_Parent Insert(string fileid, List<Drive2_Parent> parents)
       {
         return client.Request<string>(uriDriveFile + fileid + "/parents?alt=json&key=" + GoogleDriveAppKey.ApiKey,
-            TypeRequest.POST, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(parents,JsonSetting._settings_serialize))).GetObjectResponse<Drive2_Parent>();
+            TypeRequest.POST, parents).GetObjectResponse<Drive2_Parent>();
       }
 
       public Drive2_Parents_list List(string fileid)
@@ -259,24 +257,9 @@ namespace Cloud.GoogleDrive
         this.client = client;
       }
 
-      public Drive2_File CreateFolder(string name, List<Drive2_Parent> parents_id)
+      public Drive2_File CreateFolder(Drive2_File metadata)
       {
-        Drive2_File f = new Drive2_File();
-        f.mimeType = "application/vnd.google-apps.folder";
-        f.title = name;
-        f.parents = parents_id;
-        f.etag = "test";
-        string json = JsonConvert.SerializeObject(f, JsonSetting._settings_serialize);
-        return CreateFolder(json);
-      }
-
-      public Drive2_File CreateFolder(string name, string parent_id)
-      {
-        string json_data = "{\"mimeType\": \"application/vnd.google-apps.folder\", \"title\": \"" + name + "\", \"parents\": [{\"id\": \"" + parent_id + "\"}]}";
-        return CreateFolder(json_data);
-      }
-      public Drive2_File CreateFolder(string metadata)
-      {
+        metadata.mimeType = "application/vnd.google-apps.folder";
         return client.Files.Insert_MetadataRequest(metadata);
       }
     }
