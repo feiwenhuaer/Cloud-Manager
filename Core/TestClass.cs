@@ -6,13 +6,11 @@ using System.Text;
 using Core.CloudSubClass;
 using Cloud.MegaNz;
 using System.IO;
-using static Core.CloudSubClass.MegaNz;
 using System.Threading;
 using Cloud.GoogleDrive;
 using Core.StaticClass;
 using Newtonsoft.Json;
 using Cloud;
-using System.IO;
 
 namespace Core
 {

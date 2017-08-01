@@ -85,6 +85,9 @@ namespace Cloud.GoogleDrive
       if (moreheader != null) foreach (string h in moreheader) http_request.AddHeader(h);
       else if (post_data != null && (typerequest == TypeRequest.POST || typerequest == TypeRequest.PATCH)) http_request.AddHeader(Header_ContentTypeApplicationJson);
       if ((typerequest == TypeRequest.POST || typerequest == TypeRequest.DELETE) && post_data == null) http_request.AddHeader("Content-Length: 0");
+#if DEBUG
+      Console.WriteLine("Account: " + token.Email + ", Method:" + typerequest + ", Uri:" + uri);
+#endif
       if (post_data != null && (typerequest == TypeRequest.POST || typerequest == TypeRequest.PATCH))
       {
         http_request.AddHeader("Content-Length: " + buffer_json_post_data.Length.ToString());
@@ -92,7 +95,7 @@ namespace Cloud.GoogleDrive
         stream.Write(buffer_json_post_data, 0, buffer_json_post_data.Length);
         stream.Flush();
 #if DEBUG
-        Console.WriteLine("DriveAPIHttprequestv2: >>send data: " + Encoding.UTF8.GetString(buffer_json_post_data));
+        Console.WriteLine("DriveAPIHttprequestv2:" + token.Email + " >>send data: " + Encoding.UTF8.GetString(buffer_json_post_data));
 #endif
       }
       try //get response
