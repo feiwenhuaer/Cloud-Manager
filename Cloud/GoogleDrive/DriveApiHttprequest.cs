@@ -19,11 +19,8 @@ namespace Cloud.GoogleDrive
     const string Host = "HOST: www.googleapis.com";
     const string Header_ContentTypeApplicationJson = "Content-Type: application/json";
     internal protected readonly string ApiUri = "";
-    #endregion
-
-    #region sync
-    static object SyncRefreshToken = new object();
-    static object SyncLimitExceeded = new object();
+    static readonly Type typestream = typeof(Stream);
+    static readonly Type typestring = typeof(string);
     #endregion
 
     #region public event & properties
@@ -41,8 +38,6 @@ namespace Cloud.GoogleDrive
     /// Token
     /// </summary>
     public TokenGoogleDrive Token { get { return token; } set { if (!value.CheckToken()) throw new Exception("Token error"); else token = value; } }
-
-    public event TokenRenewCallback TokenRenewEvent;
 
     public event GD_LimitExceededDelegate LimitExceeded;
     #endregion
@@ -71,84 +66,54 @@ namespace Cloud.GoogleDrive
     internal RequestReturn Request<T>(string url, TypeRequest typerequest, object post_data = null, string[] moreheader = null)
     {
       RequestReturn result = new RequestReturn();
+      Type typeT = typeof(T);
       Uri uri;
+      int LimitExceededCount = 0;
       if (!Uri.TryCreate(ApiUri + url, UriKind.RelativeOrAbsolute, out uri)) Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out uri);
+      request:
       http_request = new HttpRequest_(uri, typerequest.ToString());
-#if DEBUG
-      http_request.debug = Debug;
-#endif
       byte[] buffer_json_post_data = null;
       if (post_data != null) buffer_json_post_data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(post_data, JsonSetting._settings_serialize));
-      if (typeof(T) == typeof(Stream) && post_data == null && typerequest != TypeRequest.PUT) http_request.ReceiveTimeout = this.ReceiveTimeout;
+      if (typeT == typestream && post_data == null && typerequest != TypeRequest.PUT) http_request.ReceiveTimeout = this.ReceiveTimeout;
       http_request.AddHeader(Host);
       http_request.AddHeader("Authorization", "Bearer " + Token.access_token);
       if (moreheader != null) foreach (string h in moreheader) http_request.AddHeader(h);
       else if (post_data != null && (typerequest == TypeRequest.POST || typerequest == TypeRequest.PATCH)) http_request.AddHeader(Header_ContentTypeApplicationJson);
-      if ((typerequest == TypeRequest.POST || typerequest == TypeRequest.DELETE) && post_data == null) http_request.AddHeader("Content-Length: 0");
-#if DEBUG
-      Console.WriteLine("Account: " + token.Email + ", Method:" + typerequest + ", Uri:" + uri);
-#endif
+      if ((typerequest == TypeRequest.POST || typerequest == TypeRequest.DELETE) && post_data == null) http_request.AddHeader("Content-Length", "0");
       if (post_data != null && (typerequest == TypeRequest.POST || typerequest == TypeRequest.PATCH))
       {
-        http_request.AddHeader("Content-Length: " + buffer_json_post_data.Length.ToString());
-        Stream stream = http_request.SendHeader_And_GetStream();
+        http_request.AddHeader("Content-Length", buffer_json_post_data.Length.ToString());
+        Stream stream = http_request.UploadData();
         stream.Write(buffer_json_post_data, 0, buffer_json_post_data.Length);
         stream.Flush();
-#if DEBUG
-        Console.WriteLine("DriveAPIHttprequestv2:" + token.Email + " >>send data: " + Encoding.UTF8.GetString(buffer_json_post_data));
-#endif
       }
       try //get response
       {
-        if (typeof(T) == typeof(string))
+        if (typeT == typestring)
         {
-          result.DataTextResponse = http_request.GetTextDataResponse(false, true);
-          result.HeaderResponse = http_request.HeaderReceive;
+          result.DataTextResponse = http_request.GetTextResponse();
+          result.HeaderResponse = http_request.HeadersReceived.GetTextDataHeader();
         }
-        else if (typeof(T) == typeof(Stream))
+        else if (typeT == typestream)
         {
-          if (post_data != null || typerequest == TypeRequest.PUT) result.stream = http_request.SendHeader_And_GetStream();//get stream upload
-          else result.stream = http_request.ReadHeaderResponse_and_GetStreamResponse(true);//get stream response
+          if (post_data != null || typerequest == TypeRequest.PUT) result.stream = http_request.UploadData();//get stream upload
+          else result.stream = http_request.GetDataResponse();//get stream response
         }
         else throw new Exception("Error typereturn.");
-        return result;
+        int error_code = http_request.ErrorCodeResponse;
+        if (error_code == 200 | error_code == 206) return result;
+        else throw new HttpException(error_code, http_request.GetTextResponse());
       }
       catch (HttpException ex)
       {
-        result.DataTextResponse = http_request.TextDataResponse;
+        result.DataTextResponse = http_request.GetTextResponse();
         GoogleDriveErrorMessage message;
-        try { message = Newtonsoft.Json.JsonConvert.DeserializeObject<GoogleDriveErrorMessage>(ex.Message); }
+        try { message = JsonConvert.DeserializeObject<GoogleDriveErrorMessage>(ex.Message); }
         catch { throw; }// other message;
         switch (message.error.code)
         {
           case 204: if (typerequest == TypeRequest.DELETE) return result; break;// delete result
-          case 401:
-            if (Monitor.TryEnter(SyncRefreshToken))
-            {
-#if DEBUG
-              Console.WriteLine("DriveAPIHttprequestv2 Start Refresh Token {Email:" + Token.Email + ", Thread id:" + Thread.CurrentThread.ManagedThreadId + "}");
-#endif
-              try
-              {
-                Lock();
-                Token = oauth.RefreshToken();
-                TokenRenewEvent.Invoke(Token);
-                return Request<T>(url, typerequest, post_data, moreheader);
-              }
-              finally { Unlock(); }
-            }
-            else
-            {
-#if DEBUG
-              Console.WriteLine("DriveAPIHttprequestv2 Start Wait Refresh Token {Email:" + Token.Email + ", Thread id:" + Thread.CurrentThread.ManagedThreadId + "}");
-#endif
-              try
-              {
-                Lock();
-                return Request<T>(url, typerequest, post_data, moreheader);
-              }
-              finally { Unlock(); }
-            }
+          case 401: oauth.RefreshToken(); goto request;
           case 403:
             Error403 err = (Error403)Enum.Parse(typeof(Error403), message.error.errors[0].reason);
             switch (err)
@@ -157,9 +122,6 @@ namespace Cloud.GoogleDrive
               case Error403.appNotAuthorizedToFile:
               case Error403.domainPolicy:
               case Error403.insufficientFilePermissions:
-#if DEBUG
-                Console.WriteLine("DriveAPIHttprequestv2 Error403: " + result.DataTextResponse);
-#endif
                 break;
 
               case Error403.dailyLimitExceeded:
@@ -167,21 +129,25 @@ namespace Cloud.GoogleDrive
               case Error403.sharingRateLimitExceeded:
               case Error403.userRateLimitExceeded:
                 if (LimitExceeded != null) LimitExceeded.Invoke();
-#if DEBUG
-                Console.WriteLine("DriveAPIHttprequestv2 LimitExceeded: " + err.ToString());
-#endif
-                try { Monitor.Enter(SyncLimitExceeded); Thread.Sleep(5000); } finally { Monitor.Exit(SyncLimitExceeded); }
-                return Request<T>(url, typerequest, post_data, moreheader);
+                Thread.Sleep(5000);
+                LimitExceededCount++;
+                if (LimitExceededCount > 10) throw;
+                goto request;
 
               case Error403.abuse://file malware or virut
-                if (acknowledgeAbuse) return Request<T>(url + "&acknowledgeAbuse=true", typerequest, post_data, moreheader); else break;
+                if (acknowledgeAbuse)
+                {
+                  url += "&acknowledgeAbuse=true";
+                  goto request;
+                }
+                else break;
               default: break;
             }
             break;
           case 308:
-            if (typerequest == TypeRequest.PUT && typeof(T) == typeof(Stream))
+            if (typerequest == TypeRequest.PUT && typeT == typestream)
             {
-              result.stream = http_request.GetStream();
+              result.stream = http_request.UploadData();
               return result;
             }
             else break;
@@ -189,37 +155,11 @@ namespace Cloud.GoogleDrive
         }
         throw;
       }
-      catch (ThreadAbortException)
-      {
-        Unlock();
-        throw;
-      }
-    }
-    void Lock()
-    {
-#if DEBUG
-      Console.WriteLine("DriveAPIHttprequestv2 Monitor Start Enter");
-#endif
-      Monitor.Enter(SyncRefreshToken);
-#if DEBUG
-      Console.WriteLine("DriveAPIHttprequestv2 Monitor Entered");
-#endif
-    }
-    void Unlock()
-    {
-#if DEBUG
-      Console.WriteLine("DriveAPIHttprequestv2 Monitor Start Exit");
-#endif
-      Monitor.Exit(SyncRefreshToken);
-#if DEBUG
-      Console.WriteLine("DriveAPIHttprequestv2 Monitor Exited");
-#endif
     }
     #endregion
-  }
-
-  internal enum DriveApiVersion
-  {
-    v2,v3
+    internal enum DriveApiVersion
+    {
+      v2, v3
+    }
   }
 }

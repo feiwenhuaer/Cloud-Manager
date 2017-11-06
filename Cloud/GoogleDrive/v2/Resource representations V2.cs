@@ -5,7 +5,6 @@ using Cloud;
 using System.Linq;
 namespace Cloud.GoogleDrive
 {
-  #region Files
   public class Drive2_Files_list
   {
     /// <summary>
@@ -36,8 +35,7 @@ namespace Cloud.GoogleDrive
     /// The list of files. If nextPageToken is populated, then this list may be incomplete and an additional page of results should be fetched.	
     /// </summary>
     public List<Drive2_File> items { get; internal set; }
-  }
-
+  }//readonly
   public class Drive2_File
   {
     //exportLinks { (key): string }
@@ -450,7 +448,6 @@ namespace Cloud.GoogleDrive
     /// </summary>
     public string text { get; set; }
   }//writeable
-
   public class Drive2_File_thumbnail
   {
     /// <summary>
@@ -774,10 +771,8 @@ namespace Cloud.GoogleDrive
     [JsonIgnoreSerialize]
     public double? altitude { get; internal set; }
   }//read-only
-  #endregion
 
-  #region About
-  public class Drive2_About//read-only
+  public class Drive2_About
   {
     /// <summary>
     /// This is always drive#about.	
@@ -900,8 +895,7 @@ namespace Cloud.GoogleDrive
     /// A list of themes that are supported for Team Drives.	
     /// </summary>
     public Drive2_About_teamDriveTheme[] teamDriveThemes { get; internal set; }
-  }
-
+  }//read-only
   public enum Drive2_About_quotaType
   {
     LIMITED,
@@ -1003,15 +997,84 @@ namespace Cloud.GoogleDrive
     /// </summary>
     public string colorRgb { get; internal set; }
   }
-  #endregion
+  
+  public class Drive2_Change
+  {
+    /// <summary>
+    /// This is always drive#change.	
+    /// </summary>
+    public string kind { get; internal set; }
 
-  #region Changes
-  #endregion
+    /// <summary>
+    /// The ID of the change.	
+    /// </summary>
+    public long? id { get; internal set; }
 
-  #region Children
-  #endregion
+    /// <summary>
+    /// The type of the change. Possible values are file and teamDrive.	
+    /// </summary>
+    public string type { get; internal set; }
 
-  #region Parents
+    /// <summary>
+    /// The time of this modification.	
+    /// </summary>
+    public DateTime? modificationDate { get; internal set; }
+
+    /// <summary>
+    /// Whether the file or Team Drive has been removed from this list of changes, for example by deletion or loss of access.	
+    /// </summary>
+    public bool? deleted { get; internal set; }
+
+    /// <summary>
+    /// A link back to this change.	
+    /// </summary>
+    public string selfLink { get; internal set; }
+
+    /// <summary>
+    /// The ID of the file associated with this change.	
+    /// </summary>
+    public string fileId { get; internal set; }
+
+    /// <summary>
+    /// The updated state of the file. Present if the type is file and the file has not been removed from this list of changes.	
+    /// </summary>
+    public Drive2_File file { get; internal set; }
+
+    /// <summary>
+    /// The ID of the Team Drive associated with this change.	
+    /// </summary>
+    public string teamDriveId { get; internal set; }
+
+    ///
+    ///The updated state of the Team Drive. Present if the type is teamDrive, the user is still a member of the Team Drive, and the Team Drive has not been deleted.	
+    ///
+
+    //public Drive2_TeamDrive teamDrive {get; internal set;}
+  }//readonly
+
+  public class Drive2_Children
+  {
+    /// <summary>
+    /// This is always drive#childReference.	
+    /// </summary>
+    public string kind { get; internal set; }
+
+    /// <summary>
+    /// The ID of the child.	
+    /// </summary>
+    public string id { get; internal set; }
+
+    /// <summary>
+    /// A link back to this reference.	
+    /// </summary>
+    public string selfLink { get; internal set; }
+
+    /// <summary>
+    /// A link to the child.	
+    /// </summary>
+    public string childLink { get; internal set; }
+  }//readonly
+  
   public class Drive2_Parents_list
   {
     /// <summary>
@@ -1065,9 +1128,7 @@ namespace Cloud.GoogleDrive
     [JsonIgnoreSerialize]
     public bool? isRoot { get; internal set; }
   }//isRoot { get; internal set; } [JsonIgnoreSerialize]
-  #endregion
 
-  #region Permissions
   public class Drive2_Permission
   {
     /// <summary>
@@ -1168,8 +1229,7 @@ namespace Cloud.GoogleDrive
     /// </summary>
     [JsonIgnoreSerialize]
     public bool? deleted { get; internal set; }
-  }//writeable
-  
+  }//writeable  
   public enum Drive2_Permission_type
   {
     user,
@@ -1216,13 +1276,264 @@ namespace Cloud.GoogleDrive
     /// </summary>
     public bool? inherited { get; internal set; }
   }//read-only
-  #endregion
+  
+  public class Drive2_Revision
+  {
+    /// <summary>
+    /// This is always drive#revision.	
+    /// </summary>
+    [JsonIgnoreSerialize]
+    public string kind { get; internal set; }
 
-  #region Revisions
-  #endregion
+    /// <summary>
+    /// The ETag of the revision.	
+    /// </summary>
+    [JsonIgnoreSerialize]
+    public string etag { get; internal set; }
 
-  #region Apps
-  #endregion
+    /// <summary>
+    /// The ID of the revision.	
+    /// </summary>
+    [JsonIgnoreSerialize]
+    public string id { get; internal set; }
+
+    /// <summary>
+    /// A link back to this revision.	
+    /// </summary>
+    [JsonIgnoreSerialize]
+    public string selfLink { get; internal set; }
+
+    /// <summary>
+    /// The MIME type of the revision.	
+    /// </summary>
+    [JsonIgnoreSerialize]
+    public string mimeType { get; internal set; }
+
+    /// <summary>
+    /// Last time this revision was modified (formatted RFC 3339 timestamp).	
+    /// </summary>
+    [JsonIgnoreSerialize]
+    public DateTime modifiedDate { get; internal set; }
+
+    /// <summary>
+    /// Whether this revision is pinned to prevent automatic purging. This will only be populated and can only be modified on files with content stored in Drive which are not Google Docs. Revisions can also be pinned when they are created through the drive.files.insert/update/copy by using the pinned query parameter.	
+    /// </summary>
+    public bool pinned { get; set; }
+
+    /// <summary>
+    /// Whether this revision is published. This is only populated and can only be modified for Google Docs.	
+    /// </summary>
+    public bool published { get; set; }
+
+    /// <summary>
+    /// A link to the published revision.	
+    /// </summary>
+    [JsonIgnoreSerialize]
+    public string publishedLink { get; internal set; }
+
+    /// <summary>
+    /// Whether subsequent revisions will be automatically republished. This is only populated and can only be modified for Google Docs.	
+    /// </summary>
+    public bool publishAuto { get; set; }
+
+    /// <summary>
+    /// Whether this revision is published outside the domain. This is only populated and can only be modified for Google Docs.	
+    /// </summary>
+    public bool publishedOutsideDomain { get; set; }
+
+    /// <summary>
+    /// Short term download URL for the file. This will only be populated on files with content stored in Drive.	
+    /// </summary>
+    [JsonIgnoreSerialize]
+    public string downloadUrl { get; internal set; }
+
+    //"exportLinks": { (key): string}
+
+    /// <summary>
+    /// Name of the last user to modify this revision.	
+    /// </summary>
+    [JsonIgnoreSerialize]
+    public string lastModifyingUserName { get; internal set; }
+
+    /// <summary>
+    /// The last user to modify this revision.	
+    /// </summary>
+    [JsonIgnoreSerialize]
+    public Drive2_User lastModifyingUser { get; internal set; }
+
+    /// <summary>
+    /// The original filename when this revision was created. This will only be populated on files with content stored in Drive.	
+    /// </summary>
+    [JsonIgnoreSerialize]
+    public string originalFilename { get; internal set; }
+
+    /// <summary>
+    /// An MD5 checksum for the content of this revision. This will only be populated on files with content stored in Drive.	
+    /// </summary>
+    [JsonIgnoreSerialize]
+    public string md5Checksum { get; internal set; }
+
+    /// <summary>
+    /// The size of the revision in bytes. This will only be populated on files with content stored in Drive.	
+    /// </summary>
+    [JsonIgnoreSerialize]
+    public long? fileSize { get; internal set; }
+  }//writeable  
+
+  public class Drive2_App
+  {
+    /// <summary>
+    /// This is always drive#app.	
+    /// </summary>
+    public string kind { get; internal set; }
+
+    /// <summary>
+    /// The ID of the app.	
+    /// </summary>
+    public string id { get; internal set; }
+
+    /// <summary>
+    /// The name of the app.	
+    /// </summary>
+    public string name { get; internal set; }
+
+    /// <summary>
+    /// The type of object this app creates (e.g. Chart). If empty, the app name should be used instead.	
+    /// </summary>
+    public string objectType { get; internal set; }
+
+    /// <summary>
+    /// A short description of the app.	
+    /// </summary>
+    public string shortDescription { get; internal set; }
+
+    /// <summary>
+    /// A long description of the app.	
+    /// </summary>
+    public string longDescription { get; internal set; }
+
+    /// <summary>
+    /// Whether this app supports creating new objects.	
+    /// </summary>
+    public bool? supportsCreate { get; internal set; }
+
+    /// <summary>
+    /// Whether this app supports importing Google Docs.	
+    /// </summary>
+    public bool? supportsImport { get; internal set; }
+
+    /// <summary>
+    /// Whether this app supports opening more than one file.	
+    /// </summary>
+    public bool? supportsMultiOpen { get; internal set; }
+
+    /// <summary>
+    /// Whether this app supports creating new files when offline.	
+    /// </summary>
+    public bool? supportsOfflineCreate { get; internal set; }
+
+    /// <summary>
+    /// Whether the app is installed.	
+    /// </summary>
+    public bool? installed { get; internal set; }
+
+    /// <summary>
+    /// Whether the app is authorized to access data on the user's Drive.	
+    /// </summary>
+    public bool? authorized { get; internal set; }
+
+    /// <summary>
+    /// Whether the app has drive-wide scope. An app with drive-wide scope can access all files in the user's drive.	
+    /// </summary>
+    public bool? hasDriveWideScope { get; internal set; }
+
+    /// <summary>
+    /// Whether the app is selected as the default handler for the types it supports.	
+    /// </summary>
+    public bool? useByDefault { get; internal set; }
+
+    /// <summary>
+    /// A link to the product listing for this app.	
+    /// </summary>
+    public string productUrl { get; internal set; }
+
+    /// <summary>
+    /// The ID of the product listing for this app.	
+    /// </summary>
+    public string productId { get; internal set; }
+
+    /// <summary>
+    /// The template url for opening files with this app. The template will contain {ids} and/or {exportIds} to be replaced by the actual file ids. See Open Files for the full documentation.	(https://developers.google.com/drive/web/integrate-open)
+    /// </summary>
+    public string openUrlTemplate { get; internal set; }
+
+    /// <summary>
+    /// The url to create a new file with this app.	
+    /// </summary>
+    public string createUrl { get; internal set; }
+
+    /// <summary>
+    /// The template url to create a new file with this app in a given folder. The template will contain {folderId} to be replaced by the folder to create the new file in.	
+    /// </summary>
+    public string createInFolderTemplate { get; internal set; }
+
+    /// <summary>
+    /// The list of primary mime types.	
+    /// </summary>
+    public string[] primaryMimeTypes { get; internal set; }
+
+    /// <summary>
+    /// The list of secondary mime types.	
+    /// </summary>
+    public string[] secondaryMimeTypes { get; internal set; }
+
+    /// <summary>
+    /// The list of primary file extensions.	
+    /// </summary>
+    public string[] primaryFileExtensions { get; internal set; }
+
+    /// <summary>
+    /// The list of secondary file extensions.	
+    /// </summary>
+    public string[] secondaryFileExtensions { get; internal set; }
+
+    /// <summary>
+    /// The various icons for the app.	
+    /// </summary>
+    public Drive2_App_icon[] icons { get; internal set; }
+  }//readonly
+  public class Drive2_App_icon
+  {
+    /// <summary>
+    /// Category of the icon.
+    /// </summary>
+    public Drive2_App_icon_category category { get; internal set; }
+
+    /// <summary>
+    /// Size of the icon. Represented as the maximum of the width and height.	
+    /// </summary>
+    public int? size { get; internal set; }
+
+    /// <summary>
+    /// URL for the icon.	
+    /// </summary>
+    public string iconUrl { get; internal set; }
+  }//readonly
+  public enum Drive2_App_icon_category
+  {
+    /// <summary>
+    /// icon for the application
+    /// </summary>
+    application,
+    /// <summary>
+    /// icon for a file associated with the app
+    /// </summary>
+    document,
+    /// <summary>
+    /// icon for a shared file associated with the app
+    /// </summary>
+    documentShared
+  }
 
   #region Comments
   #endregion

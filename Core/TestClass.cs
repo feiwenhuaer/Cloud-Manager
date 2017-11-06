@@ -55,9 +55,8 @@ namespace Core
     static TokenGoogleDrive Token;
     static void Drivev3()
     {
-      Token = JsonConvert.DeserializeObject<TokenGoogleDrive>(AppSetting.settings.GetToken(email_gd, CloudType.GoogleDrive));
+      Token = GoogleDrive.GetToken(email_gd);
       DriveAPIHttprequestv3 v3 = new DriveAPIHttprequestv3(Token);
-      v3.TokenRenewEvent += TokenRenewEvent;
       string data = v3.About_Get();
       Console.WriteLine(data);
     }
@@ -71,11 +70,7 @@ namespace Core
     }
     static DriveAPIHttprequestv2 GetAPIv2(string email)
     {
-      string token = AppSetting.settings.GetToken(email, CloudType.GoogleDrive);
-      Token = JsonConvert.DeserializeObject<TokenGoogleDrive>(token);
-      DriveAPIHttprequestv2 v2 = new DriveAPIHttprequestv2(Token);
-      v2.TokenRenewEvent += TokenRenewEvent;
-      return v2;
+      return GoogleDrive.GetAPIv2(email);
     }
     #endregion
     static void Drive2Test()
@@ -87,11 +82,8 @@ namespace Core
 
     static void TestDrive2Copy()
     {
-      //file 0Bx154iMNwuyWUUJEUTNRMnAwc0k           folder 0B2T-102UejylQmwxSnFGN3RsLWM
-      string token = AppSetting.settings.GetToken(email_gd, CloudType.GoogleDrive);
-      Token = JsonConvert.DeserializeObject<TokenGoogleDrive>(token);
-      DriveAPIHttprequestv2 v2 = new DriveAPIHttprequestv2(Token);
-      v2.TokenRenewEvent += TokenRenewEvent;
+      //file 0Bx154iMNwuyWUUJEUTNRMnAwc0k           folder 0B2T-102UejylQmwxSnFGN3RsLWM      
+      DriveAPIHttprequestv2 v2 =GetAPIv2(email_gd);
       Drive2_File f = v2.Files.Copy("0Bx154iMNwuyWUUJEUTNRMnAwc0k", "0B2T-102UejylQmwxSnFGN3RsLWM");
       return;
     }

@@ -14,6 +14,7 @@
         </Style>
     </UserControl.Resources>
     <ListView x:Name="LV_items" Margin="0,0,0,0" ContextMenuOpening="LVitems_ContextMenu_ContextMenuOpening" 
+              VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling"
               MouseDoubleClick="LV_items_MouseDoubleClick" SelectionMode="Extended" MouseDown="LV_items_MouseDown">
         <ListView.View>
             <GridView>

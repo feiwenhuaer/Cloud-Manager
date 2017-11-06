@@ -130,11 +130,11 @@ namespace Cloud.GoogleDrive
       public IRequestReturn Insert_Resumable_Response(bool GetMetaData = false)
       {
         RequestReturn rr = new RequestReturn();
-        rr.DataTextResponse = client.http_request.GetTextDataResponse(false, true);
+        rr.DataTextResponse = client.http_request.GetTextResponse();
 #if DEBUG
         Console.WriteLine("DriveAPIHttprequestv2: " + rr.DataTextResponse);
 #endif
-        rr.HeaderResponse = client.http_request.HeaderReceive;
+        rr.HeaderResponse = client.http_request.HeadersReceived.GetTextDataHeader();
         return rr;;
       }
       /// <summary>

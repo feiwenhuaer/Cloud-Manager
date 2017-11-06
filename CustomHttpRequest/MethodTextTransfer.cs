@@ -1,6 +1,6 @@
 ﻿namespace CustomHttpRequest
 {
-    internal enum MethodTransfer
+    internal enum MethodTextTransfer
     {
         ContentLength, Chunk, None
     }

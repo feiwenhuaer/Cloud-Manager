@@ -273,6 +273,7 @@ namespace Core.Class
       {
         xmlSettings.DocumentElement.SelectSingleNode("UserAccount").RemoveChild(cloud);
         SaveSettings();
+        if (cloudname == CloudType.GoogleDrive) Core.CloudSubClass.GoogleDrive.DeleteToken(Email);
         return true;
       }
       return false;

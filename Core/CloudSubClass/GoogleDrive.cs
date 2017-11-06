@@ -25,12 +25,32 @@ namespace Core.CloudSubClass
     internal static List<string> GoogleAppsmimeTypeGoogleRemove = new List<string>() {GoogleAppsmimeType.audio, GoogleAppsmimeType.drawing, GoogleAppsmimeType.file,GoogleAppsmimeType.form,GoogleAppsmimeType.fusiontable,
             GoogleAppsmimeType.map,GoogleAppsmimeType.presentation,GoogleAppsmimeType.script,GoogleAppsmimeType.sites,GoogleAppsmimeType.unknown,GoogleAppsmimeType.video,GoogleAppsmimeType.photo,GoogleAppsmimeType.spreadsheet,GoogleAppsmimeType.document};
 
+    static List<TokenGoogleDrive> Tokens = new List<TokenGoogleDrive>();
+    internal static TokenGoogleDrive GetToken(string Email)
+    {
+      foreach (TokenGoogleDrive token in Tokens) if (token.Email == Email) return token;
+      TokenGoogleDrive tk = JsonConvert.DeserializeObject<TokenGoogleDrive>(AppSetting.settings.GetToken(Email, CloudType.GoogleDrive));
+      Tokens.Add(tk);
+      tk.EventTokenUpdate += Tk_EventTokenUpdate;
+      return tk;
+    }
+
+    private static void Tk_EventTokenUpdate(TokenGoogleDrive token)
+    {
+      XmlNode cloud = AppSetting.settings.GetCloud(token.Email, CloudType.GoogleDrive);
+      if (cloud != null) AppSetting.settings.ChangeToken(cloud, JsonConvert.SerializeObject(token));
+      else throw new Exception("Can't save token.");
+    }
+
+    internal static void DeleteToken(string Email)
+    {
+      for (int i = 0; i < Tokens.Count; i++) if (Tokens[i].Email == Email) { Tokens.RemoveAt(i); return; }      
+    }
+
     internal static DriveAPIHttprequestv2 GetAPIv2(string Email, GD_LimitExceededDelegate LimitExceeded = null)
     {
-      DriveAPIHttprequestv2 gdclient = new DriveAPIHttprequestv2(JsonConvert.DeserializeObject<TokenGoogleDrive>(AppSetting.settings.GetToken(Email, CloudType.GoogleDrive)));
+      DriveAPIHttprequestv2 gdclient = new DriveAPIHttprequestv2(GetToken(Email));
       if (LimitExceeded != null) gdclient.LimitExceeded += LimitExceeded;
-      if (string.IsNullOrEmpty(gdclient.Token.Email) || gdclient.Token.Email != Email) gdclient.Token.Email = Email;
-      gdclient.TokenRenewEvent += Gdclient_TokenRenewEvent;
       return gdclient;
     }
 
@@ -239,14 +259,6 @@ namespace Core.CloudSubClass
         gdclient.Files.Trash(node.Info.ID);
         return true;
       }
-    }
-
-
-    public static void Gdclient_TokenRenewEvent(TokenGoogleDrive token)
-    {
-      XmlNode cloud = AppSetting.settings.GetCloud(token.Email, CloudType.GoogleDrive);
-      if (cloud != null) AppSetting.settings.ChangeToken(cloud, JsonConvert.SerializeObject(token));
-      else throw new Exception("Can't save token.");
     }
 
     public static List<IItemNode> Convert(this List<Drive2_File> items, IItemNode parent)

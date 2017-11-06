@@ -11,7 +11,8 @@
     <UserControl.Resources>
     </UserControl.Resources>
 
-    <Tree:TreeList x:Name="treeList" MouseDown="treeList_MouseDown" ContextMenuOpening="treeList_ContextMenuOpening">
+    <Tree:TreeList x:Name="treeList" MouseDown="treeList_MouseDown" ContextMenuOpening="treeList_ContextMenuOpening" 
+                   VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling">
         <Tree:TreeList.View>
             <GridView>
                 <GridViewColumn Header="From" Width="250">

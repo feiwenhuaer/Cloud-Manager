@@ -251,12 +251,12 @@ namespace Core.CloudSubClass
 
         public Stream MakeStreamUpload()
         {
-            return request.SendHeader_And_GetStream();
+            return request.UploadData();
         }
 
         public string ReadDataTextResponse()
         {
-            return request.GetTextDataResponse(true, true);
+            return request.GetTextResponse();
         }
     }
 }
