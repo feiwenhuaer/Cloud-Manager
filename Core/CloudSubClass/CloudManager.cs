@@ -19,18 +19,20 @@ namespace Core.CloudSubClass
 {
   public class CloudManager
   {
-    const string Rg_url_idFolder = "(?<=\\/folders\\/)[A-Za-z0-9-_]+",//drive/folders/id_folder or drive.google.com/drive/u/0/folders/id
-    Rg_url_idFolderOpen = "(?<=\\?id\\=)[A-Za-z0-9-_]+",
-    Rg_url_idFile = "(?<=file\\/d\\/)[A-Za-z0-9-_]+";
+    //const string Rg_url_idFolder = "(?<=\\/folders\\/)[A-Za-z0-9-_]+",//drive/folders/id_folder or drive.google.com/drive/u/0/folders/id
+    //Rg_url_idFolderOpen = "(?<=\\?id\\=)[A-Za-z0-9-_]+",
+    //Rg_url_idFile = "(?<=file\\/d\\/)[A-Za-z0-9-_]+";
 
+    #region Check Thread
     const string require_main = "Require main thread for create and show UI.";
-    const string require_child = "This is long task, use main thread will make UI not responding.";
-    public static void CheckThread(bool isMain)
+    const string require_child = "This is long task, use main thread will make UI not-responding.";
+    static void CheckThread(bool isMain)
     {
       if ((Thread.CurrentThread == AppSetting.MainThread) != isMain) throw new Exception(isMain ? require_main : require_child);
     }
+    #endregion
 
-
+    //List item in folder
     public IItemNode GetItemsList(IItemNode node)
     {
       CheckThread(false);
@@ -49,6 +51,7 @@ namespace Core.CloudSubClass
       }
     }
 
+    //download file
     public Stream GetFileStream(IItemNode node, long Startpos = -1, long endpos = -1, bool IsUpload = false, object DataEx = null)
     {
       switch (node.GetRoot.RootType.Type)
@@ -66,6 +69,7 @@ namespace Core.CloudSubClass
       }
     }
 
+    //create folder
     public void CreateFolder(IItemNode node)
     {
       CheckThread(false);
@@ -98,24 +102,18 @@ namespace Core.CloudSubClass
         case CloudType.Dropbox:
           DropboxOauthv2 oauth_dropbox = new DropboxOauthv2();
           oauth_dropbox.TokenCallBack += Oauth_dropbox_TokenCallBack;
-
           type_oauthUI = LoadDllUI.GetTypeInterface(typeof(UIinterfaceDB));
           AppSetting.UIOauth = (IOauth)Activator.CreateInstance(type_oauthUI);
-
           oauth_dropbox.GetCode(AppSetting.UIOauth, AppSetting.UIMain);
           break;
-
 
         case CloudType.GoogleDrive:
           GoogleAPIOauth2 oauth_gd = new GoogleAPIOauth2();
           oauth_gd.TokenCallBack += Oauth_gd_TokenCallBack;
-
           type_oauthUI = LoadDllUI.GetTypeInterface(typeof(UIinterfaceGD));
           AppSetting.UIOauth = (IOauth)Activator.CreateInstance(type_oauthUI);
-
           oauth_gd.GetCode(AppSetting.UIOauth, AppSetting.UIMain);
           break;
-
 
         case CloudType.Mega:
           type_oauthUI = LoadDllUI.GetTypeInterface(typeof(UIinterfaceMegaNz));
@@ -136,7 +134,6 @@ namespace Core.CloudSubClass
             SaveToken(mega.Email, JsonConvert.SerializeObject(oauthinfo), CloudType.Mega);
           }
           break;
-
 
         default: throw new Exception("Not support");
       }
@@ -167,7 +164,11 @@ namespace Core.CloudSubClass
     }
     #endregion
 
-    public bool MoveItem(IItemNode node, IItemNode newparent, string newname = null, bool Copy = false)
+    //Rename: MoveItem(node,null,newname,false)
+    //Cut: MoveItem(node,newparent,null,false)
+    //Copy: MoveItem(node,newparent,null,true)
+    //
+    public bool MoveItem(IItemNode node, IItemNode newparent = null, string newname = null, bool Copy = false)
     {
       CheckThread(false);
       if ((newparent != null && node.GetRoot == newparent.GetRoot) | newparent == null)
@@ -204,99 +205,10 @@ namespace Core.CloudSubClass
     {
       CheckThread(true);
       Type type_deleteform = LoadDllUI.GetTypeInterface(typeof(CloudManagerGeneralLib.UiInheritance.UIDelete));
-      DeleteWork dw = new DeleteWork(items.Items, AppSetting.UIMain.CreateUI<CloudManagerGeneralLib.UiInheritance.UIDelete>(type_deleteform), items.PernamentDelete);
+      DeleteTask dw = new DeleteTask(items.Items, AppSetting.UIMain.CreateUI<CloudManagerGeneralLib.UiInheritance.UIDelete>(type_deleteform), items.PernamentDelete);
       dw.Start();
     }
-
-    public class DeleteWork
-    {
-      List<ItemNode> items;
-      CloudManagerGeneralLib.UiInheritance.UIDelete ui;
-      bool PernamentDelete = false;
-      public DeleteWork(List<ItemNode> items, CloudManagerGeneralLib.UiInheritance.UIDelete ui, bool PernamentDelete = false)
-      {
-        if (ui == null) throw new Exception("UI is null.");
-        if (items == null || items.Count == 0) throw new Exception("Need >= 1 item.");
-        this.items = items;
-        this.ui = ui;
-        this.PernamentDelete = PernamentDelete;
-        this.ui.EventCancel += Deleteform_EventCancelDelegate;
-        this.ui.EventClosing += Deleteform_EventCloseForm;
-      }
-
-      public void Start()
-      {
-        Thread thr = new Thread(work);
-        ui.Show_();
-        thr.Start();
-      }
-
-      void work()
-      {
-        Thread.Sleep(500);
-        foreach (ItemNode item in items)
-        {
-          while (cancel) { Thread.Sleep(100); if (closedform) return; }
-          if (closedform) return;
-          bool Iserror = false;
-          ui.UpdateText(AppSetting.lang.GetText(LanguageKey.DeleteForm_updatetext_Deleting.ToString()) + item);
-          try
-          {
-            switch (item.GetRoot.RootType.Type)
-            {
-              case CloudType.Dropbox:
-                if (!Dropbox.Delete(item, PernamentDelete)) Iserror = true;
-                break;
-              case CloudType.GoogleDrive:
-                if (!GoogleDrive.File_trash(item, PernamentDelete)) Iserror = true;
-                break;
-              case CloudType.LocalDisk:
-                if (!LocalDisk.Delete(item, PernamentDelete)) Iserror = true;
-                break;
-              case CloudType.Mega:
-              default: throw new UnknowCloudNameException("Error Unknow Cloud Type: " + item.GetRoot.RootType.Type.ToString());
-            }
-            if (!Iserror) ui.UpdateText(AppSetting.lang.GetText(LanguageKey.DeleteForm_updatetext_Deleted.ToString()) + "\r\n");
-            else
-            {
-              ui.UpdateText(AppSetting.lang.GetText(LanguageKey.DeleteForm_updatetext_Error.ToString()) + "\r\n");
-              if (ui.AutoClose)
-              {
-                ui.SetAutoClose(false);
-              }
-            }
-          }
-          catch (Exception ex)
-          {
-            ui.UpdateText(AppSetting.lang.GetText(LanguageKey.DeleteForm_updatetext_Error.ToString()) + "\r\nMessage:" + ex.Message + "\r\n");
-            if (ui.AutoClose) ui.SetAutoClose(false);
-          }
-        }
-        if (ui.AutoClose) ui.Close_();
-        else
-        {
-          ui.SetTextButtonCancel(AppSetting.lang.GetText(LanguageKey.BT_close.ToString()));
-          while (!ui.AutoClose)
-          {
-            Thread.Sleep(100);
-            if (cancel) ui.Close_();
-          }
-        }
-      }
-
-      public bool cancel = false;
-      public bool closedform = false;
-      public void Deleteform_EventCancelDelegate()
-      {
-        cancel = !cancel;
-      }
-      public void Deleteform_EventCloseForm()
-      {
-        closedform = !closedform;
-      }
-    }
-
-
+    
     public IItemNode GetFileInfo(IItemNode node)
     {
       switch (node.GetRoot.RootType.Type)

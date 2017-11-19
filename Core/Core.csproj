@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CloudSubClass\DeleteTask.cs" />
     <Compile Include="CloudSubClass\LocalDisk_FileOperationAPIWrapper.cs" />
     <Compile Include="StaticClass\AppSetting.cs" />
     <Compile Include="CloudSubClass\CloudManager.cs" />
