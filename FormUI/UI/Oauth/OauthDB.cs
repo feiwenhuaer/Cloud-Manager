@@ -1,8 +1,8 @@
-﻿using Cloud.Dropbox.Oauth;
+﻿using TqkLibs.CloudStorage.GoogleDrive.Oauth;
 
 namespace FormUI.UI.Oauth
 {
-    public class OauthDB: UIOauth, UIinterfaceDB
+    public class OauthDB: UIOauth, UIinterfaceGD
     {
         public OauthDB()
         {

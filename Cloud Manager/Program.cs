@@ -11,6 +11,9 @@ using Core.Transfer;
 using Core.Class;
 using System.Runtime.InteropServices;
 using System.Reflection;
+using System.ServiceProcess;
+using System.Security.Principal;
+using System.Diagnostics;
 
 namespace Cloud_Manager
 {
@@ -19,7 +22,7 @@ namespace Cloud_Manager
     public static string guid;
     public static Mutex mutex;
     [STAThread]
-    static void Main(string[] arg)
+    static void Main(string[] args)
     {
       Assembly assembly = typeof(Program).Assembly;
       GuidAttribute attribute = (GuidAttribute)assembly.GetCustomAttributes(typeof(GuidAttribute), true)[0];
@@ -51,7 +54,7 @@ namespace Cloud_Manager
         AddEventHandleUI.CreateInstanceLogin();//Create Login UI
         AddEventHandleUI.Load_Setting_UI();//Load Setting_UI and event
 
-        AppSetting.login.Load(arg);// load login form
+        AppSetting.login.Load(args);// load login form
         AppSetting.UILogin.ShowDialog_();
         if (!string.IsNullOrEmpty(AppSetting.Pass))
         {
@@ -60,7 +63,7 @@ namespace Cloud_Manager
 #endif
           AppSetting.TransferManager.Start();
           AddEventHandleUI.Load_UIMain();
-          showMainForm:
+        showMainForm:
           AppSetting.TransferManager.status = StatusUpDownApp.Start;
           AppSetting.UIMain.ShowDialog_();
           if (AppSetting.UIMain.AreReloadUI)//if reload ui
@@ -91,10 +94,38 @@ namespace Cloud_Manager
         MessageBox.Show("false");
       }
     }
+
+    static bool CheckAdminRight()
+    {
+      using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
+      {
+        WindowsPrincipal principal = new WindowsPrincipal(identity);
+        return principal.IsInRole(WindowsBuiltInRole.Administrator);
+      }
+    }
+
+    static void StartProc(string[] args,bool AsAdmin = false)
+    {
+      string arg = "";
+      foreach (string a in args) arg += a + " ";
+      arg.TrimEnd(' ');
+      Process proc = new Process();
+      ProcessStartInfo info = new ProcessStartInfo(System.Reflection.Assembly.GetEntryAssembly().Location, arg);
+      info.UseShellExecute = true;
+      if (AsAdmin)
+      {        
+        info.Verb = "runas";
+      }
+      proc.StartInfo = info;
+      proc.Start();
+    }
+
 #if DEBUG
     private static void DeleteFile_dev()
     {
       Console.WriteLine("Debug mode");
+
+
       //FileInfo info = new FileInfo(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\lang\\" + "eng.xml");
       //if (info.Exists) info.Delete();
       //info = new FileInfo("Settings.dat");

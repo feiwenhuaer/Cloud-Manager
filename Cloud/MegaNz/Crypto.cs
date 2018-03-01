@@ -301,6 +301,49 @@ namespace Cloud.MegaNz
       return data.modPow(d, p * q).getBytes();
     }
 
+    public static RsaStringKey GenerateRsaKey()
+    {
+      RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
+      
+      return new RsaStringKey(rsa.ToXmlString(false), rsa.ToXmlString(true));
+    }
+
+    public static byte[] RSAEncrypt(byte[] data, string xmlPublic)
+    {
+      byte[] encryptedData;
+      RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
+      rsa.FromXmlString(xmlPublic);
+      encryptedData = rsa.Encrypt(data, true);
+      rsa.Dispose();
+      return encryptedData;
+    }
+
+    public static byte[] RSADecrypt(byte[] data, string xmlPrivate)
+    {
+      byte[] decryptedData;
+      RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
+      rsa.FromXmlString(xmlPrivate);
+      decryptedData = rsa.Decrypt(data, true);
+      rsa.Dispose();
+      return decryptedData;
+    }
+
     #endregion
+  }
+  public class RsaStringKey
+  {
+    public RsaStringKey()
+    {
+      RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
+      this.xmlPublic = rsa.ToXmlString(false);
+      this.xmlPrivate = rsa.ToXmlString(true);
+    }
+    public RsaStringKey(string xmlPublic, string xmlPrivate)
+    {
+      this.xmlPublic = xmlPublic;
+      this.xmlPrivate = xmlPrivate;
+    }
+    public string xmlPublic { get; private set; }
+    public string xmlPrivate { get; private set; }
   }
 }

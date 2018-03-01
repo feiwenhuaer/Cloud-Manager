@@ -1,8 +1,8 @@
-﻿using Cloud.Dropbox.Oauth;
+﻿using TqkLibs.CloudStorage.GoogleDrive.Oauth;
 
 namespace WpfUI.UI.Oauth
 {
-    public class OauthDB: UiOauth, UIinterfaceDB
+    public class OauthDB: UiOauth, UIinterfaceGD
     {
         public OauthDB()
         {

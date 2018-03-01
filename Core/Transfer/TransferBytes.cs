@@ -1,15 +1,14 @@
-﻿using Cloud.Dropbox;
-using Cloud.GoogleDrive;
-using Cloud.MegaNz;
-using Core.CloudSubClass;
+﻿using Core.CloudSubClass;
 using Core.StaticClass;
-using Newtonsoft.Json;
 using CloudManagerGeneralLib;
 using CloudManagerGeneralLib.Class;
 using System;
 using System.IO;
 using System.Linq;
 using static Core.CloudSubClass.MegaNz;
+using TqkLibs.CloudStorage.Dropbox;
+using TqkLibs.CloudStorage.MegaNz;
+using TqkLibs.CloudStorage.GoogleDrive;
 
 namespace Core.Transfer
 {
@@ -151,8 +150,8 @@ namespace Core.Transfer
           break;
 
         case CloudType.GoogleDrive:
-          if (!CreateNew) ((DriveAPIHttprequestv2)clientTo).Files.Insert_Resumable_Response();//get data return from server
-          item.To.stream = ((DriveAPIHttprequestv2)clientTo).Files.Insert_Resumable(item.UploadID, item.SizeWasTransfer, pos_end, item.From.node.Info.Size);
+          if (!CreateNew) ((DriveAPIv2)clientTo).Files.Insert_Resumable_Response();//get data return from server
+          item.To.stream = ((DriveAPIv2)clientTo).Files.Insert_Resumable(item.UploadID, item.SizeWasTransfer, pos_end, item.From.node.Info.Size);
           break;
         case CloudType.Mega:
           if (!CreateNew)

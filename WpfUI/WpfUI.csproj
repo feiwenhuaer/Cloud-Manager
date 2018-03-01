@@ -113,6 +113,7 @@
     <Compile Include="UI\UILogin.xaml.cs">
       <DependentUpon>UILogin.xaml</DependentUpon>
     </Compile>
+    <None Include="App.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -120,13 +121,13 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Libs\TqkLibs\CloudStorage\CloudStorage.csproj">
+      <Project>{5B10E1F6-8252-4EBE-94AA-06E59C748C80}</Project>
+      <Name>CloudStorage</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Aga.Controls\Aga.Controls.csproj">
       <Project>{d17cd489-1b14-47eb-8c22-c189d078aec9}</Project>
       <Name>Aga.Controls</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Cloud\Cloud.csproj">
-      <Project>{0B8A1A7D-0267-48A9-BAD6-DCDE5104D660}</Project>
-      <Name>Cloud</Name>
     </ProjectReference>
     <ProjectReference Include="..\SupDataDll\CloudManagerGeneralLib.csproj">
       <Project>{700eed73-135e-422d-a06e-738d3ad057a1}</Project>
@@ -190,6 +191,9 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

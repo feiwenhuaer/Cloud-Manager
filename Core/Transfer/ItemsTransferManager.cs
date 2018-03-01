@@ -1,15 +1,14 @@
-﻿using Cloud.Dropbox;
-using Cloud.GoogleDrive;
-using Cloud.MegaNz;
-using Core.CloudSubClass;
+﻿using Core.CloudSubClass;
 using Core.StaticClass;
-using Newtonsoft.Json;
 using CloudManagerGeneralLib;
 using CloudManagerGeneralLib.Class;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using TqkLibs.CloudStorage.GoogleDrive;
+using TqkLibs.CloudStorage.MegaNz;
+using TqkLibs.CloudStorage.Dropbox;
 
 namespace Core.Transfer
 {
@@ -299,7 +298,7 @@ namespace Core.Transfer
       switch (item.From.node.GetRoot.RootType.Type)
       {
         case CloudType.GoogleDrive:
-          Drive2_File f = GoogleDrive.MoveItem(item.From.node,item.To.node,null,true);
+          Drivev2_File f = GoogleDrive.MoveItem(item.From.node,item.To.node,null,true);
 
           foreach (var p in f.parents) if (p.id == item.To.node.Parent.Info.ID) item.status = StatusTransfer.Done;
                                       else item.status = StatusTransfer.Error;
@@ -355,7 +354,7 @@ namespace Core.Transfer
 
         case CloudType.GoogleDrive:
           #region GoogleDrive
-          DriveAPIHttprequestv2 gdclient = GoogleDrive.GetAPIv2(rootnodeto.GetRoot.RootType.Email);
+          DriveAPIv2 gdclient = GoogleDrive.GetAPIv2(rootnodeto.GetRoot.RootType.Email);
           GoogleDrive.CreateFolder(item.To.node.Parent);
           int chunksizeGD = 5;//default
           int.TryParse(AppSetting.settings.GetSettingsAsString(SettingsKey.GD_ChunksSize), out chunksizeGD);
@@ -367,8 +366,8 @@ namespace Core.Transfer
             string parentid = item.To.node.Parent.Info.ID;
             string mimeType = Get_mimeType.Get_mimeType_From_FileExtension(item.To.node.GetExtension());
 
-            Drive2_File f_metadata = new Drive2_File() {  title = item.From.node.Info.Name, mimeType = mimeType};
-            f_metadata.parents = new List<Drive2_Parent>() { new Drive2_Parent() { id = parentid } };
+            Drivev2_File f_metadata = new Drivev2_File() {  title = item.From.node.Info.Name, mimeType = mimeType};
+            f_metadata.parents = new List<Drivev2_Parent>() { new Drivev2_Parent() { id = parentid } };
 
             item.UploadID = gdclient.Files.Insert_Resumable_GetUploadID(f_metadata, mimeType, item.From.node.Info.Size);
           }

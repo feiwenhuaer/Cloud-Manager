@@ -1,6 +1,4 @@
-﻿using Cloud.Dropbox;
-using Newtonsoft.Json;
-using CloudManagerGeneralLib;
+﻿using CloudManagerGeneralLib;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,6 +6,7 @@ using System.Web;
 using System.Threading;
 using CloudManagerGeneralLib.Class;
 using Core.StaticClass;
+using TqkLibs.CloudStorage.Dropbox;
 
 namespace Core.CloudSubClass
 {
@@ -128,7 +127,7 @@ namespace Core.CloudSubClass
         
 
     }
-    internal class Dropbox_Request_ListFolder : Cloud.Dropbox.IDropbox_Request_ListFolder
+    internal class Dropbox_Request_ListFolder : TqkLibs.CloudStorage.Dropbox.IDropbox_Request_ListFolder
     {
         public Dropbox_Request_ListFolder(string path,bool include_media_info =false, bool include_deleted = false, bool include_has_explicit_shared_members = false, bool recursive = false)
         {
@@ -147,7 +146,7 @@ namespace Core.CloudSubClass
 
     }
 
-    internal class Dropbox_Request_Metadata : Cloud.Dropbox.IDropbox_Request_Metadata
+    internal class Dropbox_Request_Metadata : TqkLibs.CloudStorage.Dropbox.IDropbox_Request_Metadata
     {
         public Dropbox_Request_Metadata(string path, bool include_deleted = false, bool include_media_info = false, bool include_has_explicit_shared_members = false)
         {
@@ -173,7 +172,7 @@ namespace Core.CloudSubClass
         public string path { get; set; }
     }
 
-    internal class Dropbox_Request_MoveCopy : Cloud.Dropbox.IDropbox_Request_MoveCopy
+    internal class Dropbox_Request_MoveCopy : TqkLibs.CloudStorage.Dropbox.IDropbox_Request_MoveCopy
     {
         public Dropbox_Request_MoveCopy(string from_path, string to_path, bool autorename = false, bool allow_shared_folder = false)
         {

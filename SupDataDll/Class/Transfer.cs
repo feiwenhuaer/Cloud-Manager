@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
-using Cloud.MegaNz;
+using TqkLibs.CloudStorage.MegaNz;
 
 namespace CloudManagerGeneralLib.Class
 {

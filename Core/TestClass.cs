@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Core.CloudSubClass;
-using Cloud.MegaNz;
 using System.IO;
 using System.Threading;
-using Cloud.GoogleDrive;
 using Core.StaticClass;
 using Newtonsoft.Json;
-using Cloud;
+using TqkLibs.CloudStorage.GoogleDrive;
+using TqkLibs.CloudStorage;
+using TqkLibs.CloudStorage.MegaNz;
 
 namespace Core
 {
@@ -31,7 +31,8 @@ namespace Core
       //Drivev3();
       //TestDrive2Copy();
       //Drive2Checkquotas();
-      Drive2Test();
+      //Drive2Test();
+      CryptTest();
     }
 
     #region Mega
@@ -56,7 +57,7 @@ namespace Core
     static void Drivev3()
     {
       Token = GoogleDrive.GetToken(email_gd);
-      DriveAPIHttprequestv3 v3 = new DriveAPIHttprequestv3(Token);
+      DriveAPIv3 v3 = new DriveAPIv3(Token);
       string data = v3.About_Get();
       Console.WriteLine(data);
     }
@@ -68,7 +69,7 @@ namespace Core
       Token = token;
       AppSetting.settings.ChangeToken(AppSetting.settings.GetCloud(token.Email, CloudType.GoogleDrive), JsonConvert.SerializeObject(token));
     }
-    static DriveAPIHttprequestv2 GetAPIv2(string email)
+    static DriveAPIv2 GetAPIv2(string email)
     {
       return GoogleDrive.GetAPIv2(email);
     }
@@ -83,13 +84,13 @@ namespace Core
     static void TestDrive2Copy()
     {
       //file 0Bx154iMNwuyWUUJEUTNRMnAwc0k           folder 0B2T-102UejylQmwxSnFGN3RsLWM      
-      DriveAPIHttprequestv2 v2 =GetAPIv2(email_gd);
-      Drive2_File f = v2.Files.Copy("0Bx154iMNwuyWUUJEUTNRMnAwc0k", "0B2T-102UejylQmwxSnFGN3RsLWM");
+      DriveAPIv2 v2 =GetAPIv2(email_gd);
+      Drivev2_File f = v2.Files.Copy("0Bx154iMNwuyWUUJEUTNRMnAwc0k", "0B2T-102UejylQmwxSnFGN3RsLWM");
       return;
     }
     static void Drive2Checkquotas()
     {
-      DriveAPIHttprequestv2 v2 = GetAPIv2(email_gd);
+      DriveAPIv2 v2 = GetAPIv2(email_gd);
       //var about = v2.About.Get();
       //string about_string = JsonConvert.SerializeObject(about, JsonSetting._settings_serialize);
       var file = v2.Files.Patch("0B2T-102UejylMXZpbUwtUU13c2c");
@@ -100,7 +101,7 @@ namespace Core
     {
       //DriveAPIHttprequestv2 v2 = GetAPIv2(email_gd);
       //var list = v2.Files.List(GoogleDrive.en, "'0B2T-102UejylMXZpbUwtUU13c2c' in parents and trashed=false");
-      var list = ReadFile<Drive2_Files_list>("F:\\IDrive2_Files array.json");
+      var list = ReadFile<Drivev2_Files_list>("F:\\IDrive2_Files array.json");
       string list_string = JsonConvert.SerializeObject(list.items, JsonSetting._settings_serialize);      
     }
     #endregion
@@ -112,6 +113,15 @@ namespace Core
       fo.Read(buffer, 0, buffer.Length);
       fo.Close();
       return JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(buffer), JsonSetting._settings_deserialize);
+    }
+
+    public static void CryptTest()
+    {
+      var key = TqkLibs.CloudStorage.MegaNz.Crypto.GenerateRsaKey();
+      Console.WriteLine();
+      Console.WriteLine(key.xmlPublic + " | " + key.xmlPrivate);
+      byte[] encrypt = Crypto.RSAEncrypt(Encoding.UTF8.GetBytes("tqk2811"), key.xmlPublic);
+      Console.WriteLine(Encoding.UTF8.GetString(Crypto.RSADecrypt(encrypt, key.xmlPrivate)));
     }
   }
 #endif

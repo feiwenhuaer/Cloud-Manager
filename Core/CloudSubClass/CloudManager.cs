@@ -4,16 +4,13 @@ using Newtonsoft.Json;
 using System;
 using Core.StaticClass;
 using System.Threading;
-using Cloud;
-using Cloud.Dropbox.Oauth;
-using Cloud.GoogleDrive;
-using Cloud.GoogleDrive.Oauth;
-using Cloud.Dropbox;
-using Cloud.MegaNz.Oauth;
-using Cloud.MegaNz;
-using System.Text.RegularExpressions;
 using CloudManagerGeneralLib.Class;
-using System.Collections.Generic;
+using TqkLibs.CloudStorage.GoogleDrive;
+using TqkLibs.CloudStorage.GoogleDrive.Oauth;
+using TqkLibs.CloudStorage;
+using TqkLibs.CloudStorage.MegaNz;
+using TqkLibs.CloudStorage.Dropbox.Oauth;
+using TqkLibs.CloudStorage.Dropbox;
 
 namespace Core.CloudSubClass
 {
@@ -102,7 +99,7 @@ namespace Core.CloudSubClass
         case CloudType.Dropbox:
           DropboxOauthv2 oauth_dropbox = new DropboxOauthv2();
           oauth_dropbox.TokenCallBack += Oauth_dropbox_TokenCallBack;
-          type_oauthUI = LoadDllUI.GetTypeInterface(typeof(UIinterfaceDB));
+          type_oauthUI = LoadDllUI.GetTypeInterface(typeof(UIinterfaceGD));
           AppSetting.UIOauth = (IOauth)Activator.CreateInstance(type_oauthUI);
           oauth_dropbox.GetCode(AppSetting.UIOauth, AppSetting.UIMain);
           break;
@@ -152,8 +149,8 @@ namespace Core.CloudSubClass
         TokenGoogleDrive token = JsonConvert.DeserializeObject<TokenGoogleDrive>(token_);
         if (token.IsError) throw new Exception("Accesstoken:" + token.access_token + ",RefreshToken:" + token.refresh_token);
         string token_text = JsonConvert.SerializeObject(token);
-        DriveAPIHttprequestv2 client = new DriveAPIHttprequestv2(token);
-        Drive2_About about = client.About.Get();
+        DriveAPIv2 client = new DriveAPIv2(token);
+        Drivev2_About about = client.About.Get();
         SaveToken(about.user.emailAddress, token_text, CloudType.GoogleDrive);
       }
       else throw new Exception("Oauth token GD failed.");
@@ -178,7 +175,7 @@ namespace Core.CloudSubClass
         {
           case CloudType.Dropbox: flag = Dropbox.Move(node, newparent, newname); break;
           case CloudType.GoogleDrive:
-            Drive2_File item = GoogleDrive.MoveItem(node, newparent, newname);
+            Drivev2_File item = GoogleDrive.MoveItem(node, newparent, newname);
             if (item.title == newname) flag = true;
             item.parents.ForEach(s => { if (!flag && newparent != null && s.id == newparent.Info.ID) flag = true; });
             break;
@@ -216,7 +213,7 @@ namespace Core.CloudSubClass
         case CloudType.Dropbox:
           return Dropbox.GetMetaData(node);
         case CloudType.GoogleDrive:
-          Drive2_File item = GoogleDrive.GetMetadataItem(node);
+          Drivev2_File item = GoogleDrive.GetMetadataItem(node);
           node.Info.Size = item.fileSize ?? -1;
           node.Info.Name = item.title;
           node.Info.DateMod = item.modifiedDate ?? DateTime.Now;

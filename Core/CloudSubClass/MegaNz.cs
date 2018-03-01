@@ -1,13 +1,13 @@
-﻿using Cloud.MegaNz;
-using CloudManagerGeneralLib;
+﻿using CloudManagerGeneralLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using System.IO;
-using CustomHttpRequest;
 using CloudManagerGeneralLib.Class;
 using Core.StaticClass;
+using TqkLibs.CloudStorage.MegaNz;
+using TqkLibs.HttpRequest;
 
 namespace Core.CloudSubClass
 {

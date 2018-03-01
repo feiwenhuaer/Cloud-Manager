@@ -1,17 +1,14 @@
-﻿using Cloud.GoogleDrive;
-using Core.StaticClass;
+﻿using Core.StaticClass;
 using Newtonsoft.Json;
 using CloudManagerGeneralLib;
 using CloudManagerGeneralLib.Class;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml;
-using static Cloud.GoogleDrive.DriveAPIHttprequestv2;
-using Cloud;
+using TqkLibs.CloudStorage.GoogleDrive;
 
 namespace Core.CloudSubClass
 {
@@ -47,9 +44,9 @@ namespace Core.CloudSubClass
       for (int i = 0; i < Tokens.Count; i++) if (Tokens[i].Email == Email) { Tokens.RemoveAt(i); return; }      
     }
 
-    internal static DriveAPIHttprequestv2 GetAPIv2(string Email, GD_LimitExceededDelegate LimitExceeded = null)
+    internal static DriveAPIv2 GetAPIv2(string Email, GD_LimitExceededDelegate LimitExceeded = null)
     {
-      DriveAPIHttprequestv2 gdclient = new DriveAPIHttprequestv2(GetToken(Email));
+      DriveAPIv2 gdclient = new DriveAPIv2(GetToken(Email));
       if (LimitExceeded != null) gdclient.LimitExceeded += LimitExceeded;
       return gdclient;
     }
@@ -92,12 +89,12 @@ namespace Core.CloudSubClass
       #region Get Child Node Data
       if (!string.IsNullOrEmpty(parent_ID))//if found id is folder
       {
-        List<Drive2_File> list_ = Search("'" + parent_ID + "' in parents and trashed=false", Email);
+        List<Drivev2_File> list_ = Search("'" + parent_ID + "' in parents and trashed=false", Email);
         if (parent_ID == "root")//save root id
         {
-          foreach (Drive2_File item in list_)
+          foreach (Drivev2_File item in list_)
           {
-            foreach (Drive2_Parent parent in item.parents)
+            foreach (Drivev2_Parent parent in item.parents)
             {
               if (parent.isRoot ?? false) { parent_ID = parent.id; break; }
             }
@@ -118,7 +115,7 @@ namespace Core.CloudSubClass
           RootNode n = new RootNode();
           n.Info.ID = match.Value;
           n.RootType.Email = Email;
-          Drive2_File item = GoogleDrive.GetMetadataItem(n);
+          Drivev2_File item = GoogleDrive.GetMetadataItem(n);
           n.Info.Size = item.fileSize ?? -1;
           n.Info.Name = item.title;
           n.Info.MimeType = item.mimeType;
@@ -133,14 +130,14 @@ namespace Core.CloudSubClass
 
     public static Stream GetFileStream(IItemNode node, long Startpos = -1, long endpos = -1)
     {
-      DriveAPIHttprequestv2 gdclient = GetAPIv2(node.GetRoot.RootType.Email);
+      DriveAPIv2 gdclient = GetAPIv2(node.GetRoot.RootType.Email);
       return gdclient.Files.Get(node.Info.ID, Startpos, endpos);
     }
 
-    public static List<Drive2_File> Search(string query, string Email, string pageToken = null)
+    public static List<Drivev2_File> Search(string query, string Email, string pageToken = null)
     {
-      DriveAPIHttprequestv2 gdclient = GetAPIv2(Email);
-      Drive2_Files_list list = gdclient.Files.List(en, query, pageToken);
+      DriveAPIv2 gdclient = GetAPIv2(Email);
+      Drivev2_Files_list list = gdclient.Files.List(en, query, pageToken);
       if (!string.IsNullOrEmpty(list.nextPageToken)) list.items.AddRange(Search(query, Email, list.nextPageToken));
       return list.items;
     }
@@ -149,7 +146,7 @@ namespace Core.CloudSubClass
     public static void CreateFolder(IItemNode node)
     {
       string Email = node.GetRoot.RootType.Email;
-      DriveAPIHttprequestv2 gdclient = GetAPIv2(Email);
+      DriveAPIv2 gdclient = GetAPIv2(Email);
       string parent_id = "";
       try
       {
@@ -176,10 +173,10 @@ namespace Core.CloudSubClass
 
           if (create)
           {
-            Drive2_File metadata = new Drive2_File() { title = listnode[i].Info.Name };
-            metadata.parents = new List<Drive2_Parent>() { new Drive2_Parent() { id = parent_id } };
+            Drivev2_File metadata = new Drivev2_File() { title = listnode[i].Info.Name };
+            metadata.parents = new List<Drivev2_Parent>() { new Drivev2_Parent() { id = parent_id } };
 
-            Drive2_File folder = gdclient.Extend.CreateFolder(metadata);
+            Drivev2_File folder = gdclient.Extend.CreateFolder(metadata);
             parent_id = listnode[i].Info.ID = folder.id;
           }
         }
@@ -189,8 +186,8 @@ namespace Core.CloudSubClass
 
     public static bool ReNameItem(IItemNode node, string newname)
     {
-      DriveAPIHttprequestv2 gdclient = GetAPIv2(node.GetRoot.RootType.Email);
-      Drive2_File response = gdclient.Files.Patch(node.Info.ID, new Drive2_File() { title = newname});
+      DriveAPIv2 gdclient = GetAPIv2(node.GetRoot.RootType.Email);
+      Drivev2_File response = gdclient.Files.Patch(node.Info.ID, new Drivev2_File() { title = newname});
       if (response.title == newname) return true;
       else return false;
     }
@@ -203,27 +200,27 @@ namespace Core.CloudSubClass
     /// <param name="newname">rename (cut)</param>
     /// <param name="copy"></param>
     /// <returns></returns>
-    public static Drive2_File MoveItem(IItemNode nodemove, IItemNode newparent, string newname = null, bool copy = false)
+    public static Drivev2_File MoveItem(IItemNode nodemove, IItemNode newparent, string newname = null, bool copy = false)
     {
       if (newparent != null && nodemove.GetRoot.RootType.Type != newparent.GetRoot.RootType.Type) throw new Exception("TypeCloud not match.");
-      DriveAPIHttprequestv2 gdclient;
+      DriveAPIv2 gdclient;
       if (!copy)
       {
         //Same account
         gdclient = GetAPIv2(nodemove.GetRoot.RootType.Email);
         if (newparent != null && nodemove.GetRoot.RootType.Email != newparent.GetRoot.RootType.Email) throw new Exception("Email not match.");
-        Drive2_File item = null;
+        Drivev2_File item = null;
         if (newparent == null & newname != null)//rename
         {
-          item = new Drive2_File();
+          item = new Drivev2_File();
           item.title = newname;
         }
         else//move
         {
-          Drive2_Parents_list parents = gdclient.Parent.List(nodemove.Info.ID);
-          Drive2_Parent found = parents.items.Find(p => p.id == nodemove.Parent.Info.ID);
+          Drivev2_Parents_list parents = gdclient.Parent.List(nodemove.Info.ID);
+          Drivev2_Parent found = parents.items.Find(p => p.id == nodemove.Parent.Info.ID);
           if (found != null) parents.items.Remove(found);
-          parents.items.Add(new Drive2_Parent() { id = newparent.Info.ID });
+          parents.items.Add(new Drivev2_Parent() { id = newparent.Info.ID });
           gdclient.Parent.Insert(nodemove.Info.ID, parents.items);
         }
         return gdclient.Files.Patch(nodemove.Info.ID, item);
@@ -239,15 +236,15 @@ namespace Core.CloudSubClass
       }
     }
 
-    public static Drive2_File GetMetadataItem(IItemNode node)
+    public static Drivev2_File GetMetadataItem(IItemNode node)
     {
-      DriveAPIHttprequestv2 client = GetAPIv2(node.GetRoot.RootType.Email);
+      DriveAPIv2 client = GetAPIv2(node.GetRoot.RootType.Email);
       return client.Files.Patch(node.Info.ID, null);
     }
     //trash/delete
     public static bool File_trash(IItemNode node, bool Permanently)
     {
-      DriveAPIHttprequestv2 gdclient = GetAPIv2(node.GetRoot.RootType.Email);
+      DriveAPIv2 gdclient = GetAPIv2(node.GetRoot.RootType.Email);
       if (node == node.GetRoot) throw new Exception("Can't delete root.");
       if (Permanently)
       {
@@ -261,10 +258,10 @@ namespace Core.CloudSubClass
       }
     }
 
-    public static List<IItemNode> Convert(this List<Drive2_File> items, IItemNode parent)
+    public static List<IItemNode> Convert(this List<Drivev2_File> items, IItemNode parent)
     {
       List<IItemNode> list = new List<IItemNode>();
-      foreach (Drive2_File item in items)
+      foreach (Drivev2_File item in items)
       {
         bool add = true;
         GoogleAppsmimeTypeGoogleRemove.ForEach(m => { if (item.mimeType == m) add = false; });

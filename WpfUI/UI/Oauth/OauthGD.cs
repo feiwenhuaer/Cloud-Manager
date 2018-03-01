@@ -1,4 +1,4 @@
-﻿using Cloud.GoogleDrive.Oauth;
+﻿using TqkLibs.CloudStorage.GoogleDrive.Oauth;
 
 namespace WpfUI.UI.Oauth
 {
