@@ -54,7 +54,7 @@
     <Compile Include="Class\IconListManager\IconListManager.cs" />
     <Compile Include="Class\ManagerThread.cs" />
     <Compile Include="Class\RequestToCore.cs" />
-    <Compile Include="Class\Transfer.cs" />
+    <Compile Include="Class\TransferItem.cs" />
     <Compile Include="Class\UI_n_lang.cs" />
     <Compile Include="Class\UnitConventer.cs" />
     <Compile Include="Md5.cs" />
@@ -79,10 +79,6 @@
     <ProjectReference Include="..\..\..\Libs\TqkLibs\CloudStorage\CloudStorage.csproj">
       <Project>{5B10E1F6-8252-4EBE-94AA-06E59C748C80}</Project>
       <Name>CloudStorage</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Aga.Controls\Aga.Controls.csproj">
-      <Project>{d17cd489-1b14-47eb-8c22-c189d078aec9}</Project>
-      <Name>Aga.Controls</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

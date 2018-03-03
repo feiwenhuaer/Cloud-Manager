@@ -1,30 +1,20 @@
 ﻿<UserControl
-             x:Class="WpfUI.UI.Main.Lv_ud.UC_TLV"
+             x:Class="WpfUI.UI.Main.UC_LV"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:WpfUI.UI.Main.Lv_ud"
+             xmlns:local="clr-namespace:WpfUI.UI.Main"
              xmlns:a="clr-namespace:WpfUI.Class"
-             xmlns:Tree="clr-namespace:Aga.Controls.Tree;assembly=Aga.Controls" 
              mc:Ignorable="d" Height="186.132" Width="1191.1">
     <UserControl.Resources>
     </UserControl.Resources>
 
-    <Tree:TreeList x:Name="treeList" MouseDown="treeList_MouseDown" ContextMenuOpening="treeList_ContextMenuOpening" 
+    <ListView x:Name="lv" MouseDown="lv_MouseDown" ContextMenuOpening="lv_ContextMenuOpening" 
                    VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling">
-        <Tree:TreeList.View>
+        <ListView.View>
             <GridView>
-                <GridViewColumn Header="From" Width="250">
-                    <GridViewColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <Tree:RowExpander/>
-                                <TextBlock Text="{Binding DataSource.From}"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </GridViewColumn.CellTemplate>
-                </GridViewColumn>
+                <GridViewColumn Header="From" Width="250" DisplayMemberBinding="{Binding DataSource.From}"/>
                 <GridViewColumn Header="To" Width="250" DisplayMemberBinding="{Binding DataSource.To}"/>
                 <GridViewColumn Header="Status" Width="60" DisplayMemberBinding="{Binding DataSource.Status}"/>
                 <GridViewColumn Header="Progress" Width="150" DisplayMemberBinding="{Binding DataSource.Progress}"/>
@@ -32,8 +22,8 @@
                 <GridViewColumn Header="Estimated" Width="100" DisplayMemberBinding="{Binding DataSource.Estimated}"/>
                 <GridViewColumn Header="Error" Width="250" DisplayMemberBinding="{Binding DataSource.Error}"/>
             </GridView>
-        </Tree:TreeList.View>
-        <Tree:TreeList.ContextMenu>
+        </ListView.View>
+        <ListView.ContextMenu>
             <ContextMenu>
                 <ContextMenu.Resources>
                     <ControlTemplate x:Key="MenuSeparatorTemplate">
@@ -54,6 +44,6 @@
                     </Style>
                 </ContextMenu.ItemContainerStyle>
             </ContextMenu>
-        </Tree:TreeList.ContextMenu>
-    </Tree:TreeList>
+        </ListView.ContextMenu>
+    </ListView>
 </UserControl>

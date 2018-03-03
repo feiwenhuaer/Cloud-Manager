@@ -55,7 +55,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class\ContextMenuDataModel.cs" />
-    <Compile Include="Class\TransferDataTLVWPF.cs" />
     <Compile Include="Class\TreeviewDataItem.cs" />
     <Compile Include="Class\TreeViewDataModel.cs" />
     <Compile Include="Class\TreeViewLineConverter.cs" />
@@ -98,11 +97,8 @@
     <Compile Include="UI\Main\Lv_item\UC_Lv_item.xaml.cs">
       <DependentUpon>UC_Lv_item.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Main\Lv_ud\UC_TLV_ud.xaml.cs">
-      <DependentUpon>UC_TLV_ud.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Main\Lv_ud\UC_TLV.xaml.cs">
-      <DependentUpon>UC_TLV.xaml</DependentUpon>
+    <Compile Include="UI\Main\UC_LV.xaml.cs">
+      <DependentUpon>UC_LV.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Main\UIMain.xaml.cs">
       <DependentUpon>UIMain.xaml</DependentUpon>
@@ -124,10 +120,6 @@
     <ProjectReference Include="..\..\..\Libs\TqkLibs\CloudStorage\CloudStorage.csproj">
       <Project>{5B10E1F6-8252-4EBE-94AA-06E59C748C80}</Project>
       <Name>CloudStorage</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Aga.Controls\Aga.Controls.csproj">
-      <Project>{d17cd489-1b14-47eb-8c22-c189d078aec9}</Project>
-      <Name>Aga.Controls</Name>
     </ProjectReference>
     <ProjectReference Include="..\SupDataDll\CloudManagerGeneralLib.csproj">
       <Project>{700eed73-135e-422d-a06e-738d3ad057a1}</Project>
@@ -171,11 +163,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\Main\Lv_ud\UC_TLV_ud.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\Main\Lv_ud\UC_TLV.xaml">
+    <Page Include="UI\Main\UC_LV.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

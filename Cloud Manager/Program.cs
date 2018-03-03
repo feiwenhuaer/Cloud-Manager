@@ -42,7 +42,7 @@ namespace Cloud_Manager
         ReadWriteData.CreateFolderSaveData();// create folder %appdata%\\CloudManager
         Get_mimeType.Load();//mimeType (google drive upload)
         AppSetting.ManageCloud = new CloudManager();//explorer
-        AppSetting.TransferManager = new GroupsTransferManager();//transfer file
+        AppSetting.TransferManager = new ItemsTransferManager();//transfer file
         AppSetting.login = new Core.Class.Login();//load login
 
         //load core
@@ -61,15 +61,16 @@ namespace Cloud_Manager
 #if DEBUG && TESTCLASS
           Core.TestClass.Test();
 #endif
-          AppSetting.TransferManager.Start();
+          AppSetting.TransferManager.Start(typeof(Program));
           AddEventHandleUI.Load_UIMain();
+          AppSetting.UIMain.ItemsTransfer = AppSetting.TransferManager.ItemsTransfer;
         showMainForm:
-          AppSetting.TransferManager.status = StatusUpDownApp.Start;
+          AppSetting.TransferManager.Status = StatusUpDownApp.Start;
           AppSetting.UIMain.ShowDialog_();
           if (AppSetting.UIMain.AreReloadUI)//if reload ui
           {
             AppSetting.CloseOauthUI();
-            AppSetting.TransferManager.status = StatusUpDownApp.Pause;
+            AppSetting.TransferManager.Status = StatusUpDownApp.Pause;
             //clean memory
             AppSetting.UIMain = null;
             //reload dll ui
@@ -84,7 +85,7 @@ namespace Cloud_Manager
           AppSetting.UIclose = (UIClosing)Activator.CreateInstance(LoadDllUI.GetTypeInterface(typeof(UIClosing)));
           AppSetting.TransferManager.Eventupdateclosingform += AppSetting.UIclose.updatedata;
           AppSetting.TransferManager.Eventcloseapp += AppSetting.UIclose.Close_;
-          AppSetting.TransferManager.status = StatusUpDownApp.StopForClosingApp;
+          AppSetting.TransferManager.Status = StatusUpDownApp.StopForClosingApp;
           AppSetting.UIclose.ShowDialog_();
         }
         mutex.ReleaseMutex();

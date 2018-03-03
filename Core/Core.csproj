@@ -65,10 +65,8 @@
     <Compile Include="StaticClass\AddEventHandleUI.cs" />
     <Compile Include="Class\Settings.cs" />
     <Compile Include="TestClass.cs" />
-    <Compile Include="Transfer\GroupsTransferManager.cs" />
     <Compile Include="Class\HostStreamingFileViaHttp.cs" />
     <Compile Include="Transfer\ItemsTransferManager.cs" />
-    <Compile Include="Transfer\JsonDataSaveGroup.cs" />
     <Compile Include="Transfer\TransferBytes.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -13,7 +13,7 @@ namespace Core.StaticClass
     //can't static class (because event)
     public static Settings settings;//setting
     public static Login login;//login
-    public static GroupsTransferManager TransferManager;//upload download
+    public static ItemsTransferManager TransferManager;//upload download
     public static CloudManager ManageCloud;
     public static Languages lang;
     //instance

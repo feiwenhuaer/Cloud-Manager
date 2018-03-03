@@ -12,9 +12,8 @@ using TqkLibs.CloudStorage.GoogleDrive;
 
 namespace Core.Transfer
 {
-  class TransferBytes
+  public class TransferBytes
   {
-    ItemsTransferManager GroupManager;
     public TransferItem item { get; private set; }
 
     //mega
@@ -26,16 +25,14 @@ namespace Core.Transfer
     CloudType Type_root_to;
     CloudType Type_root_from;
     object clientTo;
-    public TransferBytes(TransferItem item, ItemsTransferManager GroupManager, object clientTo = null)
+    public TransferBytes(TransferItem item, object clientTo = null)
     {
-      if (item.From.node.Info.Size == 0) { item.ErrorMsg = "File size zero."; Dispose(); }
+      if (item.From.node.Info.Size == 0) { item.DataSource.Error = "File size zero."; Dispose(); }
       this.item = item;
-      this.GroupManager = GroupManager;
       Type_root_to = this.item.To.node.GetRoot.RootType.Type;
       Type_root_from = this.item.From.node.GetRoot.RootType.Type;
 
-      if (GroupManager.AreCut && (Type_root_to | CloudType.LocalDisk) == Type_root_from &&
-          item.To.node.GetRoot.Info.Name == item.From.node.GetRoot.Info.Name)
+      if (item.AreCut && (Type_root_to | CloudType.LocalDisk) == Type_root_from && item.To.node.GetRoot.Info.Name == item.From.node.GetRoot.Info.Name)
       {
         LocalDisk.AutoCreateFolder(this.item.To.node.Parent);
         File.Move(item.From.node.GetFullPathString(), item.To.node.GetFullPathString());
@@ -72,11 +69,11 @@ namespace Core.Transfer
         #endregion
 
         #region transfer done/force stop.
-        if (item.SizeWasTransfer == item.From.node.Info.Size || item.status != StatusTransfer.Running || GroupManager.GroupData.status != StatusTransfer.Running)//transfer done/force stop.
+        if (item.SizeWasTransfer == item.From.node.Info.Size || item.status != StatusTransfer.Running)//transfer done/force stop.
         {
           if (item.ChunkUploadSize < 0 || item.SizeWasTransfer == item.From.node.Info.Size)//save last pos if download or done (up/down)
           {
-            if (Type_root_from == CloudType.Mega) this.item.dataCryptoMega = (item.From.stream as MegaAesCtrStreamCrypter).PosSave;//save pos
+            if (Type_root_from == CloudType.Mega) this.item.dataCryptoMega = (item.From.stream as MegaAesCtrStreamCrypter).PosSave;//save pos Mega
             if (Type_root_to == CloudType.Mega) CommitUploadMega();//upload done to mega
             else if (Type_root_to == CloudType.Dropbox) ((DropboxRequestAPIv2)clientTo).GetResponse_upload_session_append();//get data return from server
             item.SaveSizeTransferSuccess = item.SizeWasTransfer;
@@ -84,18 +81,11 @@ namespace Core.Transfer
 
           try { item.From.stream.Close(); } catch { }//close stream if can
           try { item.To.stream.Close(); } catch { }//close stream if can
-
-          switch (GroupManager.GroupData.status)
+          
+          if (item.status == StatusTransfer.Running)
           {
-            case StatusTransfer.Waiting: item.status = StatusTransfer.Waiting; break;
-            case StatusTransfer.Running: break;
-            default: item.status = StatusTransfer.Stop; break;
-          }
-          if (item.status == StatusTransfer.Remove) GroupManager.GroupData.items.Remove(item);
-          else if (item.status == StatusTransfer.Running && GroupManager.GroupData.status == StatusTransfer.Running)
-          {
-            item.status = StatusTransfer.Done;
-            if (Type_root_to == CloudType.Dropbox) if (!SaveUploadDropbox()) item.status = StatusTransfer.Error;
+            if (Type_root_to == CloudType.Dropbox) { if (!SaveUploadDropbox()) item.status = StatusTransfer.Error; }
+            else item.status = StatusTransfer.Done;
           }
           else item.status = StatusTransfer.Stop;
           Dispose();
@@ -127,8 +117,8 @@ namespace Core.Transfer
       }
       catch (Exception ex)
       {
-        if (AppSetting.TransferManager.status == StatusUpDownApp.StopForClosingApp || AppSetting.TransferManager.status == StatusUpDownApp.SavingData) return;
-        item.ErrorMsg = ex.Message;
+        if (AppSetting.TransferManager.Status == StatusUpDownApp.StopForClosingApp || AppSetting.TransferManager.Status == StatusUpDownApp.SavingData) return;
+        item.DataSource.Error = ex.Message;
         item.status = StatusTransfer.Error;
         Dispose();
       }
@@ -215,15 +205,14 @@ namespace Core.Transfer
       if (size == item.From.node.Info.Size) return true;
       else
       {
-        item.ErrorMsg = "File size was upload not match.";
+        item.DataSource.Error = "File size was upload not match.";
         return false;
       }
     }
 
     void Dispose()
     {
-      GroupManager.ItemsTransferWork.Remove(this);
-      GroupManager = null;
+      AppSetting.TransferManager.ItemsTransferWork.Remove(this);
       item = null;
       clientTo = null;
       chunksSizesToUploadMega = null;

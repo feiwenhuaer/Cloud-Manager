@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfUI.UI.Main"
         xmlns:c="clr-namespace:WpfUI.Class"
-        xmlns:Lv_ud="clr-namespace:WpfUI.UI.Main.Lv_ud" x:Class="WpfUI.UI.Main.UIMain"
+        x:Class="WpfUI.UI.Main.UIMain"
         mc:Ignorable="d"
         Title="UIMain" Height="590.778" Width="1181.411" Closing="Window_Closing" WindowStartupLocation="CenterScreen">
 
@@ -219,6 +219,6 @@
             <Image x:Name="image_next" Margin="40,0,0,0" HorizontalAlignment="Left" Width="30" MouseUp="image_next_MouseUp"/>
             <Image x:Name="image_search" Margin ="70,0,0,0" HorizontalAlignment="Left" Width="26" MouseUp="image_search_MouseUp"/>
         </Grid>
-        <Lv_ud:UC_TLV_ud Grid.Row="3" Grid.ColumnSpan="2" x:Name="TLV_UD"/>
+        <local:UC_LV Grid.Row="3" Grid.ColumnSpan="2" x:Name="LV_UD"/>
     </Grid>
 </Window>

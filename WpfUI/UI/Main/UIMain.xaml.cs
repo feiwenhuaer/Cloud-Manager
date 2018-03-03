@@ -11,7 +11,6 @@ using System.Threading;
 using System.Collections.ObjectModel;
 using WpfUI.Class;
 using WpfUI.UI.Main.Lv_item;
-using WpfUI.UI.Main.Lv_ud;
 using CloudManagerGeneralLib.Class;
 
 namespace WpfUI.UI.Main
@@ -37,16 +36,7 @@ namespace WpfUI.UI.Main
     {
       this.ShowDialog();
     }
-
-    public void UpdateGroup(TransferGroup Group, UpdateTransfer_TLVUD type)
-    {
-      switch (type)
-      {
-        case UpdateTransfer_TLVUD.Add: TLV_UD.AddNewGroup(Group); break;
-        case UpdateTransfer_TLVUD.Remove: TLV_UD.RemoveGroup(Group); break;
-        case UpdateTransfer_TLVUD.Refresh: TLV_UD.RefreshAll(); break;
-      }
-    }
+    public TransferListViewData ItemsTransfer { get { return LV_UD.Datas; } set { LV_UD.Datas = value; } }
 
     public void FileSaveDialog(string InitialDirectory, string FileName, string Filter, IItemNode node)
     {
@@ -83,7 +73,7 @@ namespace WpfUI.UI.Main
       TreeObservableCollection = new ObservableCollection<TreeViewDataModel>();
       this.DataContext = this;
       InitializeComponent();
-      TLV_UD.Width = TLV_UD.Height = double.NaN;
+      LV_UD.Width = LV_UD.Height = double.NaN;
       TV_LoadDisk();
       TV_LoadCloud();
       Newtab();
