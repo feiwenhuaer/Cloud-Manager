@@ -145,4 +145,7 @@
   <data name="MegaNzApiKey" xml:space="preserve">
     <value>K1t33QJC</value>
   </data>
+  <data name="DropboxDefaultPort" xml:space="preserve">
+    <value>22434</value>
+  </data>
 </root>

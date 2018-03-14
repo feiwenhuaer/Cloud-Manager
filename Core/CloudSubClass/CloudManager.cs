@@ -99,7 +99,7 @@ namespace Core.CloudSubClass
         case CloudType.Dropbox:
           DropboxOauthv2 oauth_dropbox = new DropboxOauthv2();
           oauth_dropbox.TokenCallBack += Oauth_dropbox_TokenCallBack;
-          type_oauthUI = LoadDllUI.GetTypeInterface(typeof(UIinterfaceGD));
+          type_oauthUI = LoadDllUI.GetTypeInterface(typeof(UIinterfaceDB));
           AppSetting.UIOauth = (IOauth)Activator.CreateInstance(type_oauthUI);
           oauth_dropbox.GetCode(AppSetting.UIOauth, AppSetting.UIMain);
           break;

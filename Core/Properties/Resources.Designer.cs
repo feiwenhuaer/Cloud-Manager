@@ -79,6 +79,15 @@ namespace Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 22434.
+        /// </summary>
+        internal static string DropboxDefaultPort {
+            get {
+                return ResourceManager.GetString("DropboxDefaultPort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
         ///&lt;Configuration&gt;
         ///  &lt;LANG&gt;

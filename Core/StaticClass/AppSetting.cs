@@ -30,6 +30,7 @@ namespace Core.StaticClass
     {
       DropboxAppKey.ApiKey = Properties.Resources.DropboxApiKey;
       DropboxAppKey.ApiSecret = Properties.Resources.DropboxApiSecret;
+      DropboxAppKey.DefaultPort = int.Parse(Properties.Resources.DropboxDefaultPort);
       GoogleDriveAppKey.ApiKey = Properties.Resources.GoogleDriveApiKey;
       GoogleDriveAppKey.Clientsecret = Properties.Resources.GoogleDriveClientsecret;
       GoogleDriveAppKey.ClientID = Properties.Resources.GoogleDriveClientID;
